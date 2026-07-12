@@ -61,18 +61,35 @@
                 >
               </li>
               <li class="nav-item">
+                <a class="nav-link " href="#classnotesintrotonodejs"
+                  >class notes of intro to nodejs</a
+                >
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="#nodejsfacts">Nodejs facts</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#jsonserver">Js on Server</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#globalObject">Global Object</a>
+                <a class="nav-link" href="#classnotesjsonserver">Class notes of Js on Server</a>
+              </li>
+            
+              <li class="nav-item">
+                <a class="nav-link" href="#globalobject"
+                  >Global This object</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#classnotesglobalobject">Class notes of globalobject</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#importsvsexports"
-                  >Imports VS exports</a
+                >Imports VS exports</a
                 >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#classnotesimportsexports">Class notes of Import vs Exports</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#howmoduleworksinnodejs"
@@ -521,6 +538,27 @@
               </div>
             </section>
             <hr />
+
+            <section id="classnotesintrotonodejs" class="py-5 bg-light">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-5">
+
+                <h2 class="fw-bold text-primary mb-3">
+                    Episode-01 introduction to nodejs
+                </h2>
+
+
+                <a href="../class notes/Episode-01 introduction to nodejs.pdf"
+                   target="_blank"
+                   class="btn btn-primary btn-lg px-4">
+                    Episode-01 introduction to nodejs
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- facts of nodejs -->
             <section id="nodejsfacts" class="container my-5">
@@ -1099,154 +1137,196 @@ CPU</pre
             </section>
             <hr />
 
-            <!-- Global object -->
-            <section
-              id="globalObject"
-              class="card shadow-lg border-0 rounded-4 mb-5"
-            >
-              <!-- Header -->
-              <div class="card-header bg-primary text-white py-3 rounded-top-4">
-                <h2 class="mb-0">
-                  🌍 Global Object in JavaScript (globalThis)
-                </h2>
+             <div class="text-center">
+                <img
+                  src="../../mohith_decodes/Images/nodeimage.png"
+                  alt="nodeimage"
+                  class="img-fluid"
+                />
               </div>
 
-              <div class="card-body">
-                <!-- Introduction -->
-                <div class="alert alert-primary">
-                  <strong>Definition:</strong><br />
-                  A <strong>Global Object</strong> is a built-in object that is
-                  available everywhere in your JavaScript application. It
-                  provides common functions and variables that can be accessed
-                  from any file without importing them.
+
+              <section id="classnotesjsonserver" class="py-5 bg-light">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-5">
+
+                <h2 class="fw-bold text-primary mb-3">
+                   Episode-02 JS on Server
+                </h2>
+
+
+                <a href="../class notes/Episode-02 JS on Server.pdf"
+                   target="_blank"
+                   class="btn btn-primary btn-lg px-4">
+                    Episode-02 JS on Server
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+  <!-- Global object -->
+
+            <section id="globalobject" class="card shadow-lg border-0 rounded-4 mb-5">
+
+    <!-- Header -->
+    <div class="card-header bg-primary text-white py-3 rounded-top-4">
+        <h2 class="mb-0">
+            🌍 Global Object in JavaScript (globalThis)
+        </h2>
+    </div>
+
+    <div class="card-body">
+
+        <!-- Introduction -->
+        <div class="alert alert-primary">
+            <strong>Definition:</strong><br>
+            A <strong>Global Object</strong> is a built-in object that is available everywhere in your JavaScript application.
+            It provides common functions and variables that can be accessed from any file without importing them.
+        </div>
+
+        <!-- Why globalThis -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">🤔 Why was <code>globalThis</code> introduced?</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    Earlier, different JavaScript environments used different global objects.
+                    This created confusion for developers because the same JavaScript code
+                    could not work everywhere.
+                </p>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Environment</th>
+                            <th>Global Object</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Browser</td>
+                            <td><code>window</code></td>
+                        </tr>
+
+                        <tr>
+                            <td>Browser (Web Workers)</td>
+                            <td><code>self</code></td>
+                        </tr>
+
+                        <tr>
+                            <td>Node.js</td>
+                            <td><code>global</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-warning">
+                    Because every JavaScript engine had a different global object,
+                    writing common JavaScript libraries became difficult.
                 </div>
 
-                <!-- Why globalThis -->
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">
-                      🤔 Why was <code>globalThis</code> introduced?
-                    </h4>
-                  </div>
+            </div>
+        </div>
 
-                  <div class="card-body">
-                    <p>
-                      Earlier, different JavaScript environments used different
-                      global objects. This created confusion for developers
-                      because the same JavaScript code could not work
-                      everywhere.
-                    </p>
+        <!-- Solution -->
+        <div class="card shadow-sm border-0 mb-4">
 
-                    <table class="table table-bordered table-striped">
-                      <thead class="table-dark">
-                        <tr>
-                          <th>Environment</th>
-                          <th>Global Object</th>
-                        </tr>
-                      </thead>
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">✅ Solution: globalThis</h4>
+            </div>
 
-                      <tbody>
-                        <tr>
-                          <td>Browser</td>
-                          <td><code>window</code></td>
-                        </tr>
+            <div class="card-body">
 
-                        <tr>
-                          <td>Browser (Web Workers)</td>
-                          <td><code>self</code></td>
-                        </tr>
+                <p>
+                    To solve this problem, the ECMAScript committee introduced
+                    <code>globalThis</code>.
+                </p>
 
-                        <tr>
-                          <td>Node.js</td>
-                          <td><code>global</code></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <p>
+                    <strong>globalThis</strong> is a single standard global object
+                    that works in every JavaScript environment.
+                </p>
 
-                    <div class="alert alert-warning">
-                      Because every JavaScript engine had a different global
-                      object, writing common JavaScript libraries became
-                      difficult.
-                    </div>
-                  </div>
+                <div class="alert alert-success">
+                    <strong>Interview Ready Definition:</strong><br>
+                    <code>globalThis</code> is the standard global object introduced by
+                    ECMAScript so the same JavaScript code works in browsers,
+                    Node.js and all JavaScript engines.
                 </div>
 
-                <!-- Solution -->
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">✅ Solution: globalThis</h4>
-                  </div>
+            </div>
 
-                  <div class="card-body">
-                    <p>
-                      To solve this problem, the ECMAScript committee introduced
-                      <code>globalThis</code>.
-                    </p>
+        </div>
 
-                    <p>
-                      <strong>globalThis</strong> is a single standard global
-                      object that works in every JavaScript environment.
-                    </p>
+        <!-- Comparison -->
+        <div class="card shadow-sm border-0 mb-4">
 
-                    <div class="alert alert-success">
-                      <strong>Interview Ready Definition:</strong><br />
-                      <code>globalThis</code> is the standard global object
-                      introduced by ECMAScript so the same JavaScript code works
-                      in browsers, Node.js and all JavaScript engines.
-                    </div>
-                  </div>
-                </div>
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">📊 Global Objects Comparison</h4>
+            </div>
 
-                <!-- Comparison -->
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-secondary text-white">
-                    <h4 class="mb-0">📊 Global Objects Comparison</h4>
-                  </div>
+            <div class="card-body">
 
-                  <div class="card-body">
-                    <table class="table table-bordered align-middle">
-                      <thead class="table-light">
+                <table class="table table-bordered align-middle">
+
+                    <thead class="table-light">
                         <tr>
-                          <th>Environment</th>
-                          <th>Global Object</th>
+                            <th>Environment</th>
+                            <th>Global Object</th>
                         </tr>
-                      </thead>
+                    </thead>
 
-                      <tbody>
+                    <tbody>
+
                         <tr>
-                          <td>Browser</td>
-                          <td>
-                            <code>window</code>, <code>this</code>,
-                            <code>self</code>
-                          </td>
+                            <td>Browser</td>
+                            <td>
+                                <code>window</code>,
+                                <code>this</code>,
+                                <code>self</code>
+                            </td>
                         </tr>
 
                         <tr>
-                          <td>Node.js</td>
-                          <td>
-                            <code>global</code>
-                          </td>
+                            <td>Node.js</td>
+                            <td>
+                                <code>global</code>
+                            </td>
                         </tr>
 
                         <tr class="table-success">
-                          <td>All JavaScript Engines</td>
-                          <td>
-                            <strong><code>globalThis</code></strong>
-                          </td>
+                            <td>All JavaScript Engines</td>
+                            <td>
+                                <strong><code>globalThis</code></strong>
+                            </td>
                         </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
 
-                <!-- Diagram -->
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0">📈 Visual Diagram</h4>
-                  </div>
+                    </tbody>
 
-                  <div class="card-body">
-                    <pre class="bg-dark text-light p-3 rounded">
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- Diagram -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">📈 Visual Diagram</h4>
+            </div>
+
+            <div class="card-body">
+
+<pre class="bg-dark text-light p-3 rounded">
              JavaScript
 
                   │
@@ -1265,19 +1345,22 @@ CPU</pre
 
              globalThis
       (Works Everywhere)
-</pre
-                    >
-                  </div>
-                </div>
+</pre>
 
-                <!-- Code -->
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">💻 Example</h4>
-                  </div>
+            </div>
 
-                  <div class="card-body">
-                    <pre class="bg-dark text-light p-3 rounded"><code>// Node.js
+        </div>
+
+        <!-- Code -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">💻 Example</h4>
+            </div>
+
+            <div class="card-body">
+
+<pre class="bg-dark text-light p-3 rounded"><code>// Node.js
 
 console.log(globalThis === global);
 
@@ -1285,95 +1368,122 @@ console.log(globalThis === global);
 true
 </code></pre>
 
-                    <pre class="bg-dark text-light p-3 rounded"><code>// Browser
+<pre class="bg-dark text-light p-3 rounded"><code>// Browser
 
 console.log(globalThis === window);
 
 // Output
 true
 </code></pre>
-                  </div>
+
+            </div>
+
+        </div>
+
+        <!-- Real Time -->
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-warning">
+                <h4 class="mb-0">🏢 Real-Time Example</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    Imagine you are building a JavaScript library that should work
+                    in both the browser and Node.js.
+                </p>
+
+                <p>
+                    Instead of checking whether
+                    <code>window</code> or
+                    <code>global</code> exists,
+                    simply use
+                    <code>globalThis</code>.
+                </p>
+
+                <div class="alert alert-info">
+                    This makes your code portable, cleaner, and compatible with all JavaScript environments.
                 </div>
 
-                <!-- Real Time -->
-                <div class="card shadow-sm border-0 mb-4">
-                  <div class="card-header bg-warning">
-                    <h4 class="mb-0">🏢 Real-Time Example</h4>
-                  </div>
+            </div>
 
-                  <div class="card-body">
-                    <p>
-                      Imagine you are building a JavaScript library that should
-                      work in both the browser and Node.js.
-                    </p>
+        </div>
 
-                    <p>
-                      Instead of checking whether
-                      <code>window</code> or <code>global</code> exists, simply
-                      use <code>globalThis</code>.
-                    </p>
+        <!-- Interview Tip -->
+        <div class="alert alert-danger">
 
-                    <div class="alert alert-info">
-                      This makes your code portable, cleaner, and compatible
-                      with all JavaScript environments.
-                    </div>
-                  </div>
-                </div>
+            <h5>🎯 Interview Tip</h5>
 
-                <!-- Interview Tip -->
-                <div class="alert alert-danger">
-                  <h5>🎯 Interview Tip</h5>
+            <ul class="mb-0">
+                <li>Browser global object → <code>window</code></li>
+                <li>Node.js global object → <code>global</code></li>
+                <li>Standard global object → <code>globalThis</code></li>
+                <li><code>globalThis</code> was introduced by ECMAScript to provide one common global object for all JavaScript engines.</li>
+            </ul>
 
-                  <ul class="mb-0">
-                    <li>Browser global object → <code>window</code></li>
-                    <li>Node.js global object → <code>global</code></li>
-                    <li>Standard global object → <code>globalThis</code></li>
-                    <li>
-                      <code>globalThis</code> was introduced by ECMAScript to
-                      provide one common global object for all JavaScript
-                      engines.
-                    </li>
-                  </ul>
-                </div>
+        </div>
 
-                <!-- Quick Revision -->
-                <div class="card border-success shadow-sm">
-                  <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">📝 Quick Revision</h4>
-                  </div>
+        <!-- Quick Revision -->
+        <div class="card border-success shadow-sm">
 
-                  <div class="card-body">
-                    <ul>
-                      <li>
-                        Earlier every environment had a different global object.
-                      </li>
-                      <li>Browser uses <code>window</code>.</li>
-                      <li>Node.js uses <code>global</code>.</li>
-                      <li><code>globalThis</code> works everywhere.</li>
-                      <li>
-                        Use <code>globalThis</code> in modern JavaScript
-                        projects.
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">📝 Quick Revision</h4>
+            </div>
 
-                <!-- Reference -->
-                <div class="alert alert-secondary mt-4">
-                  <h5>📚 Reference for Latest JavaScript Updates</h5>
+            <div class="card-body">
 
-                  <ul class="mb-0">
-                    <li>
-                      <strong>ECMAScript Specifications:</strong>
-                      <a href="https://tc39.es/ecma262/"
-                        >ECMAScript Specifications</a
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-            <hr />
+                <ul>
+                    <li>Earlier every environment had a different global object.</li>
+                    <li>Browser uses <code>window</code>.</li>
+                    <li>Node.js uses <code>global</code>.</li>
+                    <li><code>globalThis</code> works everywhere.</li>
+                    <li>Use <code>globalThis</code> in modern JavaScript projects.</li>
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- Reference -->
+        <div class="alert alert-secondary mt-4">
+
+            <h5>📚 Reference for Latest JavaScript Updates</h5>
+
+            <ul class="mb-0">
+                <li>
+                    <strong>ECMAScript Specifications:</strong><br>
+                    https://tc39.es/ecma262/
+                </li>
+            </ul>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section id="classnotesglobalobject" class="py-5 bg-light">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-5">
+
+                <h2 class="fw-bold text-primary mb-3">
+                   Episode-03 global object
+                </h2>
+
+
+                <a href="../class notes/Episode-03 global object.pdf"
+                   target="_blank"
+                   class="btn btn-primary btn-lg px-4">
+                    Episode-03 global object
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- import vs exports -->
             <section id="importsvsexports">
@@ -1594,6 +1704,27 @@ Function used in app.js</pre
               </div>
             </section>
             <hr>
+
+          <section id="classnotesimportsexports" class="py-5 bg-light">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-5">
+
+                <h2 class="fw-bold text-primary mb-3">
+                   Episode-04 imports vs exports
+                </h2>
+
+
+                <a href="../class notes/Episode-04 imports vs exports.pdf"
+                   target="_blank"
+                   class="btn btn-primary btn-lg px-4">
+                    Episode-04 imports vs exports
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- How modules works  in nodejs -->
 
@@ -2156,6 +2287,32 @@ Return Exported Values</code></pre>
 
             </section>
             <hr>
+
+            <section id="classnotesjsonserver" class="py-5 bg-light">
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-5">
+
+                <h2 class="fw-bold text-primary mb-3">
+                   Episode-03 Global This & Episode-04  
+                </h2>
+
+
+                <a href="../class notes/Episode-02 JS on Server.pdf"
+                   target="_blank"
+                   class="btn btn-primary btn-lg px-4">
+                    Episode-02 JS on Server
+                </a>
+                <a href="../class notes/Episode-02 JS on Server.pdf"
+                   target="_blank"
+                   class="btn btn-primary btn-lg px-4">
+                    Episode-02 JS on Server
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
 
 
             <!--  -->
