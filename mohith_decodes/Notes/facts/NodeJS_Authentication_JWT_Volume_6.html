@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Authentication & JWT</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-primary text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 6 — Authentication & JWT</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>JWT Authentication Flow</h5>
+<pre class="bg-dark text-white p-3 rounded">User Login
+    │
+    ▼
+Validate Credentials
+    │
+    ▼
+jwt.sign()
+    │
+    ▼
+JWT Token
+    │
+    ▼
+Client Stores Token
+    │
+    ▼
+Authorization: Bearer &lt;token&gt;
+    │
+    ▼
+authenticate Middleware
+    │
+jwt.verify()
+    │
+    ▼
+Protected Route
+</pre>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 1: Authentication vs Authorization</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>// Authentication
+POST /login
+
+// Authorization
+GET /profile</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Authentication verifies who the user is. Authorization determines what the authenticated user is allowed to access.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is the difference between authentication and authorization?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Authentication verifies identity; authorization checks permissions.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 2: JWT Structure</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>HEADER.PAYLOAD.SIGNATURE</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>A JWT has three Base64URL-encoded parts: Header, Payload and Signature.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What are the three parts of a JWT?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Header, Payload and Signature.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 3: Generate JWT</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const token = jwt.sign({ id:user._id }, SECRET_KEY, {
+  expiresIn:&#x27;1h&#x27;
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>jwt.sign() creates a signed token using a payload and a secret key.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What does jwt.sign() do?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It generates a signed JWT token.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 4: Verify JWT</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const decoded = jwt.verify(token, SECRET_KEY);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>jwt.verify() validates the signature and decodes the payload.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What happens if the secret key is wrong?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Token verification fails.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 5: Authorization Header</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>Authorization: Bearer &lt;token&gt;</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>The client sends the JWT in the Authorization header for protected APIs.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Where is the JWT usually sent?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>In the Authorization header as a Bearer token.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 6: Protecting Routes</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.get(&#x27;/profile&#x27;, authenticate, controller);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Authentication middleware verifies the token before allowing access.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use authentication middleware?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To protect private routes.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 7: JWT Payload</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>jwt.sign({ id:user._id, role:&#x27;admin&#x27; }, SECRET_KEY);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Store only non-sensitive data in the payload. Never store passwords or OTPs.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What data should not be stored in a JWT?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Passwords, OTPs and other sensitive information.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 8: JWT Expiration</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>jwt.sign(payload, SECRET_KEY, {
+  expiresIn:&#x27;1h&#x27;
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Short-lived tokens reduce the impact of a leaked token.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why set expiresIn?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To limit the token&#x27;s lifetime.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 9: Common JWT Errors</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>try {
+  jwt.verify(token, SECRET_KEY);
+} catch(err) {
+  next(err);
+}</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Handle missing, expired and invalid tokens consistently.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What status code is commonly returned for an invalid token?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>401 Unauthorized.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 10: Best Practices</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>// Store secrets in .env
+SECRET_KEY=mySecret</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Keep secrets in environment variables, use HTTPS, validate tokens on every protected request and hash passwords with bcrypt.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What are JWT security best practices?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Use HTTPS, .env secrets, bcrypt, short expiry and token validation.</div></div>
+</div>
+</div></div>
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Authentication verifies identity; authorization checks permissions.</li>
+<li>JWT contains Header, Payload and Signature.</li>
+<li>Generate tokens using <code>jwt.sign()</code>.</li>
+<li>Validate tokens using <code>jwt.verify()</code>.</li>
+<li>Send JWT in the <code>Authorization: Bearer &lt;token&gt;</code> header.</li>
+<li>Never store sensitive data in the JWT payload.</li>
+<li>Keep <code>SECRET_KEY</code> in a <code>.env</code> file.</li>
+</ul>
+</div>
+</div></div>
+</section>
+</body></html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Middleware & Error Handling</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-primary text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 5 — Middleware & Error Handling</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>Middleware Flow</h5>
+<pre class="bg-dark text-white p-3 rounded">Incoming Request
+      │
+      ▼
+Built-in Middleware
+      │
+Application Middleware
+      │
+Router Middleware
+      │
+Route Handler
+      │
+Error?
+ ┌────┴────┐
+ │ No      │ Yes
+ ▼         ▼
+Response  Error Middleware
+</pre>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 1: What is Middleware?</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use((req,res,next)=&gt;{
+ console.log(req.method);
+ next();
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Middleware is a function that runs between receiving a request and sending a response. It can modify req/res, end the response, or pass control with next().</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is middleware?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>A function that has access to req, res and next().</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 2: Types of Middleware</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(express.json());
+app.use(&#x27;/api&#x27;,router);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Common types are built-in, application-level, router-level, third-party and error-handling middleware.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Name different middleware types.</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Built-in, application, router, third-party and error middleware.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 3: next()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use((req,res,next)=&gt;{
+ console.log(&#x27;Auth&#x27;);
+ return next();
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>next() passes control to the next matching middleware.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What happens if next() is omitted?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>The request hangs unless a response is sent.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 4: Multiple Middleware</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.get(&#x27;/profile&#x27;,auth,logger,controller);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Multiple middleware execute from left to right.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How are multiple middleware executed?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>In the order they are registered.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 5: Error Middleware</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use((err,req,res,next)=&gt;{
+ res.status(500).json({message:err.message});
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Express recognizes error middleware by its four parameters.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why four parameters?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It tells Express this middleware handles errors.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 6: next(error)</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>try{
+ throw new Error(&#x27;Oops&#x27;);
+}catch(err){
+ next(err);
+}</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Passing an error to next() skips normal middleware and jumps to the error handler.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What does next(err) do?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Transfers control to error middleware.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 7: Custom Errors</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>throw new AppError(&#x27;User not found&#x27;,404);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Custom error classes help return consistent status codes and messages.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why create AppError?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To standardize error responses.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 8: Global Error Handler</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const errorHandler=(err,req,res,next)=&gt;{
+ res.status(err.statusCode||500).json({message:err.message});
+};</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>A single place to format all API errors.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use one global error handler?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Cleaner and reusable error handling.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 9: Middleware Order</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(express.json());
+app.use(routes);
+app.use(errorHandler);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Register parsers first, routes second and the error handler last.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Where should error middleware be registered?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>After all routes and middleware.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 10: Best Practices</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>return res.status(400).json({message:&#x27;Invalid input&#x27;});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Always return after sending a response and use meaningful HTTP status codes.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is one middleware best practice?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Return after sending a response.</div></div>
+</div>
+</div>
+</div>
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Middleware executes in order.</li>
+<li>Call <code>next()</code> or send a response.</li>
+<li><code>next(err)</code> jumps to the error handler.</li>
+<li>Error middleware must have four parameters.</li>
+<li>Register the global error handler last.</li>
+<li>Use custom error classes for consistent API responses.</li>
+</ul>
+</div>
+</div></div>
+</section>
+</body></html>

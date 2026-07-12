@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Worker Threads & Cluster</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-primary text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 12 — Worker Threads & Cluster</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>Architecture Overview</h5>
+<pre class="bg-dark text-white p-3 rounded">Incoming Requests
+        │
+        ▼
+   Primary Process
+   ┌────┴────┐
+   ▼         ▼
+Worker 1   Worker 2
+   │         │
+   ▼         ▼
+CPU Tasks / HTTP Requests
+</pre>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 1: Why Worker Threads?</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>import { Worker } from &#x27;worker_threads&#x27;;</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Worker Threads run CPU-intensive tasks on separate threads so the Event Loop stays responsive.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>When should Worker Threads be used?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>For CPU-bound work such as image processing or heavy calculations.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 2: Creating a Worker</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const worker = new Worker(&#x27;./worker.js&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>A Worker executes another JavaScript file in parallel.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How do you create a Worker?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Using the Worker class from worker_threads.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 3: Communicating with Workers</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>worker.postMessage(data);
+worker.on(&#x27;message&#x27;,(msg)=&gt;{});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>The main thread and worker exchange messages.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How do Workers communicate?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Using postMessage() and the message event.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 4: workerData</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>new Worker(&#x27;./worker.js&#x27;,{ workerData:{ n:100 } });</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Pass initial data to a worker when it starts.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How do you send startup data?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Using the workerData option.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 5: parentPort</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>parentPort.postMessage(result);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Inside the worker, parentPort sends data back to the main thread.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How does a worker return results?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Using parentPort.postMessage().</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 6: Cluster Module</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>import cluster from &#x27;cluster&#x27;;</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Cluster creates multiple Node.js processes to utilize multiple CPU cores.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use Cluster?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To improve throughput by using all CPU cores.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 7: Worker Threads vs Cluster</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>Worker Threads share one process.
+Cluster creates separate processes.</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Workers are ideal for CPU tasks; Cluster is ideal for scaling HTTP servers.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Difference between Worker Threads and Cluster?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Workers = threads, Cluster = processes.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 8: CPU Count</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>import os from &#x27;os&#x27;;
+const cores=os.cpus().length;</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Use available CPU cores when creating cluster workers.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How do you get CPU core count?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>os.cpus().length.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 9: Error Handling</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>worker.on(&#x27;error&#x27;,err=&gt;console.error(err));</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Always listen for worker errors and exits.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why handle worker errors?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To prevent silent failures.</div></div>
+</div>
+</div></div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 10: Best Practices</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>// Use workers only for heavy CPU work</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Avoid Workers for simple I/O tasks because Node already handles I/O efficiently.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Should every task use Worker Threads?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>No, only CPU-intensive tasks.</div></div>
+</div>
+</div></div>
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Worker Threads are for CPU-intensive tasks.</li>
+<li>Cluster uses multiple Node.js processes to utilize CPU cores.</li>
+<li>Workers communicate using <code>postMessage()</code> and <code>parentPort</code>.</li>
+<li>Use <code>workerData</code> to pass startup data.</li>
+<li>Use <code>os.cpus().length</code> to determine available cores.</li>
+<li>Always handle worker <code>error</code> and <code>exit</code> events.</li>
+<li>Don't use Worker Threads for normal I/O operations.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</body></html>

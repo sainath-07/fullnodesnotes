@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Performance & Memory Optimization</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-primary text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 10 — Performance & Memory Optimization</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>Optimization Flow</h5>
+<pre class="bg-dark text-white p-3 rounded">Client Request
+      │
+      ▼
+Async APIs / Streams
+      │
+Optimized Queries
+      │
+Caching / Indexes
+      │
+Worker Threads (CPU Tasks)
+      │
+      ▼
+Fast Response &amp; Low Memory Usage</pre>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 1: Avoid Blocking the Event Loop</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>// Bad
+fs.readFileSync(&#x27;large.txt&#x27;);
+
+// Good
+await fs.promises.readFile(&#x27;large.txt&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Synchronous APIs block the Event Loop. Prefer asynchronous APIs in servers.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why avoid readFileSync() in APIs?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It blocks all incoming requests.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 2: Use Streams for Large Files</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>fs.createReadStream(&#x27;movie.mp4&#x27;)
+  .pipe(res);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Streams process files in chunks, reducing memory usage.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why are streams memory efficient?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>They don&#x27;t load the whole file into memory.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 3: Promise.all()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await Promise.all([
+  getUsers(),
+  getOrders()
+]);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Run independent asynchronous operations concurrently.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>When should Promise.all() be used?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>When async tasks don&#x27;t depend on each other.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 4: Use lean() in Mongoose</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const users = await User.find().lean();</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>lean() skips Mongoose document creation, improving read performance.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use lean()?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Faster read-only queries.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 5: Select Required Fields</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await User.find().select(&#x27;name email&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Fetch only required fields to reduce network and memory usage.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use select()?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To reduce payload size.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 6: Indexes</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>schema.index({ email: 1 });</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Indexes speed up reads but slightly slow writes.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why create indexes?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To optimize query performance.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 7: Avoid Memory Leaks</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>users = null;
+clearInterval(timer);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Release unused references and clear timers/listeners.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What causes memory leaks?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Unused references and unremoved listeners.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 8: Worker Threads</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>import { Worker } from &#x27;worker_threads&#x27;;</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Use Worker Threads for CPU-intensive work instead of blocking the Event Loop.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>When should Worker Threads be used?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>For CPU-heavy tasks.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 9: Caching</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const cache = new Map();</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Cache frequently requested data to reduce database calls.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why cache data?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To improve response time.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 10: Compression</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(compression());</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Compress responses to reduce bandwidth and improve load times.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use compression middleware?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To send smaller responses.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 11: Connection Pooling</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>mongoose.connect(uri,{ maxPoolSize:10 });</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Reuse database connections instead of creating a new one for every request.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use connection pooling?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To improve database performance.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 12: Performance Best Practices</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>return res.status(200).json(data);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Profile your app, avoid unnecessary work, paginate results, and monitor memory usage.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is one easy optimization?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Return only the data clients need.</div></div>
+</div>
+</div>
+</div>
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Use asynchronous APIs instead of synchronous ones.</li>
+<li>Prefer streams for large files.</li>
+<li>Use <code>Promise.all()</code> for independent async tasks.</li>
+<li>Use <code>lean()</code> and <code>select()</code> for faster MongoDB reads.</li>
+<li>Create indexes for frequently queried fields.</li>
+<li>Prevent memory leaks by clearing timers and listeners.</li>
+<li>Use Worker Threads for CPU-intensive work.</li>
+<li>Cache frequently accessed data.</li>
+<li>Enable response compression.</li>
+<li>Use database connection pooling.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</body>
+</html>

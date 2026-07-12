@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File System & Path Module</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-primary text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 9 — File System & Path Module</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>File System Flow</h5>
+<pre class="bg-dark text-white p-3 rounded">Application
+     │
+     ▼
+ fs Module
+     │
+Read / Write / Delete
+     │
+Path Module
+     │
+Cross-platform File Paths
+     │
+     ▼
+Operating System File System</pre>
+</div>
+
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 1: fs.readFile() vs fs.readFileSync()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await fs.promises.readFile(&#x27;data.txt&#x27;,&#x27;utf8&#x27;);
+
+const data = fs.readFileSync(&#x27;data.txt&#x27;,&#x27;utf8&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>readFile() is asynchronous and doesn&#x27;t block the Event Loop. readFileSync() blocks execution until the file is completely read.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>Which one is preferred in production APIs?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>The asynchronous version.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 2: writeFile()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await fs.promises.writeFile(&#x27;notes.txt&#x27;,&#x27;Hello Node.js&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Creates a new file or overwrites an existing file.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>What happens if the file already exists?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>Its contents are overwritten.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 3: appendFile()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await fs.promises.appendFile(&#x27;logs.txt&#x27;,&#x27;New Log\n&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Adds new content to the end of an existing file.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>When should appendFile() be used?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>For logs and incremental writes.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 4: unlink()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await fs.promises.unlink(&#x27;old.txt&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Deletes a file from the file system.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>Which method deletes a file?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>unlink().</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 5: mkdir()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>await fs.promises.mkdir(&#x27;uploads&#x27;,{recursive:true});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Creates a directory. recursive:true also creates missing parent folders.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>What does recursive:true do?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>Creates nested folders if needed.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 6: existsSync()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>if(fs.existsSync(&#x27;uploads&#x27;)){
+ console.log(&#x27;Folder exists&#x27;);
+}</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Checks whether a file or folder exists synchronously.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>When is existsSync() useful?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>Before creating or deleting files/folders.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 7: createReadStream()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const stream = fs.createReadStream(&#x27;movie.mp4&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Reads large files chunk by chunk instead of loading them entirely into memory.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>Why use createReadStream()?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>To reduce memory usage.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 8: path.join()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const filePath = path.join(__dirname,&#x27;uploads&#x27;,&#x27;image.png&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Safely joins path segments using the correct OS separator.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>Why use path.join()?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>To create cross-platform file paths.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 9: path.extname()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const ext = path.extname(&#x27;photo.jpg&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Returns the file extension including the leading dot.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>What does path.extname() return?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>The file extension.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 10: path.basename()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const name = path.basename(&#x27;/images/logo.png&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Returns only the file name from a full path.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>What does basename() return?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>The file name.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 11: path.dirname()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const dir = path.dirname(&#x27;/images/logo.png&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Returns the directory portion of a path.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>What does dirname() return?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>The directory path.</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 12: Best Practices</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>try {
+ await fs.promises.readFile(&#x27;data.txt&#x27;);
+} catch(err){
+ console.error(err);
+}</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Prefer fs/promises with async/await, handle errors, and use path.join() instead of hardcoded separators.</p>
+<div class="row">
+<div class="col-md-6">
+<div class="alert alert-warning"><strong>Interview Question</strong><br>What is the recommended way to use the fs module?</div>
+</div>
+<div class="col-md-6">
+<div class="alert alert-info"><strong>Expected Answer</strong><br>Use fs/promises with async/await.</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Prefer asynchronous fs methods in production.</li>
+<li>Use <code>fs/promises</code> with <code>async/await</code>.</li>
+<li><code>readFileSync()</code> blocks the Event Loop.</li>
+<li>Use <code>createReadStream()</code> for large files.</li>
+<li>Use <code>path.join()</code> for cross-platform compatibility.</li>
+<li>Use <code>path.extname()</code>, <code>basename()</code>, and <code>dirname()</code> to work with file paths.</li>
+<li>Always wrap file operations in <code>try...catch</code>.</li>
+</ul>
+</div>
+
+</div>
+</div>
+</section>
+</body>
+</html>

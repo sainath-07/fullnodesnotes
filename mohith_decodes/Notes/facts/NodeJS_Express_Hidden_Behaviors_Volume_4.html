@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Express.js Hidden Behaviors</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-primary text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 4 — Express.js Hidden Behaviors</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>Express Request Pipeline</h5>
+<pre class="bg-dark text-white p-3 rounded">Incoming Request
+      │
+      ▼
+Middleware 1
+      │ next()
+      ▼
+Middleware 2
+      │ next()
+      ▼
+Route Handler
+      │
+      ▼
+Response
+      │
+      ▼
+Error? ──► Error Middleware
+</pre>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 1: Middleware Executes in Order</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(logger);
+app.use(auth);
+app.use(routes);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Express executes middleware in the exact order they are registered.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why does middleware order matter?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Requests flow top-to-bottom through registered middleware.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 2: next() Doesn&#x27;t Stop Execution</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use((req,res,next)=&gt;{
+  console.log(&#x27;A&#x27;);
+  next();
+  console.log(&#x27;B&#x27;);
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Code after next() still executes unless you return.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is the benefit of return next()?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It prevents accidental execution of code after next().</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 3: return res.json()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>if(!user){
+  return res.status(404).json({message:&#x27;Not found&#x27;});
+}
+console.log(&#x27;Runs only if user exists&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Returning avoids sending multiple responses.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use return with res.json()?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To stop the current function.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 4: Error Middleware Has Four Parameters</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use((err,req,res,next)=&gt;{
+ res.status(500).json({message:err.message});
+});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Express recognizes error handlers only when they have four parameters.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why include next if unused?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It identifies the function as error middleware.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 5: Route Matching Order</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.get(&#x27;/login&#x27;,login);
+app.get(&#x27;/:id&#x27;,user);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Static routes should come before dynamic routes.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why can /:id capture /login?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Because Express matches routes in declaration order.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 6: express.json()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(express.json());</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Without it, JSON request bodies are not parsed.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why is req.body undefined?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>JSON parser middleware is missing.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 7: Router is Mini App</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const router=express.Router();
+router.get(&#x27;/users&#x27;,handler);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Routers help organize related endpoints.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use express.Router()?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To keep code modular and maintainable.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 8: Headers Already Sent</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>res.json({ok:true});
+// res.json({again:true});</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Sending two responses throws &#x27;Cannot set headers after they are sent&#x27;.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What causes &#x27;headers already sent&#x27;?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Sending more than one response.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 9: Async Errors</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>try{
+ await work();
+}catch(err){
+ next(err);
+}</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Forward async errors to centralized error handling.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>How should async route errors be handled?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Pass them to next(err).</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Behavior 10: app.use() vs app.METHOD()</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(&#x27;/api&#x27;,router);
+app.get(&#x27;/users&#x27;,handler);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>app.use() registers middleware; app.get/post/etc. register route handlers.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>When should you use app.use()?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>For middleware or mounting routers.</div></div>
+</div>
+</div>
+</div>
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Middleware runs in registration order.</li>
+<li>Use <code>return res.json()</code> to stop execution.</li>
+<li>Always place static routes before dynamic routes.</li>
+<li>Register <code>express.json()</code> before routes.</li>
+<li>Error middleware must have four parameters.</li>
+<li>Use <code>express.Router()</code> for modular routing.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</body></html>

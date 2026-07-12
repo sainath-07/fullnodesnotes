@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MERN Libraries Cheat Sheet</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{scroll-behavior:smooth;background:#f8f9fa}
+.sidebar{position:sticky;top:20px;max-height:90vh;overflow:auto}
+.nav-pills .nav-link{color:#333;border-radius:10px;margin-bottom:6px}
+.nav-pills .nav-link.active{background:#0d6efd}
+pre{background:#212529;color:#fff;padding:12px;border-radius:8px}
+section.topic{scroll-margin-top:80px}
+</style>
+</head>
+<body>
+<div class="container-fluid py-4">
+<div class="row">
+<div class="col-lg-3">
+<div class="card shadow-sm sidebar">
+<div class="card-header bg-dark text-white"><h5 class="mb-0">📦 MERN Libraries</h5></div>
+<div class="card-body">
+<div class="nav flex-column nav-pills">
+<a class="nav-link active" href="#basic">Basic npm Commands</a>
+<a class="nav-link" href="#installtypes">Installation Types</a>
+<a class="nav-link" href="#diff-global-local">Diff global vs local</a>
+<a class="nav-link" href="#express">Express</a>
+<a class="nav-link" href="#chalk">Chalk</a>
+<a class="nav-link" href="#nodemon">Nodemon</a>
+<a class="nav-link" href="#ejs">EJS</a>
+<a class="nav-link" href="#mongodb">MongoDB</a>
+<a class="nav-link" href="#mongoose">Mongoose</a>
+<a class="nav-link" href="#multer">Multer</a>
+<a class="nav-link" href="#dotenv">dotenv</a>
+<a class="nav-link" href="#nodemailer">Nodemailer</a>
+<a class="nav-link" href="#bcrypt">bcryptjs</a>
+<a class="nav-link" href="#jwt">jsonwebtoken</a>
+</div></div></div></div>
+<div class="col-lg-9">
+<section id="basic" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Basic npm Commands</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm install <package>
+npm uninstall <package>
+npm update <package>
+npm list
+npm list -g</pre>
+<h6>What is it?</h6><p>Common npm package management commands.</p>
+<h6>Why is it used?</h6><ul><li>Install packages</li><li>Remove packages</li><li>Update packages</li><li>View installed packages</li></ul>
+</div></div>
+
+</section>
+
+<section id="installtypes" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Installation Types</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i express
+npm i nodemon --save-dev
+npm i -g nodemon
+node --watch app.js</pre>
+<h6>What is it?</h6><p>Different installation scopes.</p>
+<h6>Why is it used?</h6><ul><li>Normal dependency</li><li>Development dependency</li><li>Global install</li><li>Built-in auto restart</li></ul>
+</div></div></section>
+
+
+<!--  -->
+ <section  id="diff-global-local" class="container py-5" id="global-vs-local-installation">
+
+    <div class="card shadow-lg border-0">
+
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">
+                🌍 Global vs Local Installation (Quick Revision)
+            </h2>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Why Global -->
+
+            <div class="alert alert-primary">
+
+                <h5>❓ Why do we install packages globally?</h5>
+
+                <p class="mb-0">
+                    Global installation is used for <strong>command-line tools (CLI)</strong> that can be used from
+                    <strong>any Node.js project</strong>.
+                </p>
+
+            </div>
+
+            <!-- Why only few -->
+
+            <div class="alert alert-warning">
+
+                <h5>❓ Why are only a few libraries installed globally?</h5>
+
+                <p class="mb-0">
+                    Because only <strong>CLI tools</strong> need to be available on your computer.
+                    <br>
+                    Application libraries should stay inside each project.
+                </p>
+
+            </div>
+
+            <!-- Comparison -->
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th width="50%">Global Installation</th>
+
+                            <th>Local Installation</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>
+                                Installed <strong>once</strong> on your computer.
+                            </td>
+
+                            <td>
+                                Installed inside <strong>one project</strong>.
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>
+                                Can be used in <strong>all projects</strong>.
+                            </td>
+
+                            <td>
+                                Can be used <strong>only in that project</strong>.
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>
+                                Mainly used for <strong>CLI Tools</strong>.
+                            </td>
+
+                            <td>
+                                Mainly used for <strong>Application Libraries</strong>.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Examples -->
+
+            <div class="row mt-4">
+
+                <div class="col-md-6">
+
+                    <div class="card border-success">
+
+                        <div class="card-header bg-success text-white">
+                            ✅ Install Globally
+                        </div>
+
+                        <div class="card-body">
+
+<pre class="mb-0"><code>npm i -g nodemon
+
+npm i -g typescript
+
+npm i -g yarn</code></pre>
+
+                            <hr>
+
+                            <strong>Why?</strong>
+
+                            <ul class="mb-0">
+                                <li>Command Line Tools</li>
+                                <li>Shared across all projects</li>
+                                <li>Installed once</li>
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="card border-primary">
+
+                        <div class="card-header bg-primary text-white">
+                            📦 Install Locally
+                        </div>
+
+                        <div class="card-body">
+
+<pre class="mb-0"><code>npm i express
+
+npm i mongoose
+
+npm i dotenv
+
+npm i multer
+
+npm i bcryptjs</code></pre>
+
+                            <hr>
+
+                            <strong>Why?</strong>
+
+                            <ul class="mb-0">
+                                <li>Project Dependency</li>
+                                <li>Stored in node_modules</li>
+                                <li>Version controlled by package.json</li>
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Real World -->
+
+            <div class="card mt-4 border-info">
+
+                <div class="card-header bg-info text-dark">
+                    💡 Simple Real-World Example
+                </div>
+
+                <div class="card-body">
+
+<pre class="mb-0">
+
+Microsoft Word
+        │
+Installed Once
+        │
+        ▼
+Open Any Document
+
+--------------------------------
+
+Nodemon
+        │
+Installed Once
+        │
+        ▼
+Run Any Node.js Project
+
+</pre>
+
+                </div>
+
+            </div>
+
+            <!-- Memory Trick -->
+
+            <div class="alert alert-success mt-4">
+
+                <h5>🎯 Interview Memory Trick</h5>
+
+<pre class="mb-0">
+
+Global
+↓
+
+CLI Tools
+
+✔ nodemon
+✔ typescript
+✔ yarn
+
+---------------------
+
+Local
+↓
+
+Project Libraries
+
+✔ express
+✔ mongoose
+✔ mongodb
+✔ dotenv
+✔ multer
+✔ bcryptjs
+✔ jsonwebtoken
+✔ nodemailer
+✔ ejs
+
+</pre>
+
+            </div>
+
+            <!-- Interview Answer -->
+
+            <div class="alert alert-secondary">
+
+                <strong>Interview Answer (One Line)</strong>
+
+                <p class="mb-0 mt-2">
+
+                    <strong>Global packages</strong> are installed for reusable
+                    <strong>command-line tools</strong>,
+                    while <strong>local packages</strong> are installed because they are
+                    <strong>application dependencies</strong> required only by a specific project.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+    
+
+
+<section id="express" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Express</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i express</pre>
+<h6>What is it?</h6><p>Fast Node.js web framework</p>
+<h6>Why is it used?</h6><ul><li>Routing</li><li>Middleware</li><li>REST APIs</li></ul>
+</div></div></section><section id="chalk" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Chalk</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i chalk</pre>
+<h6>What is it?</h6><p>Terminal styling library</p>
+<h6>Why is it used?</h6><ul><li>Colored console output</li></ul>
+</div></div></section><section id="nodemon" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Nodemon</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i nodemon --save-dev</pre>
+<h6>What is it?</h6><p>Auto restarts server</p>
+<h6>Why is it used?</h6><ul><li>Development productivity</li></ul>
+</div></div></section><section id="ejs" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">EJS</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i ejs</pre>
+<h6>What is it?</h6><p>Template engine</p>
+<h6>Why is it used?</h6><ul><li>Dynamic HTML rendering</li></ul>
+</div></div></section><section id="mongodb" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">MongoDB</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i mongodb</pre>
+<h6>What is it?</h6><p>Official MongoDB driver</p>
+<h6>Why is it used?</h6><ul><li>Connect to MongoDB</li></ul>
+</div></div></section><section id="mongoose" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Mongoose</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i mongoose</pre>
+<h6>What is it?</h6><p>MongoDB ODM</p>
+<h6>Why is it used?</h6><ul><li>Schemas</li><li>Models</li><li>Validation</li></ul>
+</div></div></section><section id="multer" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Multer</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i multer</pre>
+<h6>What is it?</h6><p>File upload middleware</p>
+<h6>Why is it used?</h6><ul><li>Handle multipart/form-data</li></ul>
+</div></div></section><section id="dotenv" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">dotenv</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i dotenv</pre>
+<h6>What is it?</h6><p>Loads .env variables</p>
+<h6>Why is it used?</h6><ul><li>Environment configuration</li></ul>
+</div></div></section><section id="nodemailer" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">Nodemailer</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i nodemailer</pre>
+<h6>What is it?</h6><p>Email library</p>
+<h6>Why is it used?</h6><ul><li>Send emails</li></ul>
+</div></div></section><section id="bcrypt" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">bcryptjs</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i bcryptjs</pre>
+<h6>What is it?</h6><p>Password hashing</p>
+<h6>Why is it used?</h6><ul><li>Hash passwords</li><li>Compare passwords</li></ul>
+</div></div></section><section id="jwt" class="topic mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h4 class="mb-0">jsonwebtoken</h4></div>
+<div class="card-body">
+<h6>Installation</h6><pre>npm i jsonwebtoken</pre>
+<h6>What is it?</h6><p>JWT library</p>
+<h6>Why is it used?</h6><ul><li>Authentication</li><li>Authorization</li></ul>
+</div></div></section></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.querySelectorAll('.nav-link').forEach(a=>{
+a.onclick=function(){
+document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active'));
+this.classList.add('active');
+};
+});
+</script>
+</body></html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Best Practices</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<section class="container my-5">
+<div class="card shadow-lg">
+<div class="card-header bg-danger text-white">
+<h1>🚀 Node.js Hidden Facts Handbook</h1>
+<h3>Volume 11 — Security Best Practices</h3>
+</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<h5>Security Flow</h5>
+<pre class="bg-dark text-white p-3 rounded">Client
+   │
+HTTPS
+   │
+Input Validation
+   │
+Authentication (JWT)
+   │
+Authorization
+   │
+Database
+   │
+Encrypted Passwords
+</pre>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 1: Never Store Plain Text Passwords</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const hash = await bcrypt.hash(password, 12);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Always hash passwords before storing them in the database. Never save plain text passwords.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use bcrypt?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It hashes passwords with a salt, making them difficult to crack.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 2: Use Environment Variables</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>SECRET_KEY=mySecret
+DB_URL=mongodb://localhost:27017/app</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Store secrets in a .env file instead of hardcoding them.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use .env?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To keep secrets out of source code.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 3: Validate User Input</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>validate(req.body);
+// or use express-validator/Joi</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Validate all client input to prevent invalid or malicious data.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why validate input?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To improve security and data integrity.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 4: Prevent NoSQL Injection</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const user = await User.findOne({ email });</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Never pass raw user objects directly into database queries.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is NoSQL Injection?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Manipulating MongoDB queries using crafted input.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 5: Use HTTPS</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>https.createServer(options, app);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Encrypt data in transit using TLS/SSL.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why HTTPS?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>It protects data from interception.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 6: Secure JWT</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>jwt.sign(payload, SECRET_KEY, { expiresIn:&#x27;1h&#x27; });</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Use strong secrets, short expiration times and verify every token.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What should never be stored in a JWT?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Passwords, OTPs or sensitive personal data.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 7: Protect HTTP Headers</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.disable(&#x27;x-powered-by&#x27;);</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Hide framework details and set secure HTTP headers.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why disable x-powered-by?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To reveal less information about the server.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 8: Rate Limiting</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(rateLimit({ windowMs:60000, max:100 }));</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Limit repeated requests to reduce brute-force and abuse.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why use rate limiting?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To protect APIs from excessive requests.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 9: Enable CORS Carefully</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>app.use(cors({ origin:&#x27;https://example.com&#x27; }));</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Allow only trusted origins instead of &#x27;*&#x27;.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why restrict CORS?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To reduce unauthorized cross-origin access.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 10: Sanitize Data</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>const name = req.body.name.trim();</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Remove unwanted characters and normalize input before processing.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is sanitization?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Cleaning input before using or storing it.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 11: Handle Errors Safely</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>return res.status(500).json({ message:&#x27;Internal Server Error&#x27; });</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Don&#x27;t expose stack traces or sensitive information in production.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>Why hide internal errors?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>To avoid leaking implementation details.</div></div>
+</div>
+</div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+<div class="card-header bg-dark text-white"><h4 class="mb-0">Topic 12: Security Checklist</h4></div>
+<div class="card-body">
+<h6 class="text-primary">Code Example</h6>
+<pre class="bg-dark text-white p-3 rounded"><code>// bcrypt
+// HTTPS
+// JWT
+// CORS
+// Rate Limit</code></pre>
+<h6 class="text-success">Explanation</h6>
+<p>Combine multiple layers of security rather than relying on one mechanism.</p>
+<div class="row">
+<div class="col-md-6"><div class="alert alert-warning"><strong>Interview Question</strong><br>What is the best security practice?</div></div>
+<div class="col-md-6"><div class="alert alert-info"><strong>Expected Answer</strong><br>Use defense in depth with multiple protections.</div></div>
+</div>
+</div>
+</div>
+
+<div class="alert alert-success">
+<h4>Quick Revision</h4>
+<ul class="mb-0">
+<li>Hash passwords with <code>bcrypt</code>.</li>
+<li>Store secrets in <code>.env</code>.</li>
+<li>Validate and sanitize all user input.</li>
+<li>Use HTTPS in production.</li>
+<li>Use short-lived JWTs and verify every request.</li>
+<li>Restrict CORS origins.</li>
+<li>Apply rate limiting to public APIs.</li>
+<li>Don't expose internal error details.</li>
+<li>Disable unnecessary server information such as <code>x-powered-by</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</body>
+</html>

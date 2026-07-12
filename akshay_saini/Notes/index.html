@@ -1,0 +1,2172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nodejs - Akshay saini</title>
+
+    <!-- Bootstrap CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css" />
+
+    <style>
+      body {
+        background: #eef3f8;
+        font-family:
+          Segoe UI,
+          Arial,
+          sans-serif;
+      }
+      .hero {
+        background: linear-gradient(135deg, #0d6efd, #003c8f);
+        color: #fff;
+        padding: 40px;
+      }
+      section.card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.08);
+        margin-bottom: 28px;
+      }
+      pre {
+        background: #1f2937;
+        color: #fff;
+        padding: 15px;
+        border-radius: 10px;
+      }
+      .badge-title {
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+          <div class="position-sticky">
+            <h6 class="sidebar-title">Nodejs - Akshay saini</h6>
+            <hr />
+
+            <!-- Sidebar -->
+            <ul class="nav flex-column" id="topicList">
+              <li class="nav-item">
+                <a class="nav-link active" href="#introtonodejs"
+                  >Intro to nodejs</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#nodejsfacts">Nodejs facts</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#jsonserver">Js on Server</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#globalObject">Global Object</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#importsvsexports"
+                  >Imports VS exports</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#howmoduleworksinnodejs"
+                  >How modules work in nodejs</a
+                >
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content-area">
+          <div class="content-wrapper">
+            <!-- Intro of nodejs -->
+
+            <section id="introtonodejs" class="container my-5">
+              <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                  <h2 class="mb-0">📘 History of Node.js</h2>
+                </div>
+
+                <div class="card-body">
+                  <div class="alert alert-primary">
+                    <h4>Introduction</h4>
+                    <p class="mb-0">
+                      Node.js is one of the most popular technologies for
+                      building backend applications. It allows JavaScript to run
+                      outside the browser and helps developers build fast,
+                      scalable and real-time applications.
+                    </p>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">1. Who Developed Node.js?</h4>
+
+                    <ul>
+                      <li>
+                        Node.js was developed by <strong>Ryan Dahl</strong>.
+                      </li>
+                      <li>
+                        The first version of Node.js was released in
+                        <strong>2009</strong>.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">2. Initial Development</h4>
+
+                    <ul>
+                      <li>
+                        Ryan Dahl first started developing Node.js using
+                        <strong>SpiderMonkey</strong>, which is the JavaScript
+                        engine used by <strong>Mozilla Firefox</strong>.
+                      </li>
+                      <li>Every web browser has its own JavaScript engine.</li>
+                      <li>
+                        <strong>Google Chrome</strong> uses the
+                        <strong>V8 Engine</strong>.
+                      </li>
+                      <li>
+                        <strong>Mozilla Firefox</strong> uses the
+                        <strong>SpiderMonkey Engine</strong>.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">3. Switching to the V8 Engine</h4>
+
+                    <ul>
+                      <li>
+                        After about two days of development, Ryan Dahl switched
+                        from SpiderMonkey to Google's
+                        <strong>V8 Engine</strong>.
+                      </li>
+                      <li>
+                        The exact reason for the switch is not publicly known.
+                      </li>
+                      <li>
+                        Today, Node.js uses Google's
+                        <strong>V8 JavaScript Engine</strong>.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">4. Joyent Joined the Project</h4>
+
+                    <ul>
+                      <li>
+                        Ryan Dahl initially developed Node.js independently.
+                      </li>
+                      <li>
+                        At the same time, a company called
+                        <strong>Joyent</strong> was also interested in running
+                        JavaScript on the server.
+                      </li>
+                      <li>
+                        Joyent approached Ryan Dahl and invited him to work
+                        together.
+                      </li>
+                      <li>
+                        Ryan Dahl joined Joyent as an employee and continued
+                        developing Node.js.
+                      </li>
+                      <li>Later, many more developers joined the project.</li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">
+                      5. Who Maintains Node.js Today?
+                    </h4>
+
+                    <ul>
+                      <li>
+                        Node.js is
+                        <strong>not maintained by Joyent</strong> today.
+                      </li>
+                      <li>
+                        It is maintained by the
+                        <strong>OpenJS Foundation</strong>.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">6. Why Was It Called Node.js?</h4>
+
+                    <ul>
+                      <li>
+                        In the early stages, Ryan Dahl named the project
+                        <strong>Web.js</strong>.
+                      </li>
+                      <li>
+                        The original goal was mainly to build web servers.
+                      </li>
+                      <li>
+                        Later, Ryan Dahl realized that JavaScript could do much
+                        more than just create servers.
+                      </li>
+                      <li>He renamed it to <strong>Node.js</strong>.</li>
+                      <li>
+                        Today, Node.js is used for:
+                        <ul>
+                          <li>Building web servers</li>
+                          <li>Real-time chat applications</li>
+                          <li>Socket communication</li>
+                          <li>REST APIs</li>
+                          <li>Third-party API integration</li>
+                          <li>Microservices</li>
+                          <li>Many other backend applications</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">7. Why Was Node.js Created?</h4>
+
+                    <ul>
+                      <li>
+                        While developing Node.js, Ryan Dahl observed that the
+                        <strong>Apache HTTP Server</strong> used a blocking
+                        approach.
+                      </li>
+                      <li>
+                        Blocking servers make requests wait until the current
+                        request is finished.
+                      </li>
+                      <li>Ryan Dahl wanted to solve this problem.</li>
+                      <li>
+                        He designed Node.js as a
+                        <strong>Non-Blocking I/O</strong> platform.
+                      </li>
+                      <li>
+                        The main goal was to handle many client requests without
+                        blocking the server.
+                      </li>
+                    </ul>
+
+                    <div class="alert alert-warning">
+                      <strong>Main Advantage of Non-Blocking I/O</strong>
+
+                      <ul class="mb-0">
+                        <li>Handles more requests.</li>
+                        <li>Uses fewer threads.</li>
+                        <li>Provides better performance.</li>
+                        <li>Suitable for highly scalable applications.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">8. Introduction of npm (2010)</h4>
+
+                    <ul>
+                      <li>
+                        In <strong>2010</strong>, <strong>npm</strong> was
+                        introduced.
+                      </li>
+                      <li>
+                        npm stands for <strong>Node Package Manager</strong>.
+                      </li>
+                      <li>
+                        It is the central registry where Node.js packages are
+                        published.
+                      </li>
+                      <li>
+                        npm was created by <strong>Isaac Schlueter</strong>, who
+                        was working at Joyent.
+                      </li>
+                      <li>
+                        It allows developers to create small, reusable packages.
+                      </li>
+                      <li>
+                        This saves development time because developers can reuse
+                        existing packages instead of writing everything from
+                        scratch.
+                      </li>
+                    </ul>
+
+                    <div class="alert alert-info">
+                      <strong>Important:</strong>
+                      Without npm, Node.js would probably not have become as
+                      successful as it is today.
+                    </div>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">9. Windows Support (2011)</h4>
+
+                    <ul>
+                      <li>
+                        Initially, Node.js supported only
+                        <strong>Linux</strong> and <strong>macOS</strong>.
+                      </li>
+                      <li>
+                        In <strong>2011</strong>, Microsoft partnered with
+                        Joyent.
+                      </li>
+                      <li>
+                        Together they made Node.js available for
+                        <strong>Windows</strong>.
+                      </li>
+                      <li>
+                        As Node.js became more popular, Microsoft started
+                        actively supporting the project.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">
+                      10. Ryan Dahl Stepped Away (2012)
+                    </h4>
+
+                    <ul>
+                      <li>
+                        In <strong>2012</strong>, Ryan Dahl stopped leading
+                        Node.js development.
+                      </li>
+                      <li>He was still an employee at Joyent.</li>
+                      <li>
+                        The responsibility for Node.js was given to
+                        <strong>Isaac Schlueter</strong>, the creator of npm.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">11. Slow Development Phase</h4>
+
+                    <ul>
+                      <li>
+                        After Isaac took over, Node.js development became
+                        slower.
+                      </li>
+                      <li>
+                        Google Chrome's V8 engine was adding new features
+                        quickly.
+                      </li>
+                      <li>Node.js was slower to adopt those new features.</li>
+                      <li>
+                        Because of this, Node.js started losing some popularity.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">12. io.js Fork (2014)</h4>
+
+                    <ul>
+                      <li>
+                        In <strong>2014</strong>, a developer named
+                        <strong>Fedor Indutny</strong> created a fork of Node.js
+                        called <strong>io.js</strong>.
+                      </li>
+                      <li>
+                        At that time, two separate projects existed:
+                        <ul>
+                          <li>Node.js</li>
+                          <li>io.js</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">
+                      13. Node.js and io.js Merged (2015)
+                    </h4>
+
+                    <ul>
+                      <li>
+                        In <strong>2015</strong>, Node.js and io.js merged into
+                        a single project.
+                      </li>
+                      <li>
+                        The <strong>Node.js Foundation</strong> was created.
+                      </li>
+                      <li>
+                        The foundation became responsible for Node.js releases,
+                        versions and future development.
+                      </li>
+                      <li>The Node.js we use today is the merged version.</li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-4">
+                    <h4 class="text-primary">14. OpenJS Foundation (2019)</h4>
+
+                    <ul>
+                      <li>
+                        In <strong>2019</strong>, two organizations existed:
+                        <ul>
+                          <li>Node.js Foundation</li>
+                          <li>JS Foundation</li>
+                        </ul>
+                      </li>
+                      <li>
+                        Both organizations merged to form the
+                        <strong>OpenJS Foundation</strong>.
+                      </li>
+                      <li>
+                        Today, the OpenJS Foundation is fully responsible for
+                        maintaining, improving and releasing Node.js.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <hr />
+
+                  <div class="alert alert-success">
+                    <h4>📌 Quick Timeline</h4>
+
+                    <table class="table table-bordered">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Year</th>
+                          <th>Event</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td>2009</td>
+                          <td>
+                            Ryan Dahl released the first version of Node.js.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>2010</td>
+                          <td>npm was introduced.</td>
+                        </tr>
+
+                        <tr>
+                          <td>2011</td>
+                          <td>
+                            Windows support was added with Microsoft's help.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>2012</td>
+                          <td>
+                            Isaac Schlueter took responsibility for Node.js
+                            development.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>2014</td>
+                          <td>io.js was created by Fedor Indutny.</td>
+                        </tr>
+
+                        <tr>
+                          <td>2015</td>
+                          <td>
+                            Node.js and io.js merged. Node.js Foundation was
+                            formed.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>2019</td>
+                          <td>
+                            Node.js Foundation and JS Foundation merged to form
+                            the OpenJS Foundation.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <hr />
+
+            <!-- facts of nodejs -->
+            <section id="nodejsfacts" class="container my-5">
+              <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                  <h2 class="mb-0">🚀 Interesting Node.js Facts</h2>
+                </div>
+
+                <div class="card-body">
+                  <div class="alert alert-primary">
+                    <h4>Why Learn These Facts?</h4>
+
+                    <p class="mb-0">
+                      These are interesting facts that are often discussed in
+                      interviews. Understanding these concepts helps you answer
+                      questions confidently and gives you a better understanding
+                      of how Node.js works.
+                    </p>
+                  </div>
+
+                  <hr />
+
+                  <!-- Fact 1 -->
+
+                  <div class="card mb-4 border-primary">
+                    <div class="card-header bg-primary text-white">
+                      <h4 class="mb-0">
+                        📌 Fact 1 - Node.js Uses Google's V8 Engine
+                      </h4>
+                    </div>
+
+                    <div class="card-body">
+                      <p>
+                        Node.js is built on top of
+                        <strong>Google Chrome's V8 JavaScript Engine</strong>.
+                      </p>
+
+                      <p>
+                        Express.js is built on top of <strong>Node.js</strong>.
+                      </p>
+
+                      <p>
+                        Since Express.js runs inside Node.js, it also uses the
+                        same
+                        <strong>Google V8 Engine</strong>.
+                      </p>
+
+                      <div class="alert alert-warning">
+                        <strong>Visual Flow</strong>
+
+                        <pre class="mb-0">
+Google Chrome
+      │
+      ▼
+   V8 Engine
+      │
+      ▼
+    Node.js
+      │
+      ▼
+   Express.js
+</pre
+                        >
+                      </div>
+
+                      <div class="alert alert-info mb-0">
+                        <strong>Interview Answer:</strong><br />
+
+                        Express.js does not have its own JavaScript engine. It
+                        runs on Node.js, and Node.js uses Google's V8 Engine.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fact 2 -->
+
+                  <div class="card mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                      <h4 class="mb-0">
+                        📌 Fact 2 - JavaScript Was Originally Created Only for
+                        Browsers
+                      </h4>
+                    </div>
+
+                    <div class="card-body">
+                      <p>
+                        JavaScript was originally created to add
+                        <strong>dynamic behavior</strong> to web pages.
+                      </p>
+
+                      <p>
+                        Earlier, JavaScript could only run inside a web browser.
+                      </p>
+
+                      <p>
+                        After the introduction of <strong>Node.js</strong>,
+                        JavaScript could also run outside the browser.
+                      </p>
+
+                      <p>Today, JavaScript is used for:</p>
+
+                      <ul>
+                        <li>Building backend servers</li>
+
+                        <li>Creating REST APIs</li>
+
+                        <li>Fetching data from databases</li>
+
+                        <li>Real-time chat applications</li>
+
+                        <li>Socket communication</li>
+
+                        <li>Command Line (CLI) applications</li>
+                      </ul>
+
+                      <div class="alert alert-warning">
+                        <pre class="mb-0">
+Before Node.js
+
+JavaScript
+      │
+      ▼
+ Browser Only
+
+
+After Node.js
+
+JavaScript
+      │
+ ┌────┴─────┐
+ ▼          ▼
+Browser   Server
+</pre
+                        >
+                      </div>
+
+                      <div class="alert alert-info mb-0">
+                        <strong>Interview Answer:</strong><br />
+
+                        Before Node.js, JavaScript was mainly used in browsers.
+                        After Node.js, JavaScript became a full-stack language
+                        because it could also run on servers.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fact 3 -->
+
+                  <div class="card mb-4 border-danger">
+                    <div class="card-header bg-danger text-white">
+                      <h4 class="mb-0">
+                        📌 Fact 3 - Why Is Node.js So Successful?
+                      </h4>
+                    </div>
+
+                    <div class="card-body">
+                      <p>
+                        One of the biggest reasons for Node.js's success is its
+                        <strong>Event-Driven Architecture</strong>.
+                      </p>
+
+                      <p>
+                        Node.js also supports
+                        <strong>Asynchronous I/O (Non-Blocking I/O)</strong>.
+                      </p>
+
+                      <p>
+                        Instead of waiting for one task to finish, Node.js can
+                        continue handling other requests.
+                      </p>
+
+                      <div class="alert alert-warning">
+                        <pre class="mb-0">
+Client Request
+      │
+      ▼
+ Event Loop
+      │
+      ▼
+ Continue Handling
+ Other Requests
+</pre
+                        >
+                      </div>
+
+                      <h5>Main Advantages</h5>
+
+                      <ul>
+                        <li>Handles many users at the same time.</li>
+
+                        <li>Uses fewer threads.</li>
+
+                        <li>Fast response time.</li>
+
+                        <li>Highly scalable.</li>
+
+                        <li>Ideal for APIs and real-time applications.</li>
+                      </ul>
+
+                      <div class="alert alert-info mb-0">
+                        <strong>Interview Answer:</strong><br />
+
+                        Node.js is successful because of its event-driven
+                        architecture and non-blocking asynchronous I/O, which
+                        allows it to handle many requests efficiently.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fact 4 -->
+
+                  <div class="card mb-4 border-warning">
+                    <div class="card-header bg-warning">
+                      <h4 class="mb-0">
+                        📌 Fact 4 - JavaScript Always Needs a JavaScript Engine
+                      </h4>
+                    </div>
+
+                    <div class="card-body">
+                      <p>JavaScript cannot run by itself.</p>
+
+                      <p>
+                        It always needs a
+                        <strong>JavaScript Engine</strong>
+                        to understand and execute JavaScript code.
+                      </p>
+
+                      <p>JavaScript engines are available in many devices.</p>
+
+                      <ul>
+                        <li>Web Browsers</li>
+
+                        <li>Node.js Servers</li>
+
+                        <li>Smart TVs</li>
+
+                        <li>Smart Watches</li>
+
+                        <li>IoT Devices</li>
+
+                        <li>Machine Learning Applications</li>
+
+                        <li>Desktop Applications</li>
+                      </ul>
+
+                      <div class="alert alert-warning">
+                        <pre class="mb-0">
+JavaScript Code
+       │
+       ▼
+JavaScript Engine
+       │
+       ▼
+ Machine Code
+       │
+       ▼
+Program Runs
+</pre
+                        >
+                      </div>
+
+                      <div class="alert alert-danger">
+                        <strong>Important:</strong><br />
+
+                        Without a JavaScript Engine, JavaScript code cannot
+                        execute.
+                      </div>
+
+                      <div class="alert alert-info mb-0">
+                        <strong>Interview Answer:</strong><br />
+
+                        JavaScript always requires a JavaScript Engine such as
+                        Google's V8 Engine or Firefox's SpiderMonkey Engine to
+                        execute JavaScript code.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fact 5 -->
+
+                  <div class="card border-secondary">
+                    <div class="card-header bg-secondary text-white">
+                      <h4 class="mb-0">
+                        📌 Fact 5 - One Language for Both Frontend and Backend
+                      </h4>
+                    </div>
+
+                    <div class="card-body">
+                      <p>
+                        One of the biggest advantages of Node.js is that
+                        developers can use the
+                        <strong>same programming language (JavaScript)</strong>
+                        for both frontend and backend development.
+                      </p>
+
+                      <div class="alert alert-warning">
+                        <pre class="mb-0">
+           JavaScript
+          /          \
+         ▼            ▼
+ Frontend         Backend
+ (React)         (Node.js)
+</pre
+                        >
+                      </div>
+
+                      <h5>Benefits</h5>
+
+                      <ul>
+                        <li>Learn one language.</li>
+
+                        <li>Build both frontend and backend.</li>
+
+                        <li>Share code between client and server.</li>
+
+                        <li>Faster development.</li>
+
+                        <li>
+                          Better career opportunities as a Full Stack Developer.
+                        </li>
+                      </ul>
+
+                      <div class="alert alert-info mb-0">
+                        <strong>Interview Answer:</strong><br />
+
+                        JavaScript is one of the few languages that can be used
+                        for both frontend and backend development because of
+                        Node.js.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <hr />
+
+            <!-- js on server -->
+            <section id="jsonserver">
+              <div class="hero">
+                <div class="container">
+                  <h4>📘 JS on Server</h4>
+                </div>
+              </div>
+
+              <div class="container py-4">
+                <section class="card">
+                  <div class="card-header bg-primary text-white">
+                    <h3>1. What is a Server?</h3>
+                  </div>
+                  <div class="card-body">
+                    <p>
+                      A <b>server</b> is a powerful remote computer that runs
+                      applications for users through the internet. It usually
+                      has high RAM, powerful CPU, large storage, strong security
+                      and works 24×7.
+                    </p>
+                    <div class="alert alert-info">
+                      <b>Example:</b> YouTube, Amazon and Instagram run on
+                      servers, not on your own computer.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-success text-white">
+                    <h3>2. What Happens When You Enter a Domain Name?</h3>
+                  </div>
+                  <div class="card-body">
+                    <ol>
+                      <li>Enter <b>www.abc.com</b>.</li>
+                      <li>DNS converts the domain into an IP Address.</li>
+                      <li>The browser sends a request to the server.</li>
+                      <li>The server processes the request.</li>
+                      <li>The server sends the response.</li>
+                      <li>The browser renders the webpage.</li>
+                    </ol>
+                    <pre>
+Browser
+   │
+Domain Name
+   │
+DNS
+   │
+IP Address
+   │
+Server
+   │
+Response
+   │
+Website</pre
+                    >
+                    <div class="alert alert-warning">
+                      <b>Layman Example:</b> Asking a librarian for a book. You
+                      ask, the librarian finds it and gives it back. Browser =
+                      You, Server = Librarian.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-dark text-white">
+                    <h3>3. Normal Computer vs Server</h3>
+                  </div>
+                  <div class="card-body">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Normal Computer</th>
+                          <th>Server</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>One user</td>
+                          <td>Many users at the same time</td>
+                        </tr>
+                        <tr>
+                          <td>Runs for personal work</td>
+                          <td>Runs websites and applications</td>
+                        </tr>
+                        <tr>
+                          <td>Can be turned off</td>
+                          <td>Runs 24×7</td>
+                        </tr>
+                        <tr>
+                          <td>Lower RAM & CPU</td>
+                          <td>High RAM, CPU & Storage</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-info text-white">
+                    <h3>4. JavaScript Facts</h3>
+                  </div>
+                  <div class="card-body">
+                    <ul>
+                      <li>
+                        JavaScript was originally created only for browsers.
+                      </li>
+                      <li>
+                        Later NodeJS allowed JavaScript to run on servers.
+                      </li>
+                      <li>
+                        Now JavaScript can build both frontend and backend.
+                      </li>
+                      <li>
+                        One developer can become a Full Stack Developer using
+                        the same language.
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-primary text-white">
+                    <h3>5. How NodeJS is Built</h3>
+                  </div>
+                  <div class="card-body">
+                    <ul>
+                      <li>NodeJS uses Google's <b>V8 JavaScript Engine</b>.</li>
+                      <li>V8 is mostly written in <b>C++</b>.</li>
+                      <li>V8 converts JavaScript into machine code.</li>
+                      <li>
+                        NodeJS is a C++ application with the V8 engine embedded
+                        inside it.
+                      </li>
+                    </ul>
+                    <pre>
+JavaScript
+     │
+     ▼
+V8 Engine (C++)
+     │
+     ▼
+Machine Code
+     │
+     ▼
+CPU</pre
+                    >
+                    <div class="alert alert-secondary">
+                      <b>Important:</b> When people say "JavaScript Engine",
+                      they actually mean a C++ program that executes JavaScript.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-warning">
+                    <h3>6. What is ECMAScript?</h3>
+                  </div>
+                  <div class="card-body">
+                    <p>
+                      ECMAScript is the official standard for JavaScript. It
+                      defines the syntax and rules that all JavaScript engines
+                      should follow.
+                    </p>
+                    <table class="table table-striped">
+                      <tr>
+                        <th>Engine</th>
+                        <th>Used By</th>
+                      </tr>
+                      <tr>
+                        <td>V8</td>
+                        <td>Chrome & NodeJS</td>
+                      </tr>
+                      <tr>
+                        <td>SpiderMonkey</td>
+                        <td>Firefox</td>
+                      </tr>
+                      <tr>
+                        <td>Chakra</td>
+                        <td>Older Microsoft Edge</td>
+                      </tr>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-danger text-white">
+                    <h3>7. Why Do We Need NodeJS?</h3>
+                  </div>
+                  <div class="card-body">
+                    <p>
+                      V8 only executes JavaScript according to ECMAScript rules.
+                      It cannot access files, databases or networks by itself.
+                    </p>
+                    <p>NodeJS adds extra APIs called <b>Super Powers</b>.</p>
+                    <div class="alert alert-success">
+                      <b>Super Powers:</b> File System, Fetch API, HTTP Server,
+                      Timers, Global Object, Database Connections, Streams, OS
+                      APIs.
+                    </div>
+                    <pre>V8 Engine + Node APIs = NodeJS</pre>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-success text-white">
+                    <h3>8. Why is V8 Written in C++?</h3>
+                  </div>
+                  <div class="card-body">
+                    <p>
+                      C++ is a fast system programming language. V8 uses C++ to
+                      convert JavaScript into machine code (binary 0 and 1) so
+                      the computer can execute it efficiently.
+                    </p>
+                    <div class="alert alert-info">
+                      <b>Interview Tip:</b> Computers understand only binary. V8
+                      translates JavaScript into binary instructions.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card">
+                  <div class="card-header bg-secondary text-white">
+                    <h3>9. Quick Interview Revision</h3>
+                  </div>
+                  <div class="card-body">
+                    <ul>
+                      <li>Server = Powerful remote computer.</li>
+                      <li>NodeJS = JavaScript Runtime.</li>
+                      <li>V8 = JavaScript Engine written mainly in C++.</li>
+                      <li>ECMAScript = JavaScript Standard.</li>
+                      <li>NodeJS = V8 + Server APIs.</li>
+                      <li>
+                        V8 executes JavaScript; NodeJS adds file system,
+                        networking and database support.
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+              </div>
+            </section>
+            <hr />
+
+            <!-- Global object -->
+            <section
+              id="globalObject"
+              class="card shadow-lg border-0 rounded-4 mb-5"
+            >
+              <!-- Header -->
+              <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h2 class="mb-0">
+                  🌍 Global Object in JavaScript (globalThis)
+                </h2>
+              </div>
+
+              <div class="card-body">
+                <!-- Introduction -->
+                <div class="alert alert-primary">
+                  <strong>Definition:</strong><br />
+                  A <strong>Global Object</strong> is a built-in object that is
+                  available everywhere in your JavaScript application. It
+                  provides common functions and variables that can be accessed
+                  from any file without importing them.
+                </div>
+
+                <!-- Why globalThis -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                      🤔 Why was <code>globalThis</code> introduced?
+                    </h4>
+                  </div>
+
+                  <div class="card-body">
+                    <p>
+                      Earlier, different JavaScript environments used different
+                      global objects. This created confusion for developers
+                      because the same JavaScript code could not work
+                      everywhere.
+                    </p>
+
+                    <table class="table table-bordered table-striped">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Environment</th>
+                          <th>Global Object</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td>Browser</td>
+                          <td><code>window</code></td>
+                        </tr>
+
+                        <tr>
+                          <td>Browser (Web Workers)</td>
+                          <td><code>self</code></td>
+                        </tr>
+
+                        <tr>
+                          <td>Node.js</td>
+                          <td><code>global</code></td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div class="alert alert-warning">
+                      Because every JavaScript engine had a different global
+                      object, writing common JavaScript libraries became
+                      difficult.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Solution -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">✅ Solution: globalThis</h4>
+                  </div>
+
+                  <div class="card-body">
+                    <p>
+                      To solve this problem, the ECMAScript committee introduced
+                      <code>globalThis</code>.
+                    </p>
+
+                    <p>
+                      <strong>globalThis</strong> is a single standard global
+                      object that works in every JavaScript environment.
+                    </p>
+
+                    <div class="alert alert-success">
+                      <strong>Interview Ready Definition:</strong><br />
+                      <code>globalThis</code> is the standard global object
+                      introduced by ECMAScript so the same JavaScript code works
+                      in browsers, Node.js and all JavaScript engines.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comparison -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">📊 Global Objects Comparison</h4>
+                  </div>
+
+                  <div class="card-body">
+                    <table class="table table-bordered align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Environment</th>
+                          <th>Global Object</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td>Browser</td>
+                          <td>
+                            <code>window</code>, <code>this</code>,
+                            <code>self</code>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>Node.js</td>
+                          <td>
+                            <code>global</code>
+                          </td>
+                        </tr>
+
+                        <tr class="table-success">
+                          <td>All JavaScript Engines</td>
+                          <td>
+                            <strong><code>globalThis</code></strong>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Diagram -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">📈 Visual Diagram</h4>
+                  </div>
+
+                  <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded">
+             JavaScript
+
+                  │
+
+      ┌───────────┼───────────┐
+      │           │           │
+      ▼           ▼           ▼
+
+ Browser      Node.js     Other JS Engine
+
+ window        global
+
+      └───────────┼───────────┘
+                  │
+                  ▼
+
+             globalThis
+      (Works Everywhere)
+</pre
+                    >
+                  </div>
+                </div>
+
+                <!-- Code -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">💻 Example</h4>
+                  </div>
+
+                  <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded"><code>// Node.js
+
+console.log(globalThis === global);
+
+// Output
+true
+</code></pre>
+
+                    <pre class="bg-dark text-light p-3 rounded"><code>// Browser
+
+console.log(globalThis === window);
+
+// Output
+true
+</code></pre>
+                  </div>
+                </div>
+
+                <!-- Real Time -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-warning">
+                    <h4 class="mb-0">🏢 Real-Time Example</h4>
+                  </div>
+
+                  <div class="card-body">
+                    <p>
+                      Imagine you are building a JavaScript library that should
+                      work in both the browser and Node.js.
+                    </p>
+
+                    <p>
+                      Instead of checking whether
+                      <code>window</code> or <code>global</code> exists, simply
+                      use <code>globalThis</code>.
+                    </p>
+
+                    <div class="alert alert-info">
+                      This makes your code portable, cleaner, and compatible
+                      with all JavaScript environments.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Interview Tip -->
+                <div class="alert alert-danger">
+                  <h5>🎯 Interview Tip</h5>
+
+                  <ul class="mb-0">
+                    <li>Browser global object → <code>window</code></li>
+                    <li>Node.js global object → <code>global</code></li>
+                    <li>Standard global object → <code>globalThis</code></li>
+                    <li>
+                      <code>globalThis</code> was introduced by ECMAScript to
+                      provide one common global object for all JavaScript
+                      engines.
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Quick Revision -->
+                <div class="card border-success shadow-sm">
+                  <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">📝 Quick Revision</h4>
+                  </div>
+
+                  <div class="card-body">
+                    <ul>
+                      <li>
+                        Earlier every environment had a different global object.
+                      </li>
+                      <li>Browser uses <code>window</code>.</li>
+                      <li>Node.js uses <code>global</code>.</li>
+                      <li><code>globalThis</code> works everywhere.</li>
+                      <li>
+                        Use <code>globalThis</code> in modern JavaScript
+                        projects.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Reference -->
+                <div class="alert alert-secondary mt-4">
+                  <h5>📚 Reference for Latest JavaScript Updates</h5>
+
+                  <ul class="mb-0">
+                    <li>
+                      <strong>ECMAScript Specifications:</strong>
+                      <a href="https://tc39.es/ecma262/"
+                        >ECMAScript Specifications</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+            <hr />
+
+            <!-- import vs exports -->
+            <section id="importsvsexports">
+              <div class="container py-4">
+                <div class="p-4 bg-primary text-white rounded-4 shadow mb-4">
+                  <h1>📘 Technical Study Notes</h1>
+                  <h3>NodeJS - Import & Export Modules</h3>
+                </div>
+
+                <section class="card shadow">
+                  <div class="card-header bg-success text-white">
+                    <h3>What are Modules?</h3>
+                  </div>
+                  <div class="card-body">
+                    <p>
+                      A module is a JavaScript file that contains functions,
+                      variables or classes. Modules help organize and reuse
+                      code.
+                    </p>
+                    <div class="alert alert-info">
+                      <b>Example:</b> Keep login, products and payment code in
+                      separate files.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-primary text-white">
+                    <h3>Ways to Import & Export</h3>
+                  </div>
+                  <div class="card-body">
+                    <table class="table table-bordered">
+                      <tr>
+                        <th>System</th>
+                        <th>Import</th>
+                        <th>Export</th>
+                      </tr>
+                      <tr>
+                        <td>ES Modules</td>
+                        <td>import</td>
+                        <td>export</td>
+                      </tr>
+                      <tr>
+                        <td>CommonJS</td>
+                        <td>require()</td>
+                        <td>module.exports</td>
+                      </tr>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-info text-white">
+                    <h3>ES Modules</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="alert alert-warning">
+                      package.json: <code>{"type":"module"}</code>
+                    </div>
+                    <pre>
+add.js
+function add(a,b){ console.log(a+b); }
+export default add;
+
+app.js
+import add from "./add.js";
+add(2,3);</pre
+                    >
+                    <div class="alert alert-success">
+                      <b>Interview Tip:</b> export default exports one primary
+                      value.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-secondary text-white">
+                    <h3>CommonJS</h3>
+                  </div>
+                  <div class="card-body">
+                    <pre>
+add.js
+function add(a,b){ console.log(a+b); }
+module.exports = add;
+
+index.js
+const add = require("./add.js");
+add(2,3);</pre
+                    >
+                    <div class="alert alert-primary">
+                      <ul>
+                        <li>Required files execute when loaded.</li>
+                        <li>Import exported functions to use them.</li>
+                        <li>module.exports is an empty object by default.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-dark text-white">
+                    <h3>Multiple Files (index.js)</h3>
+                  </div>
+                  <div class="card-body">
+                    <pre>
+calculate/
+ add.js
+ multiply.js
+ index.js
+
+index.js
+import add from "./add.js";
+import multiply from "./multiply.js";
+export {add,multiply};
+
+app.js
+import {add,multiply} from "./calculate";</pre
+                    >
+                    <div class="alert alert-info">
+                      <p>
+                        There is no need to specify index.js while importing.
+                        Node.js automatically imports the index.js file from the
+                        folder.
+                      </p>
+                    </div>
+                    <div class="alert alert-info">
+                      Using one index.js to export all files is called the
+                      <b>Barrel Export Pattern</b>.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-warning">
+                    <h3>Flow Diagram</h3>
+                  </div>
+                  <div class="card-body">
+                    <pre>
+app.js
+  │
+  ▼
+Imports add.js
+  │
+  ▼
+Node executes add.js
+  │
+  ▼
+Exports function
+  │
+  ▼
+Function used in app.js</pre
+                    >
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-danger text-white">
+                    <h3>CommonJS vs ES Modules</h3>
+                  </div>
+                  <div class="card-body">
+                    <table class="table table-bordered">
+                      <tr>
+                        <th>CommonJS</th>
+                        <th>ES Modules</th>
+                      </tr>
+                      <tr>
+                        <td>require()</td>
+                        <td>import</td>
+                      </tr>
+                      <tr>
+                        <td>module.exports</td>
+                        <td>export</td>
+                      </tr>
+                      <tr>
+                        <td>Older</td>
+                        <td>Modern</td>
+                      </tr>
+                      <tr>
+                        <td>Synchronous</td>
+                        <td>Asynchronous</td>
+                      </tr>
+                      <tr>
+                        <td>Mainly Node.js</td>
+                        <td>React & Modern JS</td>
+                      </tr>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="card shadow">
+                  <div class="card-header bg-success text-white">
+                    <h3>Interview Questions</h3>
+                  </div>
+                  <div class="card-body">
+                    <ol>
+                      <li>
+                        <b>How many module systems?</b> Two: CommonJS and ES
+                        Modules.
+                      </li>
+                      <li>
+                        <b>Why use modules?</b> To organize and reuse code.
+                      </li>
+                      <li>
+                        <b>What is module.exports?</b> Exports values in
+                        CommonJS.
+                      </li>
+                      <li>
+                        <b>What is export default?</b> Exports one default
+                        value.
+                      </li>
+                      <li>
+                        <b>Why use index.js?</b> To export multiple modules from
+                        one place.
+                      </li>
+                    </ol>
+                  </div>
+                </section>
+              </div>
+            </section>
+            <hr>
+
+            <!-- How modules works  in nodejs -->
+
+            <section id="howmoduleworksinnodejs" class="container my-5">
+
+    <!-- ================================================= -->
+    <!-- PAGE TITLE -->
+    <!-- ================================================= -->
+
+    <div class="card shadow-lg border-0 mb-5">
+
+        <div class="card-header bg-primary text-white py-4">
+            <h2 class="mb-0">
+                📘 NodeJS Modules Internals
+            </h2>
+            <p class="mb-0 mt-2">
+                How Modules Work in Node.js | IIFE | Module Wrapper | require() | module.exports | Module Caching
+            </p>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-primary">
+                <strong>Interview Definition</strong><br>
+
+                Every JavaScript file in Node.js is treated as a separate module.
+                Before executing the code, Node.js automatically wraps the entire file
+                inside a special function called an <strong>IIFE (Immediately Invoked Function Expression)</strong>.
+                This keeps variables and functions private and prevents conflicts with code in other files.
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- HOW MODULES WORK -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">
+                1. How Modules Work in Node.js
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                Every JavaScript file is considered a separate module.
+
+                Before running your code, Node.js automatically wraps the entire file
+                inside an <strong>Immediately Invoked Function Expression (IIFE)</strong>.
+
+            </p>
+
+            <div class="alert alert-success">
+
+                <strong>Why does Node.js wrap every module inside an IIFE?</strong>
+
+                <ul class="mb-0 mt-2">
+
+                    <li>Keeps variables private.</li>
+
+                    <li>Keeps functions private.</li>
+
+                    <li>Prevents variable name conflicts between different files.</li>
+
+                    <li>Provides module-specific objects like <code>module</code>, <code>exports</code>, and <code>require()</code>.</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- PRIVATE VARIABLES -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">
+                2. Why are Variables and Functions Private?
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                Variables and functions are private because each file is wrapped inside its own IIFE.
+
+            </p>
+
+            <p>
+
+                Every module gets its own private scope.
+
+                Therefore, variables declared in one file cannot be accessed directly from another file.
+
+            </p>
+
+            <div class="alert alert-warning">
+
+                <strong>Important:</strong>
+
+                You can only access code from another file if it is exported using
+                <code>module.exports</code> (CommonJS) or <code>export</code> (ES Modules).
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- IIFE -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-dark text-white">
+            <h3 class="mb-0">
+                3. What is an IIFE?
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                IIFE stands for <strong>Immediately Invoked Function Expression</strong>.
+
+            </p>
+
+            <p>
+
+                It is a function that executes immediately after it is created.
+
+            </p>
+
+<pre><code>(function(){
+
+    console.log("Runs immediately");
+
+})();</code></pre>
+
+            <div class="alert alert-info">
+
+                <strong>Interview Tip</strong>
+
+                Node.js automatically creates this wrapper for every module.
+                Developers do not write this wrapper manually.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- WRAPPER -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-secondary text-white">
+            <h3 class="mb-0">
+                4. How Node.js Wraps Your Module
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                Suppose your file contains the following code.
+
+            </p>
+
+<pre><code>function calculateMultiply(a, b) {
+
+    const result = a * b;
+
+    console.log(result);
+
+}
+
+module.exports = {
+
+    calculateMultiply
+
+};</code></pre>
+
+            <p>
+
+                Before execution, Node.js internally converts it into something similar to:
+
+            </p>
+
+<pre><code>(function(exports, require, module, __filename, __dirname){
+
+    function calculateMultiply(a,b){
+
+        const result = a*b;
+
+        console.log(result);
+
+    }
+
+    module.exports = {
+
+        calculateMultiply
+
+    };
+
+});</code></pre>
+
+            <div class="alert alert-success">
+
+                <strong>Important</strong>
+
+                Node.js automatically passes five parameters into every module.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- PARAMETERS -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                5. Parameters Passed by Node.js
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Parameter</th>
+
+                    <th>Purpose</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr>
+
+                    <td><code>exports</code></td>
+
+                    <td>Shortcut for exporting values.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td><code>require</code></td>
+
+                    <td>Imports another module.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td><code>module</code></td>
+
+                    <td>Represents the current module.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td><code>__filename</code></td>
+
+                    <td>Full path of the current file.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td><code>__dirname</code></td>
+
+                    <td>Directory path of the current file.</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- EXECUTION -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">
+                6. Module Execution Steps
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <ol>
+
+                <li><strong>Resolve the module</strong><br>
+                Node.js finds the requested module (local file, JSON file, or built-in module).</li>
+
+                <li class="mt-3"><strong>Load the module</strong><br>
+                Node.js loads the file based on its type.</li>
+
+                <li class="mt-3"><strong>Wrap inside an IIFE</strong><br>
+                Node.js wraps the code inside a module wrapper function.</li>
+
+                <li class="mt-3"><strong>Execute the code</strong><br>
+                JavaScript code runs and creates the exports.</li>
+
+                <li class="mt-3"><strong>Return module.exports</strong><br>
+                The exported values are returned to the calling file.</li>
+
+                <li class="mt-3"><strong>Cache the module</strong><br>
+                The module is stored in memory for future use.</li>
+
+            </ol>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- FLOW -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-warning">
+            <h3 class="mb-0">
+                7. Visual Flow
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+<pre><code>require("./math")
+
+        │
+
+        ▼
+
+Resolve Module
+
+        │
+
+        ▼
+
+Load File
+
+        │
+
+        ▼
+
+Wrap Inside IIFE
+
+        │
+
+        ▼
+
+Execute Code
+
+        │
+
+        ▼
+
+module.exports
+
+        │
+
+        ▼
+
+Store in Cache
+
+        │
+
+        ▼
+
+Return Exported Values</code></pre>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- CACHE -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">
+                8. What is Module Caching?
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                Node.js executes a module only once.
+
+            </p>
+
+            <p>
+
+                After the first execution, the exported object is stored in memory (cache).
+
+            </p>
+
+            <p>
+
+                If another file imports the same module again,
+                Node.js returns the cached version instead of executing the file again.
+
+            </p>
+
+            <div class="alert alert-success">
+
+                <strong>Interview Ready Answer</strong>
+
+                Module caching improves application performance because the same module
+                is not executed multiple times.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- REAL TIME -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0 mb-5">
+
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">
+                9. Real-Time Example
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                Suppose your application imports the database connection file
+                in multiple places.
+
+            </p>
+
+            <p>
+
+                The database connection code runs only once.
+
+            </p>
+
+            <p>
+
+                Every other <code>require()</code> call receives the same cached object,
+                preventing multiple database connections.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+ 
+
+
+
+    <!-- ================================================= -->
+    <!-- QUICK REVISION -->
+    <!-- ================================================= -->
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">
+                📝 Quick Revision
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <ul>
+
+                <li>Every file is a separate module.</li>
+
+                <li>Node.js wraps every module inside an IIFE.</li>
+
+                <li>IIFE keeps variables private.</li>
+
+                <li>Node.js provides exports, require, module, __filename and __dirname.</li>
+
+                <li>Modules are executed only once.</li>
+
+                <li>After execution, modules are stored in cache.</li>
+
+                <li>Future require() calls use the cached version.</li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+            </section>
+            <hr>
+
+
+            <!--  -->
+
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./index.js"></script>
+  </body>
+</html>
