@@ -61,7 +61,7 @@
                 >
               </li>
               <li class="nav-item">
-                <a class="nav-link " href="#classnotesintrotonodejs"
+                <a class="nav-link" href="#classnotesintrotonodejs"
                   >class notes of intro to nodejs</a
                 >
               </li>
@@ -72,28 +72,37 @@
                 <a class="nav-link" href="#jsonserver">Js on Server</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#classnotesjsonserver">Class notes of Js on Server</a>
-              </li>
-            
-              <li class="nav-item">
-                <a class="nav-link" href="#globalobject"
-                  >Global This object</a
+                <a class="nav-link" href="#classnotesjsonserver"
+                  >Class notes of Js on Server</a
                 >
               </li>
+
               <li class="nav-item">
-                <a class="nav-link" href="#classnotesglobalobject">Class notes of globalobject</a>
+                <a class="nav-link" href="#globalobject">Global This object</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#classnotesglobalobject"
+                  >Class notes of globalobject</a
+                >
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#importsvsexports"
-                >Imports VS exports</a
+                  >Imports VS exports</a
                 >
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#classnotesimportsexports">Class notes of Import vs Exports</a>
+                <a class="nav-link" href="#classnotesimportsexports"
+                  >Class notes of Import vs Exports</a
+                >
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#howmoduleworksinnodejs"
                   >How modules work in nodejs</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#libuv1"
+                  >libuv <small>(Sync, Async code execution</small> )</a
                 >
               </li>
             </ul>
@@ -540,25 +549,24 @@
             <hr />
 
             <section id="classnotesintrotonodejs" class="py-5 bg-light">
-    <div class="container">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center p-5">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-01 introduction to nodejs
+                    </h2>
 
-                <h2 class="fw-bold text-primary mb-3">
-                    Episode-01 introduction to nodejs
-                </h2>
-
-
-                <a href="../class notes/Episode-01 introduction to nodejs.pdf"
-                   target="_blank"
-                   class="btn btn-primary btn-lg px-4">
-                    Episode-01 introduction to nodejs
-                </a>
-
-            </div>
-        </div>
-    </div>
-</section>
+                    <a
+                      href="../class notes/Episode-01 introduction to nodejs.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-01 introduction to nodejs
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
 
             <!-- facts of nodejs -->
             <section id="nodejsfacts" class="container my-5">
@@ -1137,196 +1145,183 @@ CPU</pre
             </section>
             <hr />
 
-             <div class="text-center">
-                <img
-                  src="../../mohith_decodes/Images/nodeimage.png"
-                  alt="nodeimage"
-                  class="img-fluid"
-                />
+            <div class="text-center">
+              <img
+                src="../../mohith_decodes/Images/nodeimage.png"
+                alt="nodeimage"
+                class="img-fluid"
+              />
+            </div>
+
+            <section id="classnotesjsonserver" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-02 JS on Server
+                    </h2>
+
+                    <a
+                      href="../class notes/Episode-02 JS on Server.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-02 JS on Server
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Global object -->
+
+            <section
+              id="globalobject"
+              class="card shadow-lg border-0 rounded-4 mb-5"
+            >
+              <!-- Header -->
+              <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h2 class="mb-0">
+                  🌍 Global Object in JavaScript (globalThis)
+                </h2>
               </div>
 
-
-              <section id="classnotesjsonserver" class="py-5 bg-light">
-    <div class="container">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center p-5">
-
-                <h2 class="fw-bold text-primary mb-3">
-                   Episode-02 JS on Server
-                </h2>
-
-
-                <a href="../class notes/Episode-02 JS on Server.pdf"
-                   target="_blank"
-                   class="btn btn-primary btn-lg px-4">
-                    Episode-02 JS on Server
-                </a>
-
-            </div>
-        </div>
-    </div>
-</section>
-
-
-  <!-- Global object -->
-
-            <section id="globalobject" class="card shadow-lg border-0 rounded-4 mb-5">
-
-    <!-- Header -->
-    <div class="card-header bg-primary text-white py-3 rounded-top-4">
-        <h2 class="mb-0">
-            🌍 Global Object in JavaScript (globalThis)
-        </h2>
-    </div>
-
-    <div class="card-body">
-
-        <!-- Introduction -->
-        <div class="alert alert-primary">
-            <strong>Definition:</strong><br>
-            A <strong>Global Object</strong> is a built-in object that is available everywhere in your JavaScript application.
-            It provides common functions and variables that can be accessed from any file without importing them.
-        </div>
-
-        <!-- Why globalThis -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0">🤔 Why was <code>globalThis</code> introduced?</h4>
-            </div>
-
-            <div class="card-body">
-
-                <p>
-                    Earlier, different JavaScript environments used different global objects.
-                    This created confusion for developers because the same JavaScript code
-                    could not work everywhere.
-                </p>
-
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Environment</th>
-                            <th>Global Object</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td>Browser</td>
-                            <td><code>window</code></td>
-                        </tr>
-
-                        <tr>
-                            <td>Browser (Web Workers)</td>
-                            <td><code>self</code></td>
-                        </tr>
-
-                        <tr>
-                            <td>Node.js</td>
-                            <td><code>global</code></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="alert alert-warning">
-                    Because every JavaScript engine had a different global object,
-                    writing common JavaScript libraries became difficult.
+              <div class="card-body">
+                <!-- Introduction -->
+                <div class="alert alert-primary">
+                  <strong>Definition:</strong><br />
+                  A <strong>Global Object</strong> is a built-in object that is
+                  available everywhere in your JavaScript application. It
+                  provides common functions and variables that can be accessed
+                  from any file without importing them.
                 </div>
 
-            </div>
-        </div>
+                <!-- Why globalThis -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                      🤔 Why was <code>globalThis</code> introduced?
+                    </h4>
+                  </div>
 
-        <!-- Solution -->
-        <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-body">
+                    <p>
+                      Earlier, different JavaScript environments used different
+                      global objects. This created confusion for developers
+                      because the same JavaScript code could not work
+                      everywhere.
+                    </p>
 
-            <div class="card-header bg-info text-white">
-                <h4 class="mb-0">✅ Solution: globalThis</h4>
-            </div>
+                    <table class="table table-bordered table-striped">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Environment</th>
+                          <th>Global Object</th>
+                        </tr>
+                      </thead>
 
-            <div class="card-body">
+                      <tbody>
+                        <tr>
+                          <td>Browser</td>
+                          <td><code>window</code></td>
+                        </tr>
 
-                <p>
-                    To solve this problem, the ECMAScript committee introduced
-                    <code>globalThis</code>.
-                </p>
+                        <tr>
+                          <td>Browser (Web Workers)</td>
+                          <td><code>self</code></td>
+                        </tr>
 
-                <p>
-                    <strong>globalThis</strong> is a single standard global object
-                    that works in every JavaScript environment.
-                </p>
+                        <tr>
+                          <td>Node.js</td>
+                          <td><code>global</code></td>
+                        </tr>
+                      </tbody>
+                    </table>
 
-                <div class="alert alert-success">
-                    <strong>Interview Ready Definition:</strong><br>
-                    <code>globalThis</code> is the standard global object introduced by
-                    ECMAScript so the same JavaScript code works in browsers,
-                    Node.js and all JavaScript engines.
+                    <div class="alert alert-warning">
+                      Because every JavaScript engine had a different global
+                      object, writing common JavaScript libraries became
+                      difficult.
+                    </div>
+                  </div>
                 </div>
 
-            </div>
+                <!-- Solution -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">✅ Solution: globalThis</h4>
+                  </div>
 
-        </div>
+                  <div class="card-body">
+                    <p>
+                      To solve this problem, the ECMAScript committee introduced
+                      <code>globalThis</code>.
+                    </p>
 
-        <!-- Comparison -->
-        <div class="card shadow-sm border-0 mb-4">
+                    <p>
+                      <strong>globalThis</strong> is a single standard global
+                      object that works in every JavaScript environment.
+                    </p>
 
-            <div class="card-header bg-secondary text-white">
-                <h4 class="mb-0">📊 Global Objects Comparison</h4>
-            </div>
+                    <div class="alert alert-success">
+                      <strong>Interview Ready Definition:</strong><br />
+                      <code>globalThis</code> is the standard global object
+                      introduced by ECMAScript so the same JavaScript code works
+                      in browsers, Node.js and all JavaScript engines.
+                    </div>
+                  </div>
+                </div>
 
-            <div class="card-body">
+                <!-- Comparison -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">📊 Global Objects Comparison</h4>
+                  </div>
 
-                <table class="table table-bordered align-middle">
-
-                    <thead class="table-light">
+                  <div class="card-body">
+                    <table class="table table-bordered align-middle">
+                      <thead class="table-light">
                         <tr>
-                            <th>Environment</th>
-                            <th>Global Object</th>
+                          <th>Environment</th>
+                          <th>Global Object</th>
                         </tr>
-                    </thead>
+                      </thead>
 
-                    <tbody>
-
+                      <tbody>
                         <tr>
-                            <td>Browser</td>
-                            <td>
-                                <code>window</code>,
-                                <code>this</code>,
-                                <code>self</code>
-                            </td>
+                          <td>Browser</td>
+                          <td>
+                            <code>window</code>, <code>this</code>,
+                            <code>self</code>
+                          </td>
                         </tr>
 
                         <tr>
-                            <td>Node.js</td>
-                            <td>
-                                <code>global</code>
-                            </td>
+                          <td>Node.js</td>
+                          <td>
+                            <code>global</code>
+                          </td>
                         </tr>
 
                         <tr class="table-success">
-                            <td>All JavaScript Engines</td>
-                            <td>
-                                <strong><code>globalThis</code></strong>
-                            </td>
+                          <td>All JavaScript Engines</td>
+                          <td>
+                            <strong><code>globalThis</code></strong>
+                          </td>
                         </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
-                    </tbody>
+                <!-- Diagram -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">📈 Visual Diagram</h4>
+                  </div>
 
-                </table>
-
-            </div>
-
-        </div>
-
-        <!-- Diagram -->
-        <div class="card shadow-sm border-0 mb-4">
-
-            <div class="card-header bg-dark text-white">
-                <h4 class="mb-0">📈 Visual Diagram</h4>
-            </div>
-
-            <div class="card-body">
-
-<pre class="bg-dark text-light p-3 rounded">
+                  <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded">
              JavaScript
 
                   │
@@ -1345,22 +1340,19 @@ CPU</pre
 
              globalThis
       (Works Everywhere)
-</pre>
+</pre
+                    >
+                  </div>
+                </div>
 
-            </div>
+                <!-- Code -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">💻 Example</h4>
+                  </div>
 
-        </div>
-
-        <!-- Code -->
-        <div class="card shadow-sm border-0 mb-4">
-
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">💻 Example</h4>
-            </div>
-
-            <div class="card-body">
-
-<pre class="bg-dark text-light p-3 rounded"><code>// Node.js
+                  <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded"><code>// Node.js
 
 console.log(globalThis === global);
 
@@ -1368,122 +1360,112 @@ console.log(globalThis === global);
 true
 </code></pre>
 
-<pre class="bg-dark text-light p-3 rounded"><code>// Browser
+                    <pre class="bg-dark text-light p-3 rounded"><code>// Browser
 
 console.log(globalThis === window);
 
 // Output
 true
 </code></pre>
-
-            </div>
-
-        </div>
-
-        <!-- Real Time -->
-        <div class="card shadow-sm border-0 mb-4">
-
-            <div class="card-header bg-warning">
-                <h4 class="mb-0">🏢 Real-Time Example</h4>
-            </div>
-
-            <div class="card-body">
-
-                <p>
-                    Imagine you are building a JavaScript library that should work
-                    in both the browser and Node.js.
-                </p>
-
-                <p>
-                    Instead of checking whether
-                    <code>window</code> or
-                    <code>global</code> exists,
-                    simply use
-                    <code>globalThis</code>.
-                </p>
-
-                <div class="alert alert-info">
-                    This makes your code portable, cleaner, and compatible with all JavaScript environments.
+                  </div>
                 </div>
 
-            </div>
+                <!-- Real Time -->
+                <div class="card shadow-sm border-0 mb-4">
+                  <div class="card-header bg-warning">
+                    <h4 class="mb-0">🏢 Real-Time Example</h4>
+                  </div>
 
-        </div>
+                  <div class="card-body">
+                    <p>
+                      Imagine you are building a JavaScript library that should
+                      work in both the browser and Node.js.
+                    </p>
 
-        <!-- Interview Tip -->
-        <div class="alert alert-danger">
+                    <p>
+                      Instead of checking whether
+                      <code>window</code> or <code>global</code> exists, simply
+                      use <code>globalThis</code>.
+                    </p>
 
-            <h5>🎯 Interview Tip</h5>
+                    <div class="alert alert-info">
+                      This makes your code portable, cleaner, and compatible
+                      with all JavaScript environments.
+                    </div>
+                  </div>
+                </div>
 
-            <ul class="mb-0">
-                <li>Browser global object → <code>window</code></li>
-                <li>Node.js global object → <code>global</code></li>
-                <li>Standard global object → <code>globalThis</code></li>
-                <li><code>globalThis</code> was introduced by ECMAScript to provide one common global object for all JavaScript engines.</li>
-            </ul>
+                <!-- Interview Tip -->
+                <div class="alert alert-danger">
+                  <h5>🎯 Interview Tip</h5>
 
-        </div>
+                  <ul class="mb-0">
+                    <li>Browser global object → <code>window</code></li>
+                    <li>Node.js global object → <code>global</code></li>
+                    <li>Standard global object → <code>globalThis</code></li>
+                    <li>
+                      <code>globalThis</code> was introduced by ECMAScript to
+                      provide one common global object for all JavaScript
+                      engines.
+                    </li>
+                  </ul>
+                </div>
 
-        <!-- Quick Revision -->
-        <div class="card border-success shadow-sm">
+                <!-- Quick Revision -->
+                <div class="card border-success shadow-sm">
+                  <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">📝 Quick Revision</h4>
+                  </div>
 
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0">📝 Quick Revision</h4>
-            </div>
+                  <div class="card-body">
+                    <ul>
+                      <li>
+                        Earlier every environment had a different global object.
+                      </li>
+                      <li>Browser uses <code>window</code>.</li>
+                      <li>Node.js uses <code>global</code>.</li>
+                      <li><code>globalThis</code> works everywhere.</li>
+                      <li>
+                        Use <code>globalThis</code> in modern JavaScript
+                        projects.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
 
-            <div class="card-body">
+                <!-- Reference -->
+                <div class="alert alert-secondary mt-4">
+                  <h5>📚 Reference for Latest JavaScript Updates</h5>
 
-                <ul>
-                    <li>Earlier every environment had a different global object.</li>
-                    <li>Browser uses <code>window</code>.</li>
-                    <li>Node.js uses <code>global</code>.</li>
-                    <li><code>globalThis</code> works everywhere.</li>
-                    <li>Use <code>globalThis</code> in modern JavaScript projects.</li>
-                </ul>
+                  <ul class="mb-0">
+                    <li>
+                      <strong>ECMAScript Specifications:</strong><br />
+                      https://tc39.es/ecma262/
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
 
-            </div>
+            <section id="classnotesglobalobject" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-03 global object
+                    </h2>
 
-        </div>
-
-        <!-- Reference -->
-        <div class="alert alert-secondary mt-4">
-
-            <h5>📚 Reference for Latest JavaScript Updates</h5>
-
-            <ul class="mb-0">
-                <li>
-                    <strong>ECMAScript Specifications:</strong><br>
-                    https://tc39.es/ecma262/
-                </li>
-            </ul>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<section id="classnotesglobalobject" class="py-5 bg-light">
-    <div class="container">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center p-5">
-
-                <h2 class="fw-bold text-primary mb-3">
-                   Episode-03 global object
-                </h2>
-
-
-                <a href="../class notes/Episode-03 global object.pdf"
-                   target="_blank"
-                   class="btn btn-primary btn-lg px-4">
-                    Episode-03 global object
-                </a>
-
-            </div>
-        </div>
-    </div>
-</section>
+                    <a
+                      href="../class notes/Episode-03 global object.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-03 global object
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
 
             <!-- import vs exports -->
             <section id="importsvsexports">
@@ -1703,223 +1685,186 @@ Function used in app.js</pre
                 </section>
               </div>
             </section>
-            <hr>
+            <hr />
 
-          <section id="classnotesimportsexports" class="py-5 bg-light">
-    <div class="container">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center p-5">
+            <section id="classnotesimportsexports" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-04 imports vs exports
+                    </h2>
 
-                <h2 class="fw-bold text-primary mb-3">
-                   Episode-04 imports vs exports
-                </h2>
-
-
-                <a href="../class notes/Episode-04 imports vs exports.pdf"
-                   target="_blank"
-                   class="btn btn-primary btn-lg px-4">
-                    Episode-04 imports vs exports
-                </a>
-
-            </div>
-        </div>
-    </div>
-</section>
+                    <a
+                      href="../class notes/Episode-04 imports vs exports.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-04 imports vs exports
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
 
             <!-- How modules works  in nodejs -->
 
             <section id="howmoduleworksinnodejs" class="container my-5">
+              <!-- ================================================= -->
+              <!-- PAGE TITLE -->
+              <!-- ================================================= -->
 
-    <!-- ================================================= -->
-    <!-- PAGE TITLE -->
-    <!-- ================================================= -->
+              <div class="card shadow-lg border-0 mb-5">
+                <div class="card-header bg-primary text-white py-4">
+                  <h2 class="mb-0">📘 NodeJS Modules Internals</h2>
+                  <p class="mb-0 mt-2">
+                    How Modules Work in Node.js | IIFE | Module Wrapper |
+                    require() | module.exports | Module Caching
+                  </p>
+                </div>
 
-    <div class="card shadow-lg border-0 mb-5">
+                <div class="card-body">
+                  <div class="alert alert-primary">
+                    <strong>Interview Definition</strong><br />
 
-        <div class="card-header bg-primary text-white py-4">
-            <h2 class="mb-0">
-                📘 NodeJS Modules Internals
-            </h2>
-            <p class="mb-0 mt-2">
-                How Modules Work in Node.js | IIFE | Module Wrapper | require() | module.exports | Module Caching
-            </p>
-        </div>
+                    Every JavaScript file in Node.js is treated as a separate
+                    module. Before executing the code, Node.js automatically
+                    wraps the entire file inside a special function called an
+                    <strong
+                      >IIFE (Immediately Invoked Function Expression)</strong
+                    >. This keeps variables and functions private and prevents
+                    conflicts with code in other files.
+                  </div>
+                </div>
+              </div>
 
-        <div class="card-body">
+              <!-- ================================================= -->
+              <!-- HOW MODULES WORK -->
+              <!-- ================================================= -->
 
-            <div class="alert alert-primary">
-                <strong>Interview Definition</strong><br>
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-success text-white">
+                  <h3 class="mb-0">1. How Modules Work in Node.js</h3>
+                </div>
 
-                Every JavaScript file in Node.js is treated as a separate module.
-                Before executing the code, Node.js automatically wraps the entire file
-                inside a special function called an <strong>IIFE (Immediately Invoked Function Expression)</strong>.
-                This keeps variables and functions private and prevents conflicts with code in other files.
-            </div>
+                <div class="card-body">
+                  <p>
+                    Every JavaScript file is considered a separate module.
+                    Before running your code, Node.js automatically wraps the
+                    entire file inside an
+                    <strong
+                      >Immediately Invoked Function Expression (IIFE)</strong
+                    >.
+                  </p>
 
-        </div>
+                  <div class="alert alert-success">
+                    <strong
+                      >Why does Node.js wrap every module inside an
+                      IIFE?</strong
+                    >
 
-    </div>
+                    <ul class="mb-0 mt-2">
+                      <li>Keeps variables private.</li>
 
+                      <li>Keeps functions private.</li>
 
+                      <li>
+                        Prevents variable name conflicts between different
+                        files.
+                      </li>
 
-    <!-- ================================================= -->
-    <!-- HOW MODULES WORK -->
-    <!-- ================================================= -->
+                      <li>
+                        Provides module-specific objects like
+                        <code>module</code>, <code>exports</code>, and
+                        <code>require()</code>.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
 
-    <div class="card shadow border-0 mb-5">
+              <!-- ================================================= -->
+              <!-- PRIVATE VARIABLES -->
+              <!-- ================================================= -->
 
-        <div class="card-header bg-success text-white">
-            <h3 class="mb-0">
-                1. How Modules Work in Node.js
-            </h3>
-        </div>
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-info text-white">
+                  <h3 class="mb-0">
+                    2. Why are Variables and Functions Private?
+                  </h3>
+                </div>
 
-        <div class="card-body">
+                <div class="card-body">
+                  <p>
+                    Variables and functions are private because each file is
+                    wrapped inside its own IIFE.
+                  </p>
 
-            <p>
+                  <p>
+                    Every module gets its own private scope. Therefore,
+                    variables declared in one file cannot be accessed directly
+                    from another file.
+                  </p>
 
-                Every JavaScript file is considered a separate module.
+                  <div class="alert alert-warning">
+                    <strong>Important:</strong>
 
-                Before running your code, Node.js automatically wraps the entire file
-                inside an <strong>Immediately Invoked Function Expression (IIFE)</strong>.
+                    You can only access code from another file if it is exported
+                    using
+                    <code>module.exports</code> (CommonJS) or
+                    <code>export</code> (ES Modules).
+                  </div>
+                </div>
+              </div>
 
-            </p>
+              <!-- ================================================= -->
+              <!-- IIFE -->
+              <!-- ================================================= -->
 
-            <div class="alert alert-success">
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-dark text-white">
+                  <h3 class="mb-0">3. What is an IIFE?</h3>
+                </div>
 
-                <strong>Why does Node.js wrap every module inside an IIFE?</strong>
+                <div class="card-body">
+                  <p>
+                    IIFE stands for
+                    <strong>Immediately Invoked Function Expression</strong>.
+                  </p>
 
-                <ul class="mb-0 mt-2">
+                  <p>
+                    It is a function that executes immediately after it is
+                    created.
+                  </p>
 
-                    <li>Keeps variables private.</li>
-
-                    <li>Keeps functions private.</li>
-
-                    <li>Prevents variable name conflicts between different files.</li>
-
-                    <li>Provides module-specific objects like <code>module</code>, <code>exports</code>, and <code>require()</code>.</li>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- PRIVATE VARIABLES -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-info text-white">
-            <h3 class="mb-0">
-                2. Why are Variables and Functions Private?
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <p>
-
-                Variables and functions are private because each file is wrapped inside its own IIFE.
-
-            </p>
-
-            <p>
-
-                Every module gets its own private scope.
-
-                Therefore, variables declared in one file cannot be accessed directly from another file.
-
-            </p>
-
-            <div class="alert alert-warning">
-
-                <strong>Important:</strong>
-
-                You can only access code from another file if it is exported using
-                <code>module.exports</code> (CommonJS) or <code>export</code> (ES Modules).
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- IIFE -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-dark text-white">
-            <h3 class="mb-0">
-                3. What is an IIFE?
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <p>
-
-                IIFE stands for <strong>Immediately Invoked Function Expression</strong>.
-
-            </p>
-
-            <p>
-
-                It is a function that executes immediately after it is created.
-
-            </p>
-
-<pre><code>(function(){
+                  <pre><code>(function(){
 
     console.log("Runs immediately");
 
 })();</code></pre>
 
-            <div class="alert alert-info">
+                  <div class="alert alert-info">
+                    <strong>Interview Tip</strong>
 
-                <strong>Interview Tip</strong>
+                    Node.js automatically creates this wrapper for every module.
+                    Developers do not write this wrapper manually.
+                  </div>
+                </div>
+              </div>
 
-                Node.js automatically creates this wrapper for every module.
-                Developers do not write this wrapper manually.
+              <!-- ================================================= -->
+              <!-- WRAPPER -->
+              <!-- ================================================= -->
 
-            </div>
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-secondary text-white">
+                  <h3 class="mb-0">4. How Node.js Wraps Your Module</h3>
+                </div>
 
-        </div>
+                <div class="card-body">
+                  <p>Suppose your file contains the following code.</p>
 
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- WRAPPER -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-secondary text-white">
-            <h3 class="mb-0">
-                4. How Node.js Wraps Your Module
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <p>
-
-                Suppose your file contains the following code.
-
-            </p>
-
-<pre><code>function calculateMultiply(a, b) {
+                  <pre><code>function calculateMultiply(a, b) {
 
     const result = a * b;
 
@@ -1933,13 +1878,12 @@ module.exports = {
 
 };</code></pre>
 
-            <p>
+                  <p>
+                    Before execution, Node.js internally converts it into
+                    something similar to:
+                  </p>
 
-                Before execution, Node.js internally converts it into something similar to:
-
-            </p>
-
-<pre><code>(function(exports, require, module, __filename, __dirname){
+                  <pre><code>(function(exports, require, module, __filename, __dirname){
 
     function calculateMultiply(a,b){
 
@@ -1957,157 +1901,125 @@ module.exports = {
 
 });</code></pre>
 
-            <div class="alert alert-success">
-
-                <strong>Important</strong>
-
-                Node.js automatically passes five parameters into every module.
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- PARAMETERS -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">
-                5. Parameters Passed by Node.js
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <table class="table table-bordered">
-
-                <thead class="table-dark">
-
-                <tr>
-
-                    <th>Parameter</th>
-
-                    <th>Purpose</th>
-
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                <tr>
-
-                    <td><code>exports</code></td>
-
-                    <td>Shortcut for exporting values.</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><code>require</code></td>
-
-                    <td>Imports another module.</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><code>module</code></td>
-
-                    <td>Represents the current module.</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><code>__filename</code></td>
-
-                    <td>Full path of the current file.</td>
-
-                </tr>
-
-                <tr>
-
-                    <td><code>__dirname</code></td>
-
-                    <td>Directory path of the current file.</td>
-
-                </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- EXECUTION -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-danger text-white">
-            <h3 class="mb-0">
-                6. Module Execution Steps
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <ol>
-
-                <li><strong>Resolve the module</strong><br>
-                Node.js finds the requested module (local file, JSON file, or built-in module).</li>
-
-                <li class="mt-3"><strong>Load the module</strong><br>
-                Node.js loads the file based on its type.</li>
-
-                <li class="mt-3"><strong>Wrap inside an IIFE</strong><br>
-                Node.js wraps the code inside a module wrapper function.</li>
-
-                <li class="mt-3"><strong>Execute the code</strong><br>
-                JavaScript code runs and creates the exports.</li>
-
-                <li class="mt-3"><strong>Return module.exports</strong><br>
-                The exported values are returned to the calling file.</li>
-
-                <li class="mt-3"><strong>Cache the module</strong><br>
-                The module is stored in memory for future use.</li>
-
-            </ol>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- FLOW -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-warning">
-            <h3 class="mb-0">
-                7. Visual Flow
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-<pre><code>require("./math")
+                  <div class="alert alert-success">
+                    <strong>Important</strong>
+
+                    Node.js automatically passes five parameters into every
+                    module.
+                  </div>
+                </div>
+              </div>
+
+              <!-- ================================================= -->
+              <!-- PARAMETERS -->
+              <!-- ================================================= -->
+
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-primary text-white">
+                  <h3 class="mb-0">5. Parameters Passed by Node.js</h3>
+                </div>
+
+                <div class="card-body">
+                  <table class="table table-bordered">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>Parameter</th>
+
+                        <th>Purpose</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td><code>exports</code></td>
+
+                        <td>Shortcut for exporting values.</td>
+                      </tr>
+
+                      <tr>
+                        <td><code>require</code></td>
+
+                        <td>Imports another module.</td>
+                      </tr>
+
+                      <tr>
+                        <td><code>module</code></td>
+
+                        <td>Represents the current module.</td>
+                      </tr>
+
+                      <tr>
+                        <td><code>__filename</code></td>
+
+                        <td>Full path of the current file.</td>
+                      </tr>
+
+                      <tr>
+                        <td><code>__dirname</code></td>
+
+                        <td>Directory path of the current file.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- ================================================= -->
+              <!-- EXECUTION -->
+              <!-- ================================================= -->
+
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-danger text-white">
+                  <h3 class="mb-0">6. Module Execution Steps</h3>
+                </div>
+
+                <div class="card-body">
+                  <ol>
+                    <li>
+                      <strong>Resolve the module</strong><br />
+                      Node.js finds the requested module (local file, JSON file,
+                      or built-in module).
+                    </li>
+
+                    <li class="mt-3">
+                      <strong>Load the module</strong><br />
+                      Node.js loads the file based on its type.
+                    </li>
+
+                    <li class="mt-3">
+                      <strong>Wrap inside an IIFE</strong><br />
+                      Node.js wraps the code inside a module wrapper function.
+                    </li>
+
+                    <li class="mt-3">
+                      <strong>Execute the code</strong><br />
+                      JavaScript code runs and creates the exports.
+                    </li>
+
+                    <li class="mt-3">
+                      <strong>Return module.exports</strong><br />
+                      The exported values are returned to the calling file.
+                    </li>
+
+                    <li class="mt-3">
+                      <strong>Cache the module</strong><br />
+                      The module is stored in memory for future use.
+                    </li>
+                  </ol>
+                </div>
+              </div>
+
+              <!-- ================================================= -->
+              <!-- FLOW -->
+              <!-- ================================================= -->
+
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-warning">
+                  <h3 class="mb-0">7. Visual Flow</h3>
+                </div>
+
+                <div class="card-body">
+                  <pre><code>require("./math")
 
         │
 
@@ -2150,173 +2062,452 @@ Store in Cache
         ▼
 
 Return Exported Values</code></pre>
+                </div>
+              </div>
 
-        </div>
+              <!-- ================================================= -->
+              <!-- CACHE -->
+              <!-- ================================================= -->
 
-    </div>
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-success text-white">
+                  <h3 class="mb-0">8. What is Module Caching?</h3>
+                </div>
 
+                <div class="card-body">
+                  <p>Node.js executes a module only once.</p>
 
+                  <p>
+                    After the first execution, the exported object is stored in
+                    memory (cache).
+                  </p>
 
-    <!-- ================================================= -->
-    <!-- CACHE -->
-    <!-- ================================================= -->
+                  <p>
+                    If another file imports the same module again, Node.js
+                    returns the cached version instead of executing the file
+                    again.
+                  </p>
 
-    <div class="card shadow border-0 mb-5">
+                  <div class="alert alert-success">
+                    <strong>Interview Ready Answer</strong>
 
-        <div class="card-header bg-success text-white">
-            <h3 class="mb-0">
-                8. What is Module Caching?
-            </h3>
-        </div>
+                    Module caching improves application performance because the
+                    same module is not executed multiple times.
+                  </div>
+                </div>
+              </div>
 
-        <div class="card-body">
+              <!-- ================================================= -->
+              <!-- REAL TIME -->
+              <!-- ================================================= -->
 
-            <p>
+              <div class="card shadow border-0 mb-5">
+                <div class="card-header bg-info text-white">
+                  <h3 class="mb-0">9. Real-Time Example</h3>
+                </div>
 
-                Node.js executes a module only once.
+                <div class="card-body">
+                  <p>
+                    Suppose your application imports the database connection
+                    file in multiple places.
+                  </p>
 
-            </p>
+                  <p>The database connection code runs only once.</p>
 
-            <p>
+                  <p>
+                    Every other <code>require()</code> call receives the same
+                    cached object, preventing multiple database connections.
+                  </p>
+                </div>
+              </div>
 
-                After the first execution, the exported object is stored in memory (cache).
+              <!-- ================================================= -->
+              <!-- QUICK REVISION -->
+              <!-- ================================================= -->
 
-            </p>
+              <div class="card shadow border-0">
+                <div class="card-header bg-success text-white">
+                  <h3 class="mb-0">📝 Quick Revision</h3>
+                </div>
 
-            <p>
+                <div class="card-body">
+                  <ul>
+                    <li>Every file is a separate module.</li>
 
-                If another file imports the same module again,
-                Node.js returns the cached version instead of executing the file again.
+                    <li>Node.js wraps every module inside an IIFE.</li>
 
-            </p>
+                    <li>IIFE keeps variables private.</li>
 
-            <div class="alert alert-success">
+                    <li>
+                      Node.js provides exports, require, module, __filename and
+                      __dirname.
+                    </li>
 
-                <strong>Interview Ready Answer</strong>
+                    <li>Modules are executed only once.</li>
 
-                Module caching improves application performance because the same module
-                is not executed multiple times.
+                    <li>After execution, modules are stored in cache.</li>
 
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================================================= -->
-    <!-- REAL TIME -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0 mb-5">
-
-        <div class="card-header bg-info text-white">
-            <h3 class="mb-0">
-                9. Real-Time Example
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <p>
-
-                Suppose your application imports the database connection file
-                in multiple places.
-
-            </p>
-
-            <p>
-
-                The database connection code runs only once.
-
-            </p>
-
-            <p>
-
-                Every other <code>require()</code> call receives the same cached object,
-                preventing multiple database connections.
-
-            </p>
-
-        </div>
-
-    </div>
-
-
-
- 
-
-
-
-    <!-- ================================================= -->
-    <!-- QUICK REVISION -->
-    <!-- ================================================= -->
-
-    <div class="card shadow border-0">
-
-        <div class="card-header bg-success text-white">
-            <h3 class="mb-0">
-                📝 Quick Revision
-            </h3>
-        </div>
-
-        <div class="card-body">
-
-            <ul>
-
-                <li>Every file is a separate module.</li>
-
-                <li>Node.js wraps every module inside an IIFE.</li>
-
-                <li>IIFE keeps variables private.</li>
-
-                <li>Node.js provides exports, require, module, __filename and __dirname.</li>
-
-                <li>Modules are executed only once.</li>
-
-                <li>After execution, modules are stored in cache.</li>
-
-                <li>Future require() calls use the cached version.</li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
+                    <li>Future require() calls use the cached version.</li>
+                  </ul>
+                </div>
+              </div>
             </section>
-            <hr>
+            <hr />
 
             <section id="classnotesjsonserver" class="py-5 bg-light">
-    <div class="container">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center p-5">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-03 Global This & Episode-04
+                    </h2>
 
-                <h2 class="fw-bold text-primary mb-3">
-                   Episode-03 Global This & Episode-04  
-                </h2>
+                    <a
+                      href="../class notes/Episode-02 JS on Server.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-02 JS on Server
+                    </a>
+                    <a
+                      href="../class notes/Episode-02 JS on Server.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-02 JS on Server
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
 
+            <!--  libuv super hero-->
 
-                <a href="../class notes/Episode-02 JS on Server.pdf"
-                   target="_blank"
-                   class="btn btn-primary btn-lg px-4">
-                    Episode-02 JS on Server
-                </a>
-                <a href="../class notes/Episode-02 JS on Server.pdf"
-                   target="_blank"
-                   class="btn btn-primary btn-lg px-4">
-                    Episode-02 JS on Server
-                </a>
+            <section id="libuv1">
+              <style>
+                body {
+                  background: #f5f7fb;
+                }
+                section {
+                  margin: 40px auto;
+                }
+                .card {
+                  border: none;
+                }
+                pre {
+                  background: #212529;
+                  color: #f8f9fa;
+                  padding: 15px;
+                  border-radius: 8px;
+                }
+                .diagram {
+                  font-family: monospace;
+                  background: #eef5ff;
+                  border-left: 5px solid #0d6efd;
+                  padding: 15px;
+                }
+              </style>
+              <div class="container py-4">
+                <h1 class="text-center mb-4">
+                  Node.js Internals - libuv Documentation
+                </h1>
 
-            </div>
-        </div>
-    </div>
-</section>
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                      <h3>JavaScript</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="alert alert-info">
+                        JavaScript is a <b>synchronous</b>,
+                        <b>single-threaded</b> programming language. It executes
+                        code line by line using a single call stack.
+                      </div>
+                      <ul>
+                        <li>Single Thread</li>
+                        <li>Synchronous by default</li>
+                        <li>Executes one statement at a time</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
 
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                      <h3>Synchronous vs Asynchronous</h3>
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Synchronous</th>
+                            <th>Asynchronous</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Blocks execution</td>
+                            <td>Non-blocking</td>
+                          </tr>
+                          <tr>
+                            <td>One task after another</td>
+                            <td>Multiple tasks can progress together</td>
+                          </tr>
+                          <tr>
+                            <td>User waits</td>
+                            <td>User continues while task completes</td>
+                          </tr>
+                        </tbody>
+                      </table>
 
-            <!--  -->
+                      <h5>Restaurant Analogy</h5>
+                      <div class="alert alert-warning">
+                        <b>Synchronous:</b> Everyone waits until the previous
+                        customer's order finishes.
+                      </div>
+                      <div class="alert alert-success">
+                        <b>Asynchronous:</b> Long-running orders move to the
+                        waiting area while quick orders continue immediately.
+                      </div>
+                    </div>
+                  </div>
+                </section>
 
+                <section>
+                  <div class="text-center">
+                    <img
+                      src="../../../Images/synchronous.png"
+                      alt="synchronous"
+                      class="img-fluid"
+                    />
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                      <h3>Synchronous Example</h3>
+                    </div>
+                    <div class="card-body">
+                      <pre>
+var a = 333;
+var b = 3243;
+
+function multiply(x,y){
+ const result = x * y;
+ return result;
+}
+
+var c = multiply(a,b);</pre
+                      >
+
+                      <div class="alert alert-secondary">
+                        The V8 JavaScript Engine executes this entirely inside
+                        the Call Stack in milliseconds.
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="text-center">
+                    <img
+                      src="../../../Images/asychronous.png"
+                      alt="asychronous"
+                      class="img-fluid"
+                    />
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-danger text-white">
+                      <h3>Asynchronous Example</h3>
+                    </div>
+                    <div class="card-body">
+                      <pre>
+https.get("/api",(res)=>{
+ console.log(res);
+});
+
+fs.readFile("./file.txt","utf8",(err,data)=>{
+ console.log(data);
+});
+
+setTimeout(()=>{
+ console.log("Wait...");
+},4000);</pre
+                      >
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-info text-dark">
+                      <h3>How Synchronous Code Executes</h3>
+                    </div>
+                    <div class="card-body">
+                      <ol>
+                        <li>Memory allocated for variables and functions.</li>
+                        <li>Function Execution Context created.</li>
+                        <li>Function executes inside Call Stack.</li>
+                        <li>Result returned to Global Execution Context.</li>
+                        <li>
+                          Garbage Collector removes unused memory automatically.
+                        </li>
+                      </ol>
+
+                      <div class="diagram">
+                        Memory Heap | V Call Stack | Function Execution Context
+                        | Return Result | Garbage Collector
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-warning">
+                      <h3>What is libuv?</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="alert alert-primary">
+                        libuv is a cross-platform C library that provides
+                        asynchronous I/O using an event loop. It powers Node.js
+                        asynchronous operations.
+                      </div>
+
+                      <ul>
+                        <li>Built using C language.</li>
+                        <li>Communicates with Operating System.</li>
+                        <li>Handles File System operations.</li>
+                        <li>Handles Network APIs.</li>
+                        <li>Handles Timers.</li>
+                        <li>Handles Database related I/O.</li>
+                      </ul>
+
+                      <div class="diagram">
+                        V8 Engine | V libuv | V Operating System
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-secondary text-white">
+                      <h3>Why Node.js Uses libuv</h3>
+                    </div>
+                    <div class="card-body">
+                      <ul>
+                        <li>
+                          JavaScript cannot directly communicate with Operating
+                          System.
+                        </li>
+                        <li>libuv is written in C and has OS-level access.</li>
+                        <li>
+                          libuv performs asynchronous tasks on behalf of
+                          Node.js.
+                        </li>
+                        <li>After completion, callbacks are returned to V8.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="text-center">
+                    <img
+                      src="../../../Images/async_vs_sync.png"
+                      alt="async_vs_sync"
+                      class="img-fluid"
+                    />
+                  </div>
+                </section>
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                      <h3>Asynchronous Execution Flow</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="diagram">
+                        JavaScript Code | V V8 Engine | Offload Async Task | V
+                        libuv | Operating System | Task Completed | Callback
+                        Queue | Event Loop | Call Stack
+                      </div>
+
+                      <ol>
+                        <li>V8 identifies async task.</li>
+                        <li>Task is offloaded to libuv.</li>
+                        <li>libuv communicates with OS.</li>
+                        <li>When complete, callback enters Callback Queue.</li>
+                        <li>
+                          Event Loop pushes callback to Call Stack when empty.
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                      <h3>Mixed Execution Example</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="alert alert-success">
+                        Node.js never blocks synchronous execution while
+                        asynchronous tasks are running.
+                      </div>
+                      <ol>
+                        <li>Variables allocated.</li>
+                        <li>API call sent to libuv.</li>
+                        <li>Timer sent to libuv.</li>
+                        <li>File read sent to libuv.</li>
+                        <li>multiply() executes immediately.</li>
+                        <li>Callbacks execute later in FIFO order.</li>
+                      </ol>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                      <h3>Interview Tips</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="alert alert-warning">
+                        <ul class="mb-0">
+                          <li>
+                            JavaScript is synchronous and single-threaded.
+                          </li>
+                          <li>Node.js achieves async behavior using libuv.</li>
+                          <li>libuv is written in C.</li>
+                          <li>libuv communicates with the Operating System.</li>
+                          <li>
+                            Async callbacks execute through Event Loop and
+                            Callback Queue.
+                          </li>
+                          <li>Node.js is called Non-blocking I/O.</li>
+                          <li>
+                            NodeJS is called async i/o or non blocking i/o, i/o
+                            means file handling operations, api calls.
+                          </li>
+                          <li>
+                            NodeJS does not blocks the main thread, that's why
+                            NodeJS is very powerful with just single thread. it
+                            can do many async operations very fast.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
           </div>
         </main>
       </div>
