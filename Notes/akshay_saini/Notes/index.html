@@ -82,7 +82,7 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#classnotesglobalobject"
-                  >Class notes of globalobject</a
+                  >Class notes of lets write a code (globalThis object)</a
                 >
               </li>
               <li class="nav-item">
@@ -91,20 +91,116 @@
                 >
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#classnotesimportsexports"
-                  >Class notes of Import vs Exports</a
-                >
-              </li>
-              <li class="nav-item">
                 <a class="nav-link" href="#howmoduleworksinnodejs"
                   >How modules work in nodejs</a
                 >
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#libuv1"
-                  >libuv <small>(Sync, Async code execution</small> )</a
+                <a class="nav-link" href="#classnotesimportsexports"
+                  >Class notes of module.export & require</a
                 >
               </li>
+              <li class="nav-item">
+                <small>Episode-05,06,07</small>
+                <a class="nav-link" href="#libuv1"
+                  >libuv
+                  <small
+                    >(Sync, Async code execution & setTimeoutZero - code</small
+                  >
+                  )</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#async-function-execution"
+                >
+                 Async-function-execution
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#classnoteslibuv(Sync, Async code execution & setTimeoutZero - code)"
+                >
+                 Class notes of Episode-05,06,07
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#v8-engine-execution"
+                >V8-Engine Code Execution</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#classnotesv8engineexecution"
+                >
+                 Class notes of Deep divie into V8 JS engine
+                </a>
+              </li>
+               <li class="nav-item">
+                <a class="nav-link" href="#Libuv code execution"
+                >Libuv code execution</a
+                >
+              </li>
+               <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#classnoteslibuvnotes"
+                >
+                 Class notes of                       Episode-09 libuv & Event Loop
+
+                </a>
+              </li>
+               <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#Thread Pool Size & Node.js Threading"
+                >
+                 Thread Pool Size & Node.js Threading
+
+                </a>
+              </li>
+
+
+               <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#Why Only FS, Crypto and DNS Use the libuv Thread Pool?"
+                >
+                Why Only FS, Crypto and DNS Use the libuv Thread Pool?
+
+                </a>
+              </li>
+               <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#classnotesThread pool in Libuv"
+                >
+                 Class notes of                       Episode-10 Thread pool in Libuv
+
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#Bytecode vs Machine Code"
+                >
+                 Bytecode vs Machine Code
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#Interpreter & Complier Located"
+                >
+                 Interpreter & Complier Located
+                </a>
+              </li>
+             
+
             </ul>
           </div>
         </nav>
@@ -1147,7 +1243,8 @@ CPU</pre
 
             <div class="text-center">
               <img
-                src="../../mohith_decodes/Images/nodeimage.png"
+                src="../../../Images/nodeimage.png"
+              
                 alt="nodeimage"
                 class="img-fluid"
               />
@@ -2350,18 +2447,27 @@ setTimeout(()=>{
                     </div>
                     <div class="card-body">
                       <ol>
+                        <li>Global execution context is created</li>
                         <li>Memory allocated for variables and functions.</li>
                         <li>Function Execution Context created.</li>
                         <li>Function executes inside Call Stack.</li>
+                        <li>Function execution context is removed or poped out from call stack.</li>
                         <li>Result returned to Global Execution Context.</li>
                         <li>
                           Garbage Collector removes unused memory automatically.
                         </li>
                       </ol>
 
-                      <div class="diagram">
-                        Memory Heap | V Call Stack | Function Execution Context
-                        | Return Result | Garbage Collector
+                      <div class="p-3 m-2 text-white bg-dark">
+                        <pre>
+                          |- Global execution context 
+                          |- Memory Heap 
+                          |- V Call Stack 
+                          |- Function Execution Context
+                          |- Return Result 
+                          |- Function execution is poped out
+                          |- Garbage Collector
+                        </pre>
                       </div>
                     </div>
                   </div>
@@ -2388,8 +2494,12 @@ setTimeout(()=>{
                         <li>Handles Database related I/O.</li>
                       </ul>
 
-                      <div class="diagram">
-                        V8 Engine | V libuv | V Operating System
+                           <div class="p-3 m-2 text-white bg-dark">
+                            <pre>
+                              |- V8 Engine 
+                              |- V libuv 
+                              |- V Operating System
+                            </pre>
                       </div>
                     </div>
                   </div>
@@ -2432,10 +2542,18 @@ setTimeout(()=>{
                       <h3>Asynchronous Execution Flow</h3>
                     </div>
                     <div class="card-body">
-                      <div class="diagram">
-                        JavaScript Code | V V8 Engine | Offload Async Task | V
-                        libuv | Operating System | Task Completed | Callback
-                        Queue | Event Loop | Call Stack
+                           <div class="p-3 m-2 text-white bg-dark">
+                            <pre>
+                              |- JavaScript Code
+                              |- V8 Engine 
+                              |- Offload Async Task 
+                              |- libuv 
+                              |- Operating System 
+                              |- Task Completed 
+                              |- Callback Queue 
+                              |- Event Loop 
+                              |- Call Stack
+                            </pre>
                       </div>
 
                       <ol>
@@ -2467,7 +2585,7 @@ setTimeout(()=>{
                         <li>Timer sent to libuv.</li>
                         <li>File read sent to libuv.</li>
                         <li>multiply() executes immediately.</li>
-                        <li>Callbacks execute later in FIFO order.</li>
+                        <li>Callbacks execute later.</li>
                       </ol>
                     </div>
                   </div>
@@ -2508,7 +2626,2967 @@ setTimeout(()=>{
                 </section>
               </div>
             </section>
+
+            <div class="container">
+              <section>
+                <style>
+                  body {
+                    background: #f5f7fb;
+                    font-family:
+                      Segoe UI,
+                      Tahoma,
+                      Geneva,
+                      Verdana,
+                      sans-serif;
+                  }
+
+                  section {
+                    margin: 40px auto;
+                    max-width: 1200px;
+                  }
+
+                  .card {
+                    border: none;
+                    border-radius: 12px;
+                  }
+
+                  .card-header {
+                    font-weight: bold;
+                    font-size: 1.2rem;
+                  }
+
+                  .diagram {
+                    background: #212529;
+                    color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    font-family: Consolas;
+                    overflow: auto;
+                  }
+
+                  pre {
+                    margin: 0;
+                  }
+
+                  code {
+                    color: #d63384;
+                    font-weight: bold;
+                  }
+
+                  table td,
+                  table th {
+                    vertical-align: middle;
+                  }
+
+                  .tip {
+                    border-left: 5px solid #0d6efd;
+                    background: #eef6ff;
+                    padding: 15px;
+                  }
+
+                  .interview {
+                    border-left: 5px solid green;
+                    background: #f3fff5;
+                    padding: 15px;
+                  }
+                </style>
+                <div class="card shadow">
+                  <div class="card-header bg-primary text-white">
+                    Node.js Sync and Async Modules
+                  </div>
+
+                  <div class="card-body">
+                    <div class="alert alert-info">
+                      <h5>Quick Definition</h5>
+
+                      <ul>
+                        <li>
+                          <strong>Methods ending with <code>Sync</code></strong>
+                          are <b>Synchronous</b>.
+                        </li>
+                        <li>
+                          <strong>Methods without <code>Sync</code></strong> are
+                          generally <b>Asynchronous</b>.
+                        </li>
+                        <li>
+                          Both perform the same work, but the execution style is
+                          different.
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-success text-white">
+                    What is a Synchronous Function?
+                  </div>
+
+                  <div class="card-body">
+                    <p>
+                      A synchronous function executes one line at a time. The
+                      next line of code waits until the current operation is
+                      completed.
+                    </p>
+
+                    <div class="alert alert-warning">
+                      <b>Characteristics</b>
+
+                      <ul>
+                        <li>Blocks execution.</li>
+
+                        <li>Runs line by line.</li>
+
+                        <li>No callback function required.</li>
+
+                        <li>Returns the result immediately.</li>
+
+                        <li>Simple to understand.</li>
+                      </ul>
+                    </div>
+
+                    <h5>Example</h5>
+
+                    <pre class="bg-dark p-3 border rounded"><code>
+const fs = require("fs");
+
+const data = fs.readFileSync("data.txt","utf8");
+
+console.log(data);
+
+console.log("Finished");
+</code></pre>
+
+                    <p class="mt-3">
+                      Here, <code>console.log("Finished")</code> executes only
+                      after the file has been completely read.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-danger text-white">
+                    What is an Asynchronous Function?
+                  </div>
+
+                  <div class="card-body">
+                    <p>
+                      An asynchronous function starts a task and immediately
+                      continues executing the next lines of code. When the task
+                      is finished, Node.js executes the callback function or
+                      resolves the Promise.
+                    </p>
+
+                    <div class="alert alert-success">
+                      <b>Characteristics</b>
+
+                      <ul>
+                        <li>Does not block execution.</li>
+
+                        <li>Uses Callback, Promise or async/await.</li>
+
+                        <li>Better performance.</li>
+
+                        <li>
+                          Ideal for file operations, database calls, APIs,
+                          network requests.
+                        </li>
+                      </ul>
+                    </div>
+
+                    <h5>Example</h5>
+
+                    <pre class="bg-dark p-3 border rounded"><code>
+const fs = require("fs");
+
+fs.readFile("data.txt","utf8",(err,data)=>{
+
+    console.log(data);
+
+});
+
+console.log("Finished");
+</code></pre>
+
+                    <p class="mt-3">Output</p>
+
+                    <pre class="bg-dark text-white p-3 rounded"><code>
+Finished
+
+(file content)
+</code></pre>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-primary text-white">
+                    Visual Diagram
+                  </div>
+
+                  <div class="card-body">
+                    <div class="diagram">
+                      <pre>
+
+Synchronous
+
+Start
+
+↓
+
+readFileSync()
+
+↓
+
+Wait...
+
+↓
+
+File Read Completed
+
+↓
+
+Next Line Executes
+
+
+
+--------------------------------------------------
+
+
+
+Asynchronous
+
+Start
+
+↓
+
+readFile()
+
+↓
+
+Next Line Executes Immediately
+
+↓
+
+Background Thread Reads File
+
+↓
+
+Callback Executes
+</pre
+                      >
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-warning">
+                    Why doesn't readFileSync() have a Callback?
+                  </div>
+
+                  <div class="card-body">
+                    <div class="alert alert-warning">
+                      <h5>Answer</h5>
+
+                      <p>
+                        A callback is used when the result will be available
+                        later.
+                      </p>
+
+                      <p>
+                        Since <code>readFileSync()</code> waits until the file
+                        is completely read, the result is already available
+                        immediately. Therefore, there is no need for a callback
+                        function.
+                      </p>
+                    </div>
+
+                    <h5>Behind the Scenes</h5>
+
+                    <table class="table table-bordered">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>readFile()</th>
+
+                          <th>readFileSync()</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td>Starts reading</td>
+
+                          <td>Starts reading</td>
+                        </tr>
+
+                        <tr>
+                          <td>Returns immediately</td>
+
+                          <td>Waits</td>
+                        </tr>
+
+                        <tr>
+                          <td>Needs callback later</td>
+
+                          <td>Already has the result</td>
+                        </tr>
+
+                        <tr>
+                          <td>Non-blocking</td>
+
+                          <td>Blocking</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-info text-white">
+                    Examples of Sync vs Async Methods
+                  </div>
+
+                  <div class="card-body">
+                    <table class="table table-hover table-bordered">
+                      <thead class="table-primary">
+                        <tr>
+                          <th>Async</th>
+
+                          <th>Sync</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td>fs.readFile()</td>
+
+                          <td>fs.readFileSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.writeFile()</td>
+
+                          <td>fs.writeFileSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.appendFile()</td>
+
+                          <td>fs.appendFileSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.rename()</td>
+
+                          <td>fs.renameSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.unlink()</td>
+
+                          <td>fs.unlinkSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.mkdir()</td>
+
+                          <td>fs.mkdirSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.copyFile()</td>
+
+                          <td>fs.copyFileSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.readdir()</td>
+
+                          <td>fs.readdirSync()</td>
+                        </tr>
+
+                        <tr>
+                          <td>fs.stat()</td>
+
+                          <td>fs.statSync()</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-primary text-white">
+                    Most Common Node.js Modules Used in Industry
+                  </div>
+
+                  <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Module</th>
+
+                          <th>Why It Is Used</th>
+
+                          <th>How It Works</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td><b>fs</b></td>
+
+                          <td>Read and write files</td>
+
+                          <td>
+                            Interacts with the operating system's file system.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>path</b></td>
+
+                          <td>Handle file paths</td>
+
+                          <td>Creates OS-independent file paths.</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>http</b></td>
+
+                          <td>Create web servers</td>
+
+                          <td>
+                            Listens for HTTP requests and sends responses.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>https</b></td>
+
+                          <td>Secure web servers</td>
+
+                          <td>Works like HTTP with SSL/TLS encryption.</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>os</b></td>
+
+                          <td>System information</td>
+
+                          <td>
+                            Provides CPU, memory, platform and user information.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>events</b></td>
+
+                          <td>Custom event handling</td>
+
+                          <td>
+                            Uses EventEmitter to emit and listen to events.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>stream</b></td>
+
+                          <td>Large file processing</td>
+
+                          <td>
+                            Processes data in small chunks instead of loading
+                            everything.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>buffer</b></td>
+
+                          <td>Binary data</td>
+
+                          <td>Stores raw binary data in memory.</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>url</b></td>
+
+                          <td>URL parsing</td>
+
+                          <td>
+                            Extracts pathname, query parameters, protocol,
+                            hostname.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>crypto</b></td>
+
+                          <td>Encryption & Hashing</td>
+
+                          <td>
+                            Creates hashes, encryption and secure random values.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>process</b></td>
+
+                          <td>Current Node process</td>
+
+                          <td>
+                            Accesses environment variables, arguments and exits.
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>timers</b></td>
+
+                          <td>Scheduling</td>
+
+                          <td>
+                            Provides setTimeout(), setInterval(),
+                            setImmediate().
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td><b>child_process</b></td>
+
+                          <td>Run external programs</td>
+
+                          <td>Creates another process to execute commands.</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>dns</b></td>
+
+                          <td>DNS lookups</td>
+
+                          <td>Resolves domain names into IP addresses.</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>zlib</b></td>
+
+                          <td>Compression</td>
+
+                          <td>Compresses and decompresses files using gzip.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ======================================================= -->
+
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-success text-white">
+                    Interview Tips
+                  </div>
+
+                  <div class="card-body">
+                    <div class="interview">
+                      <h5>Remember These Points</h5>
+
+                      <ul>
+                        <li>Sync methods block the Event Loop.</li>
+
+                        <li>Async methods never block the Event Loop.</li>
+
+                        <li>
+                          Callbacks are only needed when the result comes later.
+                        </li>
+
+                        <li>modules which has sync are synchronous modules</li>
+                        <li>
+                          modules which doesn't have sync are asynchronous
+                          modules
+                        </li>
+                        <li>
+                          synchronous modules doesn't return any callback.
+                        </li>
+
+                        <li>readFileSync() returns data directly.</li>
+
+                        <li>
+                          readFile() returns immediately and provides data
+                          later.
+                        </li>
+
+                        <li>
+                          Use Sync methods mainly during application startup,
+                          configuration loading, or scripting.
+                        </li>
+
+                        <li>
+                          Use Async methods for production servers because they
+                          improve scalability.
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+              <div id="async-function-execution">
+ <!-- ========================================================= -->
+<section id="nodejs-callstack-async" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">Node.js Call Stack & Async Function Execution</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+                <strong>Golden Rule:</strong><br>
+                <strong>Asynchronous callbacks execute only when the Call Stack becomes empty.</strong>
+            </div>
+
+            <h4 class="text-primary mt-4">How Async Functions Execute</h4>
+
+            <p>
+                JavaScript is a <strong>single-threaded language</strong>. It executes one piece of code at a time
+                using the <strong>Call Stack</strong>.
+            </p>
+
+            <ul>
+                <li>Global (top-level) code executes first.</li>
+                <li>Every synchronous statement finishes execution.</li>
+                <li>Functions are pushed onto the Call Stack and popped after completion.</li>
+                <li>While synchronous code is executing, asynchronous operations run in the background (handled by Node.js APIs or libuv).</li>
+                <li>When an async operation completes, its callback is placed into the appropriate callback queue.</li>
+                <li><strong>The Event Loop moves callbacks from the queue to the Call Stack only when the Call Stack is empty.</strong></li>
+            </ul>
+
+            <div class="alert alert-success">
+                <strong>Interview Point</strong><br>
+                Async callbacks never interrupt synchronous code.
+                They always wait until the Call Stack becomes empty.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="callstack-diagram" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-success text-white">
+            <h2 class="h4 mb-0">Execution Flow Diagram</h2>
+        </div>
+
+        <div class="card-body">
+
+<pre class="bg-dark text-light p-4 rounded">
+
+Start Program
+      │
+      ▼
+Global Code Executes
+      │
+      ▼
+Synchronous Functions Execute
+      │
+      ▼
+Call Stack Empty ?
+      │
+      ├── No
+      │      │
+      │      ▼
+      │ Async Callbacks Wait
+      │
+      ▼
+Yes
+      │
+      ▼
+Event Loop Picks Callback
+      │
+      ▼
+Callback Executes
+      │
+      ▼
+Next Callback Executes
+</pre>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="settimeout" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-warning">
+            <h2 class="h4 mb-0">Understanding setTimeout()</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-warning">
+
+                <strong>Important:</strong>
+
+                <p class="mb-0 mt-2">
+                    The delay passed to <code>setTimeout()</code> is the <strong>minimum waiting time</strong>,
+                    not the exact execution time.
+                </p>
+
+            </div>
+
+            <h4 class="text-warning">How setTimeout() Works</h4>
+
+            <ol>
+
+                <li>JavaScript encounters <code>setTimeout()</code>.</li>
+
+                <li>The timer is registered by Node.js/libuv.</li>
+
+                <li>Meanwhile, JavaScript continues executing synchronous code.</li>
+
+                <li>When the specified delay expires, the callback is moved to the Timers Queue.</li>
+
+                <li>The callback still waits if the Call Stack is busy.</li>
+
+                <li>The callback executes only after:
+                    <ul>
+                        <li>Delay has expired.</li>
+                        <li>Call Stack is completely empty.</li>
+                    </ul>
+                </li>
+
+            </ol>
+
+            <div class="alert alert-danger">
+
+                <strong>Remember:</strong>
+
+                <ul class="mb-0">
+
+                    <li>0 ms does NOT mean execute immediately.</li>
+
+                    <li>It means execute as soon as possible after the Call Stack becomes empty.</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="settimeout-example" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-info text-white">
+            <h2 class="h4 mb-0">Example : setTimeout(0)</h2>
+        </div>
+
+        <div class="card-body">
+
+<pre class="bg-dark border rounded p-3"><code>console.log("Start");
+
+setTimeout(() => {
+    console.log("Timer");
+}, 0);
+
+console.log("Middle");
+
+console.log("End");</code></pre>
+
+            <h5 class="mt-4">Output</h5>
+
+<pre class="bg-dark text-white rounded p-3">
+
+Start
+Middle
+End
+Timer
+
+</pre>
+
+            <div class="alert alert-primary">
+
+                Even though the delay is <strong>0 milliseconds</strong>,
+                the callback executes only after all synchronous code has completed.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="libuv-offloading" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-danger text-white">
+            <h2 class="h4 mb-0">Operations Offloaded to libuv</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+
+                <strong>What is libuv?</strong>
+
+                <p class="mb-0 mt-2">
+                    libuv is the C library used by Node.js to perform asynchronous operations
+                    outside the JavaScript thread.
+                </p>
+
+            </div>
+
+            <table class="table table-bordered table-hover">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Operation</th>
+
+                    <th>Examples</th>
+
+                    <th>Why Offloaded?</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr>
+
+                    <td>File System</td>
+
+                    <td>fs.readFile(), fs.writeFile(), fs.appendFile()</td>
+
+                    <td>Disk I/O is slow.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Timers</td>
+
+                    <td>setTimeout(), setInterval()</td>
+
+                    <td>Timer scheduling is managed by libuv.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>DNS Lookup</td>
+
+                    <td>dns.lookup()</td>
+
+                    <td>Network name resolution takes time.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>HTTP / HTTPS</td>
+
+                    <td>http.request(), https.request()</td>
+
+                    <td>Network communication is asynchronous.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>TCP Connections</td>
+
+                    <td>net module</td>
+
+                    <td>Socket communication is handled asynchronously.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>TLS / SSL</td>
+
+                    <td>tls module</td>
+
+                    <td>Secure network operations.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>UDP</td>
+
+                    <td>dgram module</td>
+
+                    <td>Asynchronous network communication.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Compression</td>
+
+                    <td>zlib.gzip(), gunzip()</td>
+
+                    <td>CPU-intensive compression work.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Crypto</td>
+
+                    <td>crypto.pbkdf2(), scrypt(), randomBytes()</td>
+
+                    <td>Encryption and hashing are expensive operations.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Database Drivers</td>
+
+                    <td>MongoDB, PostgreSQL, MySQL, Redis</td>
+
+                    <td>Database communication is asynchronous.</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Child Processes</td>
+
+                    <td>child_process.exec(), spawn()</td>
+
+                    <td>Runs external programs outside JavaScript.</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="interview-points" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-dark text-white">
+            <h2 class="h4 mb-0">Interview Tips</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-success">
+
+                <h5>Remember These Points</h5>
+
+                <ul class="mb-0">
+
+                    <li>JavaScript executes synchronous code first.</li>
+
+                    <li>Async callbacks never interrupt synchronous execution.</li>
+
+                    <li>The Event Loop moves callbacks only when the Call Stack is empty.</li>
+
+                    <li><code>setTimeout(0)</code> does not execute immediately.</li>
+
+                    <li>The timer delay is the minimum delay, not the guaranteed execution time.</li>
+
+                    <li>libuv handles timers, file system operations, networking, DNS, crypto, compression, child processes, and many asynchronous I/O tasks.</li>
+
+                    <li>Node.js remains single-threaded for JavaScript execution, while libuv enables asynchronous operations in the background.</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+            </div>
+
+            <!-- libuv notes -->
+             
+            <section id="classnoteslibuv(Sync, Async code execution & setTimeoutZero - code)" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-05,06,07 Notes
+                    </h2>
+
+                    <div class="d-flex gap-3">
+
+                      <a
+                        href="../class notes/Episode-05 Diving into the nodejs.pdf"
+                        target="_blank"
+                        class="btn btn-primary btn-lg px-4"
+                      >
+                        Episode-05 Diving into the nodejs
+                      </a>
+                      <a
+                        href="../class notes/Episode-06 libuv & async IO.pdf"
+                        target="_blank"
+                        class="btn btn-primary btn-lg px-4"
+                      >
+                        Episode-06 libuv & async 
+                      </a>
+                      <a
+                        href="../class notes/Episode-07 sync, async, setTimeoutZero - code.pdf"
+                        target="_blank"
+                        class="btn btn-primary btn-lg px-4"
+                      >
+                        Episode-07 sync, async, setTimeoutZero
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- v8 engine code execution -->
+             <!-- ========================================================= -->
+
+             <section id="v8-engine-execution">
+
+             
+<section class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">How Does the V8 Engine Execute JavaScript Code?</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-primary">
+
+                <strong>Definition</strong>
+
+                <p class="mb-0 mt-2">
+                    <strong>V8</strong> is Google's open-source JavaScript engine used by
+                    <strong>Google Chrome</strong> and <strong>Node.js</strong>.
+                    It converts JavaScript code into machine code so that the CPU can execute it efficiently.
+                </p>
+
+            </div>
+
+            <h5 class="text-primary mt-4">High-Level Execution Flow</h5>
+
+<pre class="bg-dark text-light p-4 rounded">
+
+JavaScript Code
+        │
+        ▼
+Lexical Analysis
+(Tokenization)
+        │
+        ▼
+Syntax Analysis
+(AST Generation)
+        │
+        ▼
+Ignition Interpreter
+(Bytecode)
+        │
+        ▼
+Frequently Executed?
+        │
+ ┌──────┴──────┐
+ │             │
+ No            Yes
+ │             │
+ ▼             ▼
+Execute     TurboFan Compiler
+(Bytecode)       │
+                 ▼
+         Optimized Machine Code
+                 │
+                 ▼
+             Execute Faster
+                 │
+                 ▼
+      Data Type Changed?
+                 │
+          ┌──────┴──────┐
+          │             │
+         No            Yes
+          │             │
+          ▼             ▼
+ Continue       Deoptimization
+ Optimized            │
+ Execution            ▼
+                Back to Interpreter
+
+</pre>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="lexical-analysis" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-success text-white">
+            <h2 class="h4 mb-0">Step 1 : Lexical Analysis (Tokenization)</h2>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                The first stage of execution is <strong>Lexical Analysis</strong>.
+                The JavaScript source code is broken into small meaningful units called <strong>Tokens</strong>.
+            </p>
+
+            <div class="alert alert-success">
+
+                <strong>Tokenization</strong> is the process of converting JavaScript code into tokens.
+
+            </div>
+
+            <h5>Example</h5>
+
+<pre class="bg-dark border rounded p-3"><code>var a = 20;</code></pre>
+
+            <table class="table table-bordered mt-3">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Code</th>
+
+                    <th>Token</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr>
+
+                    <td>var</td>
+
+                    <td>Keyword</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>a</td>
+
+                    <td>Identifier</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>=</td>
+
+                    <td>Operator</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>20</td>
+
+                    <td>Number Literal</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>;</td>
+
+                    <td>Separator</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="syntax-analysis" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-info text-white">
+            <h2 class="h4 mb-0">Step 2 : Syntax Analysis (AST Generation)</h2>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                After tokenization, the tokens are converted into an
+                <strong>Abstract Syntax Tree (AST)</strong>.
+            </p>
+
+            <div class="alert alert-info">
+
+                AST is a tree-like structure that represents the syntax and relationships
+                between different parts of the JavaScript program.
+
+            </div>
+
+            <h5>Example</h5>
+
+<pre class="bg-dark text-light p-3 rounded">
+
+var a = 20
+
+AssignmentExpression
+│
+├── Variable : a
+│
+└── Value : 20
+
+</pre>
+
+            <div class="alert alert-warning">
+
+                <strong>Practice Tip</strong><br>
+
+                Visit <strong>https://astexplorer.net</strong>
+                to see the AST generated for JavaScript code.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="interpreter" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-warning">
+            <h2 class="h4 mb-0">Step 3 : Ignition Interpreter</h2>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                The generated AST is passed to the
+                <strong>Ignition Interpreter</strong>.
+
+            </p>
+
+            <h5>Responsibilities</h5>
+
+            <ul>
+
+                <li>Reads the AST.</li>
+
+                <li>Converts the AST into <strong>Bytecode</strong>.</li>
+
+                <li>Executes the bytecode.</li>
+
+                <li>Identifies code that is executed frequently.</li>
+
+            </ul>
+
+            <div class="alert alert-warning">
+
+                <strong>Bytecode</strong> is an intermediate representation that is easier and
+                faster for the V8 engine to execute than raw JavaScript source code.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="hot-code" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-danger text-white">
+            <h2 class="h4 mb-0">Step 4 : Hot Code & TurboFan Compiler</h2>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                When the interpreter notices that a function is executed many times,
+                it marks it as <strong>Hot Code</strong>.
+
+            </p>
+
+            <div class="alert alert-danger">
+
+                <strong>Hot Code</strong> is code that is executed repeatedly and is worth optimizing
+                for better performance.
+
+            </div>
+
+            <h5>TurboFan Compiler</h5>
+
+            <ul>
+
+                <li>Receives hot code from the interpreter.</li>
+
+                <li>Optimizes the code.</li>
+
+                <li>Converts it into machine code.</li>
+
+                <li>Future executions become much faster.</li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="deoptimization" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-secondary text-white">
+            <h2 class="h4 mb-0">Step 5 : Deoptimization</h2>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                TurboFan makes optimization assumptions based on how the code behaves.
+
+                If those assumptions become invalid, the optimized code is discarded.
+
+            </p>
+
+            <div class="alert alert-secondary">
+
+                This process is called
+                <strong>Deoptimization (Deopt)</strong>.
+
+            </div>
+
+            <h5>Example</h5>
+
+<pre class="bg-dark border rounded p-3"><code>function multiply(a, b) {
+    return a * b;
+}
+
+multiply(10, 20);
+multiply(5, 6);
+multiply(2, 4);</code></pre>
+
+            <p>
+
+                Since the function is repeatedly called with numbers,
+                TurboFan optimizes it.
+
+            </p>
+
+<pre class="bg-dark border rounded p-3 m-1"><code>multiply("10", 20);</code></pre>
+
+            <div class="alert alert-danger">
+
+                The argument type has changed from <strong>Number</strong> to <strong>String</strong>.
+                The previous optimization assumptions are no longer valid.
+
+                Therefore, V8 <strong>deoptimizes</strong> the function and sends it back
+                to the Ignition Interpreter.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="jit" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-dark text-white">
+            <h2 class="h4 mb-0">Just-In-Time (JIT) Compilation</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-success">
+
+                <strong>JavaScript uses both an Interpreter and a Compiler.</strong>
+
+                This approach is called
+                <strong>JIT (Just-In-Time Compilation)</strong>.
+
+            </div>
+
+            <table class="table table-bordered table-hover">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>Interpreter</th>
+
+                    <th>Compiler</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr>
+
+                    <td>Ignition</td>
+
+                    <td>TurboFan</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Executes code quickly line by line</td>
+
+                    <td>Optimizes frequently executed code</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Converts AST into Bytecode</td>
+
+                    <td>Converts optimized bytecode into Machine Code</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Line-by-line execution using bytecode</td>
+
+                    <td>Produces highly optimized native machine code</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Best for first execution</td>
+
+                    <td>Best for repeated execution</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="revision" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-success text-white">
+            <h2 class="h4 mb-0">Quick Revision - V8 Engine Execution</h2>
+        </div>
+
+        <div class="card-body">
+
+            <ol>
+
+                <li>JavaScript source code is converted into <strong>Tokens</strong> (Tokenization).</li>
+
+                <li>Tokens are converted into an <strong>Abstract Syntax Tree (AST)</strong>.</li>
+
+                <li>The AST is passed to the <strong>Ignition Interpreter</strong>.</li>
+
+                <li>Ignition converts the AST into <strong>Bytecode</strong> and executes it.</li>
+
+                <li>If the code is executed many times, it becomes <strong>Hot Code</strong>.</li>
+
+                <li>Hot Code is sent to the <strong>TurboFan Compiler</strong>.</li>
+
+                <li>TurboFan optimizes the code and generates <strong>Machine Code</strong>.</li>
+
+                <li>If optimization assumptions become invalid (for example, different data types), V8 performs <strong>Deoptimization</strong>.</li>
+
+                <li>The optimized code is discarded and execution returns to the <strong>Ignition Interpreter</strong>.</li>
+
+                <li>This combination of Interpreter + Compiler is called <strong>JIT (Just-In-Time Compilation)</strong>.</li>
+
+            </ol>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<section id="interview-tips" class="mb-5">
+
+    <div class="card shadow border-0">
+
+        <div class="card-header bg-warning">
+            <h2 class="h4 mb-0">Interview Tips</h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-warning">
+
+                <ul class="mb-0">
+
+                    <li>V8 does <strong>not</strong> directly convert JavaScript source code into machine code. It first generates <strong>Bytecode</strong> using the Ignition Interpreter.</li>
+
+                    <li>Frequently executed code is called <strong>Hot Code</strong>.</li>
+
+                    <li>TurboFan optimizes only hot code.</li>
+
+                    <li>Changing data types or execution patterns can trigger <strong>Deoptimization</strong>.</li>
+
+                    <li>JavaScript execution in V8 uses <strong>JIT (Just-In-Time Compilation)</strong>.</li>
+
+                    <li>Ignition = Interpreter.</li>
+
+                    <li>TurboFan = Optimizing Compiler.</li>
+
+                    <li>AST stands for <strong>Abstract Syntax Tree</strong>.</li>
+
+                    <li>Bytecode is an intermediate representation before machine code.</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+ </section>
+
+  <div class="text-center">
+              <img
+                src="../../../Images/V8 engine execution.jpeg"
+                alt="nodeimage"
+                class="img-fluid"
+              />
+            </div>
+
+
+            <!-- v8 engine code execution notes-->
+    <section id="classnotesv8engineexecution" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-08 Deep divie into V8 JS engine
+                    </h2>
+
+                    <a
+                      href="../class notes/Episode-08  Deep dive into v8 JS Engine.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-08 Deep divie into V8 JS engine
+                    </a>
+                   
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- libuv code execution -->
+
+         <section id="Libuv code execution">
+<div class="container py-5">
+ <style>
+    body {
+      background-color: #f5f7fa;
+    }
+    .card {
+      border-radius: 12px;
+    }
+    .header-title {
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .diagram-box {
+      background: #eef3f8;
+      border: 1px dashed #6c757d;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      white-space: pre-line;
+    }
+  </style>
+  <!-- TITLE -->
+  <section class="mb-5 text-center">
+    <h1 class="header-title text-primary">libuv Internal Working</h1>
+    <p class="text-muted">Node.js Core Concept | Event Loop Architecture</p>
+  </section>
+
+  <!-- INTRO -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        What is libuv?
+      </div>
+      <div class="card-body">
+        <p>
+          libuv is a core library used by Node.js to handle <strong>asynchronous (non-blocking) I/O operations</strong>.
+        </p>
+
+        <div class="alert alert-info">
+          libuv allows Node.js to perform multiple operations like file handling, API calls, and database operations without blocking the main thread.
+        </div>
+
+        <h5>Main Components:</h5>
+        <ul>
+          <li>Event Loop</li>
+          <li>Thread Pool</li>
+          <li>Callback Queue</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENT LOOP -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        Event Loop Overview
+      </div>
+      <div class="card-body">
+
+        <p>
+          The <strong>event loop</strong> is responsible for continuously checking:
+        </p>
+
+        <ul>
+          <li>Call Stack</li>
+          <li>Callback Queue</li>
+        </ul>
+
+        <div class="alert alert-warning">
+          Event loop pushes callbacks from the callback queue to the call stack for execution.
+        </div>
+
+        <!-- Diagram -->
+        <div class="diagram-box mt-3">
+Call Stack  ←  Event Loop  ←  Callback Queue
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTER PHASE -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        Outer Phase (Event Loop Phases)
+      </div>
+      <div class="card-body">
+
+        <p>The event loop has multiple phases executed in order:</p>
+
+        <div class="list-group">
+
+          <div class="list-group-item">
+            <h6 class="text-primary">1. Timers Phase</h6>
+            <p>Handles <code>setTimeout()</code> and <code>setInterval()</code>.</p>
           </div>
+
+          <div class="list-group-item">
+            <h6 class="text-primary">2. Poll Phase</h6>
+            <p>
+              Handles I/O operations like:
+              <ul>
+                <li>API calls</li>
+                <li>Database operations</li>
+                <li>File system operations</li>
+              </ul>
+            </p>
+          </div>
+
+          <div class="list-group-item">
+            <h6 class="text-primary">3. Check Phase</h6>
+            <p>Executes <code>setImmediate()</code> callbacks.</p>
+          </div>
+
+          <div class="list-group-item">
+            <h6 class="text-primary">4. Close Phase</h6>
+            <p>Handles close events like <code>socket.on("close")</code>.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- INNER PHASE -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-secondary text-white">
+        Inner Phase (Microtask Queue)
+      </div>
+      <div class="card-body">
+
+        <p>
+          After every phase, Node.js executes <strong>microtasks</strong>.
+        </p>
+
+        <div class="alert alert-success">
+          Inner phase always executes before moving to the next outer phase.
+        </div>
+
+        <ul>
+          <li><code>process.nextTick()</code></li>
+          <li>Promise callbacks (<code>.then()</code>, <code>.catch()</code>)</li>
+        </ul>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FULL FLOW DIAGRAM -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-info text-white">
+        Complete Event Loop Flow
+      </div>
+      <div class="card-body">
+
+        <div class="diagram-box">
+Microtasks → Timers → Microtasks → Poll → Microtasks → Check → Microtasks → Close → Microtasks
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- THREADPOOL -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-warning">
+        Thread Pool
+      </div>
+      <div class="card-body">
+
+        <p>
+          libuv uses a <strong>thread pool</strong> to handle heavy operations:
+        </p>
+
+        <ul>
+          <li>File system operations</li>
+          <li>Crypto operations</li>
+          <li>DNS lookup</li>
+        </ul>
+
+        <div class="alert alert-dark">
+          Default thread pool size is 4 (can be increased).
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW TIPS -->
+  <section class="mb-5">
+    <div class="card shadow">
+      <div class="card-header bg-danger text-white">
+        Interview Tips
+      </div>
+      <div class="card-body">
+
+        <ul>
+          <li>libuv handles async operations in Node.js.</li>
+          <li>Event loop manages execution flow.</li>
+          <li>Microtasks run before next phase.</li>
+          <li>Thread pool handles heavy operations.</li>
+        </ul>
+
+        <div class="alert alert-info">
+          <strong>Key Line:</strong>  
+          "Node.js is single-threaded but uses libuv to handle concurrency."
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+   <sect class="container py-4">
+          <style>
+      body {
+        background: #f4f7fb;
+      }
+      .card {
+        border: none;
+        border-radius: 14px;
+      }
+      pre {
+        background: #212529;
+        color: #f8f9fa;
+        padding: 14px;
+        border-radius: 10px;
+      }
+      .diagram {
+        background: #eef6ff;
+        border: 2px dashed #6c757d;
+        /* padding: 15px; */
+        border-radius: 10px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      section {
+        margin-bottom: 30px;
+      }
+    </style>
+      <h1 class="text-center text-primary mb-4">
+        libuv Event Loop - Execution Order & Priority
+      </h1>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h3>Execution Priority</h3>
+          </div>
+          <div class="card-body">
+           
+
+            <div class="text-white bg-dark p-2">
+              <pre>
+Start 
+|--> Inner Phase 
+├─ process.nextTick() 
+| └─ Promise
+callbacks
+|--> Timers 
+|--> Inner Phase 
+|--> Poll (FS / DB / API)
+|--> Inner Phase 
+|--> Check (setImmediate) 
+|--> Inner Phase 
+|--> Close callbacks 
+|--> Inner Phase 
+| Repeat...
+</pre>
+</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h3>Detailed Flow</h3>
+          </div>
+          <div class="card-body">
+            <ol>
+              <li>
+                <b>process.nextTick()</b> executes first. Nested nextTick
+                callbacks are completely drained before anything else.
+              </li>
+              <li>
+                <b>Promise callbacks</b> (.then/.catch/.finally) execute after
+                nextTick queue becomes empty. Nested promise callbacks are also
+                processed before moving to outer phases.
+              </li>
+              <li>
+                <b>Timers Phase</b> executes expired setTimeout()/setInterval()
+                callbacks.
+              </li>
+              <li>
+                <b>Poll Phase</b> processes I/O callbacks like File System,
+                Database and HTTP/API operations. Long running I/O continues in
+                background.
+              </li>
+              <li><b>Check Phase</b> executes setImmediate() callbacks.</li>
+              <li>
+                <b>Close Phase</b> executes close callbacks like
+                socket.on("close").
+              </li>
+              <li>
+                The loop repeats until all async work finishes. Afterwards the
+                event loop waits in the <b>Poll</b> phase for new I/O events.
+              </li>
+            </ol>
+            <div class="alert alert-warning">
+              <b>Interview Tip:</b> Node.js always gives higher priority to
+              <code>process.nextTick()</code> than Promise callbacks.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-dark text-white">
+            <h3>Code Examples with Expected Output</h3>
+          </div>
+          <div class="card-body">
+            <h5>Example 1</h5>
+            <pre>
+const fs = require("fs")
+const https = require("https")
+
+var a =2323
+var b=34343
+
+
+https.get("https://dummyjson.com/products/1",()=>{
+console.log("API call")
+})
+
+setTimeout(()=>{
+console.log("timeout function")
+},5000)
+
+
+fs.readFile("./path","utf-8",()=>{
+console.log("file operation")
+})
+
+
+function multiply (x,y){
+const result = x*y
+return result
+}
+
+var c = multiply(a,b)
+console.log(c)
+</pre
+            >
+            
+            <p>Output:</p>
+            <pre>
+79778789
+file operation
+API call
+timeout function
+            </pre>
+
+            <h5>Example 2</h5>
+            <pre>
+const fs = require("fs")
+const https = require("https")
+
+process.nextTick(()=>{
+console.log("next tick method")
+})
+
+Promise.resolve("resolve").then(()=>{console.log("resolve")})
+
+setTimeout(()=>{
+ console.log("timeOut function")
+},4000)
+
+setImmediate(()=>{
+ console.log("setImmediate")
+})
+
+fs.readFile("./file.txt","utf8",()=>{console.log("file read")})
+
+https.get("https://dummyjson.com/products/1",()=>{console.log("API read")})
+
+
+
+</pre>
+
+
+  <p class="bg-danger border text-white p-2 border-danger rounded m-2">Some times File operation may execute first and setImmediate later, depends on file content whether it has heavy data or less data</p>
+           <p>Output:</p>
+           <pre>
+next tick method
+resolve
+setImmediate
+file read
+API read
+timeOut function
+           </pre>
+
+            <h5>Example 3</h5>
+            <pre>
+const fs = require("fs")
+
+const a =100
+
+setImmediate(()=>console.log("setImmediate"))
+
+fs.readFile("./file.txt","utf8",()=>{
+    console.log("file read operations")
+})
+
+setTimeout(()=>console.log("timer expired"),0)
+
+function printA(){
+    console.log("a: ",a)
+}
+
+printA()
+
+console.log("last line of the file")
+</pre >
+<p>Output:</p>
+           
+            <pre>
+a:  100
+last line of the file
+timer expired
+setImmediate
+file read operations
+            </pre>
+
+            <h5>Example 4</h5>
+<pre>
+const fs = require("fs")
+
+const a  =100
+
+setImmediate(()=>console.log("setImmediate"))
+
+Promise.resolve("resolve").then(console.log)
+
+fs.readFile("./file.txt","utf8",()=>{
+    console.log("file read operations")
+})
+
+setTimeout(()=>console.log("timer expired"),0)
+
+process.nextTick(()=>console.log("process.nextTick"))
+
+function printA(){
+    console.log("a: ",a)
+}
+
+printA()
+
+console.log("last line of the file")
+
+</pre
+            >
+            <p>Output:</p>
+
+            <pre>
+a:  100
+last line of the file
+process.nextTick
+resolve
+timer expired
+setImmediate
+file read operations
+            </pre>
+
+            <h5>Example 5</h5>
+            <div>
+              <pre>
+  const fs = require("fs");
+  setImmediate(() => console.log("setImmediate"));
+  setTimeout(() => console.log("timer expired"), 0);
+  
+  Promise.resolve("resolve").then(console.log);
+  
+  fs.readFile("./file.txt", "utf8", () => {
+    setTimeout(() => console.log("file inner timer expired"), 0);
+    process.nextTick(() => console.log("inner process.nextTick"));
+    setImmediate(() => console.log("file inner setImmediate"));
+    console.log("file read operations");
+  });
+  process.nextTick(() => console.log("process.nextTick"));
+  console.log("last line of the file");
+  </pre
+              >
+            </div>
+            <p>Output</p>
+            
+            <div>
+                <pre>
+last line of the file
+process.nextTick
+resolve
+timer expired
+file read operations
+inner process.nextTick
+setImmediate
+file inner setImmediate
+file inner timer expired
+              </pre>
+              </div>
+
+
+            <h5>Example 6</h5>
+            <pre>
+const fs = require("fs")
+
+setImmediate(()=>console.log("setImmediate"))
+setTimeout(()=>console.log("timer expired"),0)
+
+Promise.resolve("resolve").then(console.log)
+
+fs.readFile("./file.txt","utf8",()=>{
+   
+    console.log("file read operations")
+})
+
+process.nextTick(()=>{
+    process.nextTick(()=>console.log("Inner process.nextTick"));
+    console.log("process.nextTick")
+})
+
+console.log("last line of the file")
+
+</pre >
+           <p>Output</p>
+           <ul class="bg-dark text-white p-2 rounded">
+    <li class="list-group-item">last line of the file</li>
+    <li class="list-group-item">process.nextTick</li>
+    <li class="list-group-item">Inner process.nextTick</li>
+    <li class="list-group-item">resolve</li>
+    <li class="list-group-item">timer expired</li>
+    <li class="list-group-item">setImmediate</li>
+    <li class="list-group-item">file read operations</li>
+</ul>
+          </div>
+        </div>
+      </section>
+
+
+      
+             <div class="alert alert-secondary mt-4">
+                  <h5>📚 Reference for JS V8 engine Updates</h5>
+
+                  <ul class="mb-0">
+                    <li>
+                      <strong>V8 engine official website:</strong><br />
+                     https://v8.dev/blog
+                    </li>
+                  </ul>
+                </div>
+
+   
+</div>
+          </section>
+
+            <div class="text-center">
+              <img
+                src="../../../Images/libuv execution.jpeg"
+                alt="nodeimage"
+                class="img-fluid"
+              />
+            </div>
+            <div class="text-center">
+              <img
+                src="../../../Images/Eventloop.jpeg"
+                alt="nodeimage"
+                class="img-fluid"
+              />
+            </div>
+
+
+            
+
+            
+            <!-- v8 engine code execution notes-->
+    <section id="classnoteslibuvnotes" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+                      Episode-09 libuv & Event Loop
+                    </h2>
+
+                    <a
+                      href="../class notes/Episode-09 libuv & Event Loop.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                      Episode-09 libuv & Event Loop
+                    </a>
+                   
+                  </div>
+                </div>
+              </div>
+            </section>
+
+
+
+
+            <!-- Thread Pool Size & Node.js Threading -->
+              <div id="Thread Pool Size & Node.js Threading" class="container py-5">
+                
+            
+      <section >
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">How to Change Thread Pool Size?</h3>
+          </div>
+          <div class="card-body">
+            <pre>process.UV_THREAD_POOL=8</pre>
+            <div class="text-white bg-dark p-2 m-1 rounded">
+              <pre>
+Application
+      │
+      ▼
+process.UV_THREAD_POOL=8
+      │
+      ▼
+Thread Pool Size Updateds
+              </pre>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Is Node.js Single Threaded or Multi-threaded?</h3>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li>
+                nodejs is single threaded or multithreaded depends on what code
+                we are executing and when.
+              </li>
+              <li>
+                suppose if we are executing only synchoronus code , then nodejs
+                is single threaded language
+              </li>
+              <li>
+                suppose if we are using file handling operations , db calls then
+                nodejs V8 engine will uses libuv to offload code and execute it.
+              </li>
+              <li>
+                so nodejs can be single threaded or multi threaded it depends on
+                code we write and executes.
+              </li>
+            </ul>
+
+            <div class="text-white bg-dark p-2 m-1 rounded">
+              <pre>
+Synchronous Code
+        │
+        ▼
+Single Thread
+
+Async Operations
+(File Handling, DB Calls)
+        │
+        ▼
+V8 Engine
+        │
+        ▼
+libuv Offloads Work
+              </pre>
+            </div>
+
+            <div class="alert alert-success">
+              <b>Quick Revision:</b>
+              <ul class="mb-0">
+                <li>Only synchronous code → Single-threaded execution.</li>
+                <li>Async operations → libuv helps execute background work.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+              </div>
+
+
+
+              <!-- Why Only FS, Crypto and DNS Use the libuv Thread Pool? -->
+               <div id="Why Only FS, Crypto and DNS Use the libuv Thread Pool?" class="container py-4">
+      <h1 class="text-center text-primary mb-4">
+        Why Only FS, Crypto and DNS Use the libuv Thread Pool?
+      </h1>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Layman Example (Restaurant Analogy)</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info">Imagine Node.js is a restaurant.</div>
+
+            <ul>
+              <li><b>Node.js (V8)</b> = One waiter</li>
+              <li><b>libuv Thread Pool</b> = Four kitchen helpers</li>
+              <li><b>Operating System</b> = Restaurant management</li>
+            </ul>
+
+            <div class="text-white bg-dark p-2 m-1">
+             <pre>
+              
+Customer
+   │
+   ▼
+ Waiter (Node.js)
+   │
+   ├── Easy work → Done immediately
+   │
+   └── Heavy work → Kitchen Helper (Thread Pool)
+             </pre>
+            </div>
+
+            <p>
+              The waiter should never stop serving customers. If a task takes
+              time, he gives it to a helper and continues serving others.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h3 class="mb-0">1. File System (fs)</h3>
+          </div>
+          <div class="card-body">
+            <p>A customer asks:</p>
+            <div class="alert alert-warning">
+              "Please bring my old bill from the warehouse."
+            </div>
+            <p>
+              The waiter cannot leave the restaurant to search the warehouse. So
+              he asks a helper to do it.
+            </p>
+
+            <pre>fs.readFile("data.txt", callback)</pre>
+
+            <div class="alert alert-success">
+              <b>Reason:</b> Reading files may take time, so libuv gives the
+              work to a worker thread.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">2. Crypto</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-warning">"Encrypt this huge file."</div>
+
+            <p>
+              Encryption involves lots of calculations. If the waiter does it,
+              every other customer has to wait.
+            </p>
+
+            <p>So the waiter gives it to a helper.</p>
+
+            <pre>crypto.pbkdf2(...)</pre>
+
+            <div class="alert alert-success">
+              Heavy CPU work is handled by the thread pool.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-secondary text-white">
+            <h3 class="mb-0">3. DNS Lookup</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-warning">
+              "Can you find where google.com lives?"
+            </div>
+
+            <p>
+              The waiter doesn't know the answer, so a helper finds it while the
+              waiter continues serving customers.
+            </p>
+
+            <pre>dns.lookup("google.com")</pre>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-info text-white">
+            <h3 class="mb-0">Why NOT Network Calls?</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-primary">
+              A customer says, "Call the pizza shop and tell me when the pizza
+              is ready."
+            </div>
+
+            <p>
+              The waiter doesn't stand beside the phone waiting. He gives his
+              phone number, continues working, and the pizza shop calls back
+              when it's ready.
+            </p>
+
+            <pre>
+https.get(...)
+fetch(...)</pre
+            >
+
+            <div class="alert alert-success">
+              The Operating System waits for the network response and notifies
+              libuv when data arrives. No worker thread is needed.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-warning">
+            <h3 class="mb-0">Why NOT Database Calls?</h3>
+          </div>
+          <div class="card-body">
+            <p>Most databases are on another server.</p>
+
+            <div class="text-white bg-dark p-2 m-1">
+              <pre>
+Node.js
+   │
+Internet
+   │
+Database Server
+              </pre>
+            </div>
+
+            <p>
+              Node.js sends the request and continues doing other work. When the
+              database responds, the Operating System notifies libuv.
+            </p>
+
+            <div class="alert alert-success">
+              Database calls usually use asynchronous network sockets instead of
+              the thread pool.
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            Why only FS, Crypto and DNS use Thread Pool?
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info">
+              Thread pool is used only for tasks that cannot efficiently use OS
+              asynchronous event notification.
+            </div>
+            <table class="table table-bordered">
+              <tr>
+                <th>Operation</th>
+                <th>Thread Pool</th>
+                <th>Reason</th>
+              </tr>
+              <tr>
+                <td>File System</td>
+                <td>Yes</td>
+                <td>Most OS file APIs are blocking.</td>
+              </tr>
+              <tr>
+                <td>Crypto</td>
+                <td>Yes</td>
+                <td>CPU intensive.</td>
+              </tr>
+              <tr>
+                <td>DNS lookup()</td>
+                <td>Yes</td>
+                <td>Blocking resolver.</td>
+              </tr>
+              <tr>
+                <td>Network HTTP/TCP</td>
+                <td>No</td>
+                <td>Uses non-blocking sockets (epoll/kqueue/IOCP).</td>
+              </tr>
+              <tr>
+                <td>Database</td>
+                <td>No (usually)</td>
+                <td>Uses async network sockets.</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </section>
+      
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            When does libuv use Thread Pool?
+          </div>
+          <div class="card-body">
+            <ul>
+              <li>fs module</li>
+              <li>crypto module</li>
+              <li>dns.lookup()</li>
+              <li>zlib compression</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card shadow">
+          <div class="card-header bg-dark text-white">
+            <h3 class="mb-0">Interview Ready Answer</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-danger">
+              <b>Interview Answer:</b>
+            </div>
+
+            <p>
+              libuv uses the thread pool only for operations that cannot
+              efficiently use the Operating System's asynchronous event
+              notification mechanism. File System operations, Crypto, and some
+              DNS lookups are either blocking or CPU-intensive, so they are
+              executed by worker threads. Network calls and most database
+              operations use non-blocking sockets provided by the Operating
+              System. Instead of using a worker thread, the Operating System
+              simply notifies libuv when the operation is complete.
+            </p>
+
+            <div class="alert alert-info">
+              <b>One-line Answer:</b><br />
+              FS, Crypto, and DNS use worker threads because they can block or
+              require heavy computation. Network and database operations rely on
+              asynchronous OS notifications, so they do not usually need the
+              libuv thread pool.
+            </div>
+          </div>
+        </div>
+      </section>
+               </div>
+
+
+               <!-- notes -->
+                      
+            <!-- v8 engine code execution notes-->
+    <section id="classnotesThread pool in Libuv" class="py-5 bg-light">
+              <div class="container">
+                <div class="card shadow-sm border-0">
+                  <div class="card-body text-center p-5">
+                    <h2 class="fw-bold text-primary mb-3">
+Class notes of  Episode-10 Thread pool in Libuv      
+              </h2>
+
+                    <a
+                      href="../class notes/Episode-10 Thread pool in Libuv.pdf"
+                      target="_blank"
+                      class="btn btn-primary btn-lg px-4"
+                    >
+                     Class notes of  Episode-10 Thread pool in Libuv
+                    </a>
+                   
+                  </div>
+                </div>
+              </div>
+            </section>
+
+
+       <section id="Bytecode vs Machine Code">
+
+              <div class="container py-4">
+        <h1 class="text-center text-primary">Bytecode vs Machine Code</h1>
+        <section>
+          <div class="card shadow">
+            <div class="card-header bg-primary text-white">Difference</div>
+            <div class="card-body">
+              <table class="table table-bordered">
+                <tr>
+                  <th>Bytecode</th>
+                  <th>Machine Code</th>
+                </tr>
+                <tr>
+                  <td>Intermediate code.</td>
+                  <td>CPU's native code.</td>
+                </tr>
+                <tr>
+                  <td>Executed by Ignition.</td>
+                  <td>Executed directly by CPU.</td>
+                </tr>
+                <tr>
+                  <td>Quick to generate.</td>
+                  <td>Highly optimized.</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="card shadow">
+            <div class="card-header bg-success text-white">Execution Flow</div>
+            <div class="card-body">
+              <div class="text-white bg-dark m-1">
+               <pre>
+JavaScript → Parser → AST → Ignition → Bytecode → Ignition Interpreter → Hot Code? → TurboFan → Machine Code → CPU
+               </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="card shadow">
+            <div class="card-header bg-warning">
+              Layman Example - School Translator
+            </div>
+            <div class="card-body">
+              <p>
+                JavaScript is like an English letter. Bytecode is like notes
+                prepared by a translator. Ignition reads those notes. Machine code
+                is the final language understood directly by the students (CPU).
+              </p>
+              <div class="alert alert-info">
+                The CPU cannot understand Bytecode directly. It understands only
+                Machine Code.
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="card shadow">
+            <div class="card-header bg-info text-white">
+              Layman Example - Restaurant
+            </div>
+            <div class="card-body">
+              <div class="text-white bg-dark p-2 m-1">
+                <pre>
+Customer Order (JavaScript)
+↓
+Kitchen Token (Bytecode)
+↓
+Chef Reads Token (Ignition)
+↓
+Frequently Ordered?
+↓
+Recipe Memorized (Machine Code)
+↓
+Food Prepared Faster
+
+                </pre>
+              </div>
+              <p>
+                The first time, the chef follows the kitchen token step by step.
+                After making the same dish many times, the chef memorizes it and
+                cooks much faster. That memorized recipe is like Machine Code.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="card shadow">
+            <div class="card-header bg-secondary text-white">Code Example</div>
+            <div class="card-body">
+              <pre>
+  const a=10;
+  const b=20;
+  console.log(a+b);</pre
+              >
+              <div class="alert alert-success">
+                V8 first generates Bytecode. If this code becomes hot, TurboFan
+                converts it into Machine Code.
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+              Interview Ready Answer
+            </div>
+            <div class="card-body">
+              <div class="alert alert-danger">
+                Bytecode is an intermediate representation generated by V8 and
+                executed by the Ignition Interpreter. Frequently executed (hot)
+                bytecode is optimized by TurboFan into Machine Code, which is
+                executed directly by the CPU.
+              </div>
+              <ul>
+                <li>Bytecode is not executed directly by the CPU.</li>
+                <li>Machine Code is platform specific.</li>
+                <li>TurboFan optimizes only hot code.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+         </section>
+
+         
+        <section id="Interpreter & Complier Located">
+
+          <div class="container py-4">
+              <h1 class="text-center text-primary mb-4">
+                Where is the Interpreter Located?
+              </h1>
+        
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Short Answer</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="alert alert-success">
+                      <b
+                        >The Interpreter is neither inside the CPU nor inside the
+                        monitor.</b
+                      ><br />
+                      It is a <b>software component</b> of the
+                      <b>V8 JavaScript Engine</b>.
+                    </div>
+                  </div>
+                </div>
+              </section>
+        
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Where is the Interpreter?</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="text-white bg-dark p-1 m-1">
+                      <pre>
+
+Your Computer
+   │
+   ├── CPU (Hardware)
+   ├── RAM
+   ├── Hard Disk
+   │
+   └── Node.js Process
+         │
+         └── V8 Engine
+               │
+               ├── Parser
+               ├── Ignition Interpreter ✅
+               ├── TurboFan Compiler
+               └── Garbage Collector
+                      </pre>
+                    </div>
+        
+                    <div class="alert alert-info mt-3">
+                      The <b>Ignition Interpreter</b> is part of the <b>V8 Engine</b>,
+                      which runs inside the Node.js (or Chrome) process in RAM.
+                    </div>
+                  </div>
+                </div>
+              </section>
+        
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Is it Inside the CPU?</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="alert alert-danger">
+                      <b>No.</b> The CPU only understands and executes
+                      <b>Machine Code</b>.
+                    </div>
+                    <ul>
+                      <li>CPU does not understand JavaScript.</li>
+                      <li>CPU does not understand Bytecode.</li>
+                      <li>CPU executes only machine instructions.</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+        
+           
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Execution Flow</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="text-white bg-dark p-1 m-1">
+                     <pre>
+
+JavaScript Code
+      │
+      ▼
+Parser
+      │
+      ▼
+AST
+      │
+      ▼
+Ignition creates Bytecode
+      │
+      ▼
+Ignition Interpreter executes Bytecode
+      │
+ Hot Code?
+      │
+     Yes
+      ▼
+TurboFan
+      │
+      ▼
+Machine Code
+      │
+      ▼
+CPU Executes
+                     </pre>
+                    </div>
+                  </div>
+                </div>
+              </section>
+        
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">Layman Example</h3>
+                  </div>
+                  <div class="card-body">
+                    <p><b>Imagine a factory:</b></p>
+                    <div class="text-white bg-dark p-1 m-1">
+                      <pre>
+                        Manager        = V8 Engine
+                        Translator     = Ignition Interpreter
+                        Workers        = CPU
+                      </pre>
+                    </div>
+                    <p>
+                      The manager receives instructions. The translator explains them to
+                      the workers. The workers perform the actual work.
+                    </p>
+                    <div class="alert alert-primary">
+                      The <b>translator</b> is inside the factory (V8 Engine), not
+                      inside the workers (CPU).
+                    </div>
+                  </div>
+                </div>
+              </section>
+        
+              <section>
+                <div class="card shadow">
+                  <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Interview Ready Answer</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="alert alert-danger">
+                      <b>Answer:</b><br />
+                      The Ignition Interpreter is a software component of the V8
+                      JavaScript Engine. It is not part of the CPU or the monitor. It
+                      runs inside the Node.js or browser process in RAM. The interpreter
+                      executes V8 bytecode, while the CPU executes the machine code
+                      generated by the V8 engine.
+                    </div>
+        
+                    <div class="alert alert-success">
+                      <b>One-Line Revision</b><br />
+                      Interpreter → Software inside the V8 Engine.<br />
+                      CPU → Executes Machine Code.<br />
+                    </div>
+        
+                    <h5>Interview Tips</h5>
+                    <ul>
+                      <li>Interpreter is software, not hardware.</li>
+                      <li>CPU executes only machine code.</li>
+                      <li>
+                        V8 contains Parser, Ignition, TurboFan, and Garbage Collector.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            </div>
+        </section>
+
+
         </main>
       </div>
     </div>
