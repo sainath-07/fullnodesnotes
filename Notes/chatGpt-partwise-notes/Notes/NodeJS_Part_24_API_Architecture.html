@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 24 — API Architecture</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff;padding:46px 0}
+.card-doc{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.card-header{font-weight:700;padding:16px 20px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto;font-size:.9rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:18px 0}
+.flow .box{padding:12px 16px;border-radius:10px;background:#e8f0fe;border:1px solid #b8ccf5;font-weight:600}
+.arrow{font-size:22px;font-weight:bold}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.answer{display:none}
+.folder{background:#f8fafc;border:1px solid #dee2e6;border-radius:10px;padding:18px;font-family:monospace;white-space:pre;overflow:auto}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="container">
+<h1>🟢 Part 24 — API Architecture ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how to organize an Express application so that routes, controllers, services, models and infrastructure stay easy to understand, test and scale.</p>
+</div>
+</header>
+
+<main class="container py-4">
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">1. What is API Architecture?</div>
+<div class="card-body">
+<p><strong>What:</strong> API architecture is the way we organize an API's code, responsibilities and flow.</p>
+<p><strong>Why:</strong> A small Express application can work with a few files. A large application needs clear boundaries so one file does not contain routes, business rules, database queries, validation and error handling all together.</p>
+<p><strong>Layman example:</strong> Think of a restaurant. The waiter takes your order, the kitchen prepares it, the store provides ingredients, and the manager handles rules. Each person has a different job.</p>
+<div class="flow">
+<div class="box">Client</div><div class="arrow">→</div>
+<div class="box">Route</div><div class="arrow">→</div>
+<div class="box">Controller</div><div class="arrow">→</div>
+<div class="box">Service</div><div class="arrow">→</div>
+<div class="box">Repository / Model</div><div class="arrow">→</div>
+<div class="box">Database</div>
+</div>
+<div class="alert alert-info"><strong>Interview line:</strong> Good API architecture separates responsibilities so each layer has a clear job and can change with minimal impact on other layers.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">2. Separation of Concerns</div>
+<div class="card-body">
+<p><strong>Meaning:</strong> Each part of the application should focus on a specific responsibility.</p>
+<table class="table table-bordered">
+<thead><tr><th>Layer</th><th>Main responsibility</th></tr></thead>
+<tbody>
+<tr><td>Routes</td><td>Map HTTP methods and URLs to handlers.</td></tr>
+<tr><td>Middleware</td><td>Run reusable request/response processing such as auth, logging and validation.</td></tr>
+<tr><td>Controller</td><td>Handle HTTP input/output and coordinate the use case.</td></tr>
+<tr><td>Service</td><td>Contain business rules and application logic.</td></tr>
+<tr><td>Repository</td><td>Handle database access when this abstraction is useful.</td></tr>
+<tr><td>Model</td><td>Represent database data and model-level behavior.</td></tr>
+</tbody>
+</table>
+<div class="warn"><strong>Common mistake:</strong> Do not create layers only because a diagram says so. The goal is clear responsibility. Very small applications may need fewer layers.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">3. MVC — Model, View, Controller</div>
+<div class="card-body">
+<p>In an API, MVC is commonly adapted because there is usually no server-rendered HTML view. The important pieces are the model and controller, with services often added for business logic.</p>
+<div class="flow">
+<div class="box">Request</div><div class="arrow">→</div><div class="box">Controller</div><div class="arrow">→</div><div class="box">Model / Service</div><div class="arrow">→</div><div class="box">Database</div>
+</div>
+<p><strong>Controller:</strong> receives HTTP input, calls application logic and sends the HTTP response.</p>
+<p><strong>Model:</strong> represents the data layer or database model.</p>
+<p><strong>View:</strong> in a REST API, the response is often JSON rather than a traditional HTML view.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">4. Routes</div>
+<div class="card-body">
+<p>Routes define which HTTP method and URL should execute which handler.</p>
+<div class="code">router.get("/users/:id", userController.getUser);
+router.post("/users", userController.createUser);
+router.patch("/users/:id", userController.updateUser);
+router.delete("/users/:id", userController.deleteUser);</div>
+<p><strong>When to use:</strong> Keep routes focused on HTTP mapping rather than business logic.</p>
+<div class="tip"><strong>Good route:</strong> <code>router.post("/users", userController.createUser)</code></div>
+<div class="warn"><strong>Avoid:</strong> Putting 50 lines of database and business logic directly inside the route callback.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">5. Controllers</div>
+<div class="card-body">
+<p>The controller is the HTTP-facing layer.</p>
+<div class="code">async function getUser(req, res, next) {
+  try {
+    const user = await userService.getUserById(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+}</div>
+<p><strong>Controller responsibility:</strong> read request data, call the appropriate service, choose an HTTP status and format the response.</p>
+<div class="alert alert-warning"><strong>Interview tip:</strong> A controller should coordinate the request, not become the place where all business rules live.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">6. Services</div>
+<div class="card-body">
+<p>A service contains business or application logic that should not be tied closely to Express's <code>req</code> and <code>res</code> objects.</p>
+<div class="code">async function getUserById(userId) {
+  const user = await userRepository.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+}</div>
+<p><strong>Why:</strong> Services are easier to reuse and test when they are independent of HTTP details.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-secondary text-white">7. Repository Pattern</div>
+<div class="card-body">
+<p>A repository is an abstraction around data access.</p>
+<div class="code">const userRepository = {
+  findById(id) {
+    return User.findById(id);
+  },
+
+  create(data) {
+    return User.create(data);
+  }
+};</div>
+<div class="flow">
+<div class="box">Controller</div><div class="arrow">→</div>
+<div class="box">Service</div><div class="arrow">→</div>
+<div class="box">Repository</div><div class="arrow">→</div>
+<div class="box">Database</div>
+</div>
+<p><strong>When useful:</strong> Large applications, complex data access or projects where you want business logic separated from database-specific code.</p>
+<p><strong>Important:</strong> A repository layer is not mandatory for every Express application.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">8. Service Layer vs Repository Layer</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Question</th><th>Service</th><th>Repository</th></tr></thead>
+<tbody>
+<tr><td>Main concern</td><td>Business/application rules</td><td>Data access</td></tr>
+<tr><td>Example</td><td>Check whether an order can be cancelled</td><td>Find order by ID</td></tr>
+<tr><td>HTTP knowledge</td><td>Should normally avoid it</td><td>Should avoid it</td></tr>
+<tr><td>Database-specific code</td><td>Ideally limited</td><td>Usually concentrated here</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">9. Middleware</div>
+<div class="card-body">
+<p>Middleware runs during the request pipeline and can inspect or modify the request/response, end the request, or pass control with <code>next()</code>.</p>
+<div class="code">function requireAuth(req, res, next) {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Authentication required"
+    });
+  }
+
+  next();
+}</div>
+<div class="flow">
+<div class="box">Request</div><div class="arrow">→</div>
+<div class="box">Auth Middleware</div><div class="arrow">→</div>
+<div class="box">Validation Middleware</div><div class="arrow">→</div>
+<div class="box">Controller</div>
+</div>
+<p><strong>Common middleware:</strong> authentication, authorization, validation, logging, rate limiting and error handling.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">10. Dependency Injection</div>
+<div class="card-body">
+<p><strong>What:</strong> Dependency injection means giving a component the dependencies it needs instead of having it create those dependencies internally.</p>
+<div class="code">function createUserService(userRepository) {
+  return {
+    async createUser(data) {
+      return userRepository.create(data);
+    }
+  };
+}
+
+const userService = createUserService(userRepository);</div>
+<p><strong>Why:</strong> It makes components easier to test because you can provide a fake repository instead of a real database repository.</p>
+<div class="tip"><strong>Layman example:</strong> Instead of a chef buying and building a stove every time, give the chef a ready-to-use stove. The chef can focus on cooking.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">11. Configuration Management</div>
+<div class="card-body">
+<p>Configuration includes database URLs, ports, API keys, feature flags and environment-specific settings.</p>
+<div class="code">PORT=5000
+MONGO_URI=mongodb://localhost:27017/myapp
+NODE_ENV=development</div>
+<div class="code mt-3">require("dotenv").config();
+
+const config = {
+  port: Number(process.env.PORT) || 5000,
+  mongoUri: process.env.MONGO_URI,
+  nodeEnv: process.env.NODE_ENV || "development"
+};
+
+module.exports = config;</div>
+<div class="alert alert-danger"><strong>Security:</strong> Never commit real passwords, private keys or production secrets to source control.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">12. Environment Variables</div>
+<div class="card-body">
+<p>Environment variables allow the same application code to run with different configuration in development, testing and production.</p>
+<div class="flow">
+<div class="box">Environment</div><div class="arrow">→</div>
+<div class="box">process.env</div><div class="arrow">→</div>
+<div class="box">Config module</div><div class="arrow">→</div>
+<div class="box">Application</div>
+</div>
+<div class="warn"><strong>Common mistake:</strong> Scattering <code>process.env.X</code> throughout hundreds of files. A central configuration module can make configuration easier to validate and understand.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">13. Recommended Folder Structure</div>
+<div class="card-body">
+<div class="folder">src/
+├── app.js
+├── server.js
+├── config/
+│   └── config.js
+├── routes/
+│   ├── user.routes.js
+│   └── order.routes.js
+├── controllers/
+│   ├── user.controller.js
+│   └── order.controller.js
+├── services/
+│   ├── user.service.js
+│   └── order.service.js
+├── repositories/
+│   ├── user.repository.js
+│   └── order.repository.js
+├── models/
+│   ├── user.model.js
+│   └── order.model.js
+├── middleware/
+│   ├── auth.middleware.js
+│   ├── validation.middleware.js
+│   └── error.middleware.js
+├── validators/
+├── utils/
+└── logs/</div>
+<div class="tip mt-3"><strong>Note:</strong> There is no single correct folder structure. Organize around the team's needs, application size and maintainability.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-secondary text-white">14. Reusable Utilities</div>
+<div class="card-body">
+<p>Utilities contain small reusable helpers that do not belong to a particular business layer.</p>
+<div class="code">// utils/asyncHandler.js
+const asyncHandler = (handler) =&gt; {
+  return (req, res, next) =&gt; {
+    Promise.resolve(handler(req, res, next))
+      .catch(next);
+  };
+};
+
+module.exports = asyncHandler;</div>
+<p>Other examples can include date formatting, ID generation or safe parsing helpers.</p>
+<div class="warn"><strong>Common mistake:</strong> Do not create one giant <code>utils.js</code> file containing unrelated business logic.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">15. Error Architecture</div>
+<div class="card-body">
+<div class="flow">
+<div class="box">Controller / Service error</div><div class="arrow">→</div>
+<div class="box">next(error)</div><div class="arrow">→</div>
+<div class="box">Global error middleware</div><div class="arrow">→</div>
+<div class="box">Safe JSON response + logging</div>
+</div>
+<div class="code">class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+app.use((err, req, res, next) =&gt; {
+  console.error(err);
+
+  const status = err.statusCode || 500;
+
+  res.status(status).json({
+    success: false,
+    message: status === 500
+      ? "Internal server error"
+      : err.message
+  });
+});</div>
+<p><strong>Why:</strong> Centralized error handling avoids repeating the same response and logging logic in every controller.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">16. API Response Architecture</div>
+<div class="card-body">
+<p>A consistent response shape makes frontend integration easier.</p>
+<div class="code">{
+  "success": true,
+  "data": {
+    "id": "123",
+    "name": "Sam"
+  }
+}</div>
+<div class="code">{
+  "success": false,
+  "message": "User not found",
+  "errorCode": "USER_NOT_FOUND"
+}</div>
+<div class="tip"><strong>Good practice:</strong> Decide on a consistent API response style, document it and use it across the project.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">17. Logging Architecture</div>
+<div class="card-body">
+<p>Logging records useful application events, errors and operational information.</p>
+<div class="flow">
+<div class="box">Request</div><div class="arrow">→</div>
+<div class="box">Logger</div><div class="arrow">→</div>
+<div class="box">Log destination</div>
+</div>
+<p><strong>Good logs:</strong> request ID, method, route, status code, duration and useful error context.</p>
+<p><strong>Avoid:</strong> passwords, access tokens, private keys and sensitive personal information.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">18. Large Application Structure</div>
+<div class="card-body">
+<p>As the application grows, grouping files by feature can become easier to maintain than keeping every controller, service and route in huge global folders.</p>
+<div class="folder">src/
+├── modules/
+│   ├── users/
+│   │   ├── user.routes.js
+│   │   ├── user.controller.js
+│   │   ├── user.service.js
+│   │   ├── user.repository.js
+│   │   ├── user.model.js
+│   │   └── user.validation.js
+│   └── orders/
+│       ├── order.routes.js
+│       ├── order.controller.js
+│       ├── order.service.js
+│       ├── order.repository.js
+│       ├── order.model.js
+│       └── order.validation.js
+├── config/
+├── middleware/
+└── utils/</div>
+<p class="mt-3"><strong>Benefit:</strong> Code related to one business feature stays together.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">19. Scalable Express Request Flow</div>
+<div class="card-body">
+<div class="flow">
+<div class="box">Client</div><div class="arrow">→</div>
+<div class="box">App Middleware</div><div class="arrow">→</div>
+<div class="box">Router</div><div class="arrow">→</div>
+<div class="box">Auth / Validation</div><div class="arrow">→</div>
+<div class="box">Controller</div><div class="arrow">→</div>
+<div class="box">Service</div><div class="arrow">→</div>
+<div class="box">Repository</div><div class="arrow">→</div>
+<div class="box">DB</div>
+</div>
+<div class="flow">
+<div class="box">DB result</div><div class="arrow">→</div>
+<div class="box">Repository</div><div class="arrow">→</div>
+<div class="box">Service</div><div class="arrow">→</div>
+<div class="box">Controller</div><div class="arrow">→</div>
+<div class="box">JSON response</div><div class="arrow">→</div>
+<div class="box">Client</div>
+</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">20. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Putting database queries directly in route files.</li>
+<li>Putting business rules inside controllers.</li>
+<li>Making controllers extremely large.</li>
+<li>Creating unnecessary layers in a tiny project.</li>
+<li>Sharing global mutable state between unrelated requests.</li>
+<li>Scattering configuration and secrets throughout the application.</li>
+<li>Returning different response shapes for similar endpoints without a reason.</li>
+<li>Logging passwords, tokens or sensitive data.</li>
+<li>Duplicating error handling in every route.</li>
+<li>Creating a repository layer without a real need for the abstraction.</li>
+<li>Making services depend directly on Express <code>req</code> and <code>res</code>.</li>
+<li>Using dependency injection as a pattern without understanding why it helps testing or flexibility.</li>
+</ol>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">21. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li><strong>Routes</strong> map HTTP requests to handlers.</li>
+<li><strong>Controllers</strong> handle HTTP input and output.</li>
+<li><strong>Services</strong> contain business/application rules.</li>
+<li><strong>Repositories</strong> can isolate database access.</li>
+<li><strong>Models</strong> represent database data and model behavior.</li>
+<li><strong>Middleware</strong> handles reusable request pipeline behavior.</li>
+<li><strong>Dependency injection</strong> makes dependencies explicit and can improve testability.</li>
+<li><strong>Configuration</strong> should be centralized and environment-aware.</li>
+<li><strong>Error handling</strong> should be consistent and centralized.</li>
+<li><strong>Logging</strong> should help debugging without exposing secrets.</li>
+<li>For large systems, organize code by feature when it improves maintainability.</li>
+</ul>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">22. Interview-Ready Points ⭐⭐⭐</div>
+<div class="card-body">
+<div class="tip">
+<ul class="mb-0">
+<li><strong>Separation of concerns:</strong> each layer has a focused responsibility.</li>
+<li><strong>Controller vs service:</strong> controller handles HTTP; service handles application/business logic.</li>
+<li><strong>Service vs repository:</strong> service decides what should happen; repository handles data access.</li>
+<li><strong>Why centralize errors?</strong> consistent responses, logging and less duplicated code.</li>
+<li><strong>Why dependency injection?</strong> explicit dependencies and easier testing/replacement.</li>
+<li><strong>Why configuration management?</strong> separate environment-specific values from application logic.</li>
+<li><strong>Why connection/config modules?</strong> prevent infrastructure details from spreading throughout the codebase.</li>
+<li><strong>Scalable architecture:</strong> organize around clear boundaries, not merely around the number of folders.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">23. Interview Questions — Click to Show / Hide Answer</div>
+<div class="card-body" id="questions"></div>
+</section>
+
+</main>
+
+<script>
+const questions = [
+["Q1. Why should business logic not be placed directly inside Express routes?",
+"Routes should mainly map HTTP methods and paths to handlers. Business rules are better placed in services or other application layers.",
+"This keeps routes small and makes business logic reusable and easier to test."],
+["Q2. What is the responsibility of a controller?",
+"A controller handles HTTP concerns: reading request data, calling application logic, selecting status codes and sending the response.",
+"It acts as a boundary between Express and the application's business logic."],
+["Q3. What is the difference between a controller and a service?",
+"A controller handles HTTP input/output. A service contains application or business logic and should normally not depend on Express req/res objects.",
+"This separation makes business logic easier to reuse and test."],
+["Q4. What is the repository pattern?",
+"It is an abstraction that concentrates data-access operations behind a repository interface.",
+"It can reduce database-specific code inside services, especially in larger applications."],
+["Q5. Is a repository layer mandatory in Express?",
+"No. It is an architectural choice.",
+"Adding layers without a real need can increase complexity. Use a repository when the abstraction provides a useful boundary."],
+["Q6. What is separation of concerns?",
+"It means different parts of the application have different focused responsibilities.",
+"It prevents one module from becoming responsible for routing, validation, business rules, database access and response formatting at the same time."],
+["Q7. Why use a service layer?",
+"It keeps business logic outside controllers and makes that logic easier to reuse and test.",
+"It also reduces the amount of application logic tied to Express."],
+["Q8. What is dependency injection?",
+"It is the practice of supplying a component with its dependencies instead of making the component create them internally.",
+"It makes dependencies explicit and can make unit testing easier by allowing fake implementations."],
+["Q9. How would you handle errors in a scalable Express API?",
+"Use application-specific error classes where useful, pass errors to centralized error middleware, log appropriate technical details and return a safe consistent response.",
+"Centralization avoids duplicated error-response logic and keeps production responses safer."],
+["Q10. Why centralize configuration?",
+"It gives the application one clear place to read, validate and expose environment-specific configuration.",
+"This reduces scattered process.env access and makes configuration easier to test and reason about."],
+["Q11. Why should secrets not be committed to Git?",
+"Source repositories can be copied, shared or exposed. Committing secrets can give attackers access to databases or services.",
+"Use environment/secret management appropriate for the deployment and rotate exposed credentials."],
+["Q12. What is middleware's role in API architecture?",
+"Middleware handles reusable request-pipeline concerns such as authentication, validation, logging, rate limiting and error handling.",
+"It prevents those concerns from being duplicated in every controller."],
+["Q13. What makes an Express architecture scalable?",
+"Clear boundaries, small focused modules, consistent error and response handling, centralized configuration, testable business logic and controlled infrastructure access.",
+"Scalability is more about maintainable boundaries than simply creating many folders."],
+["Q14. What is feature-based folder organization?",
+"Code for one business feature is grouped together, such as users/user.controller.js, users/user.service.js and users/user.routes.js.",
+"It can make large applications easier to navigate because related code stays together."],
+["Q15. What should a controller avoid doing?",
+"It should avoid containing large business workflows, raw database logic and unrelated infrastructure code.",
+"A controller should coordinate the request rather than become a giant application layer."],
+["Q16. What is API response architecture?",
+"It is the practice of defining a consistent structure for successful and failed API responses.",
+"Consistency makes frontend clients easier to build and reduces special cases."],
+["Q17. What should good API logs contain?",
+"Useful operational context such as request ID, method, route, status and duration, plus safe error information when needed.",
+"Logs should help diagnose problems without exposing passwords, tokens or other sensitive data."],
+["Q18. Why should services avoid req and res?",
+"req and res are Express-specific HTTP objects. Keeping services independent of them makes business logic easier to reuse and test.",
+"The controller can translate HTTP input into service arguments and translate the service result back into an HTTP response."],
+["Q19. What is the difference between MVC and a layered Express architecture?",
+"MVC commonly describes model, view and controller responsibilities. A layered Express API may add services, repositories, middleware and infrastructure layers.",
+"Modern APIs often use an MVC-inspired structure plus additional layers when the application's complexity requires them."],
+["Q20. What is the biggest architecture mistake in a large Express project?",
+"A common mistake is allowing responsibilities to mix until controllers or route files contain validation, business rules, database queries, logging and response logic all together.",
+"Clear boundaries make changes safer and reduce the cost of maintaining the application."]
+];
+
+const root=document.getElementById("questions");
+questions.forEach((q,i)=>{
+ const id="answer"+i;
+ root.innerHTML += `<div class="border rounded-3 p-3 mb-3">
+ <h6 class="fw-bold">${q[0]}</h6>
+ <button class="btn btn-outline-primary btn-sm" onclick="toggleAnswer('${id}',this)">Show Answer</button>
+ <div id="${id}" class="answer mt-3">
+  <div class="alert alert-success"><strong>Answer:</strong> ${q[1]}</div>
+  <div class="alert alert-info mb-0"><strong>Why?</strong> ${q[2]}</div>
+ </div>
+ </div>`;
+});
+function toggleAnswer(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

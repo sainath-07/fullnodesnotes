@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React Machine Coding Round - Debounce</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body { background:#f4f6f9; }
+  .topbar { position:sticky; top:0; z-index:1000; }
+  .layout { min-height:calc(100vh - 56px); }
+  .left-panel { position:sticky; top:72px; height:fit-content; }
+  .topic-btn { border:0; background:transparent; text-align:left; width:100%; padding:12px 14px; border-radius:8px; }
+  .topic-btn:hover, .topic-btn.active { background:#e9f2ff; color:#0d6efd; font-weight:600; }
+  .content-card { border:0; box-shadow:0 4px 18px rgba(0,0,0,.07); }
+  .answer-panel { display:none; }
+  .answer-panel.active { display:block; }
+  pre { background:#172033; color:#e8edf5; padding:18px; border-radius:10px; overflow:auto; }
+  .code-title { font-weight:700; margin-top:18px; }
+  .flow { background:#eef5ff; border-left:4px solid #0d6efd; padding:15px; border-radius:8px; }
+  .interview-box { background:#fff8e1; border-left:4px solid #ffc107; padding:16px; border-radius:8px; }
+  .edge { background:#f8f9fa; border-radius:8px; padding:12px; }
+  @media (max-width: 991px) {
+    .left-panel { position:static; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark topbar">
+  <div class="container-fluid">
+    <span class="navbar-brand fw-bold">React Machine Coding Round — Debounce</span>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <div class="row g-4 layout">
+
+    <!-- LEFT: TOPICS -->
+    <aside class="col-lg-3">
+      <div class="card content-card left-panel p-3">
+        <h5 class="fw-bold mb-3">Topics</h5>
+        <button class="topic-btn active" data-target="question">Question</button>
+        <button class="topic-btn" data-target="answer">Answer</button>
+        <button class="topic-btn" data-target="interviewer">How I Explain to Interviewer</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT: SELECTED CONTENT -->
+    <main class="col-lg-9">
+
+      <div id="question" class="answer-panel active">
+        <div class="card content-card">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Machine Coding Question</h4>
+          </div>
+          <div class="card-body">
+            <h5>Question</h5>
+            <p>
+              Implement a <strong>debounce search</strong> in React.
+              Make an API call only after the user stops typing for a specific
+              amount of time, such as 500ms.
+            </p>
+
+            <h6>Requirements</h6>
+            <ul>
+              <li>Create a search input.</li>
+              <li>Do not call the API for every key press.</li>
+              <li>Wait 500ms after the user's last event before calling the API.</li>
+              <li>Handle previous API requests correctly.</li>
+              <li>Show the latest search result.</li>
+            </ul>
+
+            <div class="alert alert-info">
+              <strong>Interview goal:</strong> Explain debounce clearly and show
+              how you handle stale/previous API requests.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="answer" class="answer-panel">
+        <div class="card content-card">
+          <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Answer</h4>
+          </div>
+          <div class="card-body">
+
+            <h5>Core Idea</h5>
+            <p>
+              Debounce means: <strong>wait until the user stops triggering an event
+              for a fixed amount of time, then perform the action.</strong>
+            </p>
+
+            <div class="flow mb-4">
+              User types → reset timer → user types again → reset timer →
+              user stops → 500ms completes → API call
+            </div>
+
+            <div class="accordion" id="approaches">
+
+              <!-- CANCELLED -->
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#cancelled">
+                    1. Debounce + Cancelled Flag
+                  </button>
+                </h2>
+                <div id="cancelled" class="accordion-collapse collapse show" data-bs-parent="#approaches">
+                  <div class="accordion-body">
+                    <p>
+                      The boolean flag does <strong>not cancel the network request</strong>.
+                      It marks the old effect as invalid, so when its response arrives,
+                      we ignore it.
+                    </p>
+
+<pre><code>useEffect(() =&gt; {
+  let cancelled = false;
+
+  const timer = setTimeout(async () =&gt; {
+    try {
+      const response = await fetch(`/api/search?q=${search}`);
+      const data = await response.json();
+
+      if (!cancelled) {
+        setResults(data);
+      }
+    } catch (error) {
+      if (!cancelled) {
+        setError("Request failed");
+      }
+    }
+  }, 500);
+
+  return () =&gt; {
+    clearTimeout(timer);
+    cancelled = true;
+  };
+}, [search]);</code></pre>
+
+                    <div class="alert alert-warning">
+                      <strong>Important:</strong> The request still goes to the server.
+                      We only prevent the old response from updating the UI.
+                    </div>
+
+                    <div class="mt-3 p-3 border rounded bg-light">
+                      <h6 class="fw-bold text-danger">Common Developer Mistakes</h6>
+                      <ul class="mb-0">
+                        <li>Thinking <code>cancelled = true</code> actually cancels the API/network request.</li>
+                        <li>Forgetting <code>clearTimeout()</code>, so old debounce timers can still run.</li>
+                        <li>Declaring the cancelled flag outside <code>useEffect</code>, causing different effects to share the same flag.</li>
+                        <li>Forgetting to check <code>if (!cancelled)</code> before updating state.</li>
+                        <li>Forgetting cleanup when the component unmounts or the search value changes.</li>
+                        <li>Not handling API errors separately from cancelled/stale work.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ABORT -->
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#abort">
+                    2. Debounce + Abort
+                  </button>
+                </h2>
+                <div id="abort" class="accordion-collapse collapse" data-bs-parent="#approaches">
+                  <div class="accordion-body">
+                    <p>
+                      Here, <strong>AbortController</strong> is used to cancel the
+                      previous fetch request when the search value changes.
+                    </p>
+
+<pre><code>useEffect(() =&gt; {
+  const controller = new AbortController();
+
+  const timer = setTimeout(async () =&gt; {
+    try {
+      const response = await fetch(
+        `/api/search?q=${search}`,
+        { signal: controller.signal }
+      );
+
+      const data = await response.json();
+      setResults(data);
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        setError("Request failed");
+      }
+    }
+  }, 500);
+
+  return () =&gt; {
+    clearTimeout(timer);
+    controller.abort();
+  };
+}, [search]);</code></pre>
+
+                    <div class="alert alert-success">
+                      <strong>Important:</strong> AbortController tells fetch to abort
+                      the request. The AbortError is intentionally ignored.
+                    </div>
+
+                    <div class="mt-3 p-3 border rounded bg-light">
+                      <h6 class="fw-bold text-danger">Common Developer Mistakes</h6>
+                      <ul class="mb-0">
+                        <li>Creating one <code>AbortController</code> outside <code>useEffect</code> and reusing it for every request.</li>
+                        <li>Creating the controller but forgetting to pass <code>signal</code> to <code>fetch()</code>.</li>
+                        <li>Calling <code>abort()</code> but treating <code>AbortError</code> as a real API failure.</li>
+                        <li>Forgetting <code>clearTimeout()</code> during cleanup.</li>
+                        <li>Assuming <code>abort()</code> guarantees that the server never received or processed the request.</li>
+                        <li>Incorrectly changing loading/error state after an old request is aborted.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BOTH -->
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#both">
+                    3. Debounce + Abort + Cancelled Flag
+                  </button>
+                </h2>
+                <div id="both" class="accordion-collapse collapse" data-bs-parent="#approaches">
+                  <div class="accordion-body">
+                    <p>
+                      This combines both techniques. <strong>AbortController</strong>
+                      cancels the fetch, while the <strong>cancelled flag</strong>
+                      makes the old effect invalid so stale work cannot update the UI.
+                    </p>
+
+<pre><code>useEffect(() =&gt; {
+  let cancelled = false;
+  const controller = new AbortController();
+
+  const timer = setTimeout(async () =&gt; {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(search)}`,
+        { signal: controller.signal }
+      );
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      const data = await response.json();
+
+      if (!cancelled) {
+        setResults(data);
+      }
+    } catch (error) {
+      if (!cancelled &amp;&amp; error.name !== "AbortError") {
+        setError("Something went wrong");
+      }
+    } finally {
+      if (!cancelled) {
+        setLoading(false);
+      }
+    }
+  }, 500);
+
+  return () =&gt; {
+    cancelled = true;
+    clearTimeout(timer);
+    controller.abort();
+  };
+}, [search]);</code></pre>
+
+                    <div class="alert alert-primary">
+                      <strong>Best interview explanation:</strong>
+                      Debounce reduces unnecessary API calls. AbortController cancels
+                      the previous fetch. The cancelled flag prevents invalid/stale
+                      work from updating React state.
+                    </div>
+
+                    <div class="mt-3 p-3 border rounded bg-light">
+                      <h6 class="fw-bold text-danger">Common Developer Mistakes</h6>
+                      <ul class="mb-0">
+                        <li>Using both mechanisms without understanding that they solve different problems.</li>
+                        <li>Declaring <code>cancelled</code> or the controller outside <code>useEffect</code>.</li>
+                        <li>Forgetting either <code>clearTimeout()</code> or <code>controller.abort()</code> in cleanup.</li>
+                        <li>Setting <code>cancelled = true</code> too late instead of doing it during cleanup.</li>
+                        <li>Treating <code>AbortError</code> as a normal API error.</li>
+                        <li>Allowing an old request's <code>finally</code> block to incorrectly change the current loading state.</li>
+                        <li>Thinking debounce alone solves the race condition.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <h5 class="mt-4">Difference Between Cancel and Abort</h5>
+            <table class="table table-bordered align-middle">
+              <thead>
+                <tr>
+                  <th>Technique</th>
+                  <th>What it does</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>cancelled = true</code></td>
+                  <td>Invalidates old work and prevents stale UI updates.</td>
+                </tr>
+                <tr>
+                  <td><code>controller.abort()</code></td>
+                  <td>Aborts an in-flight fetch request.</td>
+                </tr>
+                <tr>
+                  <td>Debounce</td>
+                  <td>Waits before starting the API call.</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="interviewer" class="answer-panel">
+        <div class="card content-card">
+          <div class="card-header bg-warning">
+            <h4 class="mb-0">How I Explain This to the Interviewer</h4>
+          </div>
+          <div class="card-body">
+
+            <div class="interview-box mb-4">
+              <p class="mb-0">
+                "First, I keep the search value in React state. Whenever the user
+                types, the effect runs. I start a 500ms timer. If the user types
+                again before 500ms, the cleanup clears the previous timer. Therefore,
+                the API is called only after the user stops typing."
+              </p>
+            </div>
+
+            <div class="interview-box mb-4">
+              <p class="mb-0">
+                "After the debounce delay, I make the API request. Because another
+                search can happen while the previous request is running, I need to
+                handle the previous request as well."
+              </p>
+            </div>
+
+            <div class="interview-box mb-4">
+              <p class="mb-0">
+                "I can handle this with a cancelled flag. The flag does not cancel
+                the actual network request; it only makes the previous effect invalid,
+                so an old response cannot update the UI."
+              </p>
+            </div>
+
+            <div class="interview-box mb-4">
+              <p class="mb-0">
+                "Alternatively, I can use AbortController. When the search changes,
+                the cleanup calls abort(), which cancels the previous fetch request."
+              </p>
+            </div>
+
+            <div class="interview-box mb-4">
+              <p class="mb-0">
+                "For a stronger implementation, I can use both. AbortController
+                handles the fetch cancellation, and the cancelled flag protects
+                against stale state updates. The cleanup clears the debounce timer,
+                marks the old effect as cancelled, and aborts the previous request."
+              </p>
+            </div>
+
+            <div class="alert alert-dark">
+              <strong>Short interview answer:</strong><br>
+              "Debounce controls <strong>when</strong> the API call starts.
+              AbortController cancels an old fetch, while a cancelled flag prevents
+              an old effect from updating the UI."
+            </div>
+
+            <h5>Edge Cases I Handled</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="edge">
+                  <strong>1. Empty search</strong><br>
+                  Do not make an API call for an empty value.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="edge">
+                  <strong>2. Fast typing</strong><br>
+                  Clear the previous debounce timer.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="edge">
+                  <strong>3. Previous request</strong><br>
+                  Abort the previous fetch when appropriate.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="edge">
+                  <strong>4. Stale response</strong><br>
+                  Use the cancelled flag to prevent stale state updates.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="edge">
+                  <strong>5. API error</strong><br>
+                  Handle normal errors separately from AbortError.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="edge">
+                  <strong>6. Component cleanup</strong><br>
+                  Clear the timer and clean up the request on effect cleanup.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const buttons = document.querySelectorAll(".topic-btn");
+  const panels = document.querySelectorAll(".answer-panel");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      const target = button.dataset.target;
+
+      buttons.forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      panels.forEach(panel => {
+        panel.classList.toggle("active", panel.id === target);
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+</script>
+</body>
+</html>

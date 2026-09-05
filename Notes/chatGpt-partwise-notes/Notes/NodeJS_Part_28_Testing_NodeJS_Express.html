@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Node.js Part 28 — Testing Node.js + Express</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#312e81,#2563eb);color:#fff;padding:46px 0}
+.doc{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.doc .card-header{font-weight:700;padding:16px 20px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto;font-size:.9rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:18px 0}
+.box{padding:12px 16px;border-radius:10px;background:#e8f0fe;border:1px solid #b8ccf5;font-weight:600;text-align:center}
+.arrow{font-size:22px;font-weight:bold}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.danger{border-left:5px solid #dc3545;background:#fff0f1;padding:14px;border-radius:8px}
+.answer{display:none}
+</style>
+</head>
+<body>
+<header class="hero"><div class="container">
+<h1>🟢 Part 28 — Testing Node.js + Express ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how to test Node.js applications, Express APIs, middleware and business logic with confidence.</p>
+</div></header>
+
+<main class="container py-4">
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">1. What is Testing?</div>
+<div class="card-body">
+<p><strong>What:</strong> Testing means writing code that checks whether our application behaves as expected.</p>
+<p><strong>Why:</strong> Tests catch bugs early and make refactoring safer.</p>
+<p><strong>Layman example:</strong> Before selling a car, you test the brakes, lights and engine. Software testing does the same thing for application behavior.</p>
+<div class="flow"><div class="box">Write code</div><div class="arrow">→</div><div class="box">Run test</div><div class="arrow">→</div><div class="box">Expected result?</div><div class="arrow">→</div><div class="box">Pass / Fail</div></div>
+<div class="alert alert-info"><strong>Interview line:</strong> Tests verify behavior. Good tests give fast feedback and reduce the risk of breaking existing functionality.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">2. Unit Testing</div>
+<div class="card-body">
+<p><strong>What:</strong> Unit testing checks a small unit of code in isolation, such as a function or service method.</p>
+<p><strong>Purpose:</strong> Find bugs close to where they are introduced.</p>
+<div class="code">function add(a, b) {
+  return a + b;
+}
+
+test("adds two numbers", () => {
+  expect(add(2, 3)).toBe(5);
+});</div>
+<div class="tip"><strong>When to use:</strong> Use unit tests heavily for business rules and pure functions because they are usually fast and easy to isolate.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-info text-dark">3. Integration Testing</div>
+<div class="card-body">
+<p><strong>What:</strong> Integration testing checks whether multiple parts work correctly together.</p>
+<div class="flow"><div class="box">Controller</div><div class="arrow">→</div><div class="box">Service</div><div class="arrow">→</div><div class="box">Repository</div><div class="arrow">→</div><div class="box">Test DB</div></div>
+<p><strong>Why:</strong> Unit tests prove pieces work alone; integration tests find problems in the connection between pieces.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-warning text-dark">4. API Testing</div>
+<div class="card-body">
+<p>API testing sends HTTP requests to an application and checks the response.</p>
+<div class="flow"><div class="box">Test</div><div class="arrow">→</div><div class="box">HTTP Request</div><div class="arrow">→</div><div class="box">Express API</div><div class="arrow">→</div><div class="box">HTTP Response</div><div class="arrow">→</div><div class="box">Assertions</div></div>
+<p>Typical checks include status code, response body, headers and error behavior.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-danger text-white">5. Jest</div>
+<div class="card-body">
+<p><strong>Jest</strong> is a popular JavaScript testing framework. It provides test definitions, assertions, mocks, spies and other testing features.</p>
+<div class="code">test("user is active", () => {
+  const user = { active: true };
+  expect(user.active).toBe(true);
+});</div>
+<div class="alert alert-info"><strong>Interview point:</strong> Jest is a testing framework, while Supertest focuses on making HTTP/API testing easier.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-secondary text-white">6. Node.js Built-in Test Runner</div>
+<div class="card-body">
+<p>Modern Node.js includes a built-in test runner through <code>node:test</code>.</p>
+<div class="code">const test = require("node:test");
+const assert = require("node:assert/strict");
+
+test("adds values", () => {
+  assert.equal(2 + 3, 5);
+});</div>
+<div class="tip"><strong>Interview point:</strong> Node's built-in runner avoids adding a separate test framework for projects that only need its built-in testing features.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">7. Supertest</div>
+<div class="card-body">
+<p><strong>Supertest</strong> is commonly used to test HTTP servers and Express applications.</p>
+<div class="code">const request = require("supertest");
+const app = require("./app");
+
+test("GET /health returns 200", async () => {
+  const response = await request(app).get("/health");
+
+  expect(response.status).toBe(200);
+  expect(response.body).toEqual({ ok: true });
+});</div>
+<div class="tip"><strong>Why:</strong> Supertest makes API endpoint testing convenient without requiring a real browser.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">8. Mocking</div>
+<div class="card-body">
+<p><strong>Mocking</strong> means replacing a real dependency with controlled behavior during a test.</p>
+<div class="code">const paymentService = {
+  charge: jest.fn()
+};
+
+paymentService.charge.mockResolvedValue({
+  success: true
+});</div>
+<p><strong>Why:</strong> Mocking makes tests faster and lets you simulate external-service success and failure.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-info text-dark">9. Spies</div>
+<div class="card-body">
+<p>A <strong>spy</strong> observes how a function is used. It can verify call count and arguments.</p>
+<div class="code">const logger = {
+  info(message) {
+    console.log(message);
+  }
+};
+
+const spy = jest.spyOn(logger, "info");
+
+logger.info("User created");
+
+expect(spy).toHaveBeenCalledWith("User created");
+
+spy.mockRestore();</div>
+<div class="warn"><strong>Common mistake:</strong> A spy is mainly for observation. It does not automatically mean the original implementation has been replaced.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-warning text-dark">10. Test Fixtures</div>
+<div class="card-body">
+<p><strong>Test fixtures</strong> are prepared data or setup used by tests.</p>
+<div class="code">const userFixture = {
+  name: "Sam",
+  email: "sam@example.com",
+  role: "user"
+};</div>
+<p><strong>Why:</strong> Fixtures keep test data consistent and reduce repeated setup code.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-dark text-white">11. Test Database</div>
+<div class="card-body">
+<p>A test database is used only by automated tests.</p>
+<div class="flow"><div class="box">Test starts</div><div class="arrow">→</div><div class="box">Prepare DB</div><div class="arrow">→</div><div class="box">Run test</div><div class="arrow">→</div><div class="box">Clean data</div></div>
+<div class="danger"><strong>Important:</strong> Never let automated tests accidentally delete or modify production data.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">12. Authentication Testing</div>
+<div class="card-body">
+<ul>
+<li>Valid credentials should succeed.</li>
+<li>Invalid credentials should fail.</li>
+<li>Missing credentials should be rejected.</li>
+<li>Expired or invalid tokens should be rejected.</li>
+<li>Protected routes should not be accessible without valid authentication.</li>
+</ul>
+<div class="code">const response = await request(app)
+  .get("/api/profile")
+  .set("Authorization", `Bearer ${token}`);
+
+expect(response.status).toBe(200);</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-danger text-white">13. Error Testing</div>
+<div class="card-body">
+<p>Do not test only successful cases. Test failures too.</p>
+<ul>
+<li>Invalid input → 400</li>
+<li>Unauthenticated → 401</li>
+<li>Forbidden → 403</li>
+<li>Missing resource → 404</li>
+<li>Unexpected server error → 500</li>
+</ul>
+<div class="tip"><strong>Interview point:</strong> Good tests verify both the happy path and important failure paths.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">14. Middleware Testing</div>
+<div class="card-body">
+<p>Middleware tests verify whether middleware correctly modifies the request/response or calls <code>next()</code>.</p>
+<div class="code">function requireAdmin(req, res, next) {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+  next();
+}</div>
+<p>Test an admin user, a normal user and a request with no authenticated user.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-info text-dark">15. Controller Testing</div>
+<div class="card-body">
+<p>A controller test checks request handling, service calls and response creation.</p>
+<div class="flow"><div class="box">Request</div><div class="arrow">→</div><div class="box">Controller</div><div class="arrow">→</div><div class="box">Mocked Service</div><div class="arrow">→</div><div class="box">Response</div></div>
+<p>Mocking the service keeps the controller test focused on controller behavior.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-warning text-dark">16. Service Testing</div>
+<div class="card-body">
+<p>Service tests focus on business rules.</p>
+<div class="code">async function createDiscount(user, amount) {
+  if (user.isPremium) {
+    return amount * 0.9;
+  }
+  return amount;
+}</div>
+<p>Test important business cases without needing a full HTTP request for every rule.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-secondary text-white">17. Async Testing</div>
+<div class="card-body">
+<p>Async tests must wait for the Promise to finish.</p>
+<div class="code">test("loads user", async () => {
+  const user = await getUser();
+  expect(user.name).toBe("Sam");
+});</div>
+<div class="danger"><strong>Common mistake:</strong> Starting an asynchronous operation without returning or awaiting it can cause the test to finish before the assertion runs.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">18. Coverage</div>
+<div class="card-body">
+<p><strong>Code coverage</strong> measures which parts of the code were executed by tests.</p>
+<ul><li>Statement coverage</li><li>Branch coverage</li><li>Function coverage</li><li>Line coverage</li></ul>
+<div class="warn"><strong>Important:</strong> 100% coverage does not automatically mean the application is bug-free. Poor tests can execute code without checking meaningful behavior.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-danger text-white">19. Test Isolation ⭐⭐⭐</div>
+<div class="card-body">
+<p><strong>Test isolation</strong> means each test should be independent and should not rely on another test running before it.</p>
+<div class="flow"><div class="box">Test A<br>Own data</div><div class="box">Test B<br>Own data</div><div class="box">Test C<br>Own data</div></div>
+<p><strong>Why:</strong> Isolated tests are easier to debug and can usually run in a different order or in parallel.</p>
+<div class="danger"><strong>Common mistake:</strong> Test A creates a database record and Test B assumes it exists. If Test B runs alone, it fails.</div>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">20. Testing Pyramid</div>
+<div class="card-body">
+<div class="flow"><div class="box">Few<br>End-to-end / API-heavy tests</div></div>
+<div class="flow"><div class="box">More<br>Integration tests</div></div>
+<div class="flow"><div class="box">Many<br>Fast unit tests</div></div>
+<p>The general idea is many fast unit tests, a useful number of integration tests and fewer expensive end-to-end tests.</p>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-dark text-white">21. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Testing only successful requests.</li>
+<li>Using production databases in automated tests.</li>
+<li>Sharing mutable test data between tests.</li>
+<li>Forgetting to await asynchronous operations.</li>
+<li>Writing tests that depend on execution order.</li>
+<li>Mocking everything and never testing real integration points.</li>
+<li>Testing implementation details instead of observable behavior.</li>
+<li>Assuming high coverage means high quality.</li>
+<li>Leaving mocks or spies active after a test.</li>
+<li>Making tests so large that a failure is difficult to diagnose.</li>
+</ol>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">22. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li><strong>Unit test:</strong> tests a small unit in isolation.</li>
+<li><strong>Integration test:</strong> checks multiple components working together.</li>
+<li><strong>API test:</strong> checks HTTP request/response behavior.</li>
+<li><strong>Jest:</strong> popular JavaScript testing framework.</li>
+<li><strong>Node test runner:</strong> built into modern Node.js.</li>
+<li><strong>Supertest:</strong> useful for HTTP/Express API testing.</li>
+<li><strong>Mock:</strong> replaces a dependency with controlled behavior.</li>
+<li><strong>Spy:</strong> observes function usage.</li>
+<li><strong>Fixture:</strong> reusable test data/setup.</li>
+<li><strong>Coverage:</strong> shows which code paths were exercised.</li>
+<li><strong>Isolation:</strong> tests should not depend on each other.</li>
+<li>Always test important success and failure paths.</li>
+</ul>
+</div></section>
+
+<section class="card doc">
+<div class="card-header bg-dark text-white">23. Interview-Ready Questions — Show / Hide</div>
+<div class="card-body" id="questions"></div>
+</section>
+</main>
+
+<script>
+const questions = [
+["Q1. What is unit testing?","Unit testing tests a small unit of code, usually in isolation from external dependencies.","It gives fast feedback and helps find bugs close to the business logic."],
+["Q2. What is integration testing?","Integration testing checks whether multiple parts of an application work correctly together.","It can find problems at database, service, repository and other component boundaries."],
+["Q3. Unit testing vs integration testing?","Unit tests isolate a small piece of code. Integration tests exercise multiple connected components.","Both are useful: unit tests are usually faster, while integration tests provide more realistic boundary checks."],
+["Q4. What is API testing?","API testing sends HTTP requests and verifies status codes, response bodies, headers and error behavior.","It checks the externally observable behavior of an HTTP API."],
+["Q5. What is Jest?","Jest is a JavaScript testing framework that provides test execution, assertions, mocks, spies and related features.","It provides a complete testing environment for many JavaScript projects."],
+["Q6. What is Node's built-in test runner?","It is Node.js's built-in testing system available through the node:test module.","It allows tests without installing a separate testing framework."],
+["Q7. What is Supertest used for?","Supertest is commonly used to make HTTP-like requests against Node.js HTTP servers and Express applications.","It makes endpoint testing convenient without requiring a browser."],
+["Q8. What is mocking?","Mocking replaces a real dependency with controlled behavior during a test.","It helps isolate the unit and simulate external-service success or failure."],
+["Q9. What is a spy?","A spy observes how a function is called, including call count and arguments.","It is useful when you want to verify interaction with a dependency."],
+["Q10. Mock vs spy?","A mock provides controlled replacement behavior. A spy primarily observes a real function and can optionally replace its behavior.","The key idea is controlled replacement versus observation."],
+["Q11. What is a test fixture?","A test fixture is prepared data or setup used by tests.","Fixtures make setup repeatable and reduce duplicated test data."],
+["Q12. Why should tests not use the production database?","Tests can create, update or delete data and can corrupt production state.","A dedicated test database or isolated test environment protects real data."],
+["Q13. What should you test for authentication?","Test valid login, invalid credentials, missing credentials, invalid or expired tokens and protected routes.","Authentication failures are security-critical behavior."],
+["Q14. How do you test Express middleware?","Test the middleware's behavior for valid and invalid conditions, including whether it sends a response or calls next().","This verifies request processing, authorization and error behavior."],
+["Q15. How do you test async code?","Use async/await or return the Promise so the test runner waits for completion.","Otherwise the test may finish before the asynchronous assertion executes."],
+["Q16. What is test isolation?","Each test should be independent and should not rely on another test's state or execution order.","Isolation makes tests reliable, easier to debug and safer to run in parallel."],
+["Q17. Does 100% code coverage mean there are no bugs?","No. Coverage tells you which code was executed, not whether the assertions were meaningful.","A test can execute a line without checking the correct result."],
+["Q18. What is the testing pyramid?","It is a strategy with many fast unit tests, fewer integration tests and fewer expensive end-to-end tests.","It balances confidence, speed and maintenance cost."],
+["Q19. Why test error cases?","Real systems receive invalid input, unauthorized requests, missing resources and unexpected failures.","Testing failures makes APIs safer and more predictable."],
+["Q20. Give an interview-ready testing strategy for Express.","Use unit tests for business logic, integration tests for component boundaries, API tests for HTTP behavior, mocks for external dependencies when isolation is useful, a dedicated test database for database integration and isolated tests covering success and failure paths.","This gives a balanced strategy with fast feedback and realistic integration checks."]
+];
+
+const root = document.getElementById("questions");
+questions.forEach((q,i)=>{
+  const id = "answer" + i;
+  root.innerHTML += `
+  <div class="border rounded-3 p-3 mb-3">
+    <h6 class="fw-bold">${q[0]}</h6>
+    <button class="btn btn-outline-primary btn-sm" onclick="toggleAnswer('${id}',this)">Show Answer</button>
+    <div id="${id}" class="answer mt-3">
+      <div class="alert alert-success"><strong>Answer:</strong> ${q[1]}</div>
+      <div class="alert alert-info mb-0"><strong>Why?</strong> ${q[2]}</div>
+    </div>
+  </div>`;
+});
+function toggleAnswer(id,btn){
+  const el=document.getElementById(id);
+  const open=el.style.display==="block";
+  el.style.display=open?"none":"block";
+  btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

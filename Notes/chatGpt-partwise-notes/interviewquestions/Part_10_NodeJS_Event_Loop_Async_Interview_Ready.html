@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 10 — Node.js Event Loop & Async</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#202938}.hero{background:linear-gradient(135deg,#111827,#6f42c1);color:#fff}.cardx{border:0;border-radius:16px;box-shadow:0 8px 24px #0001;overflow:hidden;margin-bottom:24px}.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:15px;white-space:pre-wrap;font-family:Consolas,monospace;overflow:auto}.flow{background:#f1edff;border:1px dashed #6f42c1;border-radius:12px;padding:18px;text-align:center;font-weight:600;line-height:1.9}.label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#64748b}.tip{border-left:5px solid #6f42c1}.phase{border-radius:10px;padding:12px;margin:7px 0;background:#f8f9fa;border:1px solid #dee2e6}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4"><div class="container">
+<span class="badge bg-light text-dark mb-2">Node.js • Event Loop • Async • Promises • I/O • MAANG • FANG • MNC</span>
+<h1 class="display-6 fw-bold">Part 10 — Event Loop & Async Node.js ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how Node.js executes JavaScript, handles asynchronous work and decides what runs next.</p>
+</div></header>
+<main class="container pb-5">
+
+<section><div class="card cardx"><div class="card-header bg-primary text-white fw-bold">1. What is the Event Loop?</div><div class="card-body">
+<p><b>What:</b> The Node.js event loop is the mechanism that lets JavaScript execution continue while asynchronous operations are handled by the runtime and operating system or Node.js facilities.</p>
+<p><b>Why:</b> It allows a Node.js process to handle many I/O operations without waiting synchronously for each one to finish.</p>
+<p><b>Layman example:</b> Imagine one receptionist handling many customers. The receptionist starts a long task, gives that task to another department, and immediately helps the next customer. When the result comes back, the receptionist handles it.</p>
+<div class="flow">JavaScript<br>↓<br>Call Stack<br>↓ asynchronous operation<br>Node.js / OS handles I/O<br>↓ completion<br>Queues / Event Loop<br>↓<br>Call Stack<br>↓<br>Callback executes</div>
+<p class="label mt-3">Q1 — Is Node.js completely single-threaded?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="alert alert-success mt-2 d-none"><b>Answer:</b> JavaScript execution in a Node.js process normally uses one main thread, but Node.js itself can use other threads and operating-system facilities for some asynchronous work. So “Node.js is single-threaded” is an oversimplification.</div>
+<p class="label mt-3">Q2 — Does the event loop make CPU-heavy JavaScript non-blocking?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="alert alert-success mt-2 d-none"><b>Answer:</b> No. A long CPU-heavy JavaScript operation runs on the main JavaScript thread and can block the event loop. The event loop helps most with asynchronous I/O, not with magically making CPU work fast.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-success text-white fw-bold">2. Call Stack</div><div class="card-body">
+<div class="code">function one() {
+  two();
+}
+function two() {
+  console.log("two");
+}
+one();</div>
+<p class="label">Q3 — What happens on the call stack?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>one()</code> is pushed onto the stack, then <code>two()</code> is pushed. <code>two()</code> finishes and is removed, then <code>one()</code> finishes and is removed.</div>
+<p class="label mt-3">Q4 — What happens if synchronous code never finishes?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="alert alert-success mt-2 d-none"><b>Answer:</b> The call stack remains busy, so the event loop cannot run other JavaScript callbacks. This blocks the process from making progress on other work.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-info text-dark fw-bold">3. Event Loop Phases</div><div class="card-body">
+<p>Node.js uses several event-loop phases. The simplified interview view is:</p>
+<div class="phase"><b>Timers:</b> callbacks for timers whose thresholds have been reached.</div>
+<div class="phase"><b>Pending callbacks:</b> certain deferred system-level I/O callbacks.</div>
+<div class="phase"><b>Poll:</b> retrieves I/O events and runs many I/O callbacks.</div>
+<div class="phase"><b>Check:</b> runs <code>setImmediate()</code> callbacks.</div>
+<div class="phase"><b>Close callbacks:</b> handles close events such as socket close callbacks.</div>
+<div class="flow mt-3">Timers → Pending Callbacks → Poll → Check → Close Callbacks → repeat</div>
+<p class="label mt-3">Q5 — In which phase does setImmediate() run?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="alert alert-success mt-2 d-none"><b>Answer:</b> Its callback runs in the <b>check</b> phase.</div>
+<p class="label mt-3">Q6 — What is the poll phase responsible for?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="alert alert-success mt-2 d-none"><b>Answer:</b> It processes many I/O-related events and can wait for new I/O when appropriate. The exact behavior depends on the state of the event loop and pending work.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-warning text-dark fw-bold">4. setTimeout() vs setImmediate()</div><div class="card-body">
+<div class="code">setTimeout(() =&gt; console.log("timeout"), 0);
+setImmediate(() =&gt; console.log("immediate"));</div>
+<p class="label">Q7 — Is the output always timeout, then immediate?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="alert alert-success mt-2 d-none"><b>Answer:</b> No. At top level, their relative order can vary because it depends on event-loop timing. Inside an I/O callback, <code>setImmediate()</code> is generally executed before a zero-delay timer scheduled there.</div>
+<div class="code mt-3">const fs = require("fs");
+
+fs.readFile(__filename, () =&gt; {
+  setTimeout(() =&gt; console.log("timeout"), 0);
+  setImmediate(() =&gt; console.log("immediate"));
+});</div>
+<p class="label">Q8 — What is the expected ordering inside this I/O callback?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="alert alert-success mt-2 d-none"><b>Answer:</b> Typically <code>immediate</code> is printed before <code>timeout</code>, because the callback is running in the poll phase and the check phase follows it.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-danger text-white fw-bold">5. process.nextTick() and Microtasks ⭐⭐⭐⭐⭐</div><div class="card-body">
+<p>Node.js has a special <code>process.nextTick()</code> queue. Promise reactions and <code>queueMicrotask()</code> use the microtask queue. These queues are processed before the event loop continues to later phases, with Node-specific ordering details.</p>
+<div class="code">console.log("A");
+
+process.nextTick(() =&gt; console.log("nextTick"));
+
+Promise.resolve().then(() =&gt; console.log("promise"));
+
+queueMicrotask(() =&gt; console.log("microtask"));
+
+console.log("B");</div>
+<p class="label">Q9 — What is the basic output order?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>A</code>, <code>B</code>, then Node's <code>process.nextTick()</code> callback, followed by the Promise/other microtasks. The exact interaction can depend on where the callbacks are scheduled, but <code>nextTick</code> has special priority in Node.js.</div>
+<p class="label mt-3">Q10 — Why can excessive process.nextTick() calls be dangerous?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="alert alert-success mt-2 d-none"><b>Answer:</b> If code continually schedules more <code>nextTick()</code> callbacks, the event loop can be prevented from reaching I/O and timer phases. This is a form of event-loop starvation.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-secondary text-white fw-bold">6. Promise Callbacks and queueMicrotask()</div><div class="card-body">
+<div class="code">console.log("start");
+
+setTimeout(() =&gt; console.log("timer"), 0);
+
+Promise.resolve().then(() =&gt; console.log("promise"));
+
+queueMicrotask(() =&gt; console.log("microtask"));
+
+console.log("end");</div>
+<p class="label">Q11 — What is the important ordering?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="alert alert-success mt-2 d-none"><b>Answer:</b> Synchronous code prints first: <code>start</code>, <code>end</code>. Then the queued microtasks run in their scheduling order: <code>promise</code>, <code>microtask</code>. The timer callback runs later.</div>
+<p class="label mt-3">Q12 — Why does the timer not run immediately when delay is 0?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="alert alert-success mt-2 d-none"><b>Answer:</b> A zero delay is not a promise of immediate execution. It means the timer becomes eligible after its minimum threshold and still has to wait for the current stack and event-loop scheduling to allow its callback to run.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-primary text-white fw-bold">7. Async File System and HTTP</div><div class="card-body">
+<div class="code">const fs = require("fs");
+
+fs.readFile("data.txt", "utf8", (err, data) =&gt; {
+  if (err) throw err;
+  console.log(data);
+});
+
+console.log("after readFile");</div>
+<p class="label">Q13 — Which is normally printed first?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="alert alert-success mt-2 d-none"><b>Answer:</b> Usually <code>after readFile</code> is printed before the file contents because the asynchronous file operation does not block the current JavaScript execution.</div>
+<p class="label mt-3">Q14 — Does async fs.readFile execute its callback on the same call stack immediately?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="alert alert-success mt-2 d-none"><b>Answer:</b> No. The file operation is started, the current JavaScript stack continues, and its callback is scheduled to run later after the operation completes.</div>
+<p class="label mt-3">Q15 — How does an HTTP server benefit from the event loop?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="alert alert-success mt-2 d-none"><b>Answer:</b> While one request is waiting for asynchronous I/O such as a database, file or network operation, Node.js can continue processing other ready work instead of synchronously waiting for that I/O.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-success text-white fw-bold">8. Blocking vs Non-blocking Code</div><div class="card-body">
+<div class="code">const fs = require("fs");
+
+console.log("1");
+
+const data = fs.readFileSync("data.txt", "utf8");
+
+console.log("2");</div>
+<p class="label">Q16 — Why can readFileSync() be dangerous in a server request?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="alert alert-success mt-2 d-none"><b>Answer:</b> It blocks the JavaScript thread until the file operation finishes. During that time, the event loop cannot process other JavaScript callbacks, which can reduce server responsiveness.</div>
+<div class="code mt-3">fs.readFile("data.txt", "utf8", (err, data) =&gt; {
+  console.log(data);
+});
+console.log("continue");</div>
+<p class="label">Q17 — Why is this generally better for I/O-heavy server code?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="alert alert-success mt-2 d-none"><b>Answer:</b> The asynchronous API lets current JavaScript execution continue while the file operation is being completed, allowing the process to make progress on other work.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-info text-dark fw-bold">9. Event Loop Ordering — Output Questions ⭐⭐⭐⭐⭐</div><div class="card-body">
+<p class="label">Q18 — Predict the output</p>
+<div class="code">console.log("1");
+
+setTimeout(() =&gt; console.log("2"), 0);
+
+Promise.resolve().then(() =&gt; console.log("3"));
+
+console.log("4");</div>
+<button class="btn btn-outline-primary" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>1 → 4 → 3 → 2</code>. Synchronous code runs first, then the Promise microtask, then the timer callback.</div>
+
+<p class="label mt-4">Q19 — Predict the output</p>
+<div class="code">process.nextTick(() =&gt; console.log("A"));
+Promise.resolve().then(() =&gt; console.log("B"));
+setImmediate(() =&gt; console.log("C"));
+console.log("D");</div>
+<button class="btn btn-outline-primary" onclick="toggle('a19',this)">Show Answer</button>
+<div id="a19" class="alert alert-success mt-2 d-none"><b>Answer:</b> The reliable basic ordering is <code>D</code> first, then <code>A</code> before the Promise microtask <code>B</code>. The relative placement of <code>C</code> depends on the event-loop context, but it runs in the check phase rather than as synchronous code.</div>
+
+<p class="label mt-4">Q20 — What is wrong with this code?</p>
+<div class="code">function work() {
+  while (true) {
+    // heavy work
+  }
+}
+work();</div>
+<button class="btn btn-outline-primary" onclick="toggle('a20',this)">Show Answer</button>
+<div id="a20" class="alert alert-success mt-2 d-none"><b>Answer:</b> It creates an infinite synchronous loop. The call stack never becomes free, so the event loop cannot process timers, I/O callbacks or other JavaScript work.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-danger text-white fw-bold">10. Event Loop Starvation ⭐⭐⭐⭐⭐</div><div class="card-body">
+<p><b>What:</b> Event-loop starvation happens when callbacks or synchronous work keep the JavaScript thread busy for too long, preventing other ready tasks from getting a chance to run.</p>
+<div class="code">function starve() {
+  process.nextTick(starve);
+}
+
+starve();
+
+setTimeout(() =&gt; {
+  console.log("Will this run?");
+}, 0);</div>
+<p class="label">Q21 — Why may the timer never get a chance to run?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a21',this)">Show Answer</button>
+<div id="a21" class="alert alert-success mt-2 d-none"><b>Answer:</b> The code continually fills the <code>nextTick</code> queue. Node.js keeps processing that high-priority queue, starving later event-loop phases where the timer would run.</div>
+<p class="label mt-3">Q22 — How can you avoid event-loop starvation from CPU-heavy work?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a22',this)">Show Answer</button>
+<div id="a22" class="alert alert-success mt-2 d-none"><b>Answer:</b> Avoid long synchronous loops on the main thread. Break work into smaller chunks when appropriate, use worker threads for CPU-heavy tasks, or move heavy computation to another service/process when suitable.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-warning text-dark fw-bold">11. async/await and the Event Loop</div><div class="card-body">
+<div class="code">async function test() {
+  console.log("A");
+  await Promise.resolve();
+  console.log("B");
+}
+
+console.log("C");
+test();
+console.log("D");</div>
+<p class="label">Q23 — Predict the output.</p>
+<button class="btn btn-outline-primary" onclick="toggle('a23',this)">Show Answer</button>
+<div id="a23" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>C → A → D → B</code>. Calling <code>test()</code> runs synchronously until <code>await</code>. The continuation after <code>await</code> is scheduled asynchronously, so the outer synchronous code prints <code>D</code> before <code>B</code>.</div>
+<p class="label mt-3">Q24 — Does await block the Node.js thread?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a24',this)">Show Answer</button>
+<div id="a24" class="alert alert-success mt-2 d-none"><b>Answer:</b> No. <code>await</code> pauses the async function's continuation; it does not block the entire JavaScript thread while the awaited Promise is pending.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-secondary text-white fw-bold">12. Common Developer Mistakes</div><div class="card-body">
+<ul>
+<li>Thinking “single-threaded” means Node.js can never use other threads.</li>
+<li>Thinking <code>setTimeout(fn, 0)</code> means “run immediately.”</li>
+<li>Assuming <code>setTimeout(0)</code> always runs before <code>setImmediate()</code>.</li>
+<li>Using synchronous filesystem APIs inside high-throughput server request paths.</li>
+<li>Running large CPU-heavy loops on the main JavaScript thread.</li>
+<li>Creating recursive <code>process.nextTick()</code> chains that starve the event loop.</li>
+<li>Thinking async/await makes CPU-heavy work asynchronous.</li>
+<li>Ignoring Promise rejection/error handling.</li>
+<li>Memorizing one event-loop output without considering where the code is scheduled.</li>
+</ul>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-dark text-white fw-bold">13. Interview-Ready Quick Recap</div><div class="card-body">
+<table class="table table-bordered align-middle">
+<tr><th>Topic</th><th>Interview-ready point</th></tr>
+<tr><td>Call stack</td><td>Executes synchronous JavaScript functions.</td></tr>
+<tr><td>Event loop</td><td>Coordinates when ready asynchronous callbacks get a chance to execute.</td></tr>
+<tr><td>Timers</td><td>Handles timer callbacks after their delay threshold is reached.</td></tr>
+<tr><td>Poll</td><td>Processes I/O-related events and may wait for I/O.</td></tr>
+<tr><td>Check</td><td>Runs <code>setImmediate()</code> callbacks.</td></tr>
+<tr><td>process.nextTick()</td><td>Node-specific high-priority queue processed before continuing to later event-loop phases.</td></tr>
+<tr><td>Microtasks</td><td>Promise callbacks and <code>queueMicrotask()</code> are microtasks.</td></tr>
+<tr><td>Async I/O</td><td>Lets current JavaScript continue while I/O is being completed.</td></tr>
+<tr><td>Blocking code</td><td>Keeps the main JavaScript thread busy and delays other work.</td></tr>
+<tr><td>Starvation</td><td>Prevents other event-loop work from getting a timely turn.</td></tr>
+</table>
+<div class="alert alert-warning"><b>Golden interview answer:</b> “Node.js executes JavaScript on a main thread with a call stack. When asynchronous I/O is started, Node.js can let the current JavaScript continue instead of synchronously waiting. The event loop coordinates timers, I/O and other callbacks through its phases. Promise microtasks and Node's nextTick queue are processed with higher priority than normal later-phase callbacks. Therefore, long synchronous work or excessive nextTick scheduling can block or starve the event loop.”</div>
+<div class="alert alert-info"><b>Fast memory trick:</b> <code>Sync code → queues/I/O → event-loop phases → callback → microtasks/nextTick handling → repeat</code>.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-primary text-white fw-bold">14. Interview Tips</div><div class="card-body">
+<ul>
+<li>Do not say “Node.js has only one thread.” Say JavaScript execution uses a main thread, while Node.js can use OS facilities and a worker pool for some operations.</li>
+<li>For output questions, first mark synchronous statements, then microtasks/nextTick, then timers/I/O/check callbacks based on context.</li>
+<li>Always ask: “Where was this callback scheduled?” Top-level and inside an I/O callback can produce different ordering.</li>
+<li>Know why <code>readFileSync()</code> can hurt server performance.</li>
+<li>Know event-loop starvation and how worker threads can help CPU-heavy work.</li>
+</ul>
+</div></div></section>
+
+</main>
+<script>
+function toggle(id,b){const e=document.getElementById(id);const hidden=e.classList.toggle("d-none");b.textContent=hidden?"Show Answer":"Hide Answer";}
+</script>
+</body>
+</html>

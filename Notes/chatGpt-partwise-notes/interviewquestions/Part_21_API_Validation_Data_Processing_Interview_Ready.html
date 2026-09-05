@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 21 — API Validation & Data Processing</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#243447;font-family:Arial,sans-serif;line-height:1.65}
+.hero{background:linear-gradient(135deg,#064e3b,#0f766e);color:#fff;border-radius:18px;padding:36px;margin-bottom:28px}
+section{margin-bottom:30px}.card{border:0;border-radius:14px;overflow:hidden}
+.card-header{font-weight:700}.diagram{background:#172033;color:#e8f0ff;border-radius:12px;padding:18px;font-family:Consolas,monospace;white-space:pre-wrap}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:10px;overflow:auto}
+pre code{color:inherit}code{color:#b42318}.answer,.why{display:none}
+.btn-toggle{min-width:145px}.small-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="container py-4">
+
+<header class="hero shadow">
+<div class="small-label">Node.js + Express.js Interview Preparation</div>
+<h1 class="display-5 fw-bold mt-2">Part 21 — API Validation &amp; Data Processing ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how to validate request data before it reaches your business logic or database.</p>
+</header>
+
+<section class="card shadow-sm">
+<div class="card-header bg-dark text-white">1. What is API Validation?</div>
+<div class="card-body">
+<p><strong>API validation</strong> checks whether data sent by a client has the correct type, shape, format, and values.</p>
+<div class="alert alert-info"><strong>Layman example:</strong> A security guard checks your ticket before allowing you into an event. Validation checks the request before your application accepts it.</div>
+<h5>Why?</h5>
+<p>Clients can send missing, incorrect, unexpected, or dangerous data. Validation protects application logic and keeps stored data consistent.</p>
+<h5>How it works</h5>
+<div class="diagram">Client Request
+      ↓
+Read body / query / params
+      ↓
+Validation + type checks
+      ↓
+Sanitize / normalize when needed
+      ↓
+Valid? ── No ──→ 400 response
+  │
+ Yes
+  ↓
+Controller / Service
+  ↓
+Database</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-primary text-white">2. Where Should We Validate?</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Source</th><th>Example</th><th>What to validate</th></tr></thead>
+<tbody>
+<tr><td>Request body</td><td><code>POST /users</code></td><td>name, email, password</td></tr>
+<tr><td>Query</td><td><code>?page=2&amp;limit=10</code></td><td>numbers, ranges, filters</td></tr>
+<tr><td>Params</td><td><code>/users/:id</code></td><td>ID format and allowed values</td></tr>
+<tr><td>Headers</td><td><code>Authorization</code></td><td>Expected header format</td></tr>
+</tbody>
+</table>
+<div class="alert alert-warning"><strong>Interview point:</strong> Never assume data is valid just because your frontend validates it. The API is a trust boundary and must validate server-side.</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-success text-white">3. Required and Optional Fields</div>
+<div class="card-body">
+<pre><code>// Conceptual schema
+{
+  name:     required string,
+  email:    required valid email,
+  age:      optional integer,
+  phone:    optional string
+}</code></pre>
+<p><strong>Required</strong> means the field must be present and valid. <strong>Optional</strong> means the field may be absent, but if supplied it still needs validation.</p>
+<div class="alert alert-success"><strong>Important:</strong> Optional does not mean “accept anything.”</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-info text-dark">4. Type Checking</div>
+<div class="card-body">
+<p>Type checking confirms that data is the type your application expects.</p>
+<pre><code>{
+  age: 25,        // number
+  active: true,   // boolean
+  name: "Sam"     // string
+}</code></pre>
+<p>A common API problem is receiving values such as <code>"25"</code> where the application expects a number. Decide explicitly whether your validation layer should coerce or reject such values.</p>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-warning text-dark">5. Nested Validation</div>
+<div class="card-body">
+<pre><code>{
+  "name": "Sam",
+  "address": {
+    "city": "Hyderabad",
+    "zip": "500001"
+  }
+}</code></pre>
+<p>Nested validation checks fields inside objects and arrays, not only top-level fields.</p>
+<div class="diagram">user
+├── name
+└── address
+    ├── city
+    └── zip</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-secondary text-white">6. Sanitization</div>
+<div class="card-body">
+<p><strong>Validation</strong> asks: “Is this data acceptable?”</p>
+<p><strong>Sanitization</strong> asks: “Can this data be safely normalized or cleaned before use?”</p>
+<pre><code>// Example idea
+"  Sam  "  →  "Sam"</code></pre>
+<div class="alert alert-warning"><strong>Security note:</strong> Sanitization is not a replacement for parameterized database queries, output encoding, authentication, authorization, or other security controls.</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-primary text-white">7. Schema Validation Libraries</div>
+<div class="card-body">
+<h5>Joi</h5>
+<p>A popular schema validation library with a readable schema API.</p>
+<h5>Zod</h5>
+<p>A TypeScript-friendly schema validation library that can validate and infer types from schemas.</p>
+<h5>express-validator</h5>
+<p>A validation/sanitization approach designed around Express request fields and middleware chains.</p>
+<pre><code>// Zod example
+import { z } from "zod";
+
+const userSchema = z.object({
+  name: z.string().min(2),
+  email: z.email(),
+  age: z.number().int().positive().optional()
+});</code></pre>
+<div class="alert alert-info"><strong>Interview answer:</strong> The exact library is less important than understanding schemas, validation boundaries, errors, and consistent middleware design.</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-success text-white">8. Validation Middleware</div>
+<div class="card-body">
+<pre><code>function validateUser(req, res, next) {
+  const result = userSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+        details: result.error.issues
+      }
+    });
+  }
+
+  req.body = result.data;
+  next();
+}
+
+app.post("/users", validateUser, createUser);</code></pre>
+<p>Validation middleware keeps controllers focused on business logic.</p>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-danger text-white">9. Validation Error Responses</div>
+<div class="card-body">
+<pre><code>{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Request data is invalid",
+    "fields": [
+      { "field": "email", "message": "Invalid email" },
+      { "field": "age", "message": "Must be a positive integer" }
+    ]
+  }
+}</code></pre>
+<p>A consistent format makes frontend error handling much easier.</p>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-dark text-white">10. Custom Validation</div>
+<div class="card-body">
+<p>Use custom validation when a business rule cannot be expressed by a simple type or format check.</p>
+<pre><code>// Example rule
+// startDate must be before endDate
+
+if (startDate >= endDate) {
+  return next(new AppError(
+    "startDate must be before endDate",
+    400,
+    "INVALID_DATE_RANGE"
+  ));
+}</code></pre>
+<p>Keep complex business rules in a suitable validation/service layer rather than spreading them across controllers.</p>
+</div></section>
+
+<section>
+<h2 class="mb-3">Interview Questions — Code Based ⭐⭐⭐</h2>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q1. What is wrong with this validation?</div><div class="card-body">
+<pre><code>app.post("/users", (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(200).json({
+      message: "Email is required"
+    });
+  }
+
+  createUser(req.body);
+});</code></pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer mt-3"><strong>Answer:</strong> It returns HTTP 200 for invalid input and does not validate the email format or handle the result/error from <code>createUser()</code>. A validation failure should normally use 400 and stop execution.</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w1',this)">Show Why?</button>
+<div id="w1" class="why mt-2 alert alert-info"><strong>Why?</strong> HTTP status codes communicate the result to clients. A malformed request should not look like a successful request.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-success text-white">Q2. What is the bug?</div><div class="card-body">
+<pre><code>function validate(req, res, next) {
+  if (!req.body.email) {
+    next(new Error("Email required"));
+  }
+
+  next();
+}</code></pre>
+<button class="btn btn-outline-success btn-toggle" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer mt-3"><strong>Answer:</strong> It can call <code>next()</code> twice. When email is missing, the first <code>next(error)</code> is followed by normal <code>next()</code>.</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w2',this)">Show Why?</button>
+<div id="w2" class="why mt-2 alert alert-info"><strong>Why?</strong> After propagating an error, return immediately so the normal request flow does not continue.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-warning text-dark">Q3. What does this validation check?</div><div class="card-body">
+<pre><code>const schema = z.object({
+  name: z.string().min(2),
+  age: z.number().int().positive()
+});</code></pre>
+<button class="btn btn-outline-warning btn-toggle" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer mt-3"><strong>Answer:</strong> It requires <code>name</code> to be a string with at least 2 characters and <code>age</code> to be a positive integer.</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w3',this)">Show Why?</button>
+<div id="w3" class="why mt-2 alert alert-info"><strong>Why?</strong> The schema describes both the expected data type and the allowed value constraints.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-danger text-white">Q4. Body vs Params vs Query</div><div class="card-body">
+<pre><code>POST /users/42?notify=true
+
+{
+  "name": "Sam"
+}</code></pre>
+<button class="btn btn-outline-danger btn-toggle" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="answer mt-3"><strong>Answer:</strong> <code>42</code> is a route parameter (<code>req.params.id</code>), <code>true</code> is a query value (<code>req.query.notify</code>), and <code>"Sam"</code> is request-body data (<code>req.body.name</code>).</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w4',this)">Show Why?</button>
+<div id="w4" class="why mt-2 alert alert-info"><strong>Why?</strong> These are different input locations and should be validated independently because they serve different purposes.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-info text-dark">Q5. What is the validation problem?</div><div class="card-body">
+<pre><code>const limit = req.query.limit;
+
+if (limit > 100) {
+  return res.status(400).json({
+    message: "Too large"
+  });
+}</code></pre>
+<button class="btn btn-outline-info btn-toggle" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="answer mt-3"><strong>Answer:</strong> Query values arrive as strings in normal Express request parsing. The code should validate and deliberately parse/coerce the value, for example ensuring it is a valid integer and within an allowed range.</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w5',this)">Show Why?</button>
+<div id="w5" class="why mt-2 alert alert-info"><strong>Why?</strong> Explicit type handling prevents unexpected values such as non-numeric input from reaching pagination or database logic.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-secondary text-white">Q6. Fix the nested validation idea.</div><div class="card-body">
+<pre><code>const schema = z.object({
+  name: z.string(),
+  address: z.object({
+    city: z.string(),
+    zip: z.string()
+  })
+});</code></pre>
+<button class="btn btn-outline-secondary btn-toggle" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="answer mt-3"><strong>Answer:</strong> This is already a nested schema. It validates <code>name</code>, then validates <code>address.city</code> and <code>address.zip</code>. A production schema can add rules such as minimum lengths, regex patterns, or required/optional fields.</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w6',this)">Show Why?</button>
+<div id="w6" class="why mt-2 alert alert-info"><strong>Why?</strong> Nested objects need nested schemas; checking only the top-level object does not guarantee that child properties are valid.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q7. What should the middleware do after invalid input?</div><div class="card-body">
+<pre><code>function validate(req, res, next) {
+  const result = schema.safeParse(req.body);
+
+  // complete this
+}</code></pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="answer mt-3"><pre><code>if (!result.success) {
+  return res.status(400).json({
+    success: false,
+    error: {
+      code: "VALIDATION_ERROR",
+      details: result.error.issues
+    }
+  });
+}
+
+req.body = result.data;
+next();</code></pre></div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w7',this)">Show Why?</button>
+<div id="w7" class="why mt-2 alert alert-info"><strong>Why?</strong> Invalid requests must stop before business logic. Using validated data also prevents controllers from working with an unchecked input object.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-success text-white">Q8. Validation or authorization?</div><div class="card-body">
+<pre><code>DELETE /users/42
+
+// user is logged in
+// user tries to delete another user's account</code></pre>
+<button class="btn btn-outline-success btn-toggle" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="answer mt-3"><strong>Answer:</strong> This is primarily an authorization problem. The request can be syntactically valid, but the authenticated user may not have permission to delete that account.</div>
+<button class="btn btn-outline-dark btn-toggle mt-2" onclick="toggle('w8',this)">Show Why?</button>
+<div id="w8" class="why mt-2 alert alert-info"><strong>Why?</strong> Validation checks whether data is acceptable. Authorization checks whether the current identity is allowed to perform the operation.</div>
+</div></div>
+</section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-danger text-white">Common Developer Mistakes</div>
+<div class="card-body">
+<div class="alert alert-danger">❌ Trusting frontend validation.</div>
+<div class="alert alert-danger">❌ Validating only the request body while ignoring params and query values.</div>
+<div class="alert alert-danger">❌ Returning 200 for validation failures.</div>
+<div class="alert alert-danger">❌ Forgetting to return after sending an error response.</div>
+<div class="alert alert-danger">❌ Treating optional fields as completely unvalidated fields.</div>
+<div class="alert alert-danger">❌ Assuming query-string values are already numbers or booleans.</div>
+<div class="alert alert-danger">❌ Mixing validation rules throughout every controller.</div>
+<div class="alert alert-danger">❌ Treating sanitization as a complete security solution.</div>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-success text-white">Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>Validate all client-controlled input on the server.</li>
+<li>Validate body, query, and route parameters separately.</li>
+<li>Use schemas for clear, reusable rules.</li>
+<li>Required and optional fields both need type/value rules.</li>
+<li>Nested data requires nested validation.</li>
+<li>Sanitization and validation solve different problems.</li>
+<li>Use validation middleware before controllers.</li>
+<li>Return consistent validation error responses.</li>
+</ul>
+</div></section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-primary text-white">Interview-Ready Points</div>
+<div class="card-body">
+<div class="alert alert-info"><strong>Strong interview line:</strong> “I treat API input as untrusted data. I validate body, params, and query values at the API boundary, use schema-based validation where appropriate, normalize data deliberately, and return a consistent 400 validation response before business logic runs.”</div>
+<ul>
+<li>Explain validation vs sanitization.</li>
+<li>Know body vs params vs query.</li>
+<li>Know why server-side validation is mandatory.</li>
+<li>Explain Joi, Zod, and express-validator at a high level.</li>
+<li>Understand nested and custom validation.</li>
+<li>Know how validation middleware protects controllers.</li>
+<li>Know how to design useful field-level validation errors.</li>
+<li>Understand that validation is not the same as authentication or authorization.</li>
+</ul>
+</div></section>
+
+</div>
+<script>
+function toggle(id,btn){
+ const el=document.getElementById(id), open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ const why=id.startsWith("w");
+ btn.textContent=open?(why?"Show Why?":"Show Answer"):(why?"Hide Why?":"Hide Answer");
+}
+</script>
+</body>
+</html>

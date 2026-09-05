@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 22 — File Uploads</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif}
+.doc-header{background:linear-gradient(135deg,#172554,#2563eb);color:white;padding:42px 0}
+.section-card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.card-header{font-weight:700;padding:16px 20px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto;font-size:.9rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:18px 0}
+.flow .box{padding:12px 16px;border-radius:10px;background:#e8f0fe;border:1px solid #b8ccf5;font-weight:600}
+.arrow{font-size:22px;font-weight:bold}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.answer{display:none}
+.btn-toggle{min-width:130px}
+small.muted{color:#64748b}
+</style>
+</head>
+<body>
+<header class="doc-header">
+<div class="container">
+<h1>🟢 Part 22 — File Uploads ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how files move from a browser to a Node.js + Express server using multipart/form-data and Multer.</p>
+</div>
+</header>
+
+<main class="container py-4">
+
+<section class="section-card">
+<div class="card-header bg-primary text-white">1. What is a File Upload?</div>
+<div class="card-body">
+<p><strong>What:</strong> A file upload means sending a file from the client, such as a browser, to a server.</p>
+<p><strong>Why:</strong> Applications need uploads for profile photos, product images, PDFs, resumes and documents.</p>
+<p><strong>Layman example:</strong> When you select a profile photo and click “Upload”, the browser sends that photo to the server. The server receives it, validates it, and stores it.</p>
+<div class="flow"><div class="box">Browser</div><div class="arrow">→</div><div class="box">multipart/form-data</div><div class="arrow">→</div><div class="box">Express</div><div class="arrow">→</div><div class="box">Multer</div><div class="arrow">→</div><div class="box">Storage</div></div>
+<div class="alert alert-info"><strong>Interview line:</strong> File uploads are usually sent as <code>multipart/form-data</code>, and Multer is commonly used with Express to parse multipart requests.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-success text-white">2. multipart/form-data</div>
+<div class="card-body">
+<p><strong>What:</strong> <code>multipart/form-data</code> is an HTTP request format designed to send files and normal form fields together.</p>
+<p><strong>How:</strong> The request is divided into separate parts. A part can contain text such as <code>username</code> or binary file data such as an image.</p>
+<div class="code">&lt;form action="/upload" method="POST" enctype="multipart/form-data"&gt;
+  &lt;input type="text" name="username"&gt;
+  &lt;input type="file" name="avatar"&gt;
+  &lt;button type="submit"&gt;Upload&lt;/button&gt;
+&lt;/form&gt;</div>
+<div class="warn mt-3"><strong>Common mistake:</strong> Using <code>application/json</code> for a normal file upload. JSON is not the usual format for sending raw files through a browser form.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-dark text-white">3. What is Multer?</div>
+<div class="card-body">
+<p><strong>What:</strong> Multer is Express middleware used to handle <code>multipart/form-data</code> requests.</p>
+<p><strong>Purpose:</strong> It reads the uploaded file and makes useful information available through objects such as <code>req.file</code> or <code>req.files</code>.</p>
+<div class="code">const express = require("express");
+const multer = require("multer");
+
+const app = express();
+
+const upload = multer({ dest: "uploads/" });
+
+app.post("/upload", upload.single("avatar"), (req, res) =&gt; {
+  console.log(req.file);
+  res.json({ message: "Uploaded successfully" });
+});</div>
+<div class="tip mt-3"><strong>Important:</strong> The field name in <code>upload.single("avatar")</code> must match the form field's <code>name="avatar"</code>.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-info text-dark">4. req.file vs req.files</div>
+<div class="card-body">
+<div class="table-responsive"><table class="table table-bordered align-middle">
+<thead><tr><th>Middleware</th><th>Result</th><th>Use case</th></tr></thead>
+<tbody>
+<tr><td><code>upload.single("avatar")</code></td><td><code>req.file</code></td><td>One file</td></tr>
+<tr><td><code>upload.array("photos", 5)</code></td><td><code>req.files</code></td><td>Many files using one field</td></tr>
+<tr><td><code>upload.fields([...])</code></td><td><code>req.files</code> as an object</td><td>Different file fields</td></tr>
+</tbody></table></div>
+<p><strong>Why?</strong> Multer chooses the output structure based on how the upload middleware is configured.</p>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-warning text-dark">5. Single File Upload</div>
+<div class="card-body">
+<p>Use <code>single()</code> when the request should contain one file for a particular field.</p>
+<div class="code">const upload = multer({ dest: "uploads/" });
+
+app.post("/profile",
+  upload.single("profileImage"),
+  (req, res) =&gt; {
+    console.log(req.file);
+    res.json({ file: req.file.filename });
+  }
+);</div>
+<p class="mt-3"><strong>When to use:</strong> Profile picture, resume, one product image, one document.</p>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-secondary text-white">6. Multiple File Upload</div>
+<div class="card-body">
+<div class="code">app.post("/gallery",
+  upload.array("photos", 5),
+  (req, res) =&gt; {
+    console.log(req.files);
+    res.json({ count: req.files.length });
+  }
+);</div>
+<p><code>5</code> is the maximum number of files accepted by this middleware configuration.</p>
+<div class="alert alert-warning"><strong>Do not trust the client:</strong> Even if the UI says “maximum 5 files”, enforce the limit on the server.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-danger text-white">7. File Size Limits</div>
+<div class="card-body">
+<p><strong>Why:</strong> Large uploads can consume disk, memory, CPU and network resources.</p>
+<div class="code">const upload = multer({
+  dest: "uploads/",
+  limits: {
+    fileSize: 2 * 1024 * 1024 // 2 MB
+  }
+});</div>
+<p><strong>Interview point:</strong> Upload limits are a resource-protection measure. Always validate on the server.</p>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-danger text-white">8. File Type Validation</div>
+<div class="card-body">
+<p>Do not accept a file only because its filename ends with <code>.jpg</code>. The server should validate what it is willing to accept.</p>
+<div class="code">const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) =&gt; {
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"));
+    }
+  }
+});</div>
+<div class="warn mt-3"><strong>Security note:</strong> MIME type checks are useful, but for high-security upload systems, inspect file content/signatures too and consider malware scanning. Never rely only on the original filename.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-primary text-white">9. Storage Configuration</div>
+<div class="card-body">
+<p>Multer can store uploaded files on disk or temporarily keep them in memory.</p>
+<h5>Disk storage</h5>
+<div class="code">const storage = multer.diskStorage({
+  destination: (req, file, cb) =&gt; {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) =&gt; {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+
+const upload = multer({ storage });</div>
+<h5 class="mt-4">Memory storage</h5>
+<div class="code">const upload = multer({ storage: multer.memoryStorage() });
+
+app.post("/upload", upload.single("file"), (req, res) =&gt; {
+  console.log(req.file.buffer);
+  res.send("Received in memory");
+});</div>
+<div class="table-responsive mt-3"><table class="table table-bordered">
+<tr><th>Disk storage</th><td>File is written to disk.</td><td>Useful for local file processing/storage.</td></tr>
+<tr><th>Memory storage</th><td>File data is held in <code>req.file.buffer</code>.</td><td>Useful when passing data directly to another service, but large files can consume RAM.</td></tr>
+</table></div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-success text-white">10. File Information</div>
+<div class="card-body">
+<p>A Multer file object can contain information such as the original field name, original filename, MIME type, size and storage information. The exact properties depend on the storage engine.</p>
+<div class="code">console.log(req.file.fieldname);
+console.log(req.file.originalname);
+console.log(req.file.mimetype);
+console.log(req.file.size);
+console.log(req.file.filename);</div>
+<div class="alert alert-info"><strong>Important:</strong> <code>originalname</code> comes from the client. Do not blindly use it as a trusted server filename.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-dark text-white">11. File Names</div>
+<div class="card-body">
+<p><strong>Why generate server-side names?</strong> User filenames may contain spaces, duplicate names or unsafe characters. A generated unique name reduces collisions and avoids trusting client input.</p>
+<div class="code">const crypto = require("crypto");
+
+const filename = crypto.randomUUID() + ".jpg";</div>
+<p class="mt-3">In a real application, preserve a safe extension only after validating the file type. Store the original filename separately if the UI needs to display it.</p>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-warning text-dark">12. Image Uploads</div>
+<div class="card-body">
+<div class="flow"><div class="box">Select image</div><div class="arrow">→</div><div class="box">multipart/form-data</div><div class="arrow">→</div><div class="box">Multer</div><div class="arrow">→</div><div class="box">Validate</div><div class="arrow">→</div><div class="box">Store</div></div>
+<p><strong>Recommended flow:</strong> Check file count → check size → validate type/content → generate safe name → store → save the file URL/key in the database.</p>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-primary text-white">13. File Deletion</div>
+<div class="card-body">
+<p>When a database record is deleted, the physical file may also need to be deleted. Otherwise, unused files can accumulate.</p>
+<div class="code">const fs = require("fs/promises");
+
+await fs.unlink("uploads/example.jpg");</div>
+<div class="warn mt-3"><strong>Common mistake:</strong> Delete the database record but forget the physical/cloud file. This can create storage leaks.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-danger text-white">14. Upload Errors</div>
+<div class="card-body">
+<p>Multer can reject uploads because of file size, file count, field configuration or filtering rules. Handle upload errors centrally or close to the route.</p>
+<div class="code">const multer = require("multer");
+
+app.post("/upload", upload.single("avatar"), (req, res) =&gt; {
+  res.json({ message: "Uploaded" });
+});
+
+app.use((err, req, res, next) =&gt; {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({
+      message: "File upload failed",
+      code: err.code
+    });
+  }
+
+  next(err);
+});</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-info text-dark">15. Cloud Storage Concept</div>
+<div class="card-body">
+<p>For production systems, files are often stored in object storage rather than the application's local disk.</p>
+<div class="flow"><div class="box">Client</div><div class="arrow">→</div><div class="box">Node.js API</div><div class="arrow">→</div><div class="box">Cloud Object Storage</div><div class="arrow">→</div><div class="box">URL / Object Key</div><div class="arrow">→</div><div class="box">Database</div></div>
+<p>The database normally stores metadata such as an object key or URL, while the actual file is stored separately.</p>
+<div class="alert alert-success"><strong>Interview line:</strong> Keep large binary files in object storage and keep file metadata/reference information in the database.</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-secondary text-white">16. Complete Interview-Style Upload Example</div>
+<div class="card-body">
+<div class="code">const express = require("express");
+const multer = require("multer");
+
+const app = express();
+
+const upload = multer({
+  dest: "uploads/",
+  limits: {
+    fileSize: 2 * 1024 * 1024
+  },
+  fileFilter: (req, file, cb) =&gt; {
+    const allowed = ["image/jpeg", "image/png"];
+
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPG and PNG files are allowed"));
+    }
+  }
+});
+
+app.post("/avatar", upload.single("avatar"), (req, res) =&gt; {
+  if (!req.file) {
+    return res.status(400).json({ message: "Avatar is required" });
+  }
+
+  res.status(201).json({
+    message: "Avatar uploaded",
+    filename: req.file.filename,
+    size: req.file.size
+  });
+});
+
+app.use((err, req, res, next) =&gt; {
+  res.status(400).json({
+    message: err.message || "Upload failed"
+  });
+});
+
+app.listen(3000);</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-success text-white">17. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Forgetting <code>enctype="multipart/form-data"</code> in an HTML form.</li>
+<li>Using a field name that does not match <code>upload.single()</code>.</li>
+<li>Accepting unlimited file sizes.</li>
+<li>Trusting the original filename.</li>
+<li>Checking only the filename extension.</li>
+<li>Using memory storage for very large files without considering RAM.</li>
+<li>Storing files locally in a multi-server production environment without a shared strategy.</li>
+<li>Forgetting to delete old files.</li>
+<li>Returning internal filesystem paths to clients.</li>
+<li>Not handling Multer errors.</li>
+</ol>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-dark text-white">18. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li><code>multipart/form-data</code> is used to send files through HTTP forms.</li>
+<li>Multer parses multipart requests in Express.</li>
+<li><code>single()</code> gives one uploaded file through <code>req.file</code>.</li>
+<li><code>array()</code> gives multiple files through <code>req.files</code>.</li>
+<li>Use file-size limits to protect resources.</li>
+<li>Validate file type and, for stronger security, inspect file content.</li>
+<li>Disk storage writes files to disk; memory storage keeps file data in RAM.</li>
+<li>Use safe server-generated filenames.</li>
+<li>Production systems often use cloud/object storage.</li>
+<li>Handle upload errors explicitly.</li>
+</ul>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-primary text-white">19. Interview-Ready Points ⭐⭐⭐</div>
+<div class="card-body">
+<div class="tip">
+<ul class="mb-0">
+<li><strong>What is Multer?</strong> Express middleware for handling multipart/form-data uploads.</li>
+<li><strong>req.file vs req.files?</strong> Depends on the Multer upload method and whether one or multiple files are expected.</li>
+<li><strong>Why multipart/form-data?</strong> It supports files and normal form fields in the same request.</li>
+<li><strong>Disk vs memory storage?</strong> Disk stores files on disk; memory keeps them in RAM.</li>
+<li><strong>Why file limits?</strong> To reduce resource-exhaustion risk.</li>
+<li><strong>Why validate file type?</strong> To accept only intended file types and reduce security risk.</li>
+<li><strong>Why avoid original filenames?</strong> They are client-controlled and may collide or contain unsafe characters.</li>
+<li><strong>Cloud storage?</strong> Store binary files in object storage and keep metadata/reference in the database.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="section-card">
+<div class="card-header bg-warning text-dark">20. Interview Questions — Click to Show Answer</div>
+<div class="card-body">
+<div id="questions"></div>
+</div>
+</section>
+
+</main>
+
+<script>
+const qs = [
+["Q1. Why is multipart/form-data used for file uploads?",
+"Because it can send file data and normal form fields as separate parts in one HTTP request.",
+"It is designed for form submissions that contain files. JSON is not the normal browser form encoding for raw file uploads."],
+["Q2. What does Multer do in Express?",
+"Multer parses multipart/form-data requests and makes uploaded file information available to the route.",
+"It is middleware that handles the multipart request before your controller/route handler runs."],
+["Q3. What is the difference between req.file and req.files?",
+"req.file is commonly used for a single uploaded file. req.files is commonly used when multiple files or multiple file fields are configured.",
+"The Multer method determines the output shape. single() produces req.file, while array() and fields() use req.files."],
+["Q4. What happens if upload.single('avatar') is used but the client sends the field name 'photo'?",
+"The upload configuration does not match the expected field and Multer can reject the request with an unexpected field error.",
+"The field name is part of the upload contract between client and server."],
+["Q5. Why should a server limit file size?",
+"To protect memory, disk, CPU and network resources from unnecessarily large uploads.",
+"An attacker or accidental client can send very large files and consume application resources."],
+["Q6. Why should you not trust file.originalname?",
+"It comes from the client and can contain unexpected characters, duplicate names or misleading extensions.",
+"Client input should be treated as untrusted data. Generate a safe server-side storage name."],
+["Q7. What is the difference between diskStorage and memoryStorage?",
+"diskStorage writes the file to disk. memoryStorage keeps the file contents in memory as a Buffer.",
+"Memory storage can be convenient for direct processing or cloud transfer, but large uploads can consume significant RAM."],
+["Q8. What is a major risk of memoryStorage?",
+"Large uploads can consume application memory and cause high memory usage or crashes.",
+"The complete file may be held in RAM, so strict size limits are important."],
+["Q9. How would you allow only PNG and JPEG uploads?",
+"Use server-side file filtering and allow only the intended MIME types, while using stronger content validation when security requirements demand it.",
+"The client can be modified, so validation must happen on the server."],
+["Q10. Why should uploaded filenames usually be generated by the server?",
+"To avoid collisions and reduce risks caused by client-controlled filenames.",
+"A generated unique identifier gives the server control over the storage name."],
+["Q11. What is the purpose of upload.single('avatar')?",
+"It tells Multer to expect one file in the avatar field.",
+"The resulting uploaded file is normally available as req.file."],
+["Q12. What is the purpose of upload.array('photos', 5)?",
+"It accepts multiple files from the photos field, with a maximum of five files.",
+"The second argument limits how many files the middleware accepts."],
+["Q13. What should a production application usually store in the database?",
+"Usually file metadata such as the object key, URL, filename, content type or size rather than the complete large binary file.",
+"This separates database data from large file storage and works well with object storage."],
+["Q14. Why can local disk storage be a problem in a multi-server deployment?",
+"Different application servers may have different local disks, so a file written on one server may not exist on another.",
+"Shared/object storage provides a more suitable storage layer for distributed applications."],
+["Q15. How should upload errors be handled?",
+"Handle Multer errors and return a clear client-safe HTTP error response.",
+"Upload errors should not become confusing server failures or expose internal paths."],
+["Q16. What is the correct high-level upload flow?",
+"Client → multipart/form-data → Express → Multer → validation → storage → save metadata/reference.",
+"Each stage has a separate job: transport, parsing, validation, storage and metadata persistence."],
+["Q17. Why is checking only '.jpg' in the filename weak validation?",
+"Because a filename extension is client-controlled and does not prove the actual file content.",
+"Stronger systems validate MIME type and inspect file signatures/content when appropriate."],
+["Q18. What happens when a file is deleted from the database but not from storage?",
+"The application can accumulate orphaned files that consume storage.",
+"Database deletion and physical/object deletion should be coordinated when the file is no longer needed."],
+["Q19. Why are file uploads a security concern?",
+"Files are untrusted input and can consume resources or contain dangerous content.",
+"Use size limits, type/content validation, safe names, controlled storage, authentication/authorization and malware scanning where appropriate."],
+["Q20. Explain this output: upload.single('avatar') then console.log(req.file).",
+"req.file contains information about the uploaded avatar after Multer successfully processes the multipart request.",
+"single() configures one expected file field and Multer attaches its file information to the request."]
+];
+
+const container = document.getElementById("questions");
+qs.forEach((q,i)=>{
+  const id = "ans"+i;
+  container.innerHTML += `
+  <div class="border rounded-3 p-3 mb-3">
+    <h6 class="fw-bold">${q[0]}</h6>
+    <button class="btn btn-outline-primary btn-sm btn-toggle" onclick="toggleAnswer('${id}',this)">Show Answer</button>
+    <div id="${id}" class="answer mt-3">
+      <div class="alert alert-success mb-2"><strong>Answer:</strong> ${q[1]}</div>
+      <div class="alert alert-info mb-0"><strong>Why?</strong> ${q[2]}</div>
+    </div>
+  </div>`;
+});
+function toggleAnswer(id,btn){
+  const el=document.getElementById(id);
+  const open=el.style.display==="block";
+  el.style.display=open?"none":"block";
+  btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

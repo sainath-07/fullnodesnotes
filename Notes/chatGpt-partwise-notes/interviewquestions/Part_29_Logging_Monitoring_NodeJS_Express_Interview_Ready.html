@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 29 — Logging & Monitoring | Node.js + Express</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#202938;font-family:Arial,sans-serif;line-height:1.65}
+.hero{background:linear-gradient(135deg,#0d6efd,#173b75);color:#fff;padding:44px 0}
+section{margin:28px 0}
+.card{border:0;border-radius:14px;overflow:hidden}
+.shadow-soft{box-shadow:0 8px 25px rgba(20,40,80,.10)}
+.card-header{font-weight:700}
+.code{background:#172033;color:#e8eef8;border-radius:10px;padding:16px;white-space:pre-wrap;font-family:Consolas,monospace;font-size:.9rem;overflow:auto}
+.flow{background:#eef5ff;border:1px solid #cfe0ff;border-radius:12px;padding:20px;text-align:center;font-weight:600}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:15px;border-radius:8px}
+.mistake{border-left:5px solid #dc3545;background:#fff1f2;padding:15px;border-radius:8px}
+.question{border:1px solid #e5e7eb;border-radius:12px}
+.answer,.why{display:none}
+.toggle-btn{min-width:130px}
+.badge-topic{letter-spacing:.3px}
+table code{white-space:nowrap}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge bg-light text-primary badge-topic">NODE.JS + EXPRESS INTERVIEW PREPARATION</span>
+    <h1 class="mt-3 fw-bold">Part 29 — Logging & Monitoring</h1>
+    <p class="lead mb-0">Interview-ready teaching notes and code/output questions for MAANG, product companies, and MNC interviews.</p>
+  </div>
+</header>
+
+<main class="container py-4">
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-primary text-white">1. What is Logging?</div>
+<div class="card-body">
+<p><b>What:</b> Logging means recording useful information about what an application is doing.</p>
+<p><b>Why:</b> Logs help developers understand requests, errors, warnings, important business events, and production failures.</p>
+<p><b>Layman example:</b> A security guard writes down who entered a building, when they entered, and what unusual event happened. Application logs provide a similar history for software.</p>
+
+<div class="flow">
+Request → Application → Log event → Log storage → Developer / Monitoring system
+</div>
+
+<div class="alert alert-info mt-3">
+<b>Interview line:</b> Logging tells us what happened. Monitoring tells us whether the system is healthy and how it is behaving over time.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-success text-white">2. Why Do We Need Logging?</div>
+<div class="card-body">
+<ul>
+<li>Find production bugs.</li>
+<li>Understand failed requests.</li>
+<li>Track important application events.</li>
+<li>Measure request behavior and response time.</li>
+<li>Investigate security or operational problems.</li>
+<li>Understand what happened before an error.</li>
+</ul>
+
+<div class="tip">
+<b>Good production log:</b> It should contain enough context to understand an event without exposing passwords, tokens, or other sensitive information.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-warning">3. Logging Levels</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Level</th><th>Meaning</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td><b>fatal</b></td><td>Very serious failure</td><td>Application cannot continue</td></tr>
+<tr><td><b>error</b></td><td>Something failed</td><td>Database/API/application error</td></tr>
+<tr><td><b>warn</b></td><td>Something needs attention</td><td>Retry, degraded dependency</td></tr>
+<tr><td><b>info</b></td><td>Normal important event</td><td>Server started, request completed</td></tr>
+<tr><td><b>debug</b></td><td>Detailed debugging information</td><td>Development/troubleshooting</td></tr>
+<tr><td><b>trace</b></td><td>Very detailed diagnostic information</td><td>Deep troubleshooting</td></tr>
+</tbody>
+</table>
+
+<div class="alert alert-warning">
+<b>Common mistake:</b> Do not log everything at <code>error</code>. The level should communicate the seriousness of the event.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-info">4. console vs Winston vs Pino</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Tool</th><th>Best understanding</th></tr></thead>
+<tbody>
+<tr><td><code>console</code></td><td>Simple built-in logging. Useful for basic debugging.</td></tr>
+<tr><td><b>Winston</b></td><td>Flexible logging library with transports, levels, and formatting.</td></tr>
+<tr><td><b>Pino</b></td><td>High-performance structured logger commonly used in Node.js services.</td></tr>
+</tbody>
+</table>
+
+<div class="code">console.log("Server started");
+console.error("Database connection failed");</div>
+
+<p class="mt-3"><b>Why use a logging library?</b> Production applications often need structured output, log levels, transports, timestamps, correlation IDs, and centralized log collection.</p>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-secondary text-white">5. Structured Logs</div>
+<div class="card-body">
+<p>A structured log stores information as fields rather than only as a sentence.</p>
+
+<div class="code">{
+  "level": "info",
+  "message": "request completed",
+  "method": "GET",
+  "path": "/users",
+  "statusCode": 200,
+  "durationMs": 18,
+  "requestId": "req-123"
+}</div>
+
+<div class="tip mt-3">
+<b>Why?</b> Machines can search and filter structured fields easily. For example, you can find all requests where <code>statusCode &gt;= 500</code>.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-primary text-white">6. Request Logging</div>
+<div class="card-body">
+<p>Request logging records useful HTTP information such as method, path, status, duration, and a request/correlation ID.</p>
+
+<div class="flow">
+Incoming Request → Request ID → Handler → Response → Log status + duration
+</div>
+
+<div class="code">GET /users
+status: 200
+duration: 21ms
+requestId: req-123</div>
+
+<p class="mt-3"><b>Interview focus:</b> Logging request duration helps identify slow endpoints.</p>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-danger text-white">7. Error Logging</div>
+<div class="card-body">
+<p>Error logs should provide enough context to investigate the failure.</p>
+
+<div class="code">{
+  "level": "error",
+  "message": "Database query failed",
+  "requestId": "req-123",
+  "route": "/orders",
+  "errorCode": "DB_TIMEOUT"
+}</div>
+
+<div class="alert alert-danger mt-3">
+<b>Never blindly log secrets:</b> passwords, access tokens, session secrets, API keys, and sensitive personal data should not be written to logs.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-success text-white">8. Correlation IDs / Request IDs</div>
+<div class="card-body">
+<p>A correlation ID is an identifier that connects related logs belonging to the same request or distributed operation.</p>
+
+<div class="flow">
+Client Request<br>
+↓<br>
+requestId = abc-123<br>
+↓<br>
+API → Service → Database / External API<br>
+↓<br>
+All related logs contain abc-123
+</div>
+
+<div class="code">requestId: "abc-123"
+API log       → abc-123
+Service log   → abc-123
+Payment log   → abc-123</div>
+
+<div class="tip">
+<b>Interview line:</b> Correlation IDs are especially useful in distributed systems because one user request may cross multiple services.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-info">9. What is Monitoring?</div>
+<div class="card-body">
+<p><b>Monitoring</b> continuously observes application health and behavior.</p>
+
+<div class="flow">
+Application → Metrics / Logs / Health Checks → Monitoring System → Alert → Developer
+</div>
+
+<p class="mt-3">Important signals include:</p>
+<ul>
+<li>Request rate</li>
+<li>Error rate</li>
+<li>Response latency</li>
+<li>CPU usage</li>
+<li>Memory usage</li>
+<li>Database health</li>
+<li>Availability</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-warning">10. Metrics</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Metric</th><th>Question it answers</th></tr></thead>
+<tbody>
+<tr><td>Request rate</td><td>How much traffic are we receiving?</td></tr>
+<tr><td>Error rate</td><td>How many requests are failing?</td></tr>
+<tr><td>Latency</td><td>How long are requests taking?</td></tr>
+<tr><td>CPU</td><td>Is the process using too much CPU?</td></tr>
+<tr><td>Memory</td><td>Is memory usage growing unexpectedly?</td></tr>
+<tr><td>Availability</td><td>Is the service reachable and healthy?</td></tr>
+</tbody>
+</table>
+
+<div class="alert alert-primary">
+<b>Interview tip:</b> A common production view is the relationship between traffic, errors, and latency.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-dark text-white">11. Health Check — /health</div>
+<div class="card-body">
+<p>A health endpoint provides a simple signal that the application process is alive and able to respond.</p>
+
+<div class="code">app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok"
+  });
+});</div>
+
+<p class="mt-3"><b>Use:</b> Load balancers, orchestration systems, or monitoring systems can call the endpoint.</p>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-secondary text-white">12. Readiness — /ready</div>
+<div class="card-body">
+<p>Readiness is different from simple liveness. A service may be running but not ready to receive traffic because an important dependency is unavailable.</p>
+
+<div class="flow">
+/health → "Is the process alive?"<br><br>
+/ready → "Can this instance safely receive traffic?"
+</div>
+
+<div class="code">app.get("/ready", async (req, res) => {
+  const databaseReady = await checkDatabase();
+
+  if (!databaseReady) {
+    return res.status(503).json({ status: "not_ready" });
+  }
+
+  res.json({ status: "ready" });
+});</div>
+
+<div class="tip">
+<b>Interview point:</b> Returning <code>503 Service Unavailable</code> can tell infrastructure that the instance is temporarily unable to serve traffic.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-primary text-white">13. Application and Performance Monitoring</div>
+<div class="card-body">
+<p>Application monitoring looks at application behavior. Performance monitoring focuses on latency, throughput, CPU, memory, database calls, and slow operations.</p>
+
+<div class="flow">
+Request
+→ Controller
+→ Service
+→ Database / External API
+→ Response
+        ↓
+Latency + errors + resource metrics
+</div>
+
+<div class="alert alert-info mt-3">
+<b>Useful production question:</b> "Is the application slow, or is one of its dependencies slow?"
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-danger text-white">14. Production Debugging</div>
+<div class="card-body">
+<p>A practical production debugging process:</p>
+<ol>
+<li>Identify the time window.</li>
+<li>Check error rate and latency.</li>
+<li>Search logs using the request/correlation ID.</li>
+<li>Find the failing route or dependency.</li>
+<li>Check database, CPU, memory, and external services.</li>
+<li>Compare with recent deployments or configuration changes.</li>
+<li>Fix safely and verify the metrics afterward.</li>
+</ol>
+
+<div class="flow">
+Alert → Metrics → Correlation ID → Logs → Root cause → Fix → Verify
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-dark text-white">15. Code / Output-Based Interview Questions</div>
+<div class="card-body">
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q1. What does this logging code do?</h5>
+<div class="code">console.log("Server started");
+console.error("Database connection failed");</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a1',this,'answer')">Show Answer</button>
+<div id="a1" class="answer alert alert-success mt-3"><b>Answer:</b> Both messages are written to the process output; the second uses the error output stream.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w1',this,'why')">Show Why?</button>
+<div id="w1" class="why alert alert-info mt-3"><b>Why:</b> console.log is commonly used for normal messages, while console.error communicates an error. In production, a structured logger is usually preferred for richer context and routing.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q2. Which log level is more appropriate?</h5>
+<div class="code">try {
+  await saveOrder(order);
+} catch (err) {
+  logger.???("Order save failed", { err });
+}</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a2',this,'answer')">Show Answer</button>
+<div id="a2" class="answer alert alert-success mt-3"><b>Answer:</b> error</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w2',this,'why')">Show Why?</button>
+<div id="w2" class="why alert alert-info mt-3"><b>Why:</b> A failed database/application operation is an error condition and should be searchable as an error rather than a normal info event.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q3. Why is this structured log easier to search?</h5>
+<div class="code">logger.info({
+  method: "GET",
+  path: "/users",
+  statusCode: 200,
+  durationMs: 18,
+  requestId: "abc-123"
+}, "request completed");</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a3',this,'answer')">Show Answer</button>
+<div id="a3" class="answer alert alert-success mt-3"><b>Answer:</b> It stores important values as fields.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w3',this,'why')">Show Why?</button>
+<div id="w3" class="why alert alert-info mt-3"><b>Why:</b> Monitoring and log systems can filter fields such as statusCode, durationMs, and requestId without parsing a sentence.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q4. What problem does the requestId solve?</h5>
+<div class="code">requestId: "abc-123"</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a4',this,'answer')">Show Answer</button>
+<div id="a4" class="answer alert alert-success mt-3"><b>Answer:</b> It lets us connect related logs for the same request or distributed operation.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w4',this,'why')">Show Why?</button>
+<div id="w4" class="why alert alert-info mt-3"><b>Why:</b> A single request may create logs in middleware, controllers, services, and external-service calls. The same ID makes those logs much easier to trace.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q5. What is the likely issue with this health check?</h5>
+<div class="code">app.get("/health", async (req, res) => {
+  await database.connect();
+  res.json({ status: "ok" });
+});</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a5',this,'answer')">Show Answer</button>
+<div id="a5" class="answer alert alert-success mt-3"><b>Answer:</b> The health endpoint is performing a potentially expensive connection operation on every health request.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w5',this,'why')">Show Why?</button>
+<div id="w5" class="why alert alert-info mt-3"><b>Why:</b> Health checks can be called frequently by infrastructure. They should be lightweight. Dependency readiness checks can be handled separately, such as through a readiness endpoint or an appropriate cached/controlled check.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q6. What should /ready return when a required database is unavailable?</h5>
+<div class="code">if (!databaseReady) {
+  return res.status(???).json({ status: "not_ready" });
+}</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a6',this,'answer')">Show Answer</button>
+<div id="a6" class="answer alert alert-success mt-3"><b>Answer:</b> 503 Service Unavailable.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w6',this,'why')">Show Why?</button>
+<div id="w6" class="why alert alert-info mt-3"><b>Why:</b> The process may still be alive, but it is not ready to safely serve traffic. A 503 response communicates temporary service unavailability to infrastructure.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q7. Which metric helps identify slow requests?</h5>
+<div class="code">{
+  statusCode: 200,
+  durationMs: 1840
+}</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a7',this,'answer')">Show Answer</button>
+<div id="a7" class="answer alert alert-success mt-3"><b>Answer:</b> Request latency or response duration.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w7',this,'why')">Show Why?</button>
+<div id="w7" class="why alert alert-info mt-3"><b>Why:</b> durationMs represents how long the request took. A rising latency metric can reveal slow application code or slow dependencies.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q8. What is dangerous about this log?</h5>
+<div class="code">logger.info({
+  email: user.email,
+  password: user.password,
+  token: req.headers.authorization
+});</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a8',this,'answer')">Show Answer</button>
+<div id="a8" class="answer alert alert-success mt-3"><b>Answer:</b> It logs sensitive credentials and authentication data.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w8',this,'why')">Show Why?</button>
+<div id="w8" class="why alert alert-info mt-3"><b>Why:</b> Passwords, access tokens, API keys, and similar secrets should not be logged. Logs are often copied to centralized systems and retained for a long time.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q9. What does this flow help a developer investigate?</h5>
+<div class="code">Alert
+  ↓
+Metrics
+  ↓
+requestId
+  ↓
+Logs
+  ↓
+Database / external API
+  ↓
+Root cause</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a9',this,'answer')">Show Answer</button>
+<div id="a9" class="answer alert alert-success mt-3"><b>Answer:</b> It provides a structured production debugging path.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w9',this,'why')">Show Why?</button>
+<div id="w9" class="why alert alert-info mt-3"><b>Why:</b> Metrics show that something is wrong, a correlation ID narrows the investigation to one operation, and logs/dependency data help identify the root cause.</div>
+</div>
+</div>
+
+<div class="question card mb-4">
+<div class="card-body">
+<h5>Q10. What is the key difference between /health and /ready?</h5>
+<div class="code">GET /health
+GET /ready</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a10',this,'answer')">Show Answer</button>
+<div id="a10" class="answer alert alert-success mt-3"><b>Answer:</b> /health generally answers whether the process is alive; /ready answers whether the instance is ready to receive traffic.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2 toggle-btn" onclick="toggle('w10',this,'why')">Show Why?</button>
+<div id="w10" class="why alert alert-info mt-3"><b>Why:</b> A running process can still be unable to serve requests correctly because a required dependency is unavailable. Separating liveness and readiness prevents infrastructure from treating both conditions as the same.</div>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-warning">16. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="mistake mb-3">
+<b>Mistake 1: Logging secrets.</b><br>
+Never log passwords, JWTs, API keys, session secrets, or sensitive authentication headers.
+</div>
+<div class="mistake mb-3">
+<b>Mistake 2: Using only plain text logs.</b><br>
+Structured fields make production searching and filtering much easier.
+</div>
+<div class="mistake mb-3">
+<b>Mistake 3: Logging every request without useful context.</b><br>
+Include useful fields such as method, route, status, duration, and request/correlation ID.
+</div>
+<div class="mistake mb-3">
+<b>Mistake 4: Confusing liveness with readiness.</b><br>
+A process can be alive but unable to serve traffic because a required dependency is unavailable.
+</div>
+<div class="mistake mb-3">
+<b>Mistake 5: Ignoring log volume.</b><br>
+Very large debug logs can increase storage cost, slow investigation, and create noise.
+</div>
+<div class="mistake">
+<b>Mistake 6: Looking only at logs.</b><br>
+Production diagnosis should combine logs, metrics, health checks, traces/correlation information, and infrastructure signals when available.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-info">17. When Should You Use Each Concept?</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Concept</th><th>When to use it</th></tr></thead>
+<tbody>
+<tr><td>console</td><td>Simple development debugging or small scripts.</td></tr>
+<tr><td>Winston / Pino</td><td>Production applications that need structured, configurable logging.</td></tr>
+<tr><td>Request logging</td><td>Understand traffic, failures, and request latency.</td></tr>
+<tr><td>Correlation ID</td><td>Trace one request across multiple layers/services.</td></tr>
+<tr><td>Metrics</td><td>Track trends such as traffic, errors, latency, CPU, and memory.</td></tr>
+<tr><td>/health</td><td>Basic liveness/health signal.</td></tr>
+<tr><td>/ready</td><td>Tell infrastructure whether an instance can receive traffic.</td></tr>
+<tr><td>Performance monitoring</td><td>Find slow requests, resource pressure, and bottlenecks.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-soft">
+<div class="card-header bg-success text-white">18. Quick Recap — Interview Ready</div>
+<div class="card-body">
+<ul>
+<li><b>Logging:</b> Records useful application events.</li>
+<li><b>Log levels:</b> Communicate event importance such as info, warn, and error.</li>
+<li><b>Winston:</b> Flexible Node.js logging library.</li>
+<li><b>Pino:</b> High-performance structured logger.</li>
+<li><b>Structured logs:</b> Store searchable fields instead of only text.</li>
+<li><b>Request logging:</b> Records request context, status, and often duration.</li>
+<li><b>Correlation ID:</b> Connects related logs across an operation.</li>
+<li><b>Metrics:</b> Measure behavior such as request rate, errors, latency, CPU, and memory.</li>
+<li><b>/health:</b> Usually checks whether the process is alive/healthy.</li>
+<li><b>/ready:</b> Checks whether the instance is ready to receive traffic.</li>
+<li><b>Monitoring:</b> Observes application health and behavior over time.</li>
+<li><b>Production debugging:</b> Combine metrics, IDs, logs, and dependency information to find the root cause.</li>
+</ul>
+
+<div class="alert alert-success">
+<b>30-second interview answer:</b>
+“Logging records what happened inside an application, while monitoring continuously tells us how the system is behaving. In Node.js production systems I prefer structured logs with levels, request IDs, status codes, and latency. Tools such as Winston or Pino can provide production-grade logging. I also expose health and readiness endpoints, monitor metrics such as error rate and latency, and use correlation IDs to trace a request across services. During production debugging, I combine metrics and logs rather than relying on a single signal, and I never log secrets.”
+</div>
+</div>
+</div>
+</section>
+
+</main>
+
+<footer class="text-center py-4 text-secondary">
+Part 29 — Logging & Monitoring • Node.js + Express Interview Preparation
+</footer>
+
+<script>
+function toggle(id, btn, type) {
+  const el = document.getElementById(id);
+  const show = el.style.display !== "block";
+  el.style.display = show ? "block" : "none";
+  btn.textContent = show
+    ? (type === "answer" ? "Hide Answer" : "Hide Why?")
+    : (type === "answer" ? "Show Answer" : "Show Why?");
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 13 — Error Handling</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}
+.hero{background:linear-gradient(135deg,#7f1d1d,#dc3545,#6f42c1);color:#fff;border-radius:18px}
+.card,.topic{border:0;border-radius:14px}.card{overflow:hidden}
+.card-header{font-weight:700}.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+code{color:#b42318}.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}
+.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}
+.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}
+.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}
+.answer{display:none;margin-top:15px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:10px;padding:15px}
+.badgebox{border-radius:12px;padding:16px;height:100%}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 13</span>
+<h1 class="display-6 fw-bold">🟢 Error Handling in Node.js ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how Node.js detects, throws, catches, propagates, logs, and safely handles errors.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">1. What is Error Handling?</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Error handling</strong> means detecting a problem, deciding what to do about it, and preventing the application from failing in an uncontrolled way.</p>
+<h5>Layman example</h5>
+<p>Imagine a delivery driver cannot find a house. A good system does not simply stop. It reports the problem, checks another option, contacts the customer, or safely ends the delivery.</p>
+<div class="flow">Application
+   ↓
+Something goes wrong
+   ↓
+Detect error
+   ↓
+Classify / log error
+   ↓
+Handle or propagate
+   ↓
+Recover OR safely shut down</div>
+<div class="interview"><strong>Interview-ready:</strong> “Good Node.js error handling separates expected operational failures from programmer bugs and makes sure errors are observed, handled, and propagated correctly.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">2. try / catch / finally</div>
+<div class="card-body">
+<div class="topic">
+<p><code>try</code> contains code that may throw. <code>catch</code> handles a thrown error. <code>finally</code> runs whether an error occurred or not.</p>
+<pre><code>try {
+  const result = JSON.parse('{"name":"Sam"}');
+  console.log(result.name);
+} catch (error) {
+  console.error("Invalid JSON:", error.message);
+} finally {
+  console.log("Finished");
+}</code></pre>
+<div class="flow">try
+ ↓
+success ─────────→ finally
+ ↓
+error → catch → finally</div>
+<h5>When to use?</h5>
+<p>Use <code>try/catch</code> around operations where you can meaningfully handle the failure, especially synchronous code that can throw and <code>await</code> expressions inside async functions.</p>
+<div class="warn"><strong>Common mistake:</strong> A try/catch does not automatically catch errors from every asynchronous callback scheduled later.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">3. throw</div>
+<div class="card-body">
+<div class="topic">
+<p><code>throw</code> creates an exception and immediately stops normal execution at that point until a matching handler catches it.</p>
+<pre><code>function withdraw(balance, amount) {
+  if (amount &gt; balance) {
+    throw new Error("Insufficient balance");
+  }
+
+  return balance - amount;
+}
+
+try {
+  console.log(withdraw(100, 200));
+} catch (error) {
+  console.error(error.message);
+}</code></pre>
+<p>In application code, prefer throwing <code>Error</code> objects rather than strings.</p>
+<pre><code>// Good
+throw new Error("User not found");
+
+// Avoid
+throw "User not found";</code></pre>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">4. Error Object</div>
+<div class="card-body">
+<div class="topic">
+<p>An Error object carries information about a failure.</p>
+<pre><code>const error = new Error("Database failed");
+
+console.log(error.name);    // Error
+console.log(error.message); // Database failed
+console.log(error.stack);   // stack trace</code></pre>
+<ul>
+<li><code>name</code> — type/name of the error.</li>
+<li><code>message</code> — human-readable explanation.</li>
+<li><code>stack</code> — useful debugging information showing where the error was created.</li>
+</ul>
+<div class="tip"><strong>Interview tip:</strong> Never depend on exact stack text for application logic. Use structured error properties or custom error classes when the application needs to distinguish error types.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">5. Common JavaScript Error Types</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="badgebox bg-danger-subtle"><h5>Error</h5><p>General error object.</p><pre><code>throw new Error("Failed");</code></pre></div></div>
+<div class="col-md-6"><div class="badgebox bg-warning-subtle"><h5>TypeError</h5><p>Operation uses a value of an unsuitable type.</p><pre><code>const x = null;
+x.name;</code></pre></div></div>
+<div class="col-md-6"><div class="badgebox bg-info-subtle"><h5>ReferenceError</h5><p>Code refers to an identifier that cannot be found.</p><pre><code>console.log(notDefined);</code></pre></div></div>
+<div class="col-md-6"><div class="badgebox bg-primary-subtle"><h5>SyntaxError</h5><p>JavaScript syntax is invalid.</p><pre><code>const = 10;</code></pre></div></div>
+</div>
+<div class="topic mt-4">
+<div class="warn"><strong>Important:</strong> Syntax errors can prevent a file from running at all, so normal runtime <code>try/catch</code> cannot be used to recover from a syntax error in that same invalid source file.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">6. Custom Errors</div>
+<div class="card-body">
+<div class="topic">
+<p>Custom errors let an application attach meaningful names or properties to domain-specific failures.</p>
+<pre><code>class ValidationError extends Error {
+  constructor(message, field) {
+    super(message);
+    this.name = "ValidationError";
+    this.field = field;
+  }
+}
+
+throw new ValidationError("Email is required", "email");</code></pre>
+<p>A centralized handler can then check <code>error instanceof ValidationError</code> and choose an appropriate response.</p>
+<div class="interview"><strong>Why?</strong> Custom errors make error handling clearer because different failures can carry different meanings and metadata.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">7. Error-First Callbacks</div>
+<div class="card-body">
+<div class="topic">
+<p>Traditional Node.js callback APIs commonly use the first argument for the error.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.readFile("data.txt", "utf8", (err, data) =&gt; {
+  if (err) {
+    console.error("Read failed:", err);
+    return;
+  }
+
+  console.log(data);
+});</code></pre>
+<div class="flow">(err, data)
+   ↓
+err exists? ── yes → handle error → return
+   │
+   no
+   ↓
+use data</div>
+<div class="tip"><strong>Common mistake:</strong> Forgetting to return after handling an error can cause the success code to continue running.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">8. Promise Errors</div>
+<div class="card-body">
+<div class="topic">
+<p>A rejected Promise represents an asynchronous failure.</p>
+<pre><code>getUser()
+  .then(user =&gt; getOrders(user.id))
+  .then(orders =&gt; console.log(orders))
+  .catch(error =&gt; {
+    console.error("Request failed:", error);
+  });</code></pre>
+<p>A rejection can travel through the Promise chain until a rejection handler catches it.</p>
+<div class="flow">Promise rejected
+      ↓
+next .then() skipped
+      ↓
+nearest matching .catch()
+      ↓
+handle error</div>
+<div class="interview"><strong>Interview line:</strong> “Promise errors propagate through the chain until they are handled by a rejection handler such as catch, or they remain unhandled.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">9. Async/Await Errors</div>
+<div class="card-body">
+<div class="topic">
+<p>When an awaited Promise rejects, <code>await</code> throws the rejection reason inside the async function.</p>
+<pre><code>async function loadUser() {
+  try {
+    const user = await getUser();
+    return user;
+  } catch (error) {
+    console.error("Could not load user:", error);
+    throw error;
+  }
+}</code></pre>
+<p>You can handle errors at the level where you have enough information to recover. If you cannot recover, rethrow so a higher-level handler can decide what to do.</p>
+<div class="warn"><strong>Common mistake:</strong> Catching an error and doing nothing can hide a real failure.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">10. Unhandled Promise Rejection</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>Promise.reject(new Error("Database unavailable"));</code></pre>
+<p>This creates a rejected Promise with no rejection handler attached. Node.js reports unhandled Promise rejections, and behavior can be serious for an application depending on runtime/version and configuration.</p>
+<div class="flow">Promise rejects
+      ↓
+No catch / handler
+      ↓
+Unhandled rejection reported
+      ↓
+Application monitoring should detect it
+      ↓
+Fix the original error path</div>
+<div class="tip"><strong>Best practice:</strong> Do not use a global unhandled-rejection handler as a substitute for handling expected failures at the correct application layer.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">11. uncaughtException</div>
+<div class="card-body">
+<div class="topic">
+<p><code>process.on("uncaughtException", ...)</code> can observe an exception that reached the process without being caught.</p>
+<pre><code>process.on("uncaughtException", (error) =&gt; {
+  console.error("Uncaught exception:", error);
+});</code></pre>
+<div class="warn"><strong>Very important:</strong> Do not treat this as normal application recovery. An uncaught exception can leave the process in an unsafe or inconsistent state. A common production strategy is to log the error, stop accepting new work, clean up what is safe to clean up, and exit so a process manager can restart the service.</div>
+<div class="interview"><strong>Interview-ready:</strong> “uncaughtException is a last-resort process-level safety mechanism, not a normal error-handling strategy.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">12. Error Propagation</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>function validateUser(user) {
+  if (!user.email) {
+    throw new Error("Email is required");
+  }
+}
+
+function createUser(user) {
+  validateUser(user);
+  return "User created";
+}
+
+try {
+  createUser({});
+} catch (error) {
+  console.error(error.message);
+}</code></pre>
+<div class="flow">validateUser()
+      ↓ throw
+createUser()
+      ↓ propagates
+caller try/catch
+      ↓
+handle error</div>
+<p>Error propagation means an error moves upward through the call chain until some layer handles it.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">13. Operational Errors vs Programmer Errors</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6">
+<div class="topic h-100">
+<h5>Operational error</h5>
+<p>A failure that can happen during normal operation.</p>
+<ul>
+<li>Database temporarily unavailable</li>
+<li>Network timeout</li>
+<li>File does not exist</li>
+<li>Invalid user input</li>
+<li>External API unavailable</li>
+</ul>
+<p><strong>Typical response:</strong> handle, retry when appropriate, return a useful response, or safely degrade.</p>
+</div>
+</div>
+<div class="col-md-6">
+<div class="topic h-100">
+<h5>Programmer error</h5>
+<p>A bug in the application code.</p>
+<ul>
+<li>Using an undefined variable</li>
+<li>Wrong assumption about a value</li>
+<li>Calling a method on null</li>
+<li>Broken application logic</li>
+</ul>
+<p><strong>Typical response:</strong> fix the bug. Do not hide it with a generic catch.</p>
+</div>
+</div>
+</div>
+<div class="interview"><strong>Interview tip:</strong> “Operational errors are expected failures of the environment or input; programmer errors are defects in code. The handling strategy should be different.”</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">14. Centralized Error Handling</div>
+<div class="card-body">
+<div class="topic">
+<p>Instead of handling every application error in a different style, larger applications often use a central error-handling layer.</p>
+<div class="flow">Request
+  ↓
+Route / Controller
+  ↓
+Service
+  ↓
+Database / External API
+  ↓
+Error occurs
+  ↓
+Propagate
+  ↓
+Central error handler
+  ↓
+Log + classify + response</div>
+<p>In an Express application, this is commonly implemented with error-handling middleware.</p>
+<pre><code>app.use((err, req, res, next) =&gt; {
+  console.error(err);
+
+  res.status(500).json({
+    message: "Internal server error"
+  });
+});</code></pre>
+<div class="tip"><strong>Security tip:</strong> Log useful technical details internally, but do not expose stack traces, database details, passwords, tokens, or secrets to clients.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">15. Graceful Shutdown</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Graceful shutdown</strong> means stopping the application in an orderly way instead of suddenly killing it.</p>
+<pre><code>const server = require("node:http").createServer((req, res) =&gt; {
+  res.end("OK");
+});
+
+server.listen(3000);
+
+process.on("SIGTERM", () =&gt; {
+  console.log("Shutdown requested");
+
+  server.close(() =&gt; {
+    console.log("Server stopped accepting new requests");
+    process.exit(0);
+  });
+});</code></pre>
+<div class="flow">SIGTERM
+  ↓
+Stop accepting new work
+  ↓
+Finish safe in-flight work
+  ↓
+Close server / DB / resources
+  ↓
+Log completion
+  ↓
+Exit process</div>
+<p>Graceful shutdown is especially important in containers, cloud deployments, and systems managed by process supervisors.</p>
+<div class="warn"><strong>Common mistake:</strong> Calling <code>process.exit()</code> immediately can terminate the process before pending cleanup finishes.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">16. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Using <code>try/catch</code> as a replacement for fixing programmer bugs.</li>
+<li>Throwing strings instead of <code>Error</code> objects.</li>
+<li>Ignoring callback errors.</li>
+<li>Forgetting <code>return</code> after handling an error-first callback.</li>
+<li>Creating a Promise rejection without a handler.</li>
+<li>Swallowing errors inside <code>catch</code> blocks.</li>
+<li>Logging sensitive information such as passwords or access tokens.</li>
+<li>Sending internal stack traces to users.</li>
+<li>Using <code>uncaughtException</code> as normal recovery.</li>
+<li>Calling <code>process.exit()</code> before cleanup is complete.</li>
+<li>Retrying every error blindly, including validation errors.</li>
+<li>Returning HTTP 500 for every type of client/input error.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">17. Interview Questions — Click to Show / Hide Answer + Why ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="topic">
+<h5>Q1. What is the difference between try/catch and Promise catch?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> try/catch handles synchronous throws and, inside an async function, rejections produced by awaited Promises. <code>.catch()</code> handles rejected Promises in a Promise chain.<br><br><strong>Why?</strong> Knowing which asynchronous model you are using prevents errors from being missed.</div>
+</div>
+
+<div class="topic">
+<h5>Q2. Will this catch the error?</h5>
+<pre><code>try {
+  setTimeout(() =&gt; {
+    throw new Error("Boom");
+  }, 0);
+} catch (error) {
+  console.log("Caught");
+}</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> No. The callback runs later, after the try block has already finished.<br><br><strong>Why?</strong> The try/catch surrounds the scheduling call, not the later callback execution.</div>
+</div>
+
+<div class="topic">
+<h5>Q3. What is an error-first callback?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> A callback convention where the first argument is the error and later arguments contain successful results.<br><br><strong>Why?</strong> It gives Node.js callback APIs a consistent error-handling pattern.</div>
+</div>
+
+<div class="topic">
+<h5>Q4. What happens when an async function throws an error?</h5>
+<pre><code>async function test() {
+  throw new Error("Failed");
+}
+
+const result = test();</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>test()</code> returns a rejected Promise.<br><br><strong>Why?</strong> An async function converts thrown errors into Promise rejections.</div>
+</div>
+
+<div class="topic">
+<h5>Q5. What is error propagation?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It is the movement of an error upward through the call stack or Promise chain until a handler deals with it.<br><br><strong>Why?</strong> It lets lower-level functions report failures without needing to know how the final caller will respond.</div>
+</div>
+
+<div class="topic">
+<h5>Q6. What is the difference between operational and programmer errors?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Operational errors are expected failures such as network problems or invalid input. Programmer errors are defects in application code.<br><br><strong>Why?</strong> Operational errors can often be handled or retried; programmer errors usually need a code fix.</div>
+</div>
+
+<div class="topic">
+<h5>Q7. What is uncaughtException?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It is a process-level event emitted when an exception reaches the Node.js process without being caught.<br><br><strong>Why?</strong> It is a last-resort safety mechanism, not a replacement for local error handling.</div>
+</div>
+
+<div class="topic">
+<h5>Q8. Should an application continue normally after uncaughtException?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Generally, you should not assume the process is safe to continue. Log what happened, perform safe cleanup, stop accepting work, and exit so a supervisor can restart it when appropriate.<br><br><strong>Why?</strong> An uncaught exception can leave application state inconsistent.</div>
+</div>
+
+<div class="topic">
+<h5>Q9. What is an unhandled Promise rejection?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It occurs when a Promise rejects and no rejection handler is attached in time.<br><br><strong>Why?</strong> Unhandled rejections can hide failures and create unstable application behavior.</div>
+</div>
+
+<div class="topic">
+<h5>Q10. Why should you throw new Error() instead of a string?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Error objects provide standard information such as name, message, and stack, and work naturally with error handling and custom error classes.<br><br><strong>Why?</strong> Structured errors are easier to debug, classify, and log.</div>
+</div>
+
+<div class="topic">
+<h5>Q11. What is the difference between Error and TypeError?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Error is the general base error type. TypeError indicates an operation was attempted with an unsuitable value type.<br><br><strong>Why?</strong> Specific error types give more information about the nature of a failure.</div>
+</div>
+
+<div class="topic">
+<h5>Q12. Why is finally useful?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It runs after success or failure and is useful for cleanup.<br><br><strong>Why?</strong> Cleanup should often happen regardless of whether the main operation succeeded.</div>
+</div>
+
+<div class="topic">
+<h5>Q13. What is centralized error handling?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It is a common error-handling layer where propagated errors are classified, logged, and converted into consistent application responses.<br><br><strong>Why?</strong> It avoids duplicated error-response logic across many routes and services.</div>
+</div>
+
+<div class="topic">
+<h5>Q14. What should you do during graceful shutdown?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Stop accepting new work, allow safe in-flight work to finish where possible, close servers and resources, then exit.<br><br><strong>Why?</strong> It prevents dropped requests, corrupted work, and incomplete cleanup.</div>
+</div>
+
+<div class="topic">
+<h5>Q15. Predict the result.</h5>
+<pre><code>async function test() {
+  try {
+    await Promise.reject("X");
+    console.log("A");
+  } catch (error) {
+    console.log("B", error);
+  }
+  console.log("C");
+}
+
+test();</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Output:</strong>
+<pre><code>B X
+C</code></pre>
+<strong>Why?</strong> The rejected Promise causes await to throw. The catch handles it, and execution then continues with C.</div>
+</div>
+
+<div class="topic">
+<h5>Q16. What happens here?</h5>
+<pre><code>async function test() {
+  try {
+    throw new Error("A");
+  } catch (error) {
+    console.log("B");
+    throw error;
+  }
+}
+
+test().catch(() =&gt; console.log("C"));</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Output:</strong>
+<pre><code>B
+C</code></pre>
+<strong>Why?</strong> The error is caught locally, logged as B, then rethrown. The async function returns a rejected Promise, which the outer catch handles as C.</div>
+</div>
+
+<div class="topic">
+<h5>Q17. Is this a good production strategy?</h5>
+<pre><code>process.on("uncaughtException", () =&gt; {
+  console.log("Ignore it and continue");
+});</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> No. Treating uncaught exceptions as harmless is unsafe.<br><br><strong>Why?</strong> The process may be in an unknown state. A safer strategy is to log, perform controlled cleanup, stop accepting work, and exit when appropriate.</div>
+</div>
+
+<div class="topic">
+<h5>Q18. Why should sensitive error details not be returned to API clients?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Stack traces and internal error details can reveal database structure, file paths, libraries, credentials, or other implementation information.<br><br><strong>Why?</strong> Clients usually need a safe, useful error message, while detailed diagnostics belong in protected server logs.</div>
+</div>
+
+<div class="topic">
+<h5>Q19. What is the danger of swallowing an error?</h5>
+<pre><code>try {
+  await saveData();
+} catch (error) {
+  console.log(error);
+}
+
+return "Success";</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The function may report success even though saveData failed.<br><br><strong>Why?</strong> Catching an error changes control flow. If the operation did not succeed, the caller should usually receive a failure signal or an intentional fallback result.</div>
+</div>
+
+<div class="topic">
+<h5>Q20. Why is process.exit() risky during shutdown?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It can terminate the process before pending cleanup or important output completes.<br><br><strong>Why?</strong> Graceful shutdown should first close servers and resources safely, then exit.</div>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">18. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>try/catch</strong><br>Handle thrown errors.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>finally</strong><br>Run cleanup after success or failure.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>throw</strong><br>Create an exception.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>Error object</strong><br>Use name, message, and stack.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>Promise errors</strong><br>Handle with catch or async/await try/catch.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>Propagation</strong><br>Errors move upward until handled.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>uncaughtException</strong><br>Last-resort process-level signal.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Operational error</strong><br>Expected runtime/environment failure.</div></div>
+<div class="col-md-4"><div class="alert alert-dark h-100"><strong>Programmer error</strong><br>Bug that needs fixing.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>Central handling</strong><br>One consistent error-response layer.</div></div>
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>Graceful shutdown</strong><br>Close safely before exiting.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>Security</strong><br>Do not expose internal error details.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">19. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ol>
+<li>Explain try/catch/finally.</li>
+<li>Explain throw and Error objects.</li>
+<li>Differentiate Error, TypeError, ReferenceError, and SyntaxError.</li>
+<li>Explain custom errors.</li>
+<li>Explain Node.js error-first callbacks.</li>
+<li>Explain Promise rejection and error propagation.</li>
+<li>Explain async/await error handling.</li>
+<li>Explain unhandled Promise rejection.</li>
+<li>Explain uncaughtException and why it is not normal recovery.</li>
+<li>Differentiate operational errors and programmer errors.</li>
+<li>Explain centralized error handling.</li>
+<li>Explain graceful shutdown.</li>
+<li>Predict output involving try/catch, async, await, and rethrow.</li>
+<li>Explain why swallowing errors is dangerous.</li>
+<li>Explain why process.exit() should be used carefully.</li>
+</ol>
+<div class="interview"><strong>Strong interview summary:</strong><br>
+“Node.js applications should handle expected operational failures at the appropriate layer, propagate errors when a lower layer cannot recover, and keep programmer bugs visible. Promises use rejection handling, async/await commonly uses try/catch, and process-level events such as uncaughtException are last-resort safety mechanisms. Production applications should log safely, avoid exposing sensitive details, and use graceful shutdown when the process must stop.”</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">20. Final Visual Map</div>
+<div class="card-body">
+<div class="topic">
+<div class="flow">ERROR HAPPENS
+      ↓
+Where did it happen?
+      ↓
+Synchronous ─────────→ try/catch
+      │
+      ├── Callback ──→ error-first callback
+      │
+      └── Promise ───→ catch()
+                         │
+                         ↓
+                    async/await
+                         │
+                         ↓
+                    try/catch
+                         │
+                         ↓
+                 propagate if needed
+                         │
+                         ↓
+                 central error layer
+                         │
+             ┌───────────┴───────────┐
+             ↓                       ↓
+      Operational error        Programmer error
+      handle/retry/etc.        fix the code
+             │
+             └───────────┬───────────┘
+                         ↓
+              Unrecoverable process state?
+                         ↓
+                  graceful shutdown
+                         ↓
+                       exit</div>
+</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 13 — Error Handling • Interview Preparation
+</footer>
+</div>
+
+<script>
+function toggle(btn){
+  const answer = btn.nextElementSibling;
+  const hidden = getComputedStyle(answer).display === "none";
+  answer.style.display = hidden ? "block" : "none";
+  btn.textContent = hidden ? "Hide Answer" : "Show Answer";
+}
+</script>
+</body>
+</html>

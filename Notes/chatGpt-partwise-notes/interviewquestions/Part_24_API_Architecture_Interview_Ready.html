@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 24 — API Architecture | Node.js + Express Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.hero{background:linear-gradient(135deg,#6f42c1,#273c75);color:#fff}
+.card{border:0;border-radius:14px;overflow:hidden}.card-header{font-weight:700}
+pre{background:#17202a;color:#eaf2f8;padding:16px;border-radius:10px;overflow:auto}
+code{color:#d63384}.flow{font-weight:700;text-align:center}.flow span{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;background:#e9ddff}
+.answer,.why{display:none}.btn-toggle{min-width:145px}.small-label{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4"><div class="container">
+<div class="small-label">Node.js + Express.js • Interview Preparation</div>
+<h1 class="display-5 fw-bold">Part 24 — API Architecture</h1>
+<p class="lead mb-0">MVC, controllers, services, repositories, dependency injection, configuration, errors, logging and scalable Express structure.</p>
+</div></header>
+
+<main class="container pb-5">
+<section class="mb-4"><div class="alert alert-info shadow-sm"><strong>Interview goal:</strong> Explain not only how an Express API works, but where each piece belongs, why responsibilities should be separated, and how the structure can grow without becoming difficult to maintain.</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What is API Architecture?</div><div class="card-body">
+<p><strong>What:</strong> API architecture is the way we organize routes, middleware, business logic, database access, errors, configuration and shared utilities.</p>
+<p><strong>Why:</strong> A small application can work with a few files. A large application needs clear boundaries so developers can change one part without breaking unrelated parts.</p>
+<p><strong>Layman example:</strong> Think of a restaurant. The waiter takes the order, the kitchen prepares it, the store provides ingredients, and the manager handles rules. One person should not do every job.</p>
+<div class="flow my-3"><span>Client</span> → <span>Middleware</span> → <span>Route</span> → <span>Controller</span> → <span>Service</span> → <span>Repository / Model</span> → <span>Database</span></div>
+<div class="alert alert-warning"><strong>Interview line:</strong> “A scalable API separates transport concerns from business logic, data access, configuration, and cross-cutting concerns such as logging and error handling.”</div>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. MVC — Model, View, Controller</div><div class="card-body">
+<p>In an API, MVC is commonly adapted because there may be no server-rendered View.</p>
+<ul>
+<li><strong>Model:</strong> Represents database data and data-access behavior.</li>
+<li><strong>Controller:</strong> Handles HTTP input and creates the HTTP response.</li>
+<li><strong>View:</strong> In a traditional web app, produces the UI. In a JSON API, the controller commonly returns JSON instead.</li>
+</ul>
+<div class="flow my-3"><span>Request</span> → <span>Controller</span> → <span>Model / Service</span> → <span>JSON Response</span></div>
+<div class="alert alert-info"><strong>Important:</strong> MVC is an architectural pattern, not a requirement that every Express project must follow exactly the same folder structure.</div>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">3. Controller Responsibility</div><div class="card-body">
+<p>A controller should mainly deal with HTTP concerns: reading params/body/query, calling the appropriate service, and sending a response.</p>
+<pre><code>// user.controller.js
+async function getUser(req, res, next) {
+  try {
+    const user = await userService.getUserById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ data: user });
+  } catch (err) {
+    next(err);
+  }
+}</code></pre>
+<p><strong>Avoid:</strong> putting large business rules and many database queries directly inside controllers.</p>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info">4. Service Layer</div><div class="card-body">
+<p>The service layer contains business rules and coordinates application operations.</p>
+<pre><code>// user.service.js
+async function registerUser(input, userRepository) {
+  const existing = await userRepository.findByEmail(input.email);
+
+  if (existing) {
+    throw new Error("Email already exists");
+  }
+
+  const hashedPassword = await hashPassword(input.password);
+
+  return userRepository.create({
+    ...input,
+    password: hashedPassword
+  });
+}</code></pre>
+<p><strong>Why:</strong> The same business operation may be used by more than one controller, job or other application entry point. Keeping it in a service reduces duplication.</p>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">5. Repository Pattern</div><div class="card-body">
+<p>A repository provides a focused interface for data access.</p>
+<pre><code>// user.repository.js
+const userRepository = {
+  findById(id) {
+    return User.findById(id);
+  },
+
+  findByEmail(email) {
+    return User.findOne({ email });
+  },
+
+  create(data) {
+    return User.create(data);
+  }
+};</code></pre>
+<div class="flow my-3"><span>Controller</span> → <span>Service</span> → <span>Repository</span> → <span>Database</span></div>
+<p><strong>Benefit:</strong> Database-specific code stays in one place. This can make testing and future data-access changes easier.</p>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning">6. Separation of Concerns</div><div class="card-body">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Layer</th><th>Main responsibility</th><th>Should avoid</th></tr></thead>
+<tbody>
+<tr><td>Route</td><td>Map HTTP path and method to handlers</td><td>Business logic</td></tr>
+<tr><td>Middleware</td><td>Cross-cutting/request processing</td><td>Unrelated database workflows</td></tr>
+<tr><td>Controller</td><td>HTTP input/output</td><td>Large business rules</td></tr>
+<tr><td>Service</td><td>Business logic</td><td>Express-specific response handling</td></tr>
+<tr><td>Repository</td><td>Data access</td><td>HTTP response logic</td></tr>
+<tr><td>Utility</td><td>Reusable generic helper</td><td>Hidden business workflows</td></tr>
+</tbody></table>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">7. Dependency Injection</div><div class="card-body">
+<p><strong>What:</strong> Dependency injection means giving a function or class the dependencies it needs instead of creating them internally.</p>
+<pre><code>function createUserService({ userRepository, passwordHasher }) {
+  return {
+    async register(input) {
+      const existing = await userRepository.findByEmail(input.email);
+
+      if (existing) {
+        throw new Error("Email already exists");
+      }
+
+      const password = await passwordHasher.hash(input.password);
+      return userRepository.create({ ...input, password });
+    }
+  };
+}
+
+const userService = createUserService({
+  userRepository,
+  passwordHasher
+});</code></pre>
+<p><strong>Layman example:</strong> Instead of a chef buying their own oven every time, the restaurant gives the chef an oven. The chef can now work with different ovens for testing or different environments.</p>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">8. Configuration Management</div><div class="card-body">
+<p>Configuration contains values that change between environments, such as database URLs, ports and external service settings.</p>
+<pre><code>// .env
+PORT=5000
+DATABASE_URL=...
+JWT_SECRET=...
+
+// config.js
+module.exports = {
+  port: Number(process.env.PORT) || 3000,
+  databaseUrl: process.env.DATABASE_URL,
+  jwtSecret: process.env.JWT_SECRET
+};</code></pre>
+<div class="alert alert-danger"><strong>Security:</strong> Do not commit real secrets to source control. Validate required environment variables when the application starts.</div>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">9. Scalable Folder Structure</div><div class="card-body">
+<pre><code>src/
+├── app.js
+├── server.js
+├── config/
+│   └── index.js
+├── routes/
+│   └── user.routes.js
+├── controllers/
+│   └── user.controller.js
+├── services/
+│   └── user.service.js
+├── repositories/
+│   └── user.repository.js
+├── models/
+│   └── user.model.js
+├── middleware/
+│   ├── auth.js
+│   └── error.js
+├── validators/
+│   └── user.validator.js
+├── utils/
+│   └── logger.js
+└── errors/
+    └── AppError.js</code></pre>
+<p>This is one possible structure. For very large systems, feature-based organization can also work well:</p>
+<pre><code>src/
+├── modules/
+│   ├── users/
+│   │   ├── user.routes.js
+│   │   ├── user.controller.js
+│   │   ├── user.service.js
+│   │   ├── user.repository.js
+│   │   └── user.model.js
+│   └── orders/
+│       ├── order.routes.js
+│       ├── order.controller.js
+│       └── ...</code></pre>
+<div class="alert alert-info"><strong>Interview point:</strong> Choose structure based on project size and team needs. The goal is discoverability and clear responsibility, not simply having many folders.</div>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">10. Error Architecture</div><div class="card-body">
+<pre><code>// AppError.js
+class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = true;
+  }
+}
+
+// service
+if (!user) {
+  throw new AppError("User not found", 404);
+}
+
+// global error middleware
+app.use((err, req, res, next) =&gt; {
+  const status = err.statusCode || 500;
+
+  res.status(status).json({
+    success: false,
+    message: err.isOperational
+      ? err.message
+      : "Internal server error"
+  });
+});</code></pre>
+<div class="flow my-3"><span>Route</span> → <span>Controller</span> → <span>Service throws</span> → <span>Error middleware</span> → <span>Consistent response</span></div>
+<p><strong>Production rule:</strong> Do not expose stack traces, secrets, database credentials or internal implementation details to API clients.</p>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info">11. API Response Architecture</div><div class="card-body">
+<p>A consistent response shape makes frontend and client code easier to maintain.</p>
+<pre><code>// success
+{
+  "success": true,
+  "data": {
+    "id": "123",
+    "name": "Sam"
+  }
+}
+
+// error
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": [
+    { "field": "email", "message": "Invalid email" }
+  ]
+}</code></pre>
+<p>There is no single universal response format. The important point is consistency across your API.</p>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">12. Logging Architecture</div><div class="card-body">
+<p>Logging records useful events for debugging, monitoring and incident investigation.</p>
+<pre><code>logger.info("User created", {
+  userId: user.id
+});
+
+logger.error("Database operation failed", {
+  operation: "findUser",
+  error: err.message
+});</code></pre>
+<ul><li>Use structured logs in larger systems.</li><li>Include request IDs/correlation IDs when possible.</li><li>Never log passwords, tokens or other sensitive secrets.</li></ul>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning">13. Code-Based Interview Questions</div><div class="card-body">
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q1. What architectural problem is shown here?</h5>
+<pre><code>app.post("/users", async (req, res) =&gt; {
+  const existing = await User.findOne({ email: req.body.email });
+
+  if (existing) {
+    return res.status(409).json({ message: "Already exists" });
+  }
+
+  const hash = await bcrypt.hash(req.body.password, 10);
+  const user = await User.create({
+    email: req.body.email,
+    password: hash
+  });
+
+  res.status(201).json(user);
+});</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a1')">Show Answer</button>
+<div id="a1" class="answer mt-3"><strong>Answer:</strong> The route contains routing, business logic, password processing, database access and response handling all in one place. Move business rules into a service and data access into a repository/model layer.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w1')">Show Why?</button>
+<div id="w1" class="why mt-2">This makes the route harder to test, reuse and maintain. Separation of concerns keeps each layer focused.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q2. What should the controller do here?</h5>
+<pre><code>async function createUser(req, res, next) {
+  try {
+    const user = await userService.createUser(req.body);
+    res.status(201).json({ data: user });
+  } catch (err) {
+    next(err);
+  }
+}</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a2')">Show Answer</button>
+<div id="a2" class="answer mt-3">Read HTTP input, call the service, choose the HTTP status/response shape, and forward errors. It should not contain the main business workflow.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w2')">Show Why?</button>
+<div id="w2" class="why mt-2">The controller is an HTTP adapter. Keeping it thin prevents business logic from becoming tightly coupled to Express.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q3. Why is this service easier to test?</h5>
+<pre><code>function createOrderService({ orderRepository, paymentService }) {
+  return {
+    async createOrder(input) {
+      const order = await orderRepository.create(input);
+      await paymentService.charge(order.total);
+      return order;
+    }
+  };
+}</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a3')">Show Answer</button>
+<div id="a3" class="answer mt-3">Its dependencies are supplied from outside. Tests can pass fake repository and payment implementations.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w3')">Show Why?</button>
+<div id="w3" class="why mt-2">This is dependency injection. The service does not create concrete dependencies itself, so tests can isolate business logic.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q4. What is the problem with this error middleware?</h5>
+<pre><code>app.use((err, req, res, next) =&gt; {
+  res.status(500).json({
+    error: err.stack
+  });
+});</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a4')">Show Answer</button>
+<div id="a4" class="answer mt-3">Returning <code>err.stack</code> to clients can expose internal implementation details. Use a safe production message and log the detailed error on the server.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w4')">Show Why?</button>
+<div id="w4" class="why mt-2">Stack traces may reveal file paths, library details and other information useful to attackers. Clients normally need a safe message, not internal debugging information.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q5. What is wrong with this configuration?</h5>
+<pre><code>const jwtSecret = "my-super-secret-key";
+const dbUrl = "mongodb://admin:password@server";</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a5')">Show Answer</button>
+<div id="a5" class="answer mt-3">Secrets and environment-specific configuration are hard-coded in source code. Use environment variables or a secure secret manager.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w5')">Show Why?</button>
+<div id="w5" class="why mt-2">Source code can be copied, logged or accidentally committed. Separating configuration from code reduces this risk and makes deployment configuration easier.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q6. Which layer should normally contain this rule?</h5>
+<pre><code>if (order.total &gt; 10000 && !user.isVerified) {
+  throw new AppError("Verification required", 403);
+}</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a6')">Show Answer</button>
+<div id="a6" class="answer mt-3">Usually the service/business layer, assuming this is an application business rule rather than a simple request validation rule.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w6')">Show Why?</button>
+<div id="w6" class="why mt-2">Business rules should not depend on one HTTP route. A service can be reused by other entry points while keeping the rule in one place.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q7. What does this repository abstraction provide?</h5>
+<pre><code>const userRepository = {
+  findById(id) {
+    return User.findById(id);
+  }
+};</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a7')">Show Answer</button>
+<div id="a7" class="answer mt-3">It gives the service a focused interface for user data access and keeps database-specific code outside the service.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w7')">Show Why?</button>
+<div id="w7" class="why mt-2">The service can depend on an interface-like contract rather than knowing every database detail. This can improve testing and maintainability.</div>
+</div>
+
+<div class="mb-4 p-3 border rounded">
+<h5>Q8. What is the better design for this route?</h5>
+<pre><code>// Design A
+router.get("/users/:id", async (req, res) =&gt; {
+  // 100 lines of validation,
+  // business logic and DB code
+});
+
+// Design B
+router.get("/users/:id", validateUserId, userController.getUser);</code></pre>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a8')">Show Answer</button>
+<div id="a8" class="answer mt-3">Design B is generally better. Keep validation in validation middleware, HTTP handling in the controller, business rules in the service, and data access in the repository/model layer.</div>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="toggle(this,'w8')">Show Why?</button>
+<div id="w8" class="why mt-2">It makes each part smaller and easier to test, reuse and change.</div>
+</div>
+
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">14. Common Developer Mistakes</div><div class="card-body">
+<ul>
+<li>Putting all logic inside route handlers.</li>
+<li>Making controllers responsible for database details and business rules.</li>
+<li>Creating a service layer that only renames repository methods without adding business value.</li>
+<li>Creating too many abstractions for a tiny application.</li>
+<li>Mixing configuration, secrets and business logic.</li>
+<li>Returning raw internal errors to clients.</li>
+<li>Logging passwords, JWTs or sensitive personal data.</li>
+<li>Making every helper a global utility even when it belongs to one feature.</li>
+<li>Using dependency injection as ceremony without a testing or design benefit.</li>
+<li>Choosing a folder structure by fashion instead of project needs.</li>
+</ul>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">15. Quick Recap</div><div class="card-body">
+<ul>
+<li><strong>Routes:</strong> map HTTP requests to handlers.</li>
+<li><strong>Middleware:</strong> handles cross-cutting request processing.</li>
+<li><strong>Controllers:</strong> handle HTTP input/output.</li>
+<li><strong>Services:</strong> contain business logic.</li>
+<li><strong>Repositories:</strong> isolate data access.</li>
+<li><strong>Models:</strong> represent database structures/access mechanisms.</li>
+<li><strong>Dependency injection:</strong> supplies dependencies from outside.</li>
+<li><strong>Configuration:</strong> keeps environment-specific values outside business code.</li>
+<li><strong>Error architecture:</strong> centralizes error conversion and safe responses.</li>
+<li><strong>Logging:</strong> records useful operational information without exposing secrets.</li>
+<li><strong>Scalable structure:</strong> grows by keeping responsibilities and boundaries clear.</li>
+</ul>
+</div></section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">16. Interview-Ready Questions</div><div class="card-body">
+<ol>
+<li>Why should controllers be thin?</li>
+<li>What is the difference between a controller and a service?</li>
+<li>When is the repository pattern useful?</li>
+<li>What is dependency injection and how does it help testing?</li>
+<li>How would you structure a large Express application?</li>
+<li>What belongs in middleware?</li>
+<li>How would you design centralized error handling?</li>
+<li>How should environment variables be managed?</li>
+<li>What should an API response architecture provide?</li>
+<li>How would you design logging for a production API?</li>
+<li>Would you always use MVC, repositories and dependency injection? Why or why not?</li>
+</ol>
+<div class="alert alert-success mb-0"><strong>Strong interview pattern:</strong> Define the concept → explain the problem it solves → show a small code example → explain where it belongs → mention a trade-off.</div>
+</div></section>
+</main>
+
+<script>
+function toggle(btn,id){
+ const el=document.getElementById(id), show=el.style.display!=="block";
+ el.style.display=show?"block":"none";
+ btn.textContent=show?(id[0]==="a"?"Hide Answer":"Hide Why?"):(id[0]==="a"?"Show Answer":"Show Why?");
+}
+</script>
+</body></html>

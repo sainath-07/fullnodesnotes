@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Developer Concepts Freshers Often Miss</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  html { scroll-behavior: smooth; }
+  body { background:#f5f7fb; color:#202733; }
+  .topbar { position:sticky; top:0; z-index:1030; }
+  .sidebar { position:sticky; top:70px; max-height:calc(100vh - 90px); overflow:auto; }
+  .nav-pills .nav-link { color:#344054; text-align:left; margin-bottom:4px; border-radius:10px; }
+  .nav-pills .nav-link:hover { background:#e9eef7; }
+  .nav-pills .nav-link.active { background:#0d6efd; color:#fff; }
+  .concept { scroll-margin-top:85px; margin-bottom:28px; }
+  .concept-card { border:0; border-radius:16px; overflow:hidden; box-shadow:0 5px 20px rgba(31,41,55,.08); }
+  .concept-header { padding:18px 22px; }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px; margin:18px 0; }
+  .flow-box { padding:12px 15px; border-radius:12px; background:#eef4ff; border:1px solid #cfe0ff; font-weight:600; text-align:center; min-width:130px; }
+  .arrow { font-size:22px; font-weight:700; color:#667085; }
+  .mini-flow { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:14px; }
+  code { color:#b42318; }
+  pre { background:#101828; color:#f8fafc; padding:16px; border-radius:12px; overflow:auto; }
+  .term { font-weight:700; }
+  .badge-soft { background:#eef2ff; color:#3730a3; }
+  .interview { border-left:4px solid #0d6efd; }
+  .mistake { border-left:4px solid #dc3545; }
+  .hero { background:linear-gradient(135deg,#0d6efd,#4f46e5); color:#fff; border-radius:18px; }
+  @media (max-width: 991px) { .sidebar { position:static; max-height:none; } }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark topbar shadow-sm">
+  <div class="container-fluid">
+    <span class="navbar-brand fw-bold">🚀 Developer Concepts Freshers Often Miss</span>
+    <span class="text-white-50 d-none d-md-inline">Practical concepts that make you sound production-ready</span>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <div class="hero p-4 p-lg-5 mb-4">
+    <h1 class="fw-bold">Things many fresh developers know by name — but don't know how to use</h1>
+    <p class="lead mb-2">A simple, visual guide to real-world frontend, backend and system concepts.</p>
+    <p class="mb-0">Focus on <strong>what it means → why we need it → how it works → where you see it in code → what to tell an interviewer.</strong></p>
+  </div>
+
+  <div class="row g-4">
+    <aside class="col-lg-3">
+      <div class="card sidebar shadow-sm border-0">
+        <div class="card-body">
+          <h6 class="fw-bold text-uppercase text-secondary">Quick Navigation</h6>
+          <div class="nav nav-pills flex-column">
+            <a class="nav-link active" href="#optimistic">1. Optimistic UI</a>
+            <a class="nav-link" href="#pessimistic">2. Pessimistic Update</a>
+            <a class="nav-link" href="#cache">3. Cache Invalidation</a>
+            <a class="nav-link" href="#debounce">4. Debounce</a>
+            <a class="nav-link" href="#throttle">5. Throttle</a>
+            <a class="nav-link" href="#race">6. Race Condition</a>
+            <a class="nav-link" href="#idempotency">7. Idempotency</a>
+            <a class="nav-link" href="#pagination">8. Pagination</a>
+            <a class="nav-link" href="#infinite">9. Infinite Scroll</a>
+            <a class="nav-link" href="#lazy">10. Lazy Loading</a>
+            <a class="nav-link" href="#code-splitting">11. Code Splitting</a>
+            <a class="nav-link" href="#memoization">12. Memoization</a>
+            <a class="nav-link" href="#stale">13. Stale Data</a>
+            <a class="nav-link" href="#retry">14. Retry & Backoff</a>
+            <a class="nav-link" href="#optimistic-lock">15. Optimistic Locking</a>
+            <a class="nav-link" href="#eventual">16. Eventual Consistency</a>
+            <a class="nav-link" href="#observability">17. Observability</a>
+            <a class="nav-link" href="#feature-flags">18. Feature Flags</a>
+            <a class="nav-link" href="#circuit">19. Circuit Breaker</a>
+            <a class="nav-link" href="#rate-limit">20. Rate Limiting</a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="col-lg-9">
+
+      <section id="optimistic" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-primary text-white">
+            <h2 class="h4 mb-1">1. Optimistic UI / Optimistic Update</h2>
+            <span class="badge bg-light text-primary">Very useful in React apps</span>
+          </div>
+          <div class="card-body">
+            <p><span class="term">Simple meaning:</span> Update the screen immediately, assuming the server request will succeed.</p>
+            <div class="alert alert-info"><strong>Example:</strong> User clicks Like. You immediately show ❤️ Liked instead of waiting for the API response.</div>
+            <div class="flow">
+              <div class="flow-box">User clicks Like</div><div class="arrow">→</div>
+              <div class="flow-box">UI shows ❤️</div><div class="arrow">→</div>
+              <div class="flow-box">API runs in background</div><div class="arrow">→</div>
+              <div class="flow-box">Server confirms</div>
+            </div>
+            <div class="mini-flow"><strong>If API fails:</strong> UI changes back → 🤍 Like. This is called <strong>rollback</strong>.</div>
+            <p class="mt-3"><strong>Important:</strong> The cache does not confirm the server. The client sends a mutation to the server. The local state/cache is updated optimistically, then reconciled with the server response or refetched.</p>
+            <pre><code>// Pseudo flow
+setLiked(true);             // instant UI update
+await api.likePost(id);     // server update
+// on failure → setLiked(false)</code></pre>
+            <div class="alert alert-success interview"><strong>Interview:</strong> “I use optimistic updates when the action is likely to succeed and the UI should feel instant. If the mutation fails, I rollback the local state and show an error.”</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pessimistic" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-secondary text-white"><h2 class="h4 mb-0">2. Pessimistic Update</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Wait for the server to succeed before changing the UI to the final state.</p>
+            <div class="flow">
+              <div class="flow-box">Click Like</div><div class="arrow">→</div>
+              <div class="flow-box">API request</div><div class="arrow">→</div>
+              <div class="flow-box">Server success</div><div class="arrow">→</div>
+              <div class="flow-box">Show ❤️</div>
+            </div>
+            <div class="alert alert-warning"><strong>Use when:</strong> You cannot safely assume success, or incorrect immediate UI would be risky.</div>
+            <p><strong>Optimistic vs Pessimistic:</strong> Optimistic = UI first. Pessimistic = server first.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="cache" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-success text-white"><h2 class="h4 mb-0">3. Cache Invalidation</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Tell the application that cached data may no longer be fresh.</p>
+            <div class="flow">
+              <div class="flow-box">Cached data</div><div class="arrow">→</div>
+              <div class="flow-box">Mutation happens</div><div class="arrow">→</div>
+              <div class="flow-box">Mark cache stale</div><div class="arrow">→</div>
+              <div class="flow-box">Refetch latest data</div>
+            </div>
+            <p><strong>Example:</strong> After creating a new todo, invalidate the todos query so the list can fetch the latest server data.</p>
+            <div class="alert alert-info">A useful phrase: <strong>“The cache is stale, so I need to reconcile it with the server.”</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="debounce" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-warning"><h2 class="h4 mb-0">4. Debounce</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Wait until the user stops triggering an event for a period of time.</p>
+            <div class="flow">
+              <div class="flow-box">R</div><div class="flow-box">Re</div><div class="flow-box">Rea</div><div class="flow-box">React</div>
+              <div class="arrow">→</div><div class="flow-box">wait 500ms</div><div class="arrow">→</div><div class="flow-box">API call</div>
+            </div>
+            <p><strong>Common use:</strong> Search boxes, autocomplete, validation.</p>
+            <p><strong>Key idea:</strong> Every new event resets the timer.</p>
+            <pre><code>clearTimeout(oldTimer);
+timer = setTimeout(() => {
+  searchAPI(value);
+}, 500);</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="throttle" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-warning"><h2 class="h4 mb-0">5. Throttle</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Allow an event to run at most once within a fixed time window.</p>
+            <div class="flow">
+              <div class="flow-box">Scroll scroll scroll scroll</div><div class="arrow">→</div>
+              <div class="flow-box">run at most once / 200ms</div><div class="arrow">→</div>
+              <div class="flow-box">handler</div>
+            </div>
+            <p><strong>Common use:</strong> Scroll, resize, mouse movement, continuous browser events.</p>
+            <div class="alert alert-secondary"><strong>Easy memory:</strong> Debounce = “wait until quiet.” Throttle = “limit the speed.”</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="race" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-danger text-white"><h2 class="h4 mb-0">6. Race Condition</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Multiple operations run at the same time, and the final result depends on which one finishes first.</p>
+            <div class="flow">
+              <div class="flow-box">Search A</div><div class="arrow">→</div><div class="flow-box">slow response</div>
+              <div class="flow-box">Search B</div><div class="arrow">→</div><div class="flow-box">fast response</div>
+            </div>
+            <div class="alert alert-danger"><strong>Problem:</strong> B may finish first and show correct data, then A may finish later and overwrite the UI with stale data.</div>
+            <p><strong>Common fix:</strong> Abort old requests, use a cancellation flag, request IDs, or a library that handles stale queries.</p>
+            <div class="alert alert-success interview"><strong>Interview:</strong> “Debouncing reduces how many requests start; race-condition handling decides which response is allowed to update the UI.”</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="idempotency" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-dark text-white"><h2 class="h4 mb-0">7. Idempotency</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Repeating the same operation produces the same intended final result.</p>
+            <div class="flow">
+              <div class="flow-box">Request #1</div><div class="arrow">→</div>
+              <div class="flow-box">Server result</div><div class="arrow">→</div>
+              <div class="flow-box">Retry request</div><div class="arrow">→</div>
+              <div class="flow-box">Same intended result</div>
+            </div>
+            <p><strong>Why it matters:</strong> Networks fail. A client may retry. Without idempotency, a payment or order operation could accidentally happen twice.</p>
+            <div class="alert alert-info"><strong>Common technique:</strong> Send an idempotency key so the server can recognize a repeated request.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pagination" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-info"><h2 class="h4 mb-0">8. Pagination</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Split a large dataset into smaller pages.</p>
+            <div class="flow">
+              <div class="flow-box">10,000 records</div><div class="arrow">→</div>
+              <div class="flow-box">Page 1: 20</div><div class="flow-box">Page 2: 20</div><div class="flow-box">Page 3: 20</div>
+            </div>
+            <p>It reduces the amount of data transferred and rendered at once.</p>
+            <p><strong>Types:</strong> Page-number pagination and cursor-based pagination. Cursor pagination is often useful for feeds where data changes frequently.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="infinite" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-info"><h2 class="h4 mb-0">9. Infinite Scroll</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Load the next batch automatically when the user gets near the bottom.</p>
+            <div class="flow">
+              <div class="flow-box">Load 20</div><div class="arrow">→</div>
+              <div class="flow-box">User scrolls</div><div class="arrow">→</div>
+              <div class="flow-box">Near bottom</div><div class="arrow">→</div>
+              <div class="flow-box">Load next 20</div>
+            </div>
+            <p><strong>Important:</strong> Usually combine it with pagination/cursors and a guard such as <code>isLoading</code> to avoid duplicate requests.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="lazy" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-primary text-white"><h2 class="h4 mb-0">10. Lazy Loading</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Do not load something until it is actually needed.</p>
+            <div class="flow">
+              <div class="flow-box">Initial page</div><div class="arrow">→</div>
+              <div class="flow-box">Load critical content</div><div class="arrow">→</div>
+              <div class="flow-box">User needs image/component</div><div class="arrow">→</div>
+              <div class="flow-box">Load it now</div>
+            </div>
+            <p><strong>Examples:</strong> Images below the fold, heavy React components, routes.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="code-splitting" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-primary text-white"><h2 class="h4 mb-0">11. Code Splitting</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Break one large JavaScript bundle into smaller chunks that can be loaded when needed.</p>
+            <div class="flow">
+              <div class="flow-box">Large app bundle</div><div class="arrow">→</div>
+              <div class="flow-box">Home chunk</div><div class="flow-box">Admin chunk</div><div class="flow-box">Reports chunk</div>
+            </div>
+            <p><strong>Benefit:</strong> Users do not need to download every part of a large application on the first page load.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="memoization" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-success text-white"><h2 class="h4 mb-0">12. Memoization</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Remember a previous computation so you can reuse the result instead of calculating it again.</p>
+            <pre><code>const result = expensiveFunction(input);
+// If input has not changed,
+// reuse the previous result.</code></pre>
+            <p>In React, <code>useMemo</code> caches a calculated value and <code>useCallback</code> caches a function reference.</p>
+            <div class="alert alert-warning">Memoization is not automatically a performance win. It also has a memory and comparison cost. Use it when it solves a real performance problem.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stale" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-secondary text-white"><h2 class="h4 mb-0">13. Stale Data</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Data in the UI/cache is older than the latest server state.</p>
+            <div class="flow">
+              <div class="flow-box">Server = 120 likes</div><div class="arrow">→</div>
+              <div class="flow-box">Browser cache = 119</div><div class="arrow">→</div>
+              <div class="flow-box">Cache is stale</div>
+            </div>
+            <p><strong>Related concepts:</strong> stale time, cache invalidation, refetching, revalidation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="retry" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-warning"><h2 class="h4 mb-0">14. Retry & Exponential Backoff</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> If a temporary request fails, try again after waiting.</p>
+            <div class="flow">
+              <div class="flow-box">Try 1</div><div class="arrow">→</div><div class="flow-box">wait 1s</div><div class="arrow">→</div>
+              <div class="flow-box">Try 2</div><div class="arrow">→</div><div class="flow-box">wait 2s</div><div class="arrow">→</div>
+              <div class="flow-box">Try 3</div>
+            </div>
+            <p>Exponential backoff increases the waiting time between retries. Add jitter in distributed systems to avoid many clients retrying at exactly the same time.</p>
+            <div class="alert alert-danger"><strong>Do not blindly retry everything.</strong> A permanent 400-style validation error usually should not be retried automatically.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="optimistic-lock" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-danger text-white"><h2 class="h4 mb-0">15. Optimistic Locking</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Detect whether someone else changed a record before you save your changes.</p>
+            <div class="flow">
+              <div class="flow-box">Read version 5</div><div class="arrow">→</div>
+              <div class="flow-box">Someone changes it → version 6</div><div class="arrow">→</div>
+              <div class="flow-box">Your update says “version 5”</div><div class="arrow">→</div>
+              <div class="flow-box">Reject / conflict</div>
+            </div>
+            <p><strong>Typical mechanism:</strong> version number or timestamp in the database. This is different from <strong>Optimistic UI</strong>: one is about user experience, the other is about concurrent data changes.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="eventual" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-dark text-white"><h2 class="h4 mb-0">16. Eventual Consistency</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Different parts of a distributed system may temporarily see different values, but they are expected to converge later.</p>
+            <div class="flow">
+              <div class="flow-box">Write succeeds</div><div class="arrow">→</div>
+              <div class="flow-box">Replica A updated</div><div class="arrow">→</div>
+              <div class="flow-box">Replica B catches up</div><div class="arrow">→</div>
+              <div class="flow-box">All converge</div>
+            </div>
+            <p>This concept becomes important when applications use replicas, caches, queues, or distributed services.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="observability" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-info"><h2 class="h4 mb-0">17. Observability</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> The ability to understand what is happening inside a running system from its external signals.</p>
+            <div class="flow">
+              <div class="flow-box">Logs</div><div class="flow-box">Metrics</div><div class="flow-box">Traces</div>
+              <div class="arrow">→</div><div class="flow-box">Understand system behavior</div>
+            </div>
+            <p><strong>Example:</strong> A user says checkout is slow. Logs show an error, metrics show high latency, and a trace shows which downstream service is slow.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="feature-flags" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-success text-white"><h2 class="h4 mb-0">18. Feature Flags</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Turn a feature on or off through configuration instead of deploying new code.</p>
+            <div class="flow">
+              <div class="flow-box">Code deployed</div><div class="arrow">→</div>
+              <div class="flow-box">Flag OFF</div><div class="arrow">→</div>
+              <div class="flow-box">Enable for 5% users</div><div class="arrow">→</div>
+              <div class="flow-box">Enable for everyone</div>
+            </div>
+            <p><strong>Uses:</strong> gradual rollout, A/B tests, emergency kill switches, unfinished features.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="circuit" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-danger text-white"><h2 class="h4 mb-0">19. Circuit Breaker</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Temporarily stop sending requests to a failing service instead of repeatedly hammering it.</p>
+            <div class="flow">
+              <div class="flow-box">Service failing</div><div class="arrow">→</div>
+              <div class="flow-box">Circuit opens</div><div class="arrow">→</div>
+              <div class="flow-box">Fast failure / fallback</div><div class="arrow">→</div>
+              <div class="flow-box">Test recovery</div>
+            </div>
+            <p>This helps prevent one unhealthy service from causing a chain reaction across a distributed system.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="rate-limit" class="concept">
+        <div class="card concept-card">
+          <div class="concept-header bg-secondary text-white"><h2 class="h4 mb-0">20. Rate Limiting</h2></div>
+          <div class="card-body">
+            <p><span class="term">Meaning:</span> Limit how many requests a client can make within a time period.</p>
+            <div class="flow">
+              <div class="flow-box">Client</div><div class="arrow">→</div>
+              <div class="flow-box">100 requests/min</div><div class="arrow">→</div>
+              <div class="flow-box">Allow</div>
+              <div class="flow-box">Too many</div><div class="arrow">→</div><div class="flow-box">429 / blocked</div>
+            </div>
+            <p><strong>Why:</strong> Protect APIs, control costs, prevent abuse, and keep services stable.</p>
+            <p><strong>Common algorithms:</strong> fixed window, sliding window, token bucket, leaky bucket.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card concept-card mb-4">
+        <div class="card-header bg-dark text-white"><h2 class="h4 mb-0">Quick Revision — Remember These Pairs</h2></div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead><tr><th>Concept</th><th>Easy memory</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Optimistic UI</strong></td><td>UI first, server confirmation later</td></tr>
+                <tr><td><strong>Pessimistic update</strong></td><td>Server first, UI final state later</td></tr>
+                <tr><td><strong>Cache invalidation</strong></td><td>Cached data may be stale</td></tr>
+                <tr><td><strong>Debounce</strong></td><td>Wait until events stop</td></tr>
+                <tr><td><strong>Throttle</strong></td><td>Limit how often an event runs</td></tr>
+                <tr><td><strong>Race condition</strong></td><td>Order of completion changes the result</td></tr>
+                <tr><td><strong>Idempotency</strong></td><td>Safe to repeat the same request</td></tr>
+                <tr><td><strong>Lazy loading</strong></td><td>Load only when needed</td></tr>
+                <tr><td><strong>Memoization</strong></td><td>Remember previous computation</td></tr>
+                <tr><td><strong>Rate limiting</strong></td><td>Control request frequency</td></tr>
+                <tr><td><strong>Feature flag</strong></td><td>Control feature without redeploying</td></tr>
+                <tr><td><strong>Circuit breaker</strong></td><td>Stop calling a failing dependency temporarily</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="alert alert-primary mb-0"><strong>Freshers' tip:</strong> You do not need to memorize every definition. Learn the problem each concept solves. In interviews, explain the problem first, then the technique.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Highlight the current topic in the left navigation.
+  const links = [...document.querySelectorAll('.nav-pills .nav-link')];
+  const sections = [...document.querySelectorAll('main section[id]')];
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(link => link.classList.toggle(
+          'active',
+          link.getAttribute('href') === '#' + entry.target.id
+        ));
+      }
+    });
+  }, { rootMargin: '-20% 0px -65% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>

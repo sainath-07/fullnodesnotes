@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 15 — Express Routing</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}.hero{background:linear-gradient(135deg,#0f172a,#0d6efd,#198754);color:#fff;border-radius:18px}
+.card,.topic{border:0;border-radius:14px}.card{overflow:hidden}.card-header{font-weight:700}
+.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+code{color:#b42318}.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}
+.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}
+.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}.answer{display:none;margin-top:15px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:10px;padding:15px}
+.endpoint{font-family:monospace;font-weight:700}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 15</span>
+<h1 class="display-6 fw-bold">🟢 Part 15 — Express Routing ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how Express decides which code should handle each HTTP request, how to organize routes, and how route parameters, query parameters, middleware, routers, and 404 handling work.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What is Express Routing?</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Routing</strong> means deciding which function should run for a particular HTTP method and URL path.</p>
+<div class="flow">Client
+  ↓
+GET /users/25?active=true
+  ↓
+Express
+  ↓
+HTTP method + path matching
+  ↓
+Matching route
+  ↓
+Middleware
+  ↓
+Route handler
+  ↓
+Response</div>
+<h5>Layman example</h5>
+<p>Think of a large office. The URL is like a department address. The HTTP method tells the receptionist what the visitor wants to do. Routing sends the visitor to the correct department.</p>
+<div class="interview"><strong>Interview-ready:</strong> “Express routing maps an HTTP method and URL path to one or more handler functions.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. Route Definitions</div>
+<div class="card-body">
+<div class="topic">
+<p>The basic pattern is:</p>
+<pre><code>app.METHOD(PATH, HANDLER);</code></pre>
+<p>Examples:</p>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  res.send("All users");
+});
+
+app.post("/users", (req, res) =&gt; {
+  res.send("Create user");
+});
+
+app.delete("/users/:id", (req, res) =&gt; {
+  res.send("Delete user");
+});</code></pre>
+<div class="tip"><strong>Remember:</strong> Express considers both the HTTP method and the path when matching a normal route.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">3. Route Parameters</div>
+<div class="card-body">
+<div class="topic">
+<p>A <strong>route parameter</strong> is a dynamic part of the URL path.</p>
+<pre><code>app.get("/users/:id", (req, res) =&gt; {
+  console.log(req.params.id);
+  res.send(`User ID: ${req.params.id}`);
+});</code></pre>
+<p>Request:</p>
+<div class="alert alert-secondary endpoint">GET /users/25</div>
+<p>Then:</p>
+<pre><code>req.params.id // "25"</code></pre>
+<div class="flow">/users/:id
+     ↓
+/users/25
+     ↓
+req.params.id
+     ↓
+"25"</div>
+<p>Route parameters are useful when the value identifies a resource.</p>
+<div class="interview"><strong>Interview line:</strong> “Route parameters are values embedded in the URL path and are accessed through req.params.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">4. Multiple Route Parameters</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>app.get("/users/:userId/orders/:orderId", (req, res) =&gt; {
+  res.json({
+    userId: req.params.userId,
+    orderId: req.params.orderId
+  });
+});</code></pre>
+<p>For <code>/users/10/orders/500</code>:</p>
+<pre><code>req.params.userId  // "10"
+req.params.orderId // "500"</code></pre>
+<div class="tip">Route parameter values arrive as strings. Convert them when your application needs a number.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">5. Query Parameters</div>
+<div class="card-body">
+<div class="topic">
+<p>Query parameters come after <code>?</code> in the URL. They are commonly used for filtering, searching, sorting, and pagination.</p>
+<pre><code>app.get("/products", (req, res) =&gt; {
+  console.log(req.query);
+  res.json(req.query);
+});</code></pre>
+<p>Request:</p>
+<div class="alert alert-secondary endpoint">GET /products?category=phone&page=2</div>
+<p>Example:</p>
+<pre><code>req.query.category // "phone"
+req.query.page     // "2"</code></pre>
+<div class="flow">/products?category=phone&page=2
+             ↓
+          req.query
+             ↓
+  { category, page }</div>
+<div class="interview"><strong>Difference:</strong> <code>req.params</code> reads path parameters such as <code>/users/25</code>; <code>req.query</code> reads query parameters such as <code>/users?page=2</code>.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">6. Request Body</div>
+<div class="card-body">
+<div class="topic">
+<p>The request body contains data sent by the client, commonly with POST, PUT, or PATCH.</p>
+<pre><code>const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+app.post("/users", (req, res) =&gt; {
+  console.log(req.body);
+
+  res.status(201).json({
+    message: "User created",
+    data: req.body
+  });
+});</code></pre>
+<div class="flow">Client
+  ↓
+POST /users
+  ↓
+JSON body
+  ↓
+express.json()
+  ↓
+req.body
+  ↓
+route handler</div>
+<div class="warn"><strong>Common mistake:</strong> Forgetting <code>express.json()</code> when expecting JSON request bodies can leave <code>req.body</code> unavailable for that content type.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">7. Route Matching</div>
+<div class="card-body">
+<div class="topic">
+<p>Express compares the incoming request against registered routes. For normal routes, the HTTP method and path must match the route.</p>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  res.send("Users");
+});
+
+app.get("/products", (req, res) =&gt; {
+  res.send("Products");
+});</code></pre>
+<div class="flow">GET /users
+   ↓
+matches /users
+   ↓
+Users handler
+
+GET /products
+   ↓
+matches /products
+   ↓
+Products handler</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">8. Route Order — Very Important</div>
+<div class="card-body">
+<div class="topic">
+<p>Route order matters because an earlier matching route can handle the request before a later route gets a chance.</p>
+<pre><code>app.get("/users/:id", (req, res) =&gt; {
+  res.send(`Dynamic user: ${req.params.id}`);
+});
+
+app.get("/users/admin", (req, res) =&gt; {
+  res.send("Admin user");
+});</code></pre>
+<p>A request to <code>/users/admin</code> can be matched by the dynamic route first, depending on the route definitions.</p>
+<div class="flow">GET /users/admin
+       ↓
+/users/:id matches
+       ↓
+dynamic handler runs
+       X
+/admin route is not reached</div>
+<div class="tip"><strong>Best practice:</strong> Put specific routes before broader dynamic routes when route patterns can overlap.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">9. Route Handlers</div>
+<div class="card-body">
+<div class="topic">
+<p>A route handler is the function that processes a matching request.</p>
+<pre><code>app.get("/profile", (req, res) =&gt; {
+  res.json({
+    name: "Sam"
+  });
+});</code></pre>
+<p>The <code>(req, res) =&gt; { ... }</code> function is the route handler.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">10. Multiple Route Handlers</div>
+<div class="card-body">
+<div class="topic">
+<p>Express allows multiple handlers for one route. A handler can finish the request or call <code>next()</code> to continue.</p>
+<pre><code>app.get(
+  "/users",
+  (req, res, next) =&gt; {
+    console.log("First handler");
+    next();
+  },
+  (req, res) =&gt; {
+    res.send("Second handler");
+  }
+);</code></pre>
+<div class="flow">Request
+  ↓
+Handler 1
+  ↓ next()
+Handler 2
+  ↓
+Response</div>
+<div class="warn"><strong>Common mistake:</strong> Calling <code>next()</code> after already sending a response can cause confusing behavior or errors. A handler should either complete the response or intentionally pass control onward.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">11. next()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>next()</code> passes control to the next matching middleware or handler.</p>
+<pre><code>app.get("/dashboard", (req, res, next) =&gt; {
+  console.log("Checking request");
+  next();
+});
+
+app.get("/dashboard", (req, res) =&gt; {
+  res.send("Dashboard");
+});</code></pre>
+<div class="flow">GET /dashboard
+      ↓
+first handler
+      ↓ next()
+second handler
+      ↓
+response</div>
+<p>For errors, Express uses <code>next(error)</code> to pass an error to error-handling middleware.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">12. Route-Specific Middleware</div>
+<div class="card-body">
+<div class="topic">
+<p>Middleware can be applied only to selected routes.</p>
+<pre><code>function checkAuth(req, res, next) {
+  const loggedIn = true;
+
+  if (!loggedIn) {
+    return res.status(401).json({
+      message: "Login required"
+    });
+  }
+
+  next();
+}
+
+app.get("/profile", checkAuth, (req, res) =&gt; {
+  res.send("Private profile");
+});</code></pre>
+<div class="flow">GET /profile
+      ↓
+checkAuth
+   ┌──┴──┐
+fail   pass
+ ↓       ↓
+401    next()
+         ↓
+     handler
+         ↓
+      response</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">13. express.Router()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>express.Router()</code> creates a small, independent routing object. It helps organize routes into separate files or modules.</p>
+<pre><code>const express = require("express");
+const router = express.Router();
+
+router.get("/", (req, res) =&gt; {
+  res.send("All users");
+});
+
+router.get("/:id", (req, res) =&gt; {
+  res.send(`User ${req.params.id}`);
+});
+
+module.exports = router;</code></pre>
+<p>Then mount it:</p>
+<pre><code>const userRouter = require("./routes/users");
+
+app.use("/users", userRouter);</code></pre>
+<div class="flow">GET /users
+      ↓
+app.use("/users", userRouter)
+      ↓
+userRouter.get("/")
+      ↓
+handler
+
+GET /users/25
+      ↓
+userRouter.get("/:id")
+      ↓
+handler</div>
+<div class="interview"><strong>Interview-ready:</strong> “express.Router() creates a modular routing system so related routes can be grouped and mounted under a common path.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">14. Router-Level Middleware</div>
+<div class="card-body">
+<div class="topic">
+<p>Router-level middleware is attached to a router instead of the whole application.</p>
+<pre><code>const router = express.Router();
+
+router.use((req, res, next) =&gt; {
+  console.log("Users router middleware");
+  next();
+});
+
+router.get("/", (req, res) =&gt; {
+  res.send("Users");
+});</code></pre>
+<div class="flow">/users request
+     ↓
+users router
+     ↓
+router middleware
+     ↓ next()
+route
+     ↓
+response</div>
+<p>This is useful when several related routes need the same middleware.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">15. Nested Routers</div>
+<div class="card-body">
+<div class="topic">
+<p>Routers can be mounted under other routers or path structures to represent related resources.</p>
+<pre><code>// users.js
+const router = express.Router();
+
+router.use("/:userId/orders", orderRouter);
+
+module.exports = router;</code></pre>
+<p>Conceptually:</p>
+<div class="flow">/users/10/orders
+       ↓
+users router
+       ↓
+userId = 10
+       ↓
+orders router</div>
+<p>For nested parameters, pay attention to how parameters are made available across routers. In common Express setups, <code>mergeParams: true</code> can be used when a child router needs parent router parameters.</p>
+<pre><code>const router = express.Router({
+  mergeParams: true
+});</code></pre>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">16. RESTful Routes</div>
+<div class="card-body">
+<div class="topic">
+<p>A REST-style API commonly represents resources using URLs and HTTP methods.</p>
+<table class="table table-bordered align-middle">
+<thead><tr><th>Method</th><th>Example</th><th>Common meaning</th></tr></thead>
+<tbody>
+<tr><td>GET</td><td>/users</td><td>Read collection</td></tr>
+<tr><td>GET</td><td>/users/10</td><td>Read one user</td></tr>
+<tr><td>POST</td><td>/users</td><td>Create user</td></tr>
+<tr><td>PUT</td><td>/users/10</td><td>Replace/update resource</td></tr>
+<tr><td>PATCH</td><td>/users/10</td><td>Partially update</td></tr>
+<tr><td>DELETE</td><td>/users/10</td><td>Delete user</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>Good REST style:</strong> Prefer resource-oriented paths such as <code>/users/10</code> rather than action-heavy paths such as <code>/getUserById</code>, while remembering that real APIs can have valid variations.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">17. Dynamic Routes</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>app.get("/products/:id", (req, res) =&gt; {
+  res.json({
+    productId: req.params.id
+  });
+});</code></pre>
+<p>Any value in the <code>:id</code> position can match the route.</p>
+<div class="flow">/products/10  → id = "10"
+ /products/25 → id = "25"
+ /products/99 → id = "99"</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">18. Optional Parameters</div>
+<div class="card-body">
+<div class="topic">
+<p>Optional route parameter syntax has changed across Express versions. In modern Express routing, do not blindly copy older examples using <code>?</code> without checking the version's routing syntax.</p>
+<p>A simple and usually clearer design is to use separate routes when a segment is optional:</p>
+<pre><code>app.get("/users", handler);
+app.get("/users/:id", handler);</code></pre>
+<div class="tip"><strong>Interview point:</strong> Explain the concept of an optional route segment, but mention that the exact pattern syntax depends on the Express version and its underlying path matching behavior.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">19. Wildcard Routes</div>
+<div class="card-body">
+<div class="topic">
+<p>A wildcard route is used when you want a route pattern to catch paths that were not handled by more specific routes. Exact wildcard syntax can vary with Express's routing matcher/version.</p>
+<p>A common conceptual 404 pattern is to place a final fallback after all normal routes:</p>
+<pre><code>app.use((req, res) =&gt; {
+  res.status(404).json({
+    message: "Route not found"
+  });
+});</code></pre>
+<div class="flow">Request
+  ↓
+Route 1? ─ no
+  ↓
+Route 2? ─ no
+  ↓
+Route 3? ─ no
+  ↓
+Final 404 handler
+  ↓
+404 response</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">20. 404 Routes</div>
+<div class="card-body">
+<div class="topic">
+<p>A 404 handler is normally placed after the application's valid routes so it acts as a fallback.</p>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  res.json([]);
+});
+
+app.use((req, res) =&gt; {
+  res.status(404).json({
+    message: "Endpoint not found"
+  });
+});</code></pre>
+<div class="warn"><strong>Important:</strong> If the 404 handler is registered too early, it can prevent valid routes below it from being reached.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">21. Route Organization</div>
+<div class="card-body">
+<div class="topic">
+<p>As an application grows, putting every route in <code>app.js</code> becomes difficult to maintain. Use routers to group related resources.</p>
+<pre><code>project/
+├── app.js
+├── routes/
+│   ├── users.js
+│   ├── products.js
+│   └── orders.js
+├── controllers/
+│   ├── userController.js
+│   ├── productController.js
+│   └── orderController.js
+└── middleware/
+    └── auth.js</code></pre>
+<p>Example:</p>
+<pre><code>// app.js
+const userRouter = require("./routes/users");
+const productRouter = require("./routes/products");
+
+app.use("/users", userRouter);
+app.use("/products", productRouter);</code></pre>
+<div class="interview"><strong>Interview tip:</strong> Separate routing from business logic as applications grow. Routers define request paths, while controllers/services can contain the application logic.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">22. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Putting a dynamic route such as <code>/:id</code> before a more specific route such as <code>/admin</code>.</li>
+<li>Confusing <code>req.params</code> with <code>req.query</code>.</li>
+<li>Forgetting <code>express.json()</code> when expecting JSON request bodies.</li>
+<li>Calling <code>next()</code> after sending a response.</li>
+<li>Creating a middleware that neither calls <code>next()</code> nor sends a response.</li>
+<li>Registering a 404 handler before valid routes.</li>
+<li>Putting all application routes into one very large file.</li>
+<li>Forgetting to mount an <code>express.Router()</code>.</li>
+<li>Using inconsistent REST resource names.</li>
+<li>Assuming route parameter values are automatically numbers.</li>
+<li>Copying old wildcard/optional-parameter syntax without checking the Express version.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">23. Interview Questions — Click to Show / Hide Answer + Why ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="topic">
+<h5>Q1. What is routing in Express?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Routing maps an HTTP method and URL path to one or more handler functions.<br><br><strong>Why?</strong> It tells Express which application code should handle a request.</div>
+</div>
+
+<div class="topic">
+<h5>Q2. What is the difference between req.params and req.query?</h5>
+<pre><code>GET /users/25?page=2</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>req.params.id</code> would contain <code>"25"</code> if the route is <code>/users/:id</code>. <code>req.query.page</code> contains <code>"2"</code>.<br><br><strong>Why?</strong> Params are part of the path; query values are after the <code>?</code>.</div>
+</div>
+
+<div class="topic">
+<h5>Q3. What does next() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It passes control to the next matching middleware or handler.<br><br><strong>Why?</strong> Express middleware uses next() to create a processing chain.</div>
+</div>
+
+<div class="topic">
+<h5>Q4. What happens if middleware does not call next() and does not send a response?</h5>
+<pre><code>app.get("/test", (req, res, next) =&gt; {
+  console.log("Hello");
+});</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The request can remain pending because the middleware neither completed the response nor passed control onward.<br><br><strong>Why?</strong> Express needs the middleware chain to continue or the response to be completed.</div>
+</div>
+
+<div class="topic">
+<h5>Q5. Predict the result.</h5>
+<pre><code>app.get("/users/:id", (req, res) =&gt; {
+  res.send(`Dynamic: ${req.params.id}`);
+});
+
+app.get("/users/admin", (req, res) =&gt; {
+  res.send("Admin");
+});</code>
+<p>Request: <code>GET /users/admin</code></p>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The first route can handle the request, producing <code>Dynamic: admin</code>.<br><br><strong>Why?</strong> The dynamic route is registered before the specific route and can match the path. Route order matters.</div>
+</div>
+
+<div class="topic">
+<h5>Q6. How would you fix Q5?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Put the specific route before the dynamic route.<br><br><pre><code>app.get("/users/admin", adminHandler);
+app.get("/users/:id", userHandler);</code></pre><strong>Why?</strong> The specific route gets the first chance to match.</div>
+</div>
+
+<div class="topic">
+<h5>Q7. What is express.Router()?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It creates a modular router object that can hold related routes and middleware.<br><br><strong>Why?</strong> It keeps large Express applications organized and easier to maintain.</div>
+</div>
+
+<div class="topic">
+<h5>Q8. What is route-level middleware?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Middleware applied to a particular route or group of routes.<br><br><strong>Why?</strong> It is useful for checks such as authentication, validation, or logging only where needed.</div>
+</div>
+
+<div class="topic">
+<h5>Q9. Where should a 404 handler normally be placed?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> After all valid routes and route middleware that should get a chance to handle the request.<br><br><strong>Why?</strong> It acts as the final fallback when no previous route matched.</div>
+</div>
+
+<div class="topic">
+<h5>Q10. What is a RESTful route for getting user 25?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>GET /users/25</code>.<br><br><strong>Why?</strong> The URL identifies the user resource and GET expresses retrieval.</div>
+</div>
+
+<div class="topic">
+<h5>Q11. What is the difference between /users/:id and /users?id=25?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> In <code>/users/:id</code>, 25 is a route parameter accessed through <code>req.params.id</code>. In <code>/users?id=25</code>, 25 is a query parameter accessed through <code>req.query.id</code>.<br><br><strong>Why?</strong> They represent different URL structures and are commonly used for different API purposes.</div>
+</div>
+
+<div class="topic">
+<h5>Q12. What happens here?</h5>
+<pre><code>app.use((req, res) =&gt; {
+  res.status(404).send("Not found");
+});
+
+app.get("/users", (req, res) =&gt; {
+  res.send("Users");
+});</code></pre>
+<p>Request: <code>GET /users</code></p>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The first middleware can send the 404 response before the /users route is reached.<br><br><strong>Why?</strong> The fallback was registered before the valid route. Middleware and route order matters.</div>
+</div>
+
+<div class="topic">
+<h5>Q13. What does this print?</h5>
+<pre><code>app.get("/users/:id", (req, res) =&gt; {
+  console.log(typeof req.params.id);
+  res.send("OK");
+});</code></pre>
+<p>Request: <code>GET /users/25</code></p>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It prints <code>"string"</code>.<br><br><strong>Why?</strong> URL path parameters are provided as strings. Convert them explicitly if numeric behavior is required.</div>
+</div>
+
+<div class="topic">
+<h5>Q14. What is the output?</h5>
+<pre><code>app.get("/test", (req, res, next) =&gt; {
+  console.log("A");
+  next();
+});
+
+app.get("/test", (req, res) =&gt; {
+  console.log("B");
+  res.send("Done");
+});</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Console output is <code>A</code> followed by <code>B</code>, and the client receives <code>Done</code>.<br><br><strong>Why?</strong> The first handler calls next(), allowing the next matching handler to run.</div>
+</div>
+
+<div class="topic">
+<h5>Q15. Find the bug.</h5>
+<pre><code>app.get("/profile", checkAuth, (req, res) =&gt; {
+  res.json({ ok: true });
+});
+
+function checkAuth(req, res, next) {
+  if (!req.headers.authorization) {
+    res.status(401).json({ message: "Login required" });
+  }
+  next();
+}</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> After sending the 401 response, the middleware still calls next().<br><br><strong>Why?</strong> It can allow the protected handler to run after the response has already been sent. Fix it with <code>return res.status(401).json(...)</code>.</div>
+</div>
+
+<div class="topic">
+<h5>Q16. Why use nested routers?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> They help represent related resources and keep route modules organized.<br><br><strong>Why?</strong> A large API becomes easier to understand when related routes are grouped by resource.</div>
+</div>
+
+<div class="topic">
+<h5>Q17. What is router-level middleware?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Middleware registered on an Express Router, usually with <code>router.use()</code> or on specific router routes.<br><br><strong>Why?</strong> It applies common behavior to a particular route group instead of the whole application.</div>
+</div>
+
+<div class="topic">
+<h5>Q18. How do you organize Express routes in a larger project?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Create resource-specific router files such as users.js, products.js, and orders.js, then mount them in the main application.<br><br><strong>Why?</strong> It reduces one huge routing file and improves maintainability.</div>
+</div>
+
+<div class="topic">
+<h5>Q19. Why is this route order risky?</h5>
+<pre><code>app.get("/:page", pageHandler);
+app.get("/login", loginHandler);</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The dynamic route can match <code>/login</code> first.<br><br><strong>Why?</strong> A single dynamic path segment is broader than the specific /login route.</div>
+</div>
+
+<div class="topic">
+<h5>Q20. Explain the full Express routing lifecycle.</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Client sends request → Express receives it → application/router middleware runs → Express checks route method/path → route-specific middleware runs → handler executes → response is sent. If no route handles it, the request can reach a final 404 handler.<br><br><strong>Why?</strong> This mental model helps debug route ordering, middleware, parameters, and missing endpoints.</div>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">24. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>Routing</strong><br>Maps method + path to handlers.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>req.params</strong><br>Reads path parameters.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>req.query</strong><br>Reads query parameters.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>req.body</strong><br>Reads request body after suitable parsing middleware.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>next()</strong><br>Passes control onward.</div></div>
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>express.Router()</strong><br>Creates modular routes.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Route order</strong><br>Earlier matching routes matter.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>404</strong><br>Usually final fallback.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>RESTful routes</strong><br>Use resources + HTTP methods.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">25. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ul>
+<li>Explain Express routing.</li>
+<li>Explain route parameters vs query parameters.</li>
+<li>Explain request body and JSON parsing.</li>
+<li>Explain route matching and route order.</li>
+<li>Explain <code>next()</code>.</li>
+<li>Explain multiple route handlers.</li>
+<li>Explain route-specific middleware.</li>
+<li>Explain router-level middleware.</li>
+<li>Explain <code>express.Router()</code>.</li>
+<li>Explain nested routers.</li>
+<li>Design RESTful routes for users/products/orders.</li>
+<li>Explain dynamic routes.</li>
+<li>Explain optional route concepts and version-dependent syntax.</li>
+<li>Explain wildcard/fallback routes.</li>
+<li>Explain 404 handling.</li>
+<li>Explain route organization in a production application.</li>
+<li>Debug a route-order bug.</li>
+<li>Debug middleware that does not call next() or send a response.</li>
+</ul>
+<div class="interview"><strong>Strong interview summary:</strong><br>
+“Express routing maps HTTP methods and paths to handlers. Dynamic values are available through req.params, query-string values through req.query, and request data through req.body after the appropriate parsing middleware. Middleware can run globally, at router level, or for specific routes, and next() passes control to the next function. express.Router() helps split routes into modules. Route order matters, and a final 404 handler is commonly placed after valid routes.”</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">26. Final Visual Map</div>
+<div class="card-body">
+<div class="topic">
+<div class="flow">CLIENT
+  │
+  │ GET /users/25?page=2
+  ↓
+EXPRESS APP
+  ↓
+App / Router Middleware
+  ↓
+Method + Path Matching
+  ↓
+Route: /users/:id
+  ↓
+Route Middleware
+  ↓
+Handler
+  ├── req.params.id = "25"
+  ├── req.query.page = "2"
+  └── req.body = request data, if applicable
+  ↓
+Response
+  ↓
+CLIENT
+
+If no route matches
+  ↓
+Final 404 handler
+  ↓
+404 Response</div>
+</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 15 — Express Routing • Interview Preparation
+</footer>
+</div>
+
+<script>
+function toggle(btn){
+  const answer=btn.nextElementSibling;
+  const hidden=getComputedStyle(answer).display==="none";
+  answer.style.display=hidden?"block":"none";
+  btn.textContent=hidden?"Hide Answer":"Show Answer";
+}
+</script>
+</body>
+</html>

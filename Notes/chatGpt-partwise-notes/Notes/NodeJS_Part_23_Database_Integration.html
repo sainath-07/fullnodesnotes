@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 23 — Database Integration</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff;padding:44px 0}
+.card-doc{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.card-header{font-weight:700;padding:16px 20px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto;font-size:.9rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:18px 0}
+.flow .box{padding:12px 16px;border-radius:10px;background:#e8f0fe;border:1px solid #b8ccf5;font-weight:600}
+.arrow{font-size:22px;font-weight:bold}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.answer{display:none}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="container">
+<h1>🟢 Part 23 — Database Integration ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how a Node.js application connects to MongoDB or SQL databases, performs async operations, handles errors, validates data and manages transactions.</p>
+</div>
+</header>
+
+<main class="container py-4">
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">1. What is Database Integration?</div>
+<div class="card-body">
+<p><strong>What:</strong> Database integration means connecting your Node.js application to a database so the application can store, read, update and delete data.</p>
+<p><strong>Why:</strong> Application data should normally survive after the Node.js process stops. A database provides persistent storage.</p>
+<p><strong>Layman example:</strong> A food delivery app needs to remember users, restaurants, products, orders and payments. The database acts like the application's organized storage room.</p>
+<div class="flow">
+<div class="box">Client</div><div class="arrow">→</div>
+<div class="box">Express API</div><div class="arrow">→</div>
+<div class="box">Database Layer</div><div class="arrow">→</div>
+<div class="box">MongoDB / SQL</div><div class="arrow">→</div>
+<div class="box">Result</div>
+</div>
+<div class="alert alert-info"><strong>Interview line:</strong> Node.js database operations are usually asynchronous, so the application can continue handling other work while the database operation is in progress.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">2. MongoDB</div>
+<div class="card-body">
+<p><strong>What:</strong> MongoDB is a NoSQL document database. It stores data as BSON documents that are similar in shape to JSON objects.</p>
+<p><strong>When to use:</strong> It is useful when document-shaped data, flexible schemas or fast development are important.</p>
+<div class="code">{
+  "_id": "...",
+  "name": "Laptop",
+  "price": 50000,
+  "category": "electronics"
+}</div>
+<p class="mt-3"><strong>Important:</strong> MongoDB does support schema validation features, but MongoDB itself is not the same thing as Mongoose schemas.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">3. MongoDB Connection</div>
+<div class="card-body">
+<p>A Node.js application normally creates a database connection during startup and reuses that connection instead of opening a brand-new connection for every request.</p>
+<div class="code">const mongoose = require("mongoose");
+
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("Database connection failed", error);
+    process.exit(1);
+  }
+}</div>
+<div class="flow">
+<div class="box">Start app</div><div class="arrow">→</div>
+<div class="box">Read DB URL</div><div class="arrow">→</div>
+<div class="box">Connect</div><div class="arrow">→</div>
+<div class="box">Ready for requests</div>
+</div>
+<div class="warn"><strong>Common mistake:</strong> Starting the server as if the database is ready without deciding how startup should behave when the initial connection fails.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">4. Mongoose</div>
+<div class="card-body">
+<p><strong>What:</strong> Mongoose is an ODM (Object Data Modeling) library for MongoDB and Node.js.</p>
+<p><strong>Purpose:</strong> It gives your application models, schemas, validation, middleware, queries and other helpful abstractions.</p>
+<div class="tip"><strong>Easy way to remember:</strong> MongoDB is the database. Mongoose is a Node.js library that provides a structured way to work with MongoDB.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">5. Schema and Model</div>
+<div class="card-body">
+<p><strong>Schema:</strong> Describes the structure and rules for documents handled by a Mongoose model.</p>
+<p><strong>Model:</strong> A constructor created from a schema that you use to create and query documents.</p>
+<div class="code">const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  age: {
+    type: Number,
+    min: 18
+  }
+});
+
+const User = mongoose.model("User", userSchema);</div>
+<div class="flow"><div class="box">Schema</div><div class="arrow">→</div><div class="box">Model</div><div class="arrow">→</div><div class="box">MongoDB documents</div></div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">6. MongoDB CRUD</div>
+<div class="card-body">
+<div class="table-responsive"><table class="table table-bordered">
+<thead><tr><th>Operation</th><th>Mongoose example</th></tr></thead>
+<tbody>
+<tr><td>Create</td><td><code>User.create(data)</code></td></tr>
+<tr><td>Read</td><td><code>User.find()</code>, <code>User.findById(id)</code></td></tr>
+<tr><td>Update</td><td><code>User.findByIdAndUpdate(id, data)</code></td></tr>
+<tr><td>Delete</td><td><code>User.findByIdAndDelete(id)</code></td></tr>
+</tbody></table></div>
+<div class="code">const user = await User.create({
+  name: "Sam",
+  email: "sam@example.com",
+  age: 25
+});
+
+const users = await User.find({ age: { $gte: 18 } });
+
+await User.findByIdAndUpdate(
+  user._id,
+  { age: 26 },
+  { new: true }
+);
+
+await User.findByIdAndDelete(user._id);</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">7. Queries</div>
+<div class="card-body">
+<p>Queries ask the database for specific data. Good queries should return only the data the application needs.</p>
+<div class="code">const users = await User
+  .find({ age: { $gte: 18 } })
+  .select("name email")
+  .sort({ name: 1 })
+  .limit(10);</div>
+<p><strong>Interview point:</strong> Filtering, projection, sorting and limiting can reduce unnecessary database work and network transfer.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">8. Validation</div>
+<div class="card-body">
+<p><strong>What:</strong> Validation checks whether data follows required rules before it is stored or processed.</p>
+<div class="code">const productSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0
+  }
+});</div>
+<div class="alert alert-warning"><strong>Important:</strong> Database/model validation is useful, but API input should also be validated at the request boundary. Do not depend on only one validation layer.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-secondary text-white">9. Mongoose Middleware</div>
+<div class="card-body">
+<p>Mongoose middleware, also called hooks, can run before or after certain model operations.</p>
+<div class="code">userSchema.pre("save", function(next) {
+  this.name = this.name.trim();
+  next();
+});</div>
+<p><strong>When to use:</strong> Reusable model-level behavior such as preparing data or running controlled hooks.</p>
+<div class="warn"><strong>Common mistake:</strong> Putting too much business logic into model middleware can make execution difficult to understand. Keep important business rules explicit when appropriate.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">10. Population and References</div>
+<div class="card-body">
+<p>MongoDB can store a reference to another document. Mongoose's <code>populate()</code> can then replace a referenced ID with related document data.</p>
+<div class="code">const orderSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
+  total: Number
+});
+
+const order = await Order
+  .findById(orderId)
+  .populate("user", "name email");</div>
+<div class="flow"><div class="box">Order</div><div class="arrow">→</div><div class="box">user ObjectId</div><div class="arrow">→</div><div class="box">User document</div></div>
+<p><strong>Important:</strong> <code>populate()</code> is a Mongoose feature; it is not a native MongoDB join operation.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">11. SQL — MySQL / PostgreSQL</div>
+<div class="card-body">
+<p><strong>SQL databases</strong> store structured data in tables and provide SQL for querying and modifying that data.</p>
+<div class="code">Users
++----+----------+-------------------+
+| id | name     | email             |
++----+----------+-------------------+
+| 1  | Sam      | sam@example.com   |
+| 2  | Alex     | alex@example.com  |
++----+----------+-------------------+</div>
+<p><strong>Examples:</strong> MySQL and PostgreSQL are relational databases. They are commonly used when relationships, constraints and transactions are important.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">12. SQL Connection</div>
+<div class="card-body">
+<p>Node.js SQL libraries generally support connection pools. The application gets a connection from the pool, performs work, and releases it.</p>
+<div class="code">const { Pool } = require("pg");
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
+
+const result = await pool.query(
+  "SELECT id, name FROM users WHERE id = $1",
+  [userId]
+);</div>
+<div class="tip"><strong>Why placeholders?</strong> <code>$1</code> is a parameter placeholder. The value is supplied separately instead of building SQL by string concatenation.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">13. Parameterized Queries</div>
+<div class="card-body">
+<p>Never build SQL using raw user input like this:</p>
+<div class="code">const sql = "SELECT * FROM users WHERE email = '" + email + "'";</div>
+<p>Use parameters:</p>
+<div class="code">const sql = "SELECT * FROM users WHERE email = $1";
+const result = await pool.query(sql, [email]);</div>
+<div class="alert alert-danger"><strong>Why?</strong> Parameterized queries help prevent SQL injection by keeping SQL structure separate from user-supplied values.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">14. Connection Pooling</div>
+<div class="card-body">
+<p><strong>What:</strong> A connection pool keeps a limited collection of database connections ready for reuse.</p>
+<div class="flow">
+<div class="box">API request 1</div><div class="arrow">→</div><div class="box">Pool</div><div class="arrow">→</div><div class="box">DB connection</div>
+</div>
+<div class="flow">
+<div class="box">API request 2</div><div class="arrow">→</div><div class="box">Pool</div><div class="arrow">→</div><div class="box">Another available connection</div>
+</div>
+<p><strong>Why:</strong> Creating a brand-new database connection for every request is expensive. A pool allows controlled reuse and limits concurrency.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">15. Transactions</div>
+<div class="card-body">
+<p><strong>What:</strong> A transaction groups multiple database operations into one logical unit of work.</p>
+<p><strong>Layman example:</strong> Moving ₹500 from Account A to Account B should not leave the money removed from A if the credit to B fails.</p>
+<div class="flow"><div class="box">Begin transaction</div><div class="arrow">→</div><div class="box">Operation A</div><div class="arrow">→</div><div class="box">Operation B</div><div class="arrow">→</div><div class="box">Commit</div></div>
+<div class="flow"><div class="box">Any failure</div><div class="arrow">→</div><div class="box">Rollback</div></div>
+<div class="alert alert-info"><strong>Interview line:</strong> Transactions provide atomicity for a group of related database operations: either the transaction commits, or its changes are rolled back.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">16. SQL Transaction Example</div>
+<div class="card-body">
+<div class="code">const client = await pool.connect();
+
+try {
+  await client.query("BEGIN");
+
+  await client.query(
+    "UPDATE accounts SET balance = balance - $1 WHERE id = $2",
+    [500, fromId]
+  );
+
+  await client.query(
+    "UPDATE accounts SET balance = balance + $1 WHERE id = $2",
+    [500, toId]
+  );
+
+  await client.query("COMMIT");
+} catch (error) {
+  await client.query("ROLLBACK");
+  throw error;
+} finally {
+  client.release();
+}</div>
+<p><strong>Key idea:</strong> Always release the pooled connection in <code>finally</code>.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">17. Database Connection Lifecycle</div>
+<div class="card-body">
+<div class="flow">
+<div class="box">Application starts</div><div class="arrow">→</div>
+<div class="box">Create pool/connection</div><div class="arrow">→</div>
+<div class="box">Accept requests</div><div class="arrow">→</div>
+<div class="box">Run async DB operation</div><div class="arrow">→</div>
+<div class="box">Return result</div><div class="arrow">→</div>
+<div class="box">Reuse connection</div>
+</div>
+<p>During shutdown, the application should stop accepting new work and close database resources cleanly.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">18. Async Database Operations</div>
+<div class="card-body">
+<div class="code">app.get("/users", async (req, res, next) =&gt; {
+  try {
+    const users = await User.find().limit(20);
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});</div>
+<p><strong>Why async?</strong> Database operations involve I/O. Waiting synchronously would prevent the JavaScript thread from doing useful application work.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">19. Database Errors</div>
+<div class="card-body">
+<p>Common database problems include connection failure, timeout, duplicate key errors, validation errors, query errors and transaction failures.</p>
+<div class="code">app.use((err, req, res, next) =&gt; {
+  console.error(err);
+
+  res.status(500).json({
+    message: "Database operation failed"
+  });
+});</div>
+<div class="warn"><strong>Production rule:</strong> Log useful technical details on the server, but do not expose database credentials, connection strings, stack traces or sensitive internal details to clients.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">20. MongoDB vs SQL</div>
+<div class="card-body">
+<div class="table-responsive"><table class="table table-bordered">
+<thead><tr><th>Topic</th><th>MongoDB</th><th>SQL</th></tr></thead>
+<tbody>
+<tr><td>Basic structure</td><td>Documents / collections</td><td>Tables / rows / columns</td></tr>
+<tr><td>Typical query style</td><td>Document query syntax</td><td>SQL</td></tr>
+<tr><td>Relationships</td><td>References / embedding</td><td>Foreign keys / joins</td></tr>
+<tr><td>Transactions</td><td>Supported</td><td>Supported</td></tr>
+<tr><td>Node.js abstraction</td><td>Mongoose is common</td><td>Drivers/ORMs/query builders are common</td></tr>
+</tbody></table></div>
+<div class="alert alert-secondary"><strong>Interview caution:</strong> Do not say “MongoDB has no transactions” or “NoSQL means no schema.” Modern MongoDB supports transactions, and schema rules can be enforced at different layers.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">21. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Opening a new DB connection for every request.</li>
+<li>Ignoring database connection failures during application startup.</li>
+<li>Not using <code>await</code> or otherwise handling async database operations correctly.</li>
+<li>Not catching rejected database promises.</li>
+<li>Building SQL using string concatenation with user input.</li>
+<li>Forgetting to release a pooled SQL connection.</li>
+<li>Returning raw database errors to clients.</li>
+<li>Putting passwords or database URLs directly in source code.</li>
+<li>Fetching far more rows/fields than the API needs.</li>
+<li>Using transactions without understanding which operations need atomic behavior.</li>
+<li>Assuming Mongoose validation replaces API validation.</li>
+<li>Using <code>populate()</code> everywhere without considering query cost.</li>
+</ol>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">22. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>MongoDB is a document-oriented NoSQL database.</li>
+<li>Mongoose is an ODM commonly used with MongoDB and Node.js.</li>
+<li>A Mongoose schema defines structure and rules; a model provides the API for documents.</li>
+<li>SQL databases such as MySQL and PostgreSQL use tables and SQL queries.</li>
+<li>Use parameterized SQL queries instead of string concatenation.</li>
+<li>Connection pools reuse a controlled number of SQL connections.</li>
+<li>Database operations are usually asynchronous in Node.js.</li>
+<li>Transactions group related operations into an atomic unit of work.</li>
+<li>Handle connection, query and validation errors properly.</li>
+<li>Keep secrets such as database credentials outside source code.</li>
+</ul>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">23. Interview-Ready Points ⭐⭐⭐</div>
+<div class="card-body">
+<div class="tip">
+<ul class="mb-0">
+<li><strong>MongoDB vs Mongoose:</strong> MongoDB is the database; Mongoose is a Node.js ODM.</li>
+<li><strong>Schema vs Model:</strong> Schema describes structure/rules; model is used to work with documents.</li>
+<li><strong>Why connection pooling?</strong> Reuse connections and control database concurrency.</li>
+<li><strong>Why parameterized queries?</strong> Separate SQL structure from user input and reduce SQL injection risk.</li>
+<li><strong>Why async DB operations?</strong> Database I/O should not block the JavaScript execution thread.</li>
+<li><strong>Why transactions?</strong> Keep related operations consistent as one logical unit.</li>
+<li><strong>What is populate()?</strong> A Mongoose feature that resolves referenced documents.</li>
+<li><strong>What happens when DB connection fails?</strong> The application should have a deliberate startup/retry/failure strategy rather than silently serving broken requests.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">24. Interview Questions — Click to Show Answer</div>
+<div class="card-body" id="questions"></div>
+</section>
+
+</main>
+
+<script>
+const questions = [
+["Q1. What is the difference between MongoDB and Mongoose?",
+"MongoDB is the database system. Mongoose is a Node.js ODM that provides schemas, models, validation, middleware and query helpers for MongoDB.",
+"Keeping these concepts separate shows that you understand the database and the application-level abstraction."],
+["Q2. What is a Mongoose schema?",
+"A schema describes the structure, types and rules for documents handled by a Mongoose model.",
+"It provides application-level structure and validation around MongoDB documents."],
+["Q3. What is a Mongoose model?",
+"A model is created from a schema and provides methods for creating, reading, updating and deleting documents.",
+"The model is the main application interface for working with a collection through Mongoose."],
+["Q4. Why should a Node.js application reuse database connections?",
+"Opening a new connection for every request adds overhead and can exhaust database resources.",
+"Connection reuse or pooling improves efficiency and controls the number of concurrent database connections."],
+["Q5. What is connection pooling?",
+"A pool maintains a controlled set of reusable database connections.",
+"Requests can borrow a connection, use it and return it instead of creating a new connection each time."],
+["Q6. Why are database operations usually asynchronous in Node.js?",
+"Database access is I/O work, so asynchronous APIs allow Node.js to continue processing other work while waiting for the database.",
+"This is important for Node.js scalability and its non-blocking execution model."],
+["Q7. What is a transaction?",
+"A transaction groups multiple database operations into one logical unit. If it fails, the transaction can be rolled back.",
+"This helps preserve consistency when several operations must succeed together."],
+["Q8. Why are parameterized SQL queries important?",
+"They keep user-supplied values separate from SQL syntax and help prevent SQL injection.",
+"String-building SQL with raw user input can allow malicious input to change the meaning of the SQL statement."],
+["Q9. What is the difference between validation and sanitization?",
+"Validation checks whether input follows expected rules. Sanitization transforms or cleans input into a safer/normalized form.",
+"They solve different problems and can both be useful at an API boundary."],
+["Q10. What does populate() do in Mongoose?",
+"It resolves a referenced document and returns the related document data instead of only the referenced ID.",
+"It is a Mongoose abstraction for working with references; it is not the same as a native SQL JOIN."],
+["Q11. Why should database errors not be returned directly to users?",
+"Raw errors may expose internal implementation details, database information or sensitive data.",
+"Clients should receive safe, meaningful error messages while detailed technical information is logged securely on the server."],
+["Q12. What is a connection lifecycle?",
+"It describes how database resources are created, used, reused and eventually closed.",
+"A typical lifecycle is startup → connection/pool → operations → reuse → graceful shutdown."],
+["Q13. What is the risk of forgetting to release a pooled SQL connection?",
+"Connections can remain occupied, causing the pool to run out of available connections.",
+"This can make later requests wait or fail even though the database itself is healthy."],
+["Q14. Why should DB credentials be kept in environment variables?",
+"Credentials are secrets and should not be hard-coded into source code or committed to repositories.",
+"Environment-based configuration helps separate code from deployment-specific secrets."],
+["Q15. Does MongoDB support transactions?",
+"Yes. MongoDB supports transactions, including multi-document transactions.",
+"Modern MongoDB is not accurately described as a database with no transaction support."],
+["Q16. Does NoSQL mean there is no schema?",
+"No. NoSQL databases can have flexible document structures, but applications can still enforce schemas and validation.",
+"For example, Mongoose schemas can provide application-level rules for MongoDB data."],
+["Q17. What is wrong with this SQL code? const q = `SELECT * FROM users WHERE email = '${email}'`;",
+"It mixes user input directly into SQL text.",
+"Use a parameterized query such as SELECT * FROM users WHERE email = $1 with the email passed separately."],
+["Q18. Why should APIs avoid selecting unnecessary database fields?",
+"Returning only needed fields reduces database work, memory usage, network transfer and response size.",
+"Projection/select can be an important performance optimization."],
+["Q19. What happens if the initial database connection fails?",
+"The application should follow a deliberate startup policy, commonly failing fast, retrying with limits, or otherwise clearly reporting that it is not ready.",
+"Serving requests that require a database while the database is unavailable can create confusing failures."],
+["Q20. What is the difference between a database driver and an ODM/ORM?",
+"A driver provides a lower-level interface to the database protocol. An ODM such as Mongoose or ORM tools provide higher-level application abstractions.",
+"The exact features depend on the library, but the abstraction level is the key difference."]
+];
+
+const root = document.getElementById("questions");
+questions.forEach((q,i)=>{
+  const id="answer"+i;
+  root.innerHTML += `<div class="border rounded-3 p-3 mb-3">
+    <h6 class="fw-bold">${q[0]}</h6>
+    <button class="btn btn-outline-primary btn-sm" onclick="toggleAnswer('${id}',this)">Show Answer</button>
+    <div id="${id}" class="answer mt-3">
+      <div class="alert alert-success"><strong>Answer:</strong> ${q[1]}</div>
+      <div class="alert alert-info mb-0"><strong>Why?</strong> ${q[2]}</div>
+    </div>
+  </div>`;
+});
+function toggleAnswer(id,btn){
+  const el=document.getElementById(id);
+  const open=el.style.display==="block";
+  el.style.display=open?"none":"block";
+  btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 3 — npm & package.json Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#1f2937}.hero{background:linear-gradient(135deg,#111827,#0d6efd);color:#fff}
+.cardx{border:0;border-radius:16px;box-shadow:0 8px 24px #0001;overflow:hidden;margin-bottom:24px}
+.code{background:#0f172a;color:#e5e7eb;border-radius:10px;padding:15px;white-space:pre-wrap;font-family:Consolas,monospace}
+.flow{background:#eef4ff;border:1px dashed #4d7cff;border-radius:12px;padding:18px;text-align:center;font-weight:600;line-height:1.9}
+.blue{background:#0d6efd;color:#fff}.green{background:#198754;color:#fff}.purple{background:#6f42c1;color:#fff}
+.orange{background:#fd7e14;color:#fff}.teal{background:#0f766e;color:#fff}.dark{background:#212529;color:#fff}.red{background:#dc3545;color:#fff}
+.label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#64748b}.tip{border-left:5px solid #0d6efd}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4">
+<div class="container">
+<span class="badge bg-light text-dark mb-2">Node.js • npm • MAANG • FANG • MNC</span>
+<h1 class="display-6 fw-bold">Part 3 — npm &amp; package.json ⭐⭐⭐</h1>
+<p class="lead mb-0">Understand packages, dependency versions, lock files and npm commands through interview-style code questions.</p>
+</div>
+</header>
+<main class="container pb-5">
+
+<section>
+<div class="card cardx">
+<div class="card-header blue fw-bold">1. What is npm?</div>
+<div class="card-body">
+<p><b>What:</b> npm is the package manager commonly used with Node.js. It helps developers install, update, remove and run packages and project scripts.</p>
+<p><b>Why / purpose:</b> Instead of writing every feature yourself, you can use tested packages and manage their versions.</p>
+<p><b>Layman example:</b> Think of npm as a store plus a manager for the libraries your project needs.</p>
+<div class="flow">Project → npm command → package registry / local cache → node_modules → application</div>
+<div class="alert alert-info tip mt-3"><b>Interview point:</b> npm is a package manager and also provides commands for project scripts and dependency management.</div>
+<p class="label mt-3">Q1 — Is npm the same thing as Node.js?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> No. Node.js is a JavaScript runtime; npm is a package manager and command-line tool commonly installed with Node.js.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header green fw-bold">2. npm init &amp; package.json</div>
+<div class="card-body">
+<p><code>npm init</code> creates a <code>package.json</code> file interactively. <code>npm init -y</code> creates it using default answers.</p>
+<div class="code">npm init
+npm init -y</div>
+<p><b>package.json</b> describes project metadata, scripts and dependency ranges.</p>
+<div class="code">{
+  "name": "my-api",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}</div>
+<p class="label">Q2 — What happens with npm start?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> npm looks for the <code>start</code> script in <code>package.json</code> and runs its command.<br>
+<b>Why?</b> The <code>scripts</code> section maps convenient names such as <code>start</code> to shell commands.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header purple fw-bold">3. package.json vs package-lock.json ⭐⭐⭐</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<tr><th>package.json</th><th>package-lock.json</th></tr>
+<tr><td>Project metadata and declared dependencies</td><td>Exact dependency resolution information</td></tr>
+<tr><td>Usually contains version ranges</td><td>Locks the resolved dependency tree</td></tr>
+<tr><td>Edited intentionally by developers</td><td>Usually updated by npm when dependency resolution changes</td></tr>
+<tr><td>Describes what the project asks for</td><td>Records what npm resolved</td></tr>
+</table>
+<div class="flow">package.json → dependency ranges<br>↓<br>npm resolves versions + transitive dependencies<br>↓<br>package-lock.json records the resolved tree</div>
+<p class="label mt-3">Q3 — Why commit package-lock.json?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> It helps the team and CI environments reproduce the same resolved dependency tree.<br>
+<b>Why?</b> A dependency range such as <code>^1.2.3</code> can allow different compatible versions over time. The lock file records the concrete resolution.
+</div>
+<p class="label mt-3">Q4 — Does package-lock.json replace package.json?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> No. They have different jobs. package.json declares project requirements; package-lock.json records the resolved dependency tree.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header orange fw-bold">4. Dependencies vs Dev Dependencies</div>
+<div class="card-body">
+<p><b>dependencies:</b> Packages required by the application when it runs.</p>
+<p><b>devDependencies:</b> Packages mainly needed during development, testing or building.</p>
+<div class="code">npm install express
+npm install --save-dev nodemon</div>
+<div class="flow">dependencies → runtime application needs<br>devDependencies → development / test / build needs</div>
+<p class="label">Q5 — Where should Express normally go?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> <code>dependencies</code>.<br>
+<b>Why?</b> A deployed Node application normally needs Express at runtime.
+</div>
+<p class="label mt-3">Q6 — Where should a test framework usually go?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> Usually <code>devDependencies</code> because tests are development/CI tooling rather than the production runtime itself.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header teal fw-bold">5. npm install ⭐⭐⭐</div>
+<div class="card-body">
+<p><code>npm install</code> with no package name installs project dependencies from <code>package.json</code>. When a lock file is present, npm uses it as part of dependency resolution.</p>
+<p><code>npm install package-name</code> installs a package and normally records it in <code>dependencies</code>.</p>
+<div class="code">npm install
+npm install express
+npm install --save-dev nodemon</div>
+<p class="label">Q7 — What changes after npm install express?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> npm installs Express into the project and normally updates <code>package.json</code>, <code>package-lock.json</code> and <code>node_modules</code>.<br>
+<b>Why?</b> The project now declares the package and npm records its resolved dependency information.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header blue fw-bold">6. npm install vs npm ci ⭐⭐⭐</div>
+<div class="card-body">
+<table class="table table-bordered">
+<tr><th>npm install</th><th>npm ci</th></tr>
+<tr><td>Used for normal dependency installation and dependency changes</td><td>Designed for clean, reproducible installs</td></tr>
+<tr><td>Can update package-lock.json when resolution changes</td><td>Requires package.json and lock file to be in sync</td></tr>
+<tr><td>Can modify dependency metadata</td><td>Removes existing node_modules and performs a clean install</td></tr>
+<tr><td>Common during development</td><td>Common in CI/CD pipelines</td></tr>
+</table>
+<div class="flow">CI/CD → package.json + package-lock.json → npm ci → clean node_modules → exact locked tree</div>
+<p class="label">Q8 — Why is npm ci preferred in CI?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> It is intended for clean, reproducible installs from the lock file.<br>
+<b>Why?</b> CI should avoid carrying old local dependencies and should install the dependency tree represented by the lock file. It also fails when the lock file and package.json are not in sync.
+</div>
+<p class="label mt-3">Q9 — What happens if package.json and package-lock.json are out of sync with npm ci?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> npm ci fails instead of silently changing the lock file.<br>
+<b>Why?</b> Reproducibility is the goal; the lock file must satisfy the package.json dependency requirements.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header red fw-bold">7. npm uninstall, update and node_modules</div>
+<div class="card-body">
+<div class="code">npm uninstall express
+npm update
+npm update express</div>
+<p><code>node_modules</code> is where npm installs project packages and their dependencies.</p>
+<p class="label">Q10 — Is node_modules usually committed to Git?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> Usually no.<br>
+<b>Why?</b> It can be very large and is reproducible from package.json and the lock file. Teams normally add <code>node_modules/</code> to <code>.gitignore</code>.
+</div>
+<p class="label mt-3">Q11 — What is npm update different from npm install?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> <code>npm update</code> updates installed dependencies within the version ranges allowed by the project configuration and lock/resolution rules. <code>npm install</code> is the general command for installing dependencies and can also add packages.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header green fw-bold">8. npm Scripts</div>
+<div class="card-body">
+<div class="code">{
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "jest"
+  }
+}</div>
+<p>Run scripts with commands such as <code>npm start</code>, <code>npm run dev</code> and <code>npm test</code>.</p>
+<p class="label">Q12 — Why does npm start work without npm run start?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> npm provides special shortcuts for scripts such as <code>start</code>, <code>test</code>, <code>stop</code> and <code>restart</code>.<br>
+<b>Why?</b> <code>npm start</code> is a built-in npm lifecycle shortcut for the <code>start</code> script.
+</div>
+<p class="label mt-3">Q13 — How do you run a custom script named build?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="alert alert-success mt-2 d-none">
+<div class="code">npm run build</div>
+<b>Why?</b> Custom scripts are normally executed through <code>npm run &lt;script-name&gt;</code>.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header purple fw-bold">9. Semantic Versioning — ^, ~ and Exact Versions ⭐⭐⭐</div>
+<div class="card-body">
+<p>Semantic versioning normally follows <b>MAJOR.MINOR.PATCH</b>.</p>
+<div class="code">2.4.7
+│ │ │
+│ │ └─ patch
+│ └─── minor
+└───── major</div>
+<table class="table table-bordered">
+<tr><th>Version</th><th>General meaning</th></tr>
+<tr><td><code>2.4.7</code></td><td>Exact version</td></tr>
+<tr><td><code>~2.4.7</code></td><td>Allows patch-level updates within the minor line</td></tr>
+<tr><td><code>^2.4.7</code></td><td>Allows compatible updates below the next major for a normal major version</td></tr>
+</table>
+<p class="label">Q14 — Which versions can ^2.4.7 generally allow?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> Versions <code>&gt;=2.4.7</code> and <code>&lt;3.0.0</code>, subject to npm semver rules.<br>
+<b>Why?</b> The caret allows compatible minor and patch changes while keeping the major version at 2.
+</div>
+<p class="label mt-3">Q15 — Which versions can ~2.4.7 generally allow?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> Versions <code>&gt;=2.4.7</code> and <code>&lt;2.5.0</code> in the normal three-part semver case.<br>
+<b>Why?</b> Tilde is generally limited to patch updates within the specified minor version.
+</div>
+<div class="alert alert-warning mt-3"><b>Important:</b> Semver range behavior has special rules for 0.x versions. Do not apply the simple caret rule blindly to every version.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header orange fw-bold">10. Global Packages vs Local Packages</div>
+<div class="card-body">
+<p><b>Local:</b> Installed inside a project and normally used by that project.</p>
+<p><b>Global:</b> Installed for broader command-line use on the machine.</p>
+<div class="code">npm install typescript
+npm install -g typescript</div>
+<p class="label">Q16 — Which is usually better for a project's build tool?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> A local dependency is usually better.<br>
+<b>Why?</b> The project can pin/control the tool version and teammates/CI can use the project's dependency instead of relying on a machine-wide version.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header teal fw-bold">11. npx</div>
+<div class="card-body">
+<p><code>npx</code> is used to execute package binaries, often from the local project's dependencies. It can also fetch a package when appropriate.</p>
+<div class="code">npx create-vite@latest
+npx eslint .</div>
+<p class="label">Q17 — Why use npx instead of installing every CLI globally?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> It can run a project-local CLI and avoids depending on a global installation.<br>
+<b>Why?</b> Local CLI versions are easier to keep consistent across developers and CI environments.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header blue fw-bold">12. Dependency Tree</div>
+<div class="card-body">
+<p>A package can depend on other packages. Those dependencies can have their own dependencies. This creates a dependency tree.</p>
+<div class="flow">
+my-app<br>
+├── express<br>
+│   ├── dependency-A<br>
+│   └── dependency-B<br>
+└── axios<br>
+    └── dependency-C
+</div>
+<p class="label mt-3">Q18 — Why can installing one package add many packages?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> Because packages can have their own dependencies, creating transitive dependencies.<br>
+<b>Why?</b> npm resolves the complete dependency graph needed to satisfy the project.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header red fw-bold">13. MAANG/FANG/MNC Output-Based Questions</div>
+<div class="card-body">
+
+<p class="label">Q19 — package.json range + lock file</p>
+<div class="code">// package.json
+"express": "^5.1.0"
+
+// package-lock.json
+resolved express version: 5.1.2
+
+npm ci</div>
+<button class="btn btn-outline-primary" onclick="toggle('a19',this)">Show Answer</button>
+<div id="a19" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> npm ci installs the locked resolved version represented by the lock file, provided the lock file is valid and in sync with package.json.<br>
+<b>Why?</b> The lock file is used to make CI installation reproducible.
+</div>
+
+<p class="label mt-4">Q20 — What happens after deleting node_modules?</p>
+<div class="code">rm -rf node_modules
+npm ci</div>
+<button class="btn btn-outline-primary" onclick="toggle('a20',this)">Show Answer</button>
+<div id="a20" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> npm ci creates a clean installation from the lock file.<br>
+<b>Why?</b> npm ci is designed to remove an existing node_modules and perform a clean dependency installation.
+</div>
+
+<p class="label mt-4">Q21 — Dependency version trap</p>
+<div class="code">// package.json
+"demo": "^1.2.3"
+
+// Developer A installs today.
+// Developer B installs later.</div>
+<button class="btn btn-outline-primary" onclick="toggle('a21',this)">Show Answer</button>
+<div id="a21" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> They can resolve different compatible versions if the lock file is not used or is regenerated under different conditions.<br>
+<b>Why?</b> The caret range permits compatible updates below the next major version. A committed lock file helps keep the resolved tree consistent.
+</div>
+
+<p class="label mt-4">Q22 — Dev dependency trap</p>
+<div class="code">"dependencies": {
+  "jest": "^30.0.0"
+}</div>
+<button class="btn btn-outline-primary" onclick="toggle('a22',this)">Show Answer</button>
+<div id="a22" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> Jest is usually better placed in <code>devDependencies</code> when it is only used for testing.<br>
+<b>Why?</b> Production runtime dependencies and development/test tools have different purposes.
+</div>
+
+<p class="label mt-4">Q23 — Lock file question</p>
+<p>A teammate changes package.json manually but does not update package-lock.json. What should you expect from npm ci?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a23',this)">Show Answer</button>
+<div id="a23" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> It may fail if the lock file does not satisfy package.json.<br>
+<b>Why?</b> npm ci expects the dependency declarations and lock file to be in sync rather than modifying the lock file for you.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header green fw-bold">14. Common Developer Mistakes</div>
+<div class="card-body">
+<ul>
+<li>Committing <code>node_modules</code> instead of the lock file.</li>
+<li>Deleting <code>package-lock.json</code> just to fix every dependency problem.</li>
+<li>Using <code>npm install</code> in CI when a reproducible clean install is expected.</li>
+<li>Thinking <code>npm ci</code> updates package.json or package-lock.json.</li>
+<li>Putting build/test tools in runtime dependencies without a reason.</li>
+<li>Installing project CLIs globally and then getting different versions on different machines.</li>
+<li>Thinking <code>^</code> and <code>~</code> mean the same thing.</li>
+<li>Forgetting that transitive dependencies create a larger dependency tree.</li>
+<li>Assuming package.json and package-lock.json have the same purpose.</li>
+</ul>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header dark fw-bold">15. Visual Flow — Installing a Dependency</div>
+<div class="card-body">
+<div class="flow">
+npm install express<br>
+↓<br>
+Read package.json<br>
+↓<br>
+Resolve Express + transitive dependencies<br>
+↓<br>
+Install into node_modules<br>
+↓<br>
+Update package.json when adding a dependency<br>
+↓<br>
+Record exact resolution in package-lock.json
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx">
+<div class="card-header purple fw-bold">16. Quick Recap &amp; Interview Ready</div>
+<div class="card-body">
+<ul>
+<li><b>npm:</b> Package manager and command-line tool used with Node.js.</li>
+<li><b>npm init:</b> Creates package.json.</li>
+<li><b>package.json:</b> Project metadata, scripts and declared dependency ranges.</li>
+<li><b>package-lock.json:</b> Records the resolved dependency tree for reproducible installs.</li>
+<li><b>dependencies:</b> Runtime packages.</li>
+<li><b>devDependencies:</b> Development, testing and build packages.</li>
+<li><b>npm install:</b> General dependency installation/update command.</li>
+<li><b>npm ci:</b> Clean, reproducible installation using the lock file; expects package.json and lock file to be in sync.</li>
+<li><b>npm start:</b> Runs the start script.</li>
+<li><b>npm run:</b> Runs custom npm scripts.</li>
+<li><b>^:</b> Generally allows compatible minor/patch updates below the next major for normal major versions.</li>
+<li><b>~:</b> Generally allows patch updates within the specified minor version.</li>
+<li><b>Exact version:</b> Pins one version in the dependency declaration.</li>
+<li><b>npx:</b> Executes package binaries, commonly from local dependencies.</li>
+<li><b>node_modules:</b> Installed dependency tree.</li>
+<li><b>Dependency tree:</b> Direct + transitive dependencies.</li>
+</ul>
+<div class="alert alert-warning"><b>Most important interview comparison:</b><br>
+<b>package.json</b> = “What versions/ranges does my project request?”<br>
+<b>package-lock.json</b> = “What exact dependency tree did npm resolve?”<br>
+<b>npm install</b> = flexible development installation and dependency management.<br>
+<b>npm ci</b> = clean, reproducible installation for CI/CD.
+</div>
+<div class="alert alert-success"><b>Golden interview line:</b> “package.json declares the project's dependencies and version ranges, while package-lock.json records the resolved dependency tree. npm ci is designed for clean, reproducible installs and requires the lock file to be synchronized with package.json.”
+</div>
+</div></div>
+</section>
+
+</main>
+<script>
+function toggle(id,b){
+ const e=document.getElementById(id);
+ const hidden=e.classList.toggle("d-none");
+ b.textContent=hidden?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

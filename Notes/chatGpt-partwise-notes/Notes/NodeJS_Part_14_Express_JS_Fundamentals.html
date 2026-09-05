@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 14 — Express.js Fundamentals</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}
+.hero{background:linear-gradient(135deg,#0f172a,#0d6efd,#198754);color:#fff;border-radius:18px}
+.card,.topic{border:0;border-radius:14px}.card{overflow:hidden}
+.card-header{font-weight:700}.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+code{color:#b42318}.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}
+.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}
+.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}
+.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}
+.answer{display:none;margin-top:15px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:10px;padding:15px}
+.endpoint{font-family:monospace;font-weight:700}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 14</span>
+<h1 class="display-6 fw-bold">🟢 Express.js Fundamentals ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how Express creates HTTP servers, handles requests and responses, defines routes, and builds the basic foundation of a Node.js backend.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What is Express.js?</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Express.js</strong> is a lightweight web framework for Node.js. It gives us convenient tools for building HTTP servers, APIs, routes, middleware, and web applications.</p>
+<h5>Layman example</h5>
+<p>Node's built-in <code>http</code> module is like having a basic kitchen. Express gives you ready-made counters, tools, and a better workflow so you can build the application faster.</p>
+<div class="flow">Client
+  ↓ HTTP request
+Express application
+  ↓
+Route matching
+  ↓
+Route handler
+  ↓
+Response
+  ↓
+Client</div>
+<div class="interview"><strong>Interview-ready:</strong> “Express is a minimal Node.js web framework that simplifies HTTP server development by providing routing, middleware support, and convenient request/response handling.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. Express Architecture — Simple View</div>
+<div class="card-body">
+<div class="topic">
+<div class="flow">Browser / React / Mobile App
+          ↓
+       HTTP Request
+          ↓
+   ┌─────────────────┐
+   │ Express App     │
+   │                 │
+   │ Middleware      │
+   │      ↓          │
+   │ Route matching  │
+   │      ↓          │
+   │ Handler         │
+   └────────┬────────┘
+            ↓
+       HTTP Response
+            ↓
+          Client</div>
+<p>Express itself is not a separate runtime. It runs on Node.js and uses Node's HTTP capabilities underneath.</p>
+<div class="tip"><strong>Important:</strong> Express is a framework/library layer on top of Node.js; Node.js provides the runtime and core networking capabilities.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">3. Installing Express</div>
+<div class="card-body">
+<div class="topic">
+<p>Create a Node.js project first:</p>
+<pre><code>npm init -y</code></pre>
+<p>Install Express as a project dependency:</p>
+<pre><code>npm install express</code></pre>
+<p>This adds Express to <code>package.json</code> and installs it into <code>node_modules</code>.</p>
+<div class="flow">npm install express
+       ↓
+package.json updated
+       ↓
+package-lock.json updated
+       ↓
+node_modules/express installed</div>
+<div class="interview"><strong>Interview tip:</strong> Express is normally installed locally in the project, not globally, because each application should control its dependency version.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">4. Creating an Express Server</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>const express = require("express");
+
+const app = express();
+
+app.listen(3000, () =&gt; {
+  console.log("Server running on port 3000");
+});</code></pre>
+<h5>How it works</h5>
+<ol>
+<li><code>require("express")</code> loads Express.</li>
+<li><code>express()</code> creates an Express application object.</li>
+<li><code>app.listen()</code> starts the HTTP server listening on a port.</li>
+</ol>
+<div class="flow">require("express")
+       ↓
+express()
+       ↓
+app object
+       ↓
+app.listen(3000)
+       ↓
+Server starts listening</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">5. express()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>express()</code> creates an Express application.</p>
+<pre><code>const express = require("express");
+
+const app = express();</code></pre>
+<p>The returned <code>app</code> object is used to configure routes, middleware, and server behavior.</p>
+<div class="interview"><strong>Interview-ready:</strong> “Calling express() creates and returns an Express application instance that exposes methods such as get, post, use, and listen.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">6. app.listen()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>app.listen()</code> starts the server and makes it listen for incoming connections.</p>
+<pre><code>app.listen(3000, () =&gt; {
+  console.log("Server started");
+});</code></pre>
+<p>Here, <code>3000</code> is the port number.</p>
+<div class="flow">Client
+  ↓
+localhost:3000
+  ↓
+Node.js HTTP server
+  ↓
+Express application</div>
+<div class="warn"><strong>Common mistake:</strong> Defining routes but forgetting <code>app.listen()</code> means the application is not listening for incoming HTTP connections.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">7. Request and Response</div>
+<div class="card-body">
+<div class="topic">
+<p>Every HTTP interaction has two important sides:</p>
+<div class="row g-3">
+<div class="col-md-6"><div class="alert alert-primary h-100"><strong>Request</strong><br>The client tells the server what it wants.</div></div>
+<div class="col-md-6"><div class="alert alert-success h-100"><strong>Response</strong><br>The server sends the result back to the client.</div></div>
+</div>
+<div class="flow">Client
+  │
+  │ Request
+  │ method + URL + headers + body
+  ↓
+Express
+  │
+  │ Response
+  │ status + headers + body
+  ↓
+Client</div>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  console.log(req.method);
+  console.log(req.url);
+
+  res.send("Users");
+});</code></pre>
+<p><code>req</code> represents the incoming request. <code>res</code> represents the outgoing response.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">8. GET — app.get()</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>app.get()</code> to handle HTTP GET requests.</p>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  res.send("Get all users");
+});</code></pre>
+<p>When a client sends:</p>
+<div class="alert alert-secondary endpoint">GET /users</div>
+<p>Express looks for a matching GET route.</p>
+<div class="flow">GET /users
+   ↓
+app.get("/users", ...)
+   ↓
+handler executes
+   ↓
+res.send(...)
+   ↓
+response</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">9. POST — app.post()</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>app.post()</code> when the client sends data to create or trigger something on the server.</p>
+<pre><code>app.post("/users", (req, res) =&gt; {
+  res.status(201).json({
+    message: "User created"
+  });
+});</code></pre>
+<div class="alert alert-secondary endpoint">POST /users</div>
+<div class="interview"><strong>Interview tip:</strong> GET commonly retrieves data. POST commonly creates a new resource or submits data for processing. The exact API semantics depend on the application design.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">10. PUT — app.put()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>app.put()</code> handles PUT requests. PUT is commonly used to replace or fully update a resource.</p>
+<pre><code>app.put("/users/10", (req, res) =&gt; {
+  res.json({
+    message: "User replaced/updated"
+  });
+});</code></pre>
+<div class="alert alert-secondary endpoint">PUT /users/10</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">11. PATCH — app.patch()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>app.patch()</code> handles partial updates.</p>
+<pre><code>app.patch("/users/10", (req, res) =&gt; {
+  res.json({
+    message: "User partially updated"
+  });
+});</code></pre>
+<div class="alert alert-secondary endpoint">PATCH /users/10</div>
+<p>For example, a PATCH request could change only a user's name without sending every user field.</p>
+<div class="interview"><strong>Interview line:</strong> “PUT is generally associated with full replacement, while PATCH is intended for partial modification.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">12. DELETE — app.delete()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>app.delete()</code> handles DELETE requests.</p>
+<pre><code>app.delete("/users/10", (req, res) =&gt; {
+  res.status(204).end();
+});</code></pre>
+<div class="alert alert-secondary endpoint">DELETE /users/10</div>
+<p>A <code>204 No Content</code> response is commonly used when deletion succeeds and there is no response body to return.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">13. Express Route Pattern</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>app.METHOD(PATH, HANDLER);</code></pre>
+<p>Examples:</p>
+<pre><code>app.get("/users", handler);
+app.post("/users", handler);
+app.put("/users/:id", handler);
+app.patch("/users/:id", handler);
+app.delete("/users/:id", handler);</code></pre>
+<div class="flow">HTTP Method
+     +
+   URL path
+     ↓
+Route matching
+     ↓
+Handler function
+     ↓
+res sends response</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">14. res.send()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>res.send()</code> sends a response to the client and ends the response.</p>
+<pre><code>app.get("/", (req, res) =&gt; {
+  res.send("Hello from Express");
+});</code></pre>
+<p>It can send strings and other supported values, with Express handling the response appropriately.</p>
+<div class="warn"><strong>Common mistake:</strong> Do not send multiple responses for one request.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">15. res.json()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>res.json()</code> sends a JSON response.</p>
+<pre><code>app.get("/user", (req, res) =&gt; {
+  res.json({
+    id: 10,
+    name: "Sam"
+  });
+});</code></pre>
+<p>This is commonly used when building REST-style APIs for frontend applications.</p>
+<div class="interview"><strong>Interview tip:</strong> <code>res.json()</code> is designed for JSON API responses and sets the appropriate JSON response behavior.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">16. res.status()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>res.status()</code> sets the HTTP status code. It can be chained with another response method.</p>
+<pre><code>app.post("/users", (req, res) =&gt; {
+  res.status(201).json({
+    message: "Created"
+  });
+});</code></pre>
+<div class="flow">res.status(201)
+      ↓
+sets status code
+      ↓
+.json(...)
+      ↓
+sends response</div>
+<div class="tip"><strong>Important:</strong> <code>res.status()</code> alone does not normally send the response. You generally follow it with <code>send()</code>, <code>json()</code>, <code>end()</code>, or another response-ending method.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">17. res.end()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>res.end()</code> finishes the HTTP response. It is useful when there is no body to send.</p>
+<pre><code>app.delete("/users/10", (req, res) =&gt; {
+  res.status(204).end();
+});</code></pre>
+<p>Compared with <code>res.json()</code>, <code>res.end()</code> is lower-level and does not format an object as JSON.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">18. Express Routing</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Routing</strong> means deciding which code should handle a request based on its HTTP method and URL path.</p>
+<pre><code>app.get("/products", (req, res) =&gt; {
+  res.json({ message: "Products" });
+});
+
+app.post("/products", (req, res) =&gt; {
+  res.status(201).json({ message: "Product created" });
+});
+
+app.get("/products/:id", (req, res) =&gt; {
+  res.json({
+    id: req.params.id
+  });
+});</code></pre>
+<div class="flow">GET /products
+      ↓
+GET products handler
+
+POST /products
+      ↓
+POST products handler
+
+GET /products/25
+      ↓
+GET products/:id handler</div>
+<p>Express checks routes and invokes a matching handler.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">19. Complete Beginner Express Server</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>const express = require("express");
+
+const app = express();
+
+app.get("/", (req, res) =&gt; {
+  res.send("Home page");
+});
+
+app.get("/users", (req, res) =&gt; {
+  res.json([
+    { id: 1, name: "Sam" },
+    { id: 2, name: "Alex" }
+  ]);
+});
+
+app.post("/users", (req, res) =&gt; {
+  res.status(201).json({
+    message: "User created"
+  });
+});
+
+app.listen(3000, () =&gt; {
+  console.log("Server running on port 3000");
+});</code></pre>
+<div class="flow">Node.js starts
+     ↓
+Express app created
+     ↓
+Routes registered
+     ↓
+app.listen(3000)
+     ↓
+Server waits for requests
+     ↓
+Request arrives
+     ↓
+Matching route runs
+     ↓
+Response sent</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">20. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Forgetting to call <code>app.listen()</code>.</li>
+<li>Using the wrong HTTP method for a route.</li>
+<li>Sending two responses for one request.</li>
+<li>Forgetting to end a response when using low-level response APIs.</li>
+<li>Using <code>res.status(404)</code> without actually sending or ending the response.</li>
+<li>Returning a success status for a failed operation.</li>
+<li>Confusing <code>req</code> and <code>res</code>.</li>
+<li>Assuming Express automatically parses every kind of request body without configuration.</li>
+<li>Putting a route at the wrong URL path.</li>
+<li>Thinking Express is the Node.js runtime itself.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">21. Interview Questions — Click to Show / Hide Answer + Why ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="topic">
+<h5>Q1. What is Express.js?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Express.js is a lightweight web framework for Node.js used to build HTTP servers, APIs, routing, and middleware-based applications.<br><br><strong>Why?</strong> It simplifies common server-side HTTP tasks compared with using Node's core HTTP APIs directly.</div>
+</div>
+
+<div class="topic">
+<h5>Q2. Is Express.js a runtime like Node.js?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> No. Node.js is the JavaScript runtime. Express is a framework/library that runs on Node.js.<br><br><strong>Why?</strong> This is a common interview distinction.</div>
+</div>
+
+<div class="topic">
+<h5>Q3. What does express() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It creates an Express application instance.<br><br><strong>Why?</strong> The returned app object provides methods for defining routes, middleware, and starting the server.</div>
+</div>
+
+<div class="topic">
+<h5>Q4. What does app.listen() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It starts the HTTP server and makes it listen for incoming connections on a specified port.<br><br><strong>Why?</strong> Without a listening server, clients cannot connect to the application over HTTP.</div>
+</div>
+
+<div class="topic">
+<h5>Q5. What is the difference between req and res?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>req</code> contains information about the incoming client request. <code>res</code> is used to construct and send the server response.<br><br><strong>Why?</strong> Understanding this distinction is fundamental to Express route handlers.</div>
+</div>
+
+<div class="topic">
+<h5>Q6. What is routing in Express?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Routing maps an HTTP method and URL path to a handler function.<br><br><strong>Why?</strong> It determines which application logic should run for each request.</div>
+</div>
+
+<div class="topic">
+<h5>Q7. What is the difference between app.get() and app.post()?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>app.get()</code> handles GET requests, while <code>app.post()</code> handles POST requests.<br><br><strong>Why?</strong> HTTP methods communicate the intended operation and Express uses the method when matching routes.</div>
+</div>
+
+<div class="topic">
+<h5>Q8. What is the difference between PUT and PATCH?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> PUT is generally used for replacing a resource, while PATCH is intended for partial modification.<br><br><strong>Why?</strong> API design should communicate whether the client is replacing the representation or changing only selected fields.</div>
+</div>
+
+<div class="topic">
+<h5>Q9. What does res.send() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It sends a response body and completes the response.<br><br><strong>Why?</strong> It is one of Express's convenient response helpers.</div>
+</div>
+
+<div class="topic">
+<h5>Q10. What does res.json() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It sends a JSON response to the client.<br><br><strong>Why?</strong> JSON is a common data format for REST-style APIs and frontend-backend communication.</div>
+</div>
+
+<div class="topic">
+<h5>Q11. What does res.status() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It sets the HTTP status code for the response.<br><br><strong>Why?</strong> Status codes communicate the result category to clients.</div>
+</div>
+
+<div class="topic">
+<h5>Q12. Does res.status(404) send the response?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> No. It sets the status code. You still need to send or end the response, for example <code>res.status(404).json(...)</code>.<br><br><strong>Why?</strong> A response must actually be completed for the client to receive it.</div>
+</div>
+
+<div class="topic">
+<h5>Q13. What does res.end() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It ends the HTTP response.<br><br><strong>Why?</strong> It is useful when there is no response body, such as a successful 204 response.</div>
+</div>
+
+<div class="topic">
+<h5>Q14. Predict the response.</h5>
+<pre><code>app.get("/hello", (req, res) =&gt; {
+  res.status(200).json({
+    message: "Hello"
+  });
+});</code></pre>
+<p>What happens for <code>GET /hello</code>?</p>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The route handler runs and sends HTTP status 200 with a JSON body containing <code>{"message":"Hello"}</code>.<br><br><strong>Why?</strong> The method and path match the registered route.</div>
+</div>
+
+<div class="topic">
+<h5>Q15. What is wrong here?</h5>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  res.status(200);
+});</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The status is set but the response is not completed.<br><br><strong>Why?</strong> Use something such as <code>res.status(200).json(users)</code>, <code>res.send(...)</code>, or <code>res.end()</code>.</div>
+</div>
+
+<div class="topic">
+<h5>Q16. What is wrong here?</h5>
+<pre><code>app.get("/users", (req, res) =&gt; {
+  res.json({ message: "One" });
+  res.json({ message: "Two" });
+});</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The handler attempts to send two responses for one request.<br><br><strong>Why?</strong> Once the response is sent, the same request cannot normally receive another independent response. This can cause “headers already sent” style errors.</div>
+</div>
+
+<div class="topic">
+<h5>Q17. Which route handles GET /users/25?</h5>
+<pre><code>app.get("/users", handlerA);
+app.post("/users", handlerB);
+app.get("/users/:id", handlerC);</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>handlerC</code>.<br><br><strong>Why?</strong> <code>/users/:id</code> matches the additional path segment, with <code>req.params.id</code> equal to <code>"25"</code>.</div>
+</div>
+
+<div class="topic">
+<h5>Q18. What is the role of app.get("/path", handler)?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It registers a handler for GET requests whose path matches the specified route pattern.<br><br><strong>Why?</strong> Express uses HTTP method + path when selecting route handlers.</div>
+</div>
+
+<div class="topic">
+<h5>Q19. What is the basic request/response lifecycle in Express?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Client sends request → Express receives it → Express checks middleware/routes → matching handler runs → handler builds response → response is sent to client.<br><br><strong>Why?</strong> This is the foundation for understanding Express APIs.</div>
+</div>
+
+<div class="topic">
+<h5>Q20. Express vs Node's http module — why use Express?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Node's <code>http</code> module provides lower-level HTTP capabilities, while Express adds convenient routing, middleware patterns, response helpers, and application structure.<br><br><strong>Why?</strong> Express reduces repetitive server code and makes larger HTTP applications easier to organize.</div>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">22. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>Express</strong><br>Node.js web framework.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>express()</strong><br>Creates the app.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>app.listen()</strong><br>Starts listening for connections.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>req</strong><br>Incoming request.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>res</strong><br>Outgoing response.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>app.get()</strong><br>Handles GET.</div></div>
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>app.post()</strong><br>Handles POST.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>app.put()</strong><br>Commonly full replacement.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>app.patch()</strong><br>Partial update.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>app.delete()</strong><br>Handles DELETE.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>res.json()</strong><br>Send JSON.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>res.end()</strong><br>End response.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">23. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ol>
+<li>Explain Express.js and why it is used with Node.js.</li>
+<li>Explain Node.js vs Express.</li>
+<li>Explain <code>express()</code>.</li>
+<li>Explain <code>app.listen()</code>.</li>
+<li>Explain request vs response.</li>
+<li>Explain <code>req</code> and <code>res</code>.</li>
+<li>Explain GET, POST, PUT, PATCH, and DELETE.</li>
+<li>Explain Express routing.</li>
+<li>Explain <code>res.send()</code>.</li>
+<li>Explain <code>res.json()</code>.</li>
+<li>Explain <code>res.status()</code>.</li>
+<li>Explain <code>res.end()</code>.</li>
+<li>Explain why two responses cannot normally be sent for one request.</li>
+<li>Explain the Express request/response lifecycle.</li>
+<li>Compare Express with Node's built-in <code>http</code> module.</li>
+</ol>
+<div class="interview"><strong>Strong interview summary:</strong><br>
+“Express is a web framework that runs on Node.js. We create an app with express(), register middleware and routes, and start listening with app.listen(). A request reaches Express, Express matches the method and path to a route, the handler processes the request, and res is used to send the response. Express provides helpers such as send(), json(), status(), and end() to simplify HTTP response handling.”</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">24. Final Visual Map</div>
+<div class="card-body">
+<div class="topic">
+<div class="flow">CLIENT
+  │
+  │ GET /users
+  ↓
+NODE.JS HTTP SERVER
+  ↓
+EXPRESS APP
+  ↓
+Route matching
+  ↓
+app.get("/users", handler)
+  ↓
+(req, res)
+  │
+  ├── read request
+  │
+  └── build response
+          ↓
+   res.status(...)
+          ↓
+   res.json(...)
+          ↓
+      HTTP RESPONSE
+          ↓
+        CLIENT</div>
+</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 14 — Express.js Fundamentals • Interview Preparation
+</footer>
+</div>
+
+<script>
+function toggle(btn){
+  const answer=btn.nextElementSibling;
+  const hidden=getComputedStyle(answer).display==="none";
+  answer.style.display=hidden?"block":"none";
+  btn.textContent=hidden?"Hide Answer":"Show Answer";
+}
+</script>
+</body>
+</html>

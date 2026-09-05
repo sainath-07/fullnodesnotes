@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Node.js Part 29 — Logging & Monitoring</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#0f172a,#2563eb);color:#fff;padding:48px 0}
+.doc{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.doc .card-header{font-weight:700;padding:16px 20px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto;font-size:.9rem;white-space:pre}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:20px 0}
+.box{padding:12px 16px;border-radius:10px;background:#e8f0fe;border:1px solid #b8ccf5;font-weight:600;text-align:center}
+.arrow{font-size:22px;font-weight:bold}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.danger{border-left:5px solid #dc3545;background:#fff0f1;padding:14px;border-radius:8px}
+.answer{display:none}
+table{background:#fff}
+</style>
+</head>
+<body>
+
+<header class="hero">
+<div class="container">
+<h1>🟢 Part 29 — Logging & Monitoring ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how production Node.js applications record events, detect problems and understand system health.</p>
+</div>
+</header>
+
+<main class="container py-4">
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">1. What is Logging?</div>
+<div class="card-body">
+<p><strong>What:</strong> Logging means recording useful information about what an application is doing.</p>
+<p><strong>Why:</strong> When a user reports a problem, logs help developers understand what happened without guessing.</p>
+<p><strong>Layman example:</strong> A shop keeps a register of sales, returns and important events. Application logs are a similar activity record.</p>
+<div class="flow">
+<div class="box">Application</div><div class="arrow">→</div>
+<div class="box">Log event</div><div class="arrow">→</div>
+<div class="box">Log storage</div><div class="arrow">→</div>
+<div class="box">Developer investigates</div>
+</div>
+<div class="alert alert-info"><strong>Interview line:</strong> Logging records application events; monitoring observes system health and behavior over time.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-dark text-white">2. console</div>
+<div class="card-body">
+<p>Node.js provides <code>console</code> methods for simple output.</p>
+<div class="code">console.log("Server started");
+console.info("User logged in");
+console.warn("Cache is nearly full");
+console.error("Database connection failed");</div>
+<p><strong>When to use:</strong> <code>console</code> is useful for local development and simple scripts. Production applications commonly use a logging library for levels, structured output, transports and consistent formatting.</p>
+<div class="warn"><strong>Common mistake:</strong> Leaving large amounts of random <code>console.log()</code> output in production makes debugging harder and can expose sensitive information.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">3. Logging Levels</div>
+<div class="card-body">
+<p>Logging levels tell us how important a message is.</p>
+<table class="table table-bordered align-middle">
+<thead><tr><th>Level</th><th>Simple meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>trace</td><td>Very detailed debugging information</td><td>Internal execution detail</td></tr>
+<tr><td>debug</td><td>Developer troubleshooting information</td><td>Query parameters used by a service</td></tr>
+<tr><td>info</td><td>Normal important events</td><td>Server started</td></tr>
+<tr><td>warn</td><td>Something unusual but not necessarily a failure</td><td>Retrying a request</td></tr>
+<tr><td>error</td><td>An operation failed</td><td>Database query failed</td></tr>
+<tr><td>fatal</td><td>Very serious failure</td><td>Application cannot start</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>Interview point:</strong> Production logging should be intentional. Do not log everything at the highest severity.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-info text-dark">4. Winston</div>
+<div class="card-body">
+<p><strong>Winston</strong> is a popular Node.js logging library. It supports logging levels, formats and different destinations called transports.</p>
+<div class="code">const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console()
+  ]
+});
+
+logger.info("Server started");</div>
+<p><strong>When to use:</strong> Use Winston when your application needs flexible logging configuration and multiple output destinations.</p>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-warning text-dark">5. Pino</div>
+<div class="card-body">
+<p><strong>Pino</strong> is a fast Node.js logger designed around structured logging and low overhead.</p>
+<div class="code">const pino = require("pino");
+const logger = pino();
+
+logger.info({ userId: 42 }, "User logged in");</div>
+<div class="alert alert-info"><strong>Interview point:</strong> Winston and Pino are both Node.js logging libraries. Pino is especially known for high performance and structured JSON logging.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">6. Structured Logs ⭐⭐⭐</div>
+<div class="card-body">
+<p><strong>What:</strong> Structured logs store information as fields, usually JSON, instead of only a free-form sentence.</p>
+<div class="code">{
+  "level": "info",
+  "message": "User logged in",
+  "userId": 42,
+  "requestId": "req-8f21",
+  "service": "auth"
+}</div>
+<p><strong>Why:</strong> Log systems can search and filter fields such as <code>userId</code>, <code>requestId</code>, <code>service</code> and <code>level</code>.</p>
+<div class="tip"><strong>Layman example:</strong> A handwritten note says “Sam bought a phone.” A structured record stores customer=Sam, product=phone and event=purchase separately, making it easier to search.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-secondary text-white">7. Request Logging</div>
+<div class="card-body">
+<p>Request logging records useful HTTP information such as method, route, status code, duration and request ID.</p>
+<div class="code">{
+  "level": "info",
+  "method": "GET",
+  "route": "/api/users",
+  "statusCode": 200,
+  "durationMs": 34,
+  "requestId": "req-123"
+}</div>
+<div class="flow">
+<div class="box">Incoming request</div><div class="arrow">→</div>
+<div class="box">Request logger</div><div class="arrow">→</div>
+<div class="box">Route</div><div class="arrow">→</div>
+<div class="box">Response</div><div class="arrow">→</div>
+<div class="box">Status + duration logged</div>
+</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-danger text-white">8. Error Logging</div>
+<div class="card-body">
+<p>Error logs should contain enough context to diagnose a failure.</p>
+<div class="code">logger.error({
+  message: err.message,
+  stack: err.stack,
+  requestId,
+  route: req.originalUrl
+});</div>
+<p>Useful fields can include error type, message, stack trace, request ID, route and safe contextual data.</p>
+<div class="danger"><strong>Security rule:</strong> Never blindly log passwords, access tokens, session secrets, API keys or other sensitive data.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">9. Correlation IDs / Request IDs ⭐⭐⭐</div>
+<div class="card-body">
+<p>A <strong>correlation ID</strong> is an identifier used to connect logs belonging to the same request or distributed operation.</p>
+<div class="flow">
+<div class="box">Client<br>requestId=A12</div><div class="arrow">→</div>
+<div class="box">API service<br>A12</div><div class="arrow">→</div>
+<div class="box">Payment service<br>A12</div><div class="arrow">→</div>
+<div class="box">Database logs<br>A12</div>
+</div>
+<p><strong>Why:</strong> If one user request crosses several services, searching for the same ID helps you follow the complete flow.</p>
+<div class="alert alert-info"><strong>Interview line:</strong> Correlation IDs improve traceability across logs, especially in distributed systems.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">10. Monitoring</div>
+<div class="card-body">
+<p><strong>Monitoring</strong> means continuously observing an application's health and behavior.</p>
+<div class="flow">
+<div class="box">Application</div><div class="arrow">→</div>
+<div class="box">Metrics / health data</div><div class="arrow">→</div>
+<div class="box">Monitoring system</div><div class="arrow">→</div>
+<div class="box">Alert / dashboard</div>
+</div>
+<p>Logging tells you about events. Monitoring helps answer questions such as: Is the service healthy? Is latency increasing? Are errors increasing?</p>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-info text-dark">11. Metrics</div>
+<div class="card-body">
+<p>Metrics are numerical measurements collected over time.</p>
+<ul>
+<li><strong>Request rate:</strong> requests per second/minute.</li>
+<li><strong>Error rate:</strong> percentage or count of failed requests.</li>
+<li><strong>Latency:</strong> how long requests take.</li>
+<li><strong>CPU usage:</strong> processor usage.</li>
+<li><strong>Memory usage:</strong> RAM usage.</li>
+<li><strong>Database metrics:</strong> query time, connections and failures.</li>
+</ul>
+<div class="tip"><strong>Interview point:</strong> A common production view is request rate + error rate + latency, combined with resource and dependency health.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-warning text-dark">12. Health Checks</div>
+<div class="card-body">
+<p>Health endpoints give infrastructure a simple way to check whether an application is functioning.</p>
+<div class="code">app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok"
+  });
+});</div>
+<p><strong>When to use:</strong> Load balancers, orchestrators and monitoring systems can call health endpoints.</p>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">13. /health vs /ready ⭐⭐⭐</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Endpoint</th><th>Purpose</th><th>Typical question</th></tr></thead>
+<tbody>
+<tr><td><code>/health</code></td><td>Basic application health</td><td>Is this process alive and able to respond?</td></tr>
+<tr><td><code>/ready</code></td><td>Readiness to receive traffic</td><td>Can this instance safely receive requests?</td></tr>
+</tbody>
+</table>
+<div class="flow">
+<div class="box">Process running</div><div class="arrow">→</div><div class="box">Health OK</div>
+<br>
+<div class="box">Dependencies ready</div><div class="arrow">→</div><div class="box">Ready for traffic</div>
+</div>
+<div class="warn"><strong>Important:</strong> Exact endpoint semantics depend on your deployment design. A readiness check may verify required dependencies such as a database connection.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-dark text-white">14. Application Monitoring</div>
+<div class="card-body">
+<p>Application monitoring watches behavior from the application's point of view.</p>
+<ul>
+<li>Request count</li>
+<li>Error rate</li>
+<li>Latency</li>
+<li>Endpoint performance</li>
+<li>External service failures</li>
+<li>Database health</li>
+<li>Queue or worker health</li>
+</ul>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-danger text-white">15. Performance Monitoring ⭐⭐⭐</div>
+<div class="card-body">
+<p>Performance monitoring helps identify slow requests and resource bottlenecks.</p>
+<div class="flow">
+<div class="box">Request</div><div class="arrow">→</div>
+<div class="box">Measure duration</div><div class="arrow">→</div>
+<div class="box">Find slow route</div><div class="arrow">→</div>
+<div class="box">Find dependency</div><div class="arrow">→</div>
+<div class="box">Optimize</div>
+</div>
+<p>Useful measurements include response latency, database query duration, CPU, memory, event-loop delay and external API duration.</p>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-secondary text-white">16. Production Debugging</div>
+<div class="card-body">
+<p>Production debugging means investigating real problems while minimizing risk to users.</p>
+<h6 class="fw-bold">A simple process</h6>
+<ol>
+<li>Check alerts and dashboards.</li>
+<li>Find the affected endpoint or service.</li>
+<li>Search logs using the request/correlation ID.</li>
+<li>Check error rate and latency.</li>
+<li>Check dependencies such as database or external APIs.</li>
+<li>Compare the timing with recent deployments or configuration changes.</li>
+<li>Fix safely, verify the result and document the root cause.</li>
+</ol>
+<div class="danger"><strong>Common mistake:</strong> Debugging production by adding random logs and restarting services repeatedly can hide the original problem. Prefer controlled investigation using existing observability data.</div>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">17. Logging vs Monitoring vs Metrics</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Concept</th><th>Main purpose</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Logging</td><td>Record events and context</td><td>User login failed</td></tr>
+<tr><td>Metrics</td><td>Measure values over time</td><td>Error rate = 2%</td></tr>
+<tr><td>Monitoring</td><td>Observe health and alert on problems</td><td>Latency exceeded threshold</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-warning text-dark">18. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Logging sensitive information such as passwords or tokens.</li>
+<li>Using only <code>console.log()</code> for a production system.</li>
+<li>Writing unstructured messages that are difficult to search.</li>
+<li>Using the wrong log level for important errors.</li>
+<li>Not including request/correlation IDs.</li>
+<li>Logging errors without useful context.</li>
+<li>Creating health checks that are too expensive.</li>
+<li>Confusing “process is alive” with “application is ready for traffic.”</li>
+<li>Collecting metrics without alerts or useful dashboards.</li>
+<li>Ignoring latency and focusing only on error count.</li>
+<li>Exposing internal error details to API clients.</li>
+<li>Keeping unlimited logs without a retention strategy.</li>
+</ol>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">19. Visual Production Flow</div>
+<div class="card-body">
+<div class="flow">
+<div class="box">Node.js API</div><div class="arrow">→</div>
+<div class="box">Structured Logs</div><div class="arrow">→</div>
+<div class="box">Log System</div>
+</div>
+<div class="flow">
+<div class="box">Node.js API</div><div class="arrow">→</div>
+<div class="box">Metrics</div><div class="arrow">→</div>
+<div class="box">Dashboard / Alerts</div>
+</div>
+<div class="flow">
+<div class="box">Load Balancer</div><div class="arrow">→</div>
+<div class="box">/health + /ready</div><div class="arrow">→</div>
+<div class="box">Traffic decision</div>
+</div>
+<p class="mb-0">These three areas work together: logs explain events, metrics show measurable behavior, and health/readiness checks help infrastructure make traffic decisions.</p>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-dark text-white">20. Interview-Ready Questions — Show / Hide</div>
+<div class="card-body" id="questions"></div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-success text-white">21. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li><strong>Logging:</strong> records application events.</li>
+<li><strong>Log levels:</strong> communicate message importance.</li>
+<li><strong>Winston:</strong> flexible Node.js logging library.</li>
+<li><strong>Pino:</strong> fast structured Node.js logger.</li>
+<li><strong>Structured logs:</strong> machine-readable fields such as JSON.</li>
+<li><strong>Request logging:</strong> records HTTP behavior and timing.</li>
+<li><strong>Error logging:</strong> records failure details safely.</li>
+<li><strong>Correlation ID:</strong> connects related logs across a request flow.</li>
+<li><strong>Metrics:</strong> numerical measurements such as rate, latency and errors.</li>
+<li><strong>/health:</strong> basic health check.</li>
+<li><strong>/ready:</strong> readiness for traffic.</li>
+<li><strong>Monitoring:</strong> observes application health and behavior.</li>
+<li><strong>Production debugging:</strong> use logs, metrics, health data and recent-change information together.</li>
+</ul>
+</div>
+</section>
+
+<section class="card doc">
+<div class="card-header bg-primary text-white">22. Interview-Ready Points ⭐⭐⭐</div>
+<div class="card-body">
+<ul>
+<li>“Logs explain <strong>what happened</strong>; metrics show <strong>how the system behaves</strong> over time.”</li>
+<li>“Structured JSON logs are easier for log platforms to search and aggregate.”</li>
+<li>“Correlation IDs help trace one request across multiple services.”</li>
+<li>“Health checks answer whether the service is healthy; readiness checks answer whether it should receive traffic.”</li>
+<li>“Production observability should avoid secrets and sensitive data in logs.”</li>
+<li>“Performance monitoring should track latency, errors, traffic and resource usage.”</li>
+</ul>
+</div>
+</section>
+
+</main>
+
+<script>
+const questions = [
+["Q1. What is logging and why is it important in Node.js?",
+"Logging records useful events and context from an application. It helps developers diagnose errors, understand behavior and investigate production issues.",
+"Without logs, production debugging becomes guesswork. Logs provide evidence of what happened."],
+["Q2. Why should we use a logging library instead of only console.log()?",
+"A logging library can provide levels, structured output, consistent formatting, multiple destinations and better production configuration.",
+"console is useful for simple development output, but production systems usually need more control and observability."],
+["Q3. What are common logging levels?",
+"Common levels include trace, debug, info, warn, error and fatal. Exact levels vary by library.",
+"Levels allow teams to filter messages based on importance and environment."],
+["Q4. Winston vs Pino?",
+"Winston is a flexible Node.js logging library with formats and transports. Pino is designed for high-performance structured logging and low overhead.",
+"The choice depends on project needs, performance requirements and logging architecture."],
+["Q5. What is structured logging?",
+"Structured logging records fields in a machine-readable format, commonly JSON, instead of only a free-form text message.",
+"It makes logs easier to search, filter, aggregate and analyze."],
+["Q6. What should request logs contain?",
+"Useful fields include HTTP method, route, status code, duration, request ID and safe contextual information.",
+"These fields help identify slow endpoints, failing routes and individual request flows."],
+["Q7. What is a correlation ID?",
+"A correlation ID is an identifier attached to related operations so logs from the same request or distributed workflow can be connected.",
+"It is especially useful when one request travels through multiple services."],
+["Q8. What is the difference between logging and monitoring?",
+"Logging records individual events and context. Monitoring continuously observes system behavior and health using logs, metrics, traces or alerts.",
+"Monitoring helps detect problems; logs often help explain why the problem happened."],
+["Q9. What are metrics?",
+"Metrics are numerical measurements collected over time, such as request rate, error rate, latency, CPU usage and memory usage.",
+"Metrics make system behavior measurable and useful for dashboards and alerts."],
+["Q10. What is a health check endpoint?",
+"A health check endpoint is a simple endpoint used to determine whether an application is healthy enough to respond.",
+"Infrastructure can use it to detect unhealthy instances."],
+["Q11. What is the difference between /health and /ready?",
+"/health commonly represents basic process/application health, while /ready indicates that the instance is prepared to receive traffic.",
+"Separating them is useful in systems where a running process may not yet be ready because dependencies are unavailable."],
+["Q12. Should a health check query every database table?",
+"Usually no. Health checks should be lightweight and designed around the application's deployment needs. A readiness check may verify critical dependencies.",
+"Expensive health checks can create extra load and can make an outage worse."],
+["Q13. What should you never log?",
+"Do not log passwords, access tokens, secret keys, session secrets or other sensitive personal/security data.",
+"Logs often have broad access and long retention, so sensitive data in logs creates security risk."],
+["Q14. What is request latency?",
+"Latency is the time taken to complete an operation, such as an HTTP request.",
+"Tracking latency helps identify slow endpoints and performance regressions even when requests are technically successful."],
+["Q15. How do logs help production debugging?",
+"Find the affected service or endpoint, use a request/correlation ID, inspect error logs and compare timing with metrics and recent changes.",
+"This turns debugging from guessing into evidence-based investigation."],
+["Q16. Why are structured logs useful in distributed systems?",
+"Structured fields such as service name, request ID, user-safe identifiers and timestamp can be indexed and searched consistently across services.",
+"They make it easier to reconstruct a request's journey."],
+["Q17. What is an observability mindset?",
+"It means collecting enough useful signals to understand system behavior from the outside, commonly through logs, metrics and traces.",
+"The goal is not to collect every possible data point, but to make important failures understandable."],
+["Q18. Why should production error responses avoid stack traces?",
+"Stack traces can reveal internal file paths, libraries and implementation details.",
+"Clients should receive safe error messages while detailed diagnostic information stays in protected logs."],
+["Q19. What is performance monitoring in Node.js?",
+"It measures application performance such as request latency, throughput, event-loop behavior, CPU, memory and dependency timing.",
+"It helps identify bottlenecks before they become major production problems."],
+["Q20. Give an interview-ready production logging and monitoring design.",
+"Use structured JSON logs with appropriate levels, request/correlation IDs, centralized log collection, metrics for traffic/errors/latency/resources, lightweight health and readiness endpoints, alerts for important thresholds, and safe log handling.",
+"This gives developers both detection and diagnosis capabilities while reducing security and operational risk."]
+];
+
+const root=document.getElementById("questions");
+questions.forEach((q,i)=>{
+ const id="answer"+i;
+ root.innerHTML+=`
+ <div class="border rounded-3 p-3 mb-3">
+   <h6 class="fw-bold">${q[0]}</h6>
+   <button class="btn btn-outline-primary btn-sm" onclick="toggleAnswer('${id}',this)">Show Answer</button>
+   <div id="${id}" class="answer mt-3">
+     <div class="alert alert-success"><strong>Answer:</strong> ${q[1]}</div>
+     <div class="alert alert-info mb-0"><strong>Why?</strong> ${q[2]}</div>
+   </div>
+ </div>`;
+});
+function toggleAnswer(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

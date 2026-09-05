@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 26 — Worker Threads & Child Processes</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#243247}.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.card{border:0;border-radius:14px}.card-header{font-weight:700}.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto}
+pre{margin:0}.diagram{background:#eef4ff;border:1px dashed #7c9bd8;border-radius:12px;padding:18px;text-align:center;font-weight:600}
+.btn-toggle{min-width:145px}.tip{border-left:5px solid #0d6efd}.danger{border-left:5px solid #dc3545}.success{border-left:5px solid #198754}
+.small-label{font-size:.8rem;font-weight:700;text-transform:uppercase;color:#64748b}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4">
+<div class="container">
+<span class="badge bg-warning text-dark mb-3">NODE.JS INTERVIEW PREPARATION</span>
+<h1 class="display-5 fw-bold">Part 26 — Worker Threads & Child Processes</h1>
+<p class="lead mb-0">Interview-ready notes, visual flows, and output-based coding questions for MAANG, FAANG and MNC interviews.</p>
+</div>
+</header>
+
+<main class="container pb-5">
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white">1. What Are Worker Threads?</div>
+<div class="card-body">
+<p><strong>What:</strong> Worker Threads allow JavaScript code to run in a separate thread inside the same Node.js process.</p>
+<p><strong>Why:</strong> Node.js normally runs JavaScript on one main thread. CPU-heavy work can block that thread. A worker can perform that CPU-heavy work separately so the main thread remains responsive.</p>
+<p><strong>Layman example:</strong> Imagine one cashier handling customers. If the cashier must calculate a huge report, every customer waits. A worker is like another employee doing the calculation while the cashier continues serving customers.</p>
+<p><strong>When to use:</strong> CPU-heavy JavaScript such as large calculations, image processing, parsing large data sets, compression, or cryptographic computation.</p>
+<div class="diagram">Main Thread → creates Worker → Worker performs CPU work → Worker sends result → Main Thread continues</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-success text-white">2. Worker Threads — Core API</div>
+<div class="card-body">
+<p>The <code>worker_threads</code> module provides <code>Worker</code>, <code>parentPort</code>, and messaging APIs.</p>
+<div class="code mb-3"><pre>const { Worker } = require("node:worker_threads");
+
+const worker = new Worker("./worker.js");
+
+worker.on("message", result =&gt; {
+  console.log("Result:", result);
+});
+
+worker.on("error", err =&gt; {
+  console.error(err);
+});
+
+worker.on("exit", code =&gt; {
+  console.log("Worker exited:", code);
+});</pre></div>
+<div class="code"><pre>// worker.js
+const { parentPort } = require("node:worker_threads");
+
+parentPort.on("message", number =&gt; {
+  const result = number * number;
+  parentPort.postMessage(result);
+});</pre></div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-info text-dark">3. postMessage() and parentPort</div>
+<div class="card-body">
+<ul>
+<li><code>worker.postMessage(data)</code> sends data from the main thread to the worker.</li>
+<li><code>parentPort.on("message", ...)</code> receives data inside the worker.</li>
+<li><code>parentPort.postMessage(data)</code> sends a result back to the parent.</li>
+<li>Messages are not normal shared variables. Node.js uses structured cloning for message data.</li>
+</ul>
+<div class="diagram">Main Thread<br>postMessage(data) ↓<br>Worker Thread<br>parentPort.on("message") → work → parentPort.postMessage(result)<br>↑<br>Main Thread receives "message"</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-warning">4. Worker Lifecycle</div>
+<div class="card-body">
+<div class="diagram mb-3">new Worker() → online → message / error → exit<br>                             ↘ worker.terminate()</div>
+<ul>
+<li><strong>online:</strong> worker has started executing.</li>
+<li><strong>message:</strong> worker sends a message.</li>
+<li><strong>error:</strong> worker encounters an uncaught error.</li>
+<li><strong>exit:</strong> worker has stopped.</li>
+<li><strong>terminate():</strong> parent requests that the worker stop.</li>
+</ul>
+<div class="alert alert-warning"><strong>Interview point:</strong> A worker is not automatically a magic solution for every slow operation. It is mainly useful when JavaScript itself is CPU-bound.</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white">5. Child Processes</div>
+<div class="card-body">
+<p><strong>What:</strong> The <code>child_process</code> module starts another operating-system process.</p>
+<p><strong>Why:</strong> A child process is useful when Node.js needs to run another program, command, script, or isolated Node.js process.</p>
+<div class="diagram">Parent Node.js Process → Child OS Process<br>                             ↕ IPC / stdin / stdout / stderr</div>
+<p><strong>Layman example:</strong> Instead of asking another employee in the same office to help, you start a completely separate office with its own resources.</p>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-secondary text-white">6. exec(), execFile(), spawn(), fork()</div>
+<div class="card-body">
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead><tr><th>API</th><th>Best use</th><th>Important point</th></tr></thead>
+<tbody>
+<tr><td><code>exec()</code></td><td>Run a shell command</td><td>Buffers command output and uses a shell.</td></tr>
+<tr><td><code>execFile()</code></td><td>Run an executable directly</td><td>Does not normally use a shell.</td></tr>
+<tr><td><code>spawn()</code></td><td>Long-running process / large output</td><td>Streams stdout and stderr.</td></tr>
+<tr><td><code>fork()</code></td><td>Start another Node.js module</td><td>Provides built-in IPC messaging.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="alert alert-danger"><strong>Security:</strong> Never place untrusted user input directly into a shell command. Shell injection can become a serious security problem.</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white">7. Worker Thread vs Child Process</div>
+<div class="card-body">
+<table class="table table-striped">
+<thead><tr><th>Feature</th><th>Worker Thread</th><th>Child Process</th></tr></thead>
+<tbody>
+<tr><td>Runs in</td><td>Separate thread</td><td>Separate OS process</td></tr>
+<tr><td>Memory</td><td>Same process; separate JS execution context</td><td>Separate process memory</td></tr>
+<tr><td>Communication</td><td>postMessage / MessagePort</td><td>IPC, stdin/stdout, pipes</td></tr>
+<tr><td>Best for</td><td>CPU-heavy JavaScript</td><td>External commands/programs and process isolation</td></tr>
+<tr><td>Startup cost</td><td>Usually lower than a separate process</td><td>Usually higher</td></tr>
+<tr><td>Isolation</td><td>Less than a separate OS process</td><td>Stronger process isolation</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-success text-white">8. IPC — Inter-Process Communication</div>
+<div class="card-body">
+<p><strong>IPC</strong> means communication between separate execution contexts.</p>
+<p>With <code>fork()</code>, the parent and child Node.js processes can communicate with <code>send()</code> and <code>message</code> events.</p>
+<div class="code"><pre>// parent.js
+const { fork } = require("node:child_process");
+
+const child = fork("./child.js");
+
+child.on("message", message =&gt; {
+  console.log("Parent received:", message);
+});
+
+child.send({ task: "calculate", value: 10 });</pre></div>
+<div class="code mt-3"><pre>// child.js
+process.on("message", message =&gt; {
+  const result = message.value * message.value;
+  process.send({ result });
+});</pre></div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-danger text-white">9. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="alert alert-danger mb-0"><strong>Using workers for I/O:</strong><br>Database and network I/O usually does not need a worker. Node.js already handles asynchronous I/O efficiently.</div></div>
+<div class="col-md-6"><div class="alert alert-danger mb-0"><strong>Creating too many workers:</strong><br>Workers have overhead. A huge number can cause CPU contention and memory pressure.</div></div>
+<div class="col-md-6"><div class="alert alert-danger mb-0"><strong>Ignoring worker errors:</strong><br>Always handle <code>error</code> and <code>exit</code> events.</div></div>
+<div class="col-md-6"><div class="alert alert-danger mb-0"><strong>Shell injection:</strong><br>Do not build shell commands from untrusted input.</div></div>
+<div class="col-md-6"><div class="alert alert-danger mb-0"><strong>Blocking the worker:</strong><br>A worker has its own JavaScript thread, but CPU-heavy work can still block that worker.</div></div>
+<div class="col-md-6"><div class="alert alert-danger mb-0"><strong>Wrong abstraction:</strong><br>Do not use child_process when a normal async API is enough.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white">10. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>Node.js JavaScript normally executes on the main thread.</li>
+<li>Worker Threads move CPU-heavy JavaScript work to separate threads.</li>
+<li><code>postMessage()</code> and <code>parentPort</code> are used for worker communication.</li>
+<li><code>child_process</code> creates separate OS processes.</li>
+<li><code>spawn()</code> is useful for streaming large process output.</li>
+<li><code>exec()</code> is convenient for shell commands but needs careful input handling.</li>
+<li><code>execFile()</code> runs an executable without normally involving a shell.</li>
+<li><code>fork()</code> starts a Node.js module with built-in IPC.</li>
+<li>Workers are mainly for CPU-heavy JavaScript; child processes are useful for external programs and stronger process isolation.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-info text-dark">11. Interview-Ready Questions</div>
+<div class="card-body">
+<div class="alert alert-primary">Try to answer each question before opening the answer.</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 1 — Predict the output</div>
+<div class="card-body">
+<pre class="code">const { Worker } = require("node:worker_threads");
+
+console.log("A");
+
+const worker = new Worker(`
+  const { parentPort } = require("node:worker_threads");
+  parentPort.postMessage("C");
+`, { eval: true });
+
+worker.on("message", msg =&gt; console.log(msg));
+
+console.log("B");</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a1','b1',this)">Show Answer</button>
+<div id="a1" class="mt-3 d-none"><strong>Answer:</strong> The normal main-thread output starts with <code>A</code>, then <code>B</code>. The worker's <code>C</code> arrives asynchronously, so the common output is <code>A B C</code>.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b1',this)">Show Why?</button>
+<div id="b1" class="mt-2 d-none"><strong>Why:</strong> Creating a worker starts another execution context. The main thread continues instead of waiting for the worker message.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 2 — Is a Worker Thread required here?</div>
+<div class="card-body">
+<pre class="code">app.get("/users", async (req, res) =&gt; {
+  const users = await db.users.findMany();
+  res.json(users);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a2','b2',this)">Show Answer</button>
+<div id="a2" class="mt-3 d-none"><strong>Answer:</strong> Usually no. A worker is not needed merely because the operation is asynchronous.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b2',this)">Show Why?</button>
+<div id="b2" class="mt-2 d-none"><strong>Why:</strong> Database/network I/O is generally handled asynchronously by Node.js. Workers are primarily useful when JavaScript computation itself is CPU-heavy.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 3 — Find the problem</div>
+<div class="card-body">
+<pre class="code">const { exec } = require("node:child_process");
+
+const username = req.query.username;
+
+exec(`grep ${username} users.txt`, (err, stdout) =&gt; {
+  res.send(stdout);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a3','b3',this)">Show Answer</button>
+<div id="a3" class="mt-3 d-none"><strong>Answer:</strong> The code is vulnerable to shell injection because untrusted input is inserted directly into a shell command.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b3',this)">Show Why?</button>
+<div id="b3" class="mt-2 d-none"><strong>Why:</strong> <code>exec()</code> uses a shell. Special shell characters in user input can change the command that gets executed. Prefer safe argument handling or APIs that avoid a shell.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 4 — Worker communication</div>
+<div class="card-body">
+<pre class="code">// main.js
+worker.postMessage(5);
+
+// worker.js
+parentPort.on("message", value =&gt; {
+  parentPort.postMessage(value * 2);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a4','b4',this)">Show Answer</button>
+<div id="a4" class="mt-3 d-none"><strong>Answer:</strong> The worker receives <code>5</code> and sends back <code>10</code>.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b4',this)">Show Why?</button>
+<div id="b4" class="mt-2 d-none"><strong>Why:</strong> <code>postMessage()</code> sends the value to the worker. The worker's message listener receives it, calculates <code>5 × 2</code>, and sends the result through <code>parentPort.postMessage()</code>.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 5 — Which child_process API?</div>
+<div class="card-body">
+<p>You need to run a long-running program that continuously produces a large amount of stdout. Which API is the better fit: <code>exec()</code> or <code>spawn()</code>?</p>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a5','b5',this)">Show Answer</button>
+<div id="a5" class="mt-3 d-none"><strong>Answer:</strong> <code>spawn()</code>.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b5',this)">Show Why?</button>
+<div id="b5" class="mt-2 d-none"><strong>Why:</strong> <code>spawn()</code> exposes stdout/stderr as streams, making it suitable for large or continuous output. <code>exec()</code> buffers command output.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 6 — Worker or child process?</div>
+<div class="card-body">
+<p>Your Node.js application needs to call an installed image-processing command-line program. Which approach is more appropriate?</p>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a6','b6',this)">Show Answer</button>
+<div id="a6" class="mt-3 d-none"><strong>Answer:</strong> A child process is usually the natural choice because the application needs to execute an external program.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b6',this)">Show Why?</button>
+<div id="b6" class="mt-2 d-none"><strong>Why:</strong> Worker Threads execute JavaScript in another thread. Child processes can launch operating-system programs and communicate with them.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 7 — Output ordering</div>
+<div class="card-body">
+<pre class="code">console.log("start");
+
+const { Worker } = require("node:worker_threads");
+
+const worker = new Worker(`
+  const { parentPort } = require("node:worker_threads");
+  parentPort.postMessage("worker");
+`, { eval: true });
+
+worker.on("message", console.log);
+
+console.log("end");</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a7','b7',this)">Show Answer</button>
+<div id="a7" class="mt-3 d-none"><strong>Answer:</strong> <code>start</code> is printed first, <code>end</code> is printed next, and <code>worker</code> arrives asynchronously afterward. So the expected order is <code>start → end → worker</code>.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b7',this)">Show Why?</button>
+<div id="b7" class="mt-2 d-none"><strong>Why:</strong> The main thread does not stop at <code>new Worker()</code>. It continues to the next statement while the worker starts separately.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 8 — fork() and IPC</div>
+<div class="card-body">
+<pre class="code">// parent.js
+const { fork } = require("node:child_process");
+const child = fork("./child.js");
+
+child.on("message", console.log);
+child.send("hello");
+
+// child.js
+process.on("message", msg =&gt; {
+  process.send(msg.toUpperCase());
+});</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a8','b8',this)">Show Answer</button>
+<div id="a8" class="mt-3 d-none"><strong>Answer:</strong> The parent receives and prints <code>HELLO</code>.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b8',this)">Show Why?</button>
+<div id="b8" class="mt-2 d-none"><strong>Why:</strong> <code>fork()</code> starts another Node.js process with an IPC channel. The parent sends <code>hello</code>; the child converts it to uppercase and sends it back.</div>
+</div>
+</div>
+
+<div class="card border mb-4">
+<div class="card-header">Question 9 — When should you NOT use workers?</div>
+<div class="card-body">
+<p>An endpoint waits for a database query for 500 ms but uses almost no CPU. Should you move the query into a worker?</p>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a9','b9',this)">Show Answer</button>
+<div id="a9" class="mt-3 d-none"><strong>Answer:</strong> Usually no.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b9',this)">Show Why?</button>
+<div id="b9" class="mt-2 d-none"><strong>Why:</strong> Waiting on I/O is different from blocking the CPU with JavaScript. A worker adds overhead without solving the main problem.</div>
+</div>
+</div>
+
+<div class="card border">
+<div class="card-header">Question 10 — CPU-heavy task</div>
+<div class="card-body">
+<pre class="code">app.get("/calculate", (req, res) =&gt; {
+  let total = 0;
+
+  for (let i = 0; i &lt; 5_000_000_000; i++) {
+    total += i;
+  }
+
+  res.json({ total });
+});</pre>
+<button class="btn btn-outline-primary btn-toggle mt-3" onclick="toggle('a10','b10',this)">Show Answer</button>
+<div id="a10" class="mt-3 d-none"><strong>Answer:</strong> This CPU-heavy calculation can block the main JavaScript thread. A Worker Thread is a strong candidate for moving this computation away from the main thread.</div>
+<button class="btn btn-outline-success btn-toggle mt-2" onclick="toggleWhy('b10',this)">Show Why?</button>
+<div id="b10" class="mt-2 d-none"><strong>Why:</strong> The loop performs a huge amount of synchronous JavaScript work. While it runs on the main thread, other JavaScript callbacks cannot get normal execution time. A worker can perform the calculation separately.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white">12. Interview Cheat Sheet</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Question</th><th>Interview-ready answer</th></tr></thead>
+<tbody>
+<tr><td>Why Worker Threads?</td><td>To move CPU-heavy JavaScript work away from the main thread.</td></tr>
+<tr><td>Why child_process?</td><td>To run external programs or separate Node.js processes.</td></tr>
+<tr><td>spawn vs exec?</td><td>spawn streams output; exec buffers output and is convenient for shell commands.</td></tr>
+<tr><td>execFile?</td><td>Runs an executable directly without normally using a shell.</td></tr>
+<tr><td>fork?</td><td>Starts a Node.js module as a child process and provides IPC.</td></tr>
+<tr><td>Worker communication?</td><td>Use postMessage(), parentPort, and message events.</td></tr>
+<tr><td>Biggest mistake?</td><td>Using workers for normal asynchronous I/O or creating an uncontrolled number of workers.</td></tr>
+</tbody>
+</table>
+<div class="alert alert-success mb-0"><strong>Final interview tip:</strong> Do not simply say “Node.js is single-threaded.” Explain that JavaScript execution is normally on the main thread, while Node.js can use other mechanisms such as the OS, libuv thread pool, Worker Threads, and child processes for different workloads.</div>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+function toggle(answerId, whyId, btn){
+  const el=document.getElementById(answerId);
+  el.classList.toggle("d-none");
+  btn.textContent=el.classList.contains("d-none")?"Show Answer":"Hide Answer";
+}
+function toggleWhy(id,btn){
+  const el=document.getElementById(id);
+  el.classList.toggle("d-none");
+  btn.textContent=el.classList.contains("d-none")?"Show Why?":"Hide Why?";
+}
+</script>
+</body>
+</html>

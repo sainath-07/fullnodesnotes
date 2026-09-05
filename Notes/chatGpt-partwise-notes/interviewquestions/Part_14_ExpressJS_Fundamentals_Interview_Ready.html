@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 14 — Express.js Fundamentals | Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#212529;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#0d6efd,#6610f2);color:#fff}
+.section-card{border:0;border-radius:16px;overflow:hidden}
+.card-header{font-weight:700}
+pre{background:#172033;color:#e9eef7;border-radius:10px;padding:16px;overflow:auto}
+code{font-family:Consolas,monospace}
+.diagram{background:#eef5ff;border:1px solid #cfe2ff;border-radius:12px;padding:18px;text-align:center;font-weight:600}
+.flow{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.flow span{background:#fff;border:1px solid #b6d4fe;padding:10px 14px;border-radius:8px}
+.q{border-left:5px solid #0d6efd}
+.toggle-btn{min-width:145px}
+.answer,.why{display:none}
+.tip{border-left:5px solid #198754}
+.warn{border-left:5px solid #ffc107}
+.small-note{font-size:.94rem;color:#6c757d}
+</style>
+</head>
+<body>
+
+<header class="hero py-5 shadow">
+<div class="container">
+<span class="badge bg-light text-primary mb-3">Node.js + Express.js Interview Preparation</span>
+<h1 class="display-5 fw-bold">Part 14 — Express.js Fundamentals</h1>
+<p class="lead mb-0">Simple explanations, visual flows, output-based code questions, answers, and interview-ready WHY explanations.</p>
+</div>
+</header>
+
+<main class="container py-5">
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-primary text-white fs-4">1. What is Express.js?</div>
+<div class="card-body">
+<p><strong>Express.js</strong> is a small and flexible web framework built on Node.js. It makes it easier to create HTTP servers, APIs, routes, and middleware.</p>
+<div class="alert alert-info"><strong>Layman example:</strong> Node.js gives you the engine. Express.js gives you convenient tools to build the web application on that engine.</div>
+<div class="diagram"><div class="flow"><span>Browser / Client</span><b>→</b><span>Express Route</span><b>→</b><span>Handler</span><b>→</b><span>Response</span></div></div>
+<h5 class="mt-4">Why use Express?</h5>
+<ul><li>Simple routing.</li><li>Easy request and response handling.</li><li>Middleware support.</li><li>Useful for REST APIs and web servers.</li></ul>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-dark text-white fs-4">2. Express Architecture and Basic Server</div>
+<div class="card-body">
+<pre><code>const express = require("express");
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Hello Express");
+});
+
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});</code></pre>
+<div class="alert alert-success"><strong>How it works:</strong> <code>express()</code> creates the application object. A route handles a request. <code>app.listen()</code> starts the server and listens for incoming connections.</div>
+<div class="diagram"><div class="flow"><span>express()</span><b>→</b><span>app</span><b>→</b><span>app.get()</span><b>→</b><span>app.listen()</span></div></div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-success text-white fs-4">3. HTTP Methods in Express</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Method</th><th>Express</th><th>Typical purpose</th></tr></thead>
+<tbody>
+<tr><td>GET</td><td><code>app.get()</code></td><td>Read data</td></tr>
+<tr><td>POST</td><td><code>app.post()</code></td><td>Create data</td></tr>
+<tr><td>PUT</td><td><code>app.put()</code></td><td>Replace/update a resource</td></tr>
+<tr><td>PATCH</td><td><code>app.patch()</code></td><td>Partially update a resource</td></tr>
+<tr><td>DELETE</td><td><code>app.delete()</code></td><td>Delete data</td></tr>
+</tbody></table>
+<div class="alert alert-warning"><strong>Interview point:</strong> Do not say PUT and PATCH are exactly the same. PUT is generally used for replacement, while PATCH is intended for partial updates.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-info text-dark fs-4">4. Request and Response</div>
+<div class="card-body">
+<p><code>req</code> contains information about the incoming request. <code>res</code> is used to send a response back to the client.</p>
+<pre><code>app.get("/user", (req, res) => {
+  console.log(req.method);
+  console.log(req.url);
+  res.status(200).json({ name: "Sam" });
+});</code></pre>
+<div class="diagram"><div class="flow"><span>Client request</span><b>→</b><span>req</span><b>→</b><span>Route handler</span><b>→</b><span>res</span><b>→</b><span>Client</span></div></div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-secondary text-white fs-4">5. Response Methods</div>
+<div class="card-body">
+<ul>
+<li><code>res.send()</code> sends a response.</li>
+<li><code>res.json()</code> sends JSON data.</li>
+<li><code>res.status()</code> sets the HTTP status code and can be chained.</li>
+<li><code>res.end()</code> ends the response without sending a formatted body.</li>
+</ul>
+<pre><code>res.status(201).json({
+  message: "User created"
+});</code></pre>
+<div class="alert alert-danger"><strong>Common mistake:</strong> Do not send two responses for one request. For example, calling <code>res.json()</code> and then trying to call <code>res.send()</code> again can cause "headers already sent" errors.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-warning text-dark fs-4">6. Express Routing</div>
+<div class="card-body">
+<pre><code>app.get("/users", (req, res) => {
+  res.json(["Sam", "John"]);
+});
+
+app.post("/users", (req, res) => {
+  res.status(201).json({ message: "Created" });
+});
+
+app.delete("/users/:id", (req, res) => {
+  res.json({ deletedId: req.params.id });
+});</code></pre>
+<div class="alert alert-info"><strong>Route matching:</strong> Express checks the incoming HTTP method and URL against registered routes. The matching handler runs.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-primary text-white fs-4">7. Interview Questions — Output and Code Based</div>
+<div class="card-body">
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q1. What is printed when <code>GET /</code> is requested?</h5>
+<pre><code>const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+  console.log("Route 1");
+  res.send("Hello");
+});
+
+app.listen(3000);</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> The terminal prints <code>Route 1</code>, and the client receives <code>Hello</code>.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w1',this)">Show Why?</button>
+<div id="w1" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> The request method and path match the registered GET route, so its callback executes.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q2. What happens here?</h5>
+<pre><code>app.get("/users", (req, res) => {
+  res.json({ ok: true });
+  res.send("Done");
+});</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer mt-3"><div class="alert alert-danger"><strong>Answer:</strong> The first response is sent. The second response attempts to send another response and can produce a "Cannot set headers after they are sent" error.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w2',this)">Show Why?</button>
+<div id="w2" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> One HTTP request should normally receive one completed response. <code>res.json()</code> ends the response, so another response is too late.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q3. Predict the response status and body.</h5>
+<pre><code>app.post("/products", (req, res) => {
+  res.status(201).json({
+    message: "Product created"
+  });
+});</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> HTTP status is <code>201</code> and the JSON body is <code>{"message":"Product created"}</code>.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w3',this)">Show Why?</button>
+<div id="w3" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> <code>res.status(201)</code> sets the status, and <code>json()</code> sends the object as JSON.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q4. Which route handles <code>GET /users/42</code>?</h5>
+<pre><code>app.get("/users", handlerA);
+app.get("/users/:id", handlerB);
+app.get("/users/profile", handlerC);</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> <code>handlerB</code>.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w4',this)">Show Why?</button>
+<div id="w4" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> <code>:id</code> is a route parameter and matches the value <code>42</code>. The static <code>/users/profile</code> route does not match.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q5. What is the value of <code>req.params.id</code>?</h5>
+<pre><code>app.get("/users/:id", (req, res) => {
+  res.send(req.params.id);
+});</code>
+<p class="mt-2">Request: <code>GET /users/99</code></p>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> <code>"99"</code>.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w5',this)">Show Why?</button>
+<div id="w5" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express stores values captured by route parameters in <code>req.params</code>.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q6. What is wrong with this server?</h5>
+<pre><code>const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("OK");
+});
+
+console.log("Server started");</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="answer mt-3"><div class="alert alert-warning"><strong>Answer:</strong> No HTTP server is listening because <code>app.listen()</code> was never called.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w6',this)">Show Why?</button>
+<div id="w6" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Creating the Express app and defining routes does not by itself start a network server. <code>app.listen()</code> starts listening on a port.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q7. What does this return?</h5>
+<pre><code>app.get("/test", (req, res) => {
+  const result = res.status(404);
+  console.log(result === res);
+  res.end();
+});</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> <code>true</code>.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w7',this)">Show Why?</button>
+<div id="w7" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express response methods such as <code>res.status()</code> return the response object, which enables method chaining.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q8. Why can this route hang?</h5>
+<pre><code>app.get("/data", (req, res) => {
+  console.log("received");
+});</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="answer mt-3"><div class="alert alert-danger"><strong>Answer:</strong> The request may remain pending because the handler neither sends a response nor passes control to another middleware.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w8',this)">Show Why?</button>
+<div id="w8" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express needs the request lifecycle to continue or finish. Use <code>res.send()</code>, <code>res.json()</code>, <code>res.end()</code>, or <code>next()</code> when appropriate.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q9. Which handler runs first?</h5>
+<pre><code>app.get("/users/:id", (req, res) => {
+  res.send("parameter");
+});
+
+app.get("/users/profile", (req, res) => {
+  res.send("profile");
+});</code>
+<p>Request: <code>GET /users/profile</code></p>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> The first handler can match <code>profile</code> as <code>:id</code>, so it sends <code>parameter</code>.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w9',this)">Show Why?</button>
+<div id="w9" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express checks routes in registration order. A route parameter can match the string <code>profile</code>. Put more specific static routes before broad parameter routes.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q10. What is the difference between <code>res.send()</code> and <code>res.json()</code>?</h5>
+<pre><code>res.send({ name: "Sam" });
+res.json({ name: "Sam" });</code></pre>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> Both can send an object as JSON in modern Express usage, but <code>res.json()</code> clearly communicates that the intended response is JSON and explicitly applies JSON response handling.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w10',this)">Show Why?</button>
+<div id="w10" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> <code>res.json()</code> is preferred when the API response is JSON because it makes the developer's intention clear.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q11. What happens if a route is registered with the wrong HTTP method?</h5>
+<pre><code>app.get("/login", (req, res) => {
+  res.send("GET login");
+});</code>
+<p>Client sends <code>POST /login</code>.</p>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="answer mt-3"><div class="alert alert-warning"><strong>Answer:</strong> This GET route does not handle the POST request. If no other matching route or middleware handles it, Express normally returns a 404 response.</div></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w11',this)">Show Why?</button>
+<div id="w11" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express routing considers both the HTTP method and path.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4">
+<div class="card-body">
+<h5>Q12. Build routes for CRUD operations.</h5>
+<button class="btn btn-primary toggle-btn" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="answer mt-3"><pre><code>app.get("/users", (req, res) => {
+  res.json(users);
+});
+
+app.post("/users", (req, res) => {
+  res.status(201).json({ message: "created" });
+});
+
+app.put("/users/:id", (req, res) => {
+  res.json({ message: "replaced" });
+});
+
+app.patch("/users/:id", (req, res) => {
+  res.json({ message: "updated partially" });
+});
+
+app.delete("/users/:id", (req, res) => {
+  res.status(204).end();
+});</code></pre></div>
+<button class="btn btn-outline-dark toggle-btn" onclick="toggle('w12',this)">Show Why?</button>
+<div id="w12" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> The routes map common CRUD actions to the HTTP methods used by REST APIs.</div></div>
+</div></div>
+
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-danger text-white fs-4">8. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="alert alert-warning"><strong>1. Forgetting app.listen()</strong><br>Routes exist, but no server is listening.</div>
+<div class="alert alert-warning"><strong>2. Sending two responses</strong><br>Do not call <code>res.send()</code> and <code>res.json()</code> for the same request.</div>
+<div class="alert alert-warning"><strong>3. Forgetting to finish the request</strong><br>A handler that only logs data can leave the client waiting.</div>
+<div class="alert alert-warning"><strong>4. Wrong HTTP method</strong><br>A POST request does not automatically use a GET route.</div>
+<div class="alert alert-warning"><strong>5. Route order problems</strong><br>Specific routes such as <code>/users/profile</code> should normally appear before broad parameter routes such as <code>/users/:id</code>.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-success text-white fs-4">9. Interview-Ready Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>Express is a web framework built on Node.js.</li>
+<li><code>express()</code> creates an Express application.</li>
+<li><code>app.listen()</code> starts the HTTP server.</li>
+<li><code>app.get/post/put/patch/delete()</code> define routes.</li>
+<li><code>req</code> represents the incoming request.</li>
+<li><code>res</code> is used to send the response.</li>
+<li><code>res.status()</code> sets the HTTP status.</li>
+<li><code>res.json()</code> sends JSON.</li>
+<li>Express matches the HTTP method and URL.</li>
+<li>Route registration order matters.</li>
+</ul>
+<div class="alert alert-primary"><strong>Golden interview answer:</strong> "Express.js is a lightweight Node.js web framework that simplifies HTTP server development by providing routing, request/response helpers, and middleware support."</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow section-card">
+<div class="card-header bg-dark text-white fs-4">10. Interview Tips</div>
+<div class="card-body">
+<div class="alert alert-info tip"><strong>Tip 1:</strong> Explain Express as a layer on top of Node's HTTP capabilities, not as a replacement for Node.js.</div>
+<div class="alert alert-info tip"><strong>Tip 2:</strong> When asked about a route, always mention both HTTP method and path.</div>
+<div class="alert alert-info tip"><strong>Tip 3:</strong> For debugging an API, trace: Client → Method + URL → Matching route → Handler → Response.</div>
+<div class="alert alert-info tip"><strong>Tip 4:</strong> Be ready to explain why "Cannot set headers after they are sent" happens.</div>
+</div></div>
+</section>
+
+</main>
+
+<footer class="py-4 bg-dark text-white text-center">
+<div class="container">Part 14 — Express.js Fundamentals • Interview Ready Notes</div>
+</footer>
+
+<script>
+function toggle(id, btn){
+  const el=document.getElementById(id);
+  const open=el.style.display==="block";
+  el.style.display=open?"none":"block";
+  if(btn){
+    const isWhy=btn.textContent.includes("Why");
+    btn.textContent=(open?(isWhy?"Show Why?":"Show Answer"):(isWhy?"Hide Why?":"Hide Answer"));
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 16 — Express Middleware | Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#212529;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#0d6efd,#6610f2);color:#fff}
+.cardx{border:0;border-radius:16px;overflow:hidden}
+pre{background:#172033;color:#e9eef7;border-radius:10px;padding:16px;overflow:auto}
+code{font-family:Consolas,monospace}
+.diagram{background:#eef5ff;border:1px solid #cfe2ff;border-radius:12px;padding:18px}
+.flow{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.flow span{background:#fff;border:1px solid #b6d4fe;padding:10px 14px;border-radius:8px;font-weight:600}
+.q{border-left:5px solid #0d6efd}
+.answer,.why{display:none}
+.toggle{min-width:145px;margin-top:6px}
+.tip{border-left:5px solid #198754}
+.warn{border-left:5px solid #ffc107}
+</style>
+</head>
+<body>
+
+<header class="hero py-5 shadow">
+<div class="container">
+<span class="badge bg-light text-primary mb-3">Node.js + Express.js Interview Preparation</span>
+<h1 class="display-5 fw-bold">Part 16 — Express Middleware ⭐⭐⭐</h1>
+<p class="lead mb-0">Simple explanations, execution-flow diagrams, tricky code questions, answers, WHY explanations, and interview-ready points.</p>
+</div>
+</header>
+
+<main class="container py-5">
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-primary text-white fs-4">1. What is Middleware?</div>
+<div class="card-body">
+<p><strong>Middleware</strong> is a function that runs between the incoming request and the final response. It can inspect or change the request, change the response, perform a task, stop the request, or pass control to the next function.</p>
+<div class="alert alert-info"><strong>Layman example:</strong> Think of airport security. Before you reach the boarding gate, security checks your ticket and baggage. Middleware performs similar checks before the final route handler runs.</div>
+<div class="diagram">
+<div class="flow"><span>Client Request</span><b>→</b><span>Middleware 1</span><b>→</b><span>Middleware 2</span><b>→</b><span>Route Handler</span><b>→</b><span>Response</span></div>
+</div>
+<h5 class="mt-4">Why use middleware?</h5>
+<ul>
+<li>Authentication and authorization</li>
+<li>Logging</li>
+<li>Validation</li>
+<li>Request parsing</li>
+<li>Error handling</li>
+<li>Adding common data to <code>req</code> or <code>res</code></li>
+</ul>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-success text-white fs-4">2. Basic Middleware and next()</div>
+<div class="card-body">
+<pre><code>function logger(req, res, next) {
+  console.log(req.method, req.url);
+  next();
+}
+
+app.use(logger);
+
+app.get("/", (req, res) => {
+  res.send("Home");
+});</code></pre>
+<div class="alert alert-success"><strong>How it works:</strong> The middleware receives <code>req</code>, <code>res</code>, and <code>next</code>. Calling <code>next()</code> tells Express to continue to the next matching middleware or route handler.</div>
+<div class="alert alert-warning"><strong>Important:</strong> A middleware must normally either finish the response or call <code>next()</code>. If it does neither, the request can remain pending.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-info text-dark fs-4">3. Types of Express Middleware</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Application middleware</td><td>Attached to the Express app</td><td><code>app.use()</code></td></tr>
+<tr><td>Router middleware</td><td>Attached to a router</td><td><code>router.use()</code></td></tr>
+<tr><td>Built-in middleware</td><td>Provided by Express</td><td><code>express.json()</code></td></tr>
+<tr><td>Third-party middleware</td><td>Installed from npm</td><td>helmet, cors, morgan</td></tr>
+<tr><td>Custom middleware</td><td>Written by your application</td><td>auth, validation, logging</td></tr>
+<tr><td>Error middleware</td><td>Handles errors</td><td><code>(err, req, res, next)</code></td></tr>
+</tbody>
+</table>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-secondary text-white fs-4">4. Application vs Router Middleware</div>
+<div class="card-body">
+<pre><code>// Application middleware
+app.use((req, res, next) => {
+  console.log("App middleware");
+  next();
+});
+
+// Router middleware
+const router = express.Router();
+
+router.use((req, res, next) => {
+  console.log("Router middleware");
+  next();
+});
+
+router.get("/profile", (req, res) => {
+  res.send("Profile");
+});
+
+app.use("/users", router);</code></pre>
+<div class="diagram"><div class="flow"><span>Request</span><b>→</b><span>app.use()</span><b>→</b><span>/users router</span><b>→</b><span>router.use()</span><b>→</b><span>route</span></div></div>
+<p><strong>When to use:</strong> Application middleware is useful for logic shared across the application. Router middleware is useful for logic shared only by a group of routes.</p>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-warning text-dark fs-4">5. Built-in, Third-party, and Custom Middleware</div>
+<div class="card-body">
+<h5>Built-in</h5>
+<pre><code>app.use(express.json());</code></pre>
+<p>Parses JSON request bodies and makes the parsed data available through <code>req.body</code>.</p>
+
+<h5>Third-party</h5>
+<pre><code>const cors = require("cors");
+app.use(cors());</code></pre>
+<p>Third-party middleware is installed separately and provides reusable functionality.</p>
+
+<h5>Custom</h5>
+<pre><code>function addRequestId(req, res, next) {
+  req.requestId = Date.now();
+  next();
+}
+
+app.use(addRequestId);</code></pre>
+<div class="alert alert-primary"><strong>Interview point:</strong> Middleware is not limited to authentication. Parsing, logging, validation, security, metrics, and error handling are also common uses.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-danger text-white fs-4">6. Authentication vs Authorization Middleware</div>
+<div class="card-body">
+<pre><code>function authenticate(req, res, next) {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: "Login required" });
+  }
+
+  req.user = { id: 10, role: "admin" };
+  next();
+}
+
+function authorizeAdmin(req, res, next) {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  next();
+}
+
+app.get("/admin",
+  authenticate,
+  authorizeAdmin,
+  (req, res) => {
+    res.json({ message: "Welcome admin" });
+  }
+);</code></pre>
+<div class="alert alert-info"><strong>Simple difference:</strong> Authentication asks, "Who are you?" Authorization asks, "Are you allowed to do this?"</div>
+<div class="diagram"><div class="flow"><span>Request</span><b>→</b><span>Authenticate</span><b>→</b><span>Authorize</span><b>→</b><span>Controller</span></div></div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-primary text-white fs-4">7. Request and Response Modification</div>
+<div class="card-body">
+<pre><code>function userContext(req, res, next) {
+  req.user = {
+    id: 101,
+    name: "Sam"
+  };
+
+  res.locals.requestTime = Date.now();
+
+  next();
+}
+
+app.get("/profile", userContext, (req, res) => {
+  res.json({
+    user: req.user,
+    time: res.locals.requestTime
+  });
+});</code></pre>
+<div class="alert alert-success"><strong>Why?</strong> Middleware can attach information that later handlers need. This avoids repeating the same work in every route.</div>
+<div class="alert alert-warning"><strong>Best practice:</strong> Keep request properties clearly named and avoid overwriting built-in Express request properties.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-dark text-white fs-4">8. Middleware Order</div>
+<div class="card-body">
+<pre><code>app.use((req, res, next) => {
+  console.log("A");
+  next();
+});
+
+app.use((req, res, next) => {
+  console.log("B");
+  next();
+});
+
+app.get("/", (req, res) => {
+  console.log("C");
+  res.send("Done");
+});</code></pre>
+<div class="diagram"><div class="flow"><span>A</span><b>→</b><span>B</span><b>→</b><span>C</span><b>→</b><span>Response</span></div></div>
+<p>Express generally executes matching middleware and handlers in registration order.</p>
+<div class="alert alert-warning"><strong>Important:</strong> Middleware order is part of application behavior. For example, body parsing must happen before code that expects parsed <code>req.body</code>.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-success text-white fs-4">9. Route-Specific Middleware and Multiple Middleware</div>
+<div class="card-body">
+<pre><code>function validateUser(req, res, next) {
+  if (!req.body.name) {
+    return res.status(400).json({
+      message: "Name is required"
+    });
+  }
+  next();
+}
+
+function audit(req, res, next) {
+  console.log("Audit");
+  next();
+}
+
+app.post("/users", validateUser, audit, (req, res) => {
+  res.status(201).json({ message: "Created" });
+});</code></pre>
+<div class="alert alert-info"><strong>When to use:</strong> Route-specific middleware is useful when a rule applies only to certain endpoints instead of the whole application.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-danger text-white fs-4">10. Error Middleware and Error Propagation</div>
+<div class="card-body">
+<pre><code>app.get("/users", async (req, res, next) => {
+  try {
+    throw new Error("Database failed");
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json({
+    message: "Internal server error"
+  });
+});</code></pre>
+<div class="alert alert-primary"><strong>Key rule:</strong> Error-handling middleware has four parameters: <code>err, req, res, next</code>. The four-argument signature tells Express this is error middleware.</div>
+<div class="diagram"><div class="flow"><span>Error</span><b>→</b><span>next(err)</span><b>→</b><span>Error Middleware</span><b>→</b><span>Error Response</span></div></div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-primary text-white fs-4">11. Async Middleware</div>
+<div class="card-body">
+<pre><code>app.get("/profile", async (req, res, next) => {
+  try {
+    const user = await findUser();
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+});</code></pre>
+<p>Async middleware can perform asynchronous work. Errors must be propagated correctly to the error-handling layer.</p>
+<div class="alert alert-warning"><strong>Interview point:</strong> Do not assume every Express version and configuration handles rejected async handlers in exactly the same way. A portable pattern is to catch the error and call <code>next(err)</code>, or use a tested async-wrapper strategy.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-warning text-dark fs-4">12. MAANG / FANG / MNC Code-Based Questions</div>
+<div class="card-body">
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q1. What is the output order?</h5>
+<pre><code>app.use((req, res, next) => {
+  console.log("A");
+  next();
+});
+
+app.use((req, res, next) => {
+  console.log("B");
+  next();
+});
+
+app.get("/", (req, res) => {
+  console.log("C");
+  res.send("OK");
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> A → B → C.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w1',this)">Show Why?</button>
+<div id="w1" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express runs matching middleware in registration order. Each middleware calls <code>next()</code>, so execution continues.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q2. What happens if <code>next()</code> is removed?</h5>
+<pre><code>app.use((req, res, next) => {
+  console.log("Auth");
+});
+
+app.get("/", (req, res) => {
+  res.send("Home");
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer mt-3"><div class="alert alert-danger"><strong>Answer:</strong> The route handler does not execute and the request can remain pending.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w2',this)">Show Why?</button>
+<div id="w2" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> The middleware neither sends a response nor passes control with <code>next()</code>.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q3. What is the bug here?</h5>
+<pre><code>app.use((req, res, next) => {
+  if (!req.headers.authorization) {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+  next();
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer mt-3"><div class="alert alert-danger"><strong>Answer:</strong> After sending the 401 response, the code still calls <code>next()</code>. This can allow later handlers to run and may lead to multiple-response errors.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w3',this)">Show Why?</button>
+<div id="w3" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> When middleware terminates the request with a response, it should normally <code>return</code> so execution does not continue.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q4. Fix the authentication middleware.</h5>
+<pre><code>function auth(req, res, next) {
+  if (!req.headers.authorization) {
+    res.status(401).json({ message: "Login required" });
+  }
+  next();
+}</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="answer mt-3"><pre><code>function auth(req, res, next) {
+  if (!req.headers.authorization) {
+    return res.status(401).json({
+      message: "Login required"
+    });
+  }
+
+  next();
+}</code></pre></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w4',this)">Show Why?</button>
+<div id="w4" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> <code>return</code> stops the current middleware after the response is sent. Only authenticated requests reach <code>next()</code>.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q5. What does the error handler print?</h5>
+<pre><code>app.get("/test", (req, res, next) => {
+  next(new Error("Failed"));
+});
+
+app.use((err, req, res, next) => {
+  console.log(err.message);
+  res.status(500).send("Error");
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> <code>Failed</code>.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w5',this)">Show Why?</button>
+<div id="w5" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Passing an error to <code>next(err)</code> switches Express into error-handling flow, so the four-argument error middleware is selected.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q6. Will the normal middleware run after <code>next(err)</code>?</h5>
+<pre><code>app.get("/x",
+  (req, res, next) => {
+    next(new Error("boom"));
+  },
+  (req, res, next) => {
+    console.log("Normal");
+    next();
+  }
+);
+
+app.use((err, req, res, next) => {
+  console.log("Error");
+  res.status(500).end();
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> Only <code>Error</code> is printed. <code>Normal</code> is skipped.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w6',this)">Show Why?</button>
+<div id="w6" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> <code>next(err)</code> signals an error and skips regular handlers until Express finds error-handling middleware.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q7. Which middleware handles <code>GET /admin/users</code>?</h5>
+<pre><code>app.use("/admin", (req, res, next) => {
+  console.log("Admin middleware");
+  next();
+});
+
+app.get("/admin/users", (req, res) => {
+  res.send("Users");
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> The <code>/admin</code> middleware runs first, followed by the <code>/admin/users</code> route.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w7',this)">Show Why?</button>
+<div id="w7" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Path-mounted middleware matches requests whose path begins with its mount path and calls <code>next()</code> to continue.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q8. What is the purpose of <code>express.json()</code>?</h5>
+<pre><code>app.use(express.json());
+
+app.post("/users", (req, res) => {
+  console.log(req.body);
+  res.json(req.body);
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> It parses incoming JSON request bodies so the parsed value can be accessed through <code>req.body</code>.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w8',this)">Show Why?</button>
+<div id="w8" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> HTTP request bodies arrive as data. The JSON parser converts a JSON payload into a JavaScript value for application code.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q9. What is the difference between authentication and authorization middleware?</h5>
+<button class="btn btn-primary toggle" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> Authentication verifies identity. Authorization checks whether the authenticated identity has permission to perform the requested operation.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w9',this)">Show Why?</button>
+<div id="w9" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> A user can be successfully logged in but still lack permission to access an admin-only resource.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q10. What is wrong with this error middleware?</h5>
+<pre><code>app.use((err, req, res) => {
+  console.log(err.message);
+  res.status(500).send("Error");
+});</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="answer mt-3"><div class="alert alert-warning"><strong>Answer:</strong> The conventional Express error-handling signature has four parameters: <code>err, req, res, next</code>. The missing fourth parameter can prevent Express from recognizing the function as error-handling middleware.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w10',this)">Show Why?</button>
+<div id="w10" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express identifies error middleware by the four-argument function signature.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q11. Where should a centralized 404 middleware usually be placed?</h5>
+<pre><code>app.get("/users", usersHandler);
+
+// 404 middleware
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
+});</code>
+<button class="btn btn-primary toggle" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> After all valid routes.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w11',this)">Show Why?</button>
+<div id="w11" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Express moves through the registered stack in order. The fallback should run only after no valid route has handled the request.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q12. Design a middleware chain for a protected API.</h5>
+<p>Requirements: log the request, authenticate the user, validate input, then execute the controller.</p>
+<button class="btn btn-primary toggle" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="answer mt-3"><pre><code>app.post(
+  "/orders",
+  logger,
+  authenticate,
+  validateOrder,
+  createOrder
+);</code></pre></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w12',this)">Show Why?</button>
+<div id="w12" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Each middleware has one focused responsibility. Order matters: logging can happen first, identity must be known before permission-sensitive validation, and the controller runs only after checks pass.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q13. What happens if middleware sends a response and then calls <code>next()</code>?</h5>
+<pre><code>app.use((req, res, next) => {
+  res.send("Done");
+  next();
+});</code>
+<button class="btn btn-primary toggle" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="answer mt-3"><div class="alert alert-danger"><strong>Answer:</strong> The response has already been completed, but later middleware may still execute. If later code tries to send another response, a headers-already-sent error can occur.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w13',this)">Show Why?</button>
+<div id="w13" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> Sending the response does not automatically make it safe to continue the application flow. When middleware terminates the request, stop execution with <code>return</code>.</div></div>
+</div></div>
+
+<div class="card q shadow-sm mb-4"><div class="card-body">
+<h5>Q14. What does router-level middleware mean?</h5>
+<pre><code>const router = express.Router();
+
+router.use(auth);
+
+router.get("/profile", profileHandler);
+router.get("/settings", settingsHandler);
+
+app.use("/users", router);</code></pre>
+<button class="btn btn-primary toggle" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="answer mt-3"><div class="alert alert-success"><strong>Answer:</strong> <code>auth</code> applies to routes handled by this router, such as <code>/users/profile</code> and <code>/users/settings</code>.</div></div>
+<button class="btn btn-outline-dark toggle" onclick="toggle('w14',this)">Show Why?</button>
+<div id="w14" class="why mt-3"><div class="alert alert-light border"><strong>Why:</strong> <code>router.use()</code> attaches middleware to a router instead of the entire application.</div></div>
+</div></div>
+
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-danger text-white fs-4">13. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="alert alert-warning"><strong>1. Forgetting <code>next()</code>:</strong> The request can remain pending.</div>
+<div class="alert alert-warning"><strong>2. Calling <code>next()</code> after sending a response:</strong> Later code may try to send another response.</div>
+<div class="alert alert-warning"><strong>3. Wrong middleware order:</strong> A route may execute before required parsing, authentication, or validation.</div>
+<div class="alert alert-warning"><strong>4. Incorrect error signature:</strong> Error middleware should use <code>(err, req, res, next)</code>.</div>
+<div class="alert alert-warning"><strong>5. Mixing authentication and authorization:</strong> Login success does not automatically mean permission is granted.</div>
+<div class="alert alert-warning"><strong>6. Doing too much in one middleware:</strong> Keep logging, authentication, validation, and business logic separate.</div>
+<div class="alert alert-warning"><strong>7. Leaking internal errors:</strong> Do not blindly send database stack traces or secrets to clients in production.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-success text-white fs-4">14. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>Middleware runs between a request and a final response.</li>
+<li><code>next()</code> passes control forward.</li>
+<li>Middleware can inspect or modify <code>req</code> and <code>res</code>.</li>
+<li>Application middleware uses <code>app.use()</code>.</li>
+<li>Router middleware uses <code>router.use()</code>.</li>
+<li><code>express.json()</code> is built-in middleware for JSON bodies.</li>
+<li>Authentication verifies identity; authorization checks permissions.</li>
+<li>Middleware order matters.</li>
+<li><code>next(err)</code> moves execution into error-handling flow.</li>
+<li>Error middleware uses <code>(err, req, res, next)</code>.</li>
+</ul>
+<div class="alert alert-primary"><strong>Golden interview answer:</strong> "Express middleware is a function in the request-response pipeline. It can perform common work such as logging, authentication, validation, or parsing, then either finish the response or call <code>next()</code> to continue the pipeline."</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow cardx">
+<div class="card-header bg-dark text-white fs-4">15. Interview-Ready Points</div>
+<div class="card-body">
+<div class="alert alert-info tip"><strong>MAANG/MNC focus:</strong> Be ready to trace middleware execution from top to bottom and identify exactly where <code>next()</code> changes control flow.</div>
+<div class="alert alert-info tip"><strong>Debugging question:</strong> If an API hangs, check whether a middleware forgot both to send a response and call <code>next()</code>.</div>
+<div class="alert alert-info tip"><strong>Senior-level question:</strong> Explain how centralized authentication, validation, logging, and error middleware reduce duplicated code and improve maintainability.</div>
+<div class="alert alert-info tip"><strong>Code question strategy:</strong> Mark every middleware, identify whether it calls <code>next()</code>, sends a response, or calls <code>next(err)</code>, then trace the execution path.</div>
+</div></div>
+</section>
+
+</main>
+
+<footer class="py-4 bg-dark text-white text-center">Part 16 — Express Middleware • Interview Ready Notes</footer>
+
+<script>
+function toggle(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ if(btn){
+  const why=btn.textContent.includes("Why");
+  btn.textContent=open?(why?"Show Why?":"Show Answer"):(why?"Hide Why?":"Hide Answer");
+ }
+}
+</script>
+</body>
+</html>

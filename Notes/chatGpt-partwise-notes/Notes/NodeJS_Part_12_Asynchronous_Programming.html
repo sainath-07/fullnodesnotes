@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Node.js Part 12 — Asynchronous Programming</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}.hero{background:linear-gradient(135deg,#111827,#0d6efd,#6f42c1);color:#fff;border-radius:18px}.card,.topic{border:0;border-radius:14px}.card{overflow:hidden}.card-header{font-weight:700}.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}code{color:#b42318}.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}.answer{display:none;margin-top:15px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:10px;padding:15px}.state{border-radius:10px;padding:15px;height:100%}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 12</span>
+<h1 class="display-6 fw-bold">🟢 Asynchronous Programming ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn callbacks, Promises, async/await, parallel work, sequential work, error propagation, and async loops in simple words.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What is Asynchronous Programming?</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Asynchronous programming</strong> means starting work that may take time without making JavaScript wait unnecessarily for that work to finish.</p>
+<h5>Layman example</h5>
+<p>Imagine ordering food at a restaurant. You place the order and then sit down. You do not stand in the kitchen until the food is ready. You can do other things while the order is being prepared.</p>
+<div class="flow">Start async work
+      ↓
+Do not wait synchronously
+      ↓
+Continue other JavaScript
+      ↓
+Async work completes
+      ↓
+Handle result / error</div>
+<div class="interview"><strong>Interview-ready:</strong> “Asynchronous programming allows a program to start time-consuming I/O work and continue other work instead of blocking the JavaScript execution thread while waiting.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. Callbacks</div>
+<div class="card-body">
+<div class="topic">
+<p>A <strong>callback</strong> is a function passed to another function so it can be called later.</p>
+<pre><code>function getUser(callback) {
+  setTimeout(() =&gt; {
+    callback({ name: "Sam" });
+  }, 1000);
+}
+
+getUser((user) =&gt; {
+  console.log(user.name);
+});</code></pre>
+<div class="flow">getUser()
+   ↓
+async work starts
+   ↓
+1 second passes
+   ↓
+callback(user)
+   ↓
+console.log()</div>
+<h5>When to use?</h5>
+<p>Callbacks are still common in Node.js APIs, event handlers, and older codebases.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">3. Error-First Callbacks</div>
+<div class="card-body">
+<div class="topic">
+<p>Node.js traditionally uses the <strong>error-first callback</strong> pattern: the first callback argument is the error, and the next argument contains the result.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.readFile("data.txt", "utf8", (err, data) =&gt; {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log(data);
+});</code></pre>
+<div class="flow">(err, data)
+   │
+   ├── err exists → handle error
+   │
+   └── err is null → use data</div>
+<div class="interview"><strong>Interview line:</strong> “In Node-style callbacks, the first argument is normally the error and the following arguments contain successful results.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">4. Callback Hell</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Callback hell</strong> happens when many dependent asynchronous operations are nested inside one another, making code hard to read and maintain.</p>
+<pre><code>getUser((err, user) =&gt; {
+  if (err) return handle(err);
+
+  getOrders(user.id, (err, orders) =&gt; {
+    if (err) return handle(err);
+
+    getPayment(orders[0].id, (err, payment) =&gt; {
+      if (err) return handle(err);
+
+      sendReceipt(payment, (err) =&gt; {
+        if (err) return handle(err);
+
+        console.log("Done");
+      });
+    });
+  });
+});</code></pre>
+<p>Promises and <code>async/await</code> can make this kind of flow easier to read.</p>
+<div class="warn"><strong>Important:</strong> Callback nesting itself is not automatically wrong. The problem is excessive nesting, repeated error handling, and difficult control flow.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">5. Promises</div>
+<div class="card-body">
+<div class="topic">
+<p>A <strong>Promise</strong> represents the eventual result of an asynchronous operation.</p>
+<pre><code>const promise = new Promise((resolve, reject) =&gt; {
+  setTimeout(() =&gt; {
+    resolve("Success");
+  }, 1000);
+});
+
+promise.then((value) =&gt; {
+  console.log(value);
+});</code></pre>
+<div class="flow">Promise created
+      ↓
+   pending
+      ↓
+ ┌────┴────┐
+ ↓         ↓
+fulfilled  rejected
+ ↓         ↓
+.then()   .catch()</div>
+<p>A Promise does not mean “the result is already available.” It represents a result that may become available later.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">6. Promise States</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="state bg-warning-subtle"><h5>Pending</h5><p>The operation has not finished yet.</p></div></div>
+<div class="col-md-4"><div class="state bg-success-subtle"><h5>Fulfilled</h5><p>The operation completed successfully.</p></div></div>
+<div class="col-md-4"><div class="state bg-danger-subtle"><h5>Rejected</h5><p>The operation failed.</p></div></div>
+</div>
+<div class="topic mt-4">
+<p>A settled Promise is either <strong>fulfilled</strong> or <strong>rejected</strong>. It does not go back to pending.</p>
+<div class="interview"><strong>Interview tip:</strong> Promise state changes only once: pending → fulfilled or pending → rejected.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">7. .then(), .catch(), and .finally()</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>fetchData()
+  .then((data) =&gt; {
+    return processData(data);
+  })
+  .then((result) =&gt; {
+    console.log(result);
+  })
+  .catch((error) =&gt; {
+    console.error(error);
+  })
+  .finally(() =&gt; {
+    console.log("Finished");
+  });</code></pre>
+<ul>
+<li><code>.then()</code> handles fulfillment and can transform the result.</li>
+<li><code>.catch()</code> handles rejection/errors in the chain.</li>
+<li><code>.finally()</code> runs after the Promise settles, whether fulfilled or rejected.</li>
+</ul>
+<div class="tip"><strong>Common use for finally:</strong> hide a loading spinner, release a resource, or perform cleanup.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">8. Promise Chaining</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>getUser()
+  .then((user) =&gt; {
+    return getOrders(user.id);
+  })
+  .then((orders) =&gt; {
+    return getPayment(orders[0].id);
+  })
+  .then((payment) =&gt; {
+    console.log(payment);
+  })
+  .catch((err) =&gt; {
+    console.error(err);
+  });</code></pre>
+<div class="flow">getUser()
+   ↓
+user
+   ↓
+getOrders(user.id)
+   ↓
+orders
+   ↓
+getPayment(...)
+   ↓
+payment</div>
+<p>Returning a Promise from a <code>.then()</code> lets the next <code>.then()</code> wait for it.</p>
+<div class="warn"><strong>Common mistake:</strong> Forgetting <code>return</code> inside a <code>.then()</code> can break the intended chain.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">9. async and await</div>
+<div class="card-body">
+<div class="topic">
+<p>An <code>async</code> function always returns a Promise. <code>await</code> pauses that async function until the awaited Promise settles; it does not block the entire Node.js JavaScript process in the same way as a synchronous blocking operation.</p>
+<pre><code>async function getData() {
+  const user = await getUser();
+  const orders = await getOrders(user.id);
+
+  return orders;
+}
+
+getData()
+  .then((orders) =&gt; console.log(orders))
+  .catch((err) =&gt; console.error(err));</code></pre>
+<div class="flow">async function
+      ↓
+await getUser()
+      ↓
+function suspends here
+      ↓
+other JS can run
+      ↓
+Promise settles
+      ↓
+function continues
+      ↓
+await getOrders()
+      ↓
+return result</div>
+<div class="interview"><strong>Interview-ready:</strong> “async/await is syntax built on top of Promises. It makes asynchronous control flow look more like sequential code while preserving asynchronous behavior.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">10. Async Function Return Values</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>async function getName() {
+  return "Sam";
+}
+
+const result = getName();
+
+console.log(result);</code></pre>
+<p><code>result</code> is a Promise, not the string directly.</p>
+<pre><code>getName().then(name =&gt; {
+  console.log(name);
+});</code></pre>
+<p>Even when an async function returns a normal value, JavaScript wraps it in a fulfilled Promise.</p>
+<div class="interview"><strong>Remember:</strong> <code>async function</code> always returns a Promise.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">11. Error Propagation</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>async function run() {
+  try {
+    const data = await getData();
+    return data;
+  } catch (error) {
+    console.error("Failed:", error);
+    throw error;
+  }
+}</code></pre>
+<p>Errors can move upward through Promise chains until a handler catches them.</p>
+<div class="flow">async operation
+      ↓
+Promise rejected
+      ↓
+await throws
+      ↓
+catch handles error
+      ↓
+throw again? ── yes → caller receives rejection</div>
+<div class="tip"><strong>Important:</strong> Catching an error and not rethrowing it means the caller may see the operation as successfully completed unless another rejected Promise is returned/thrown.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">12. Promise.all()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>Promise.all()</code> waits for all input Promises to fulfill. If one rejects, the returned Promise rejects.</p>
+<pre><code>const [users, products] = await Promise.all([
+  getUsers(),
+  getProducts()
+]);</code></pre>
+<div class="flow">getUsers() ───────┐
+                  ├──→ Promise.all() → both results
+getProducts() ────┘</div>
+<h5>When to use?</h5>
+<p>Use it when operations are independent and you need all successful results.</p>
+<div class="interview"><strong>Key point:</strong> Promise.all runs independent Promise operations concurrently from the JavaScript caller's perspective; it does not make CPU-bound JavaScript execute in parallel automatically.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">13. Promise.allSettled()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>Promise.allSettled()</code> waits for every input Promise to settle, whether fulfilled or rejected.</p>
+<pre><code>const results = await Promise.allSettled([
+  getUsers(),
+  getProducts(),
+  getOrders()
+]);
+
+console.log(results);</code></pre>
+<p>Each result tells you its status and either its value or reason.</p>
+<div class="flow">P1 ── fulfilled ─┐
+P2 ── rejected  ──┼→ allSettled() → all outcomes
+P3 ── fulfilled ─┘</div>
+<div class="tip"><strong>Use when:</strong> You want a complete report of successes and failures instead of failing the whole operation when one Promise rejects.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">14. Promise.race()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>Promise.race()</code> settles as soon as the first input Promise settles — whether fulfilled or rejected.</p>
+<pre><code>const result = await Promise.race([
+  fetchFromServer(),
+  timeoutPromise()
+]);</code></pre>
+<div class="flow">P1 ───────────┐
+P2 ──────┐    │
+P3 ──────┴────┼→ first settled → race result
+              │
+              └→ other Promises continue unless separately cancelled</div>
+<div class="warn"><strong>Important:</strong> Promise.race does not automatically cancel the losing operations.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">15. Promise.any()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>Promise.any()</code> fulfills when the first input Promise fulfills. It rejects only when all input Promises reject.</p>
+<pre><code>const result = await Promise.any([
+  getFromServerA(),
+  getFromServerB(),
+  getFromServerC()
+]);</code></pre>
+<div class="flow">A ── rejected ───┐
+B ── fulfilled ──┼→ first fulfillment → result
+C ── pending ────┘</div>
+<p>If every Promise rejects, <code>Promise.any()</code> rejects with an <code>AggregateError</code>.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">16. Promise Combinators — Quick Comparison</div>
+<div class="card-body">
+<div class="topic">
+<table class="table table-bordered">
+<thead><tr><th>Method</th><th>Settles when</th><th>Rejects when</th><th>Best use</th></tr></thead>
+<tbody>
+<tr><td><code>Promise.all()</code></td><td>All fulfill.</td><td>Any rejects.</td><td>Need every result.</td></tr>
+<tr><td><code>Promise.allSettled()</code></td><td>All settle.</td><td>Does not reject because one input rejects.</td><td>Need every outcome.</td></tr>
+<tr><td><code>Promise.race()</code></td><td>First input settles.</td><td>First settled input rejects.</td><td>First completion wins.</td></tr>
+<tr><td><code>Promise.any()</code></td><td>First input fulfills.</td><td>All inputs reject.</td><td>Any successful source is enough.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">17. Sequential Operations</div>
+<div class="card-body">
+<div class="topic">
+<p>Sequential operations run one after another because the next operation depends on the previous result.</p>
+<pre><code>const user = await getUser();
+const orders = await getOrders(user.id);
+const invoice = await getInvoice(orders[0].id);</code></pre>
+<div class="flow">getUser()
+   ↓ waits
+getOrders()
+   ↓ waits
+getInvoice()
+   ↓
+result</div>
+<p>Use sequential execution when there is a real dependency between operations.</p>
+<div class="warn"><strong>Performance mistake:</strong> Do not make independent operations sequential just because <code>await</code> is easy to write.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">18. Parallel / Concurrent Operations</div>
+<div class="card-body">
+<div class="topic">
+<p>If operations are independent, start them together.</p>
+<pre><code>const [users, products] = await Promise.all([
+  getUsers(),
+  getProducts()
+]);</code></pre>
+<div class="flow">getUsers() ───────────┐
+                      ├→ Promise.all() → results
+getProducts() ────────┘</div>
+<p>This can reduce total waiting time compared with waiting for each independent operation one by one.</p>
+<pre><code>// Sequential: roughly userTime + productTime
+const users = await getUsers();
+const products = await getProducts();
+
+// Concurrent: roughly max(userTime, productTime)
+const [users, products] = await Promise.all([
+  getUsers(),
+  getProducts()
+]);</code></pre>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">19. Async Loops</div>
+<div class="card-body">
+<div class="topic">
+<h5>Sequential async loop</h5>
+<pre><code>for (const id of ids) {
+  const user = await getUser(id);
+  console.log(user);
+}</code></pre>
+<p>This waits for each operation before starting the next.</p>
+<h5>Concurrent async operations</h5>
+<pre><code>const users = await Promise.all(
+  ids.map(id =&gt; getUser(id))
+);</code></pre>
+<p>This starts the independent operations together.</p>
+<div class="tip"><strong>Interview tip:</strong> <code>for...of</code> with <code>await</code> is sequential. <code>map()</code> creates an array of Promises; use <code>Promise.all()</code> when you want them handled concurrently.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">20. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Forgetting to <code>await</code> a Promise when the resolved value is required.</li>
+<li>Forgetting that an <code>async</code> function always returns a Promise.</li>
+<li>Using sequential <code>await</code> for independent operations.</li>
+<li>Using <code>Promise.all()</code> when partial success is required without handling its fail-fast behavior.</li>
+<li>Thinking <code>Promise.race()</code> cancels the losing Promises.</li>
+<li>Confusing <code>Promise.any()</code> with <code>Promise.race()</code>.</li>
+<li>Forgetting to return a Promise inside a <code>.then()</code> chain.</li>
+<li>Swallowing errors inside <code>catch</code> blocks without deciding what the caller should receive.</li>
+<li>Using <code>forEach(async () =&gt; ...)</code> and expecting <code>forEach</code> to await the callbacks.</li>
+<li>Creating too many concurrent operations and overwhelming an API or database.</li>
+<li>Assuming “async” means the CPU-heavy JavaScript automatically runs on another thread.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">21. Interview Questions — Click to Show / Hide Answer + Why ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="topic">
+<h5>Q1. What is asynchronous programming?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It allows a program to start work that may take time and continue other work instead of synchronously waiting for completion.<br><br><strong>Why?</strong> This is important for efficient I/O-heavy Node.js applications.</div>
+</div>
+
+<div class="topic">
+<h5>Q2. What is a callback?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> A callback is a function passed to another function so it can be called later.<br><br><strong>Why?</strong> Node.js historically used callbacks heavily for asynchronous APIs.</div>
+</div>
+
+<div class="topic">
+<h5>Q3. What is an error-first callback?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It follows the Node.js convention where the first callback argument represents an error and later arguments contain successful results.<br><br><strong>Why?</strong> It provides a consistent pattern for handling success and failure.</div>
+</div>
+
+<div class="topic">
+<h5>Q4. What is callback hell?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Excessive nested callbacks that make asynchronous control flow difficult to read, test, and maintain.<br><br><strong>Why?</strong> Promises and async/await can flatten this control flow.</div>
+</div>
+
+<div class="topic">
+<h5>Q5. What are the states of a Promise?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Pending, fulfilled, and rejected.<br><br><strong>Why?</strong> A Promise starts pending and settles once into fulfilled or rejected.</div>
+</div>
+
+<div class="topic">
+<h5>Q6. What does an async function return?</h5>
+<pre><code>async function test() {
+  return 10;
+}
+
+console.log(test());</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> A Promise that fulfills with <code>10</code>.<br><br><strong>Why?</strong> Every async function automatically wraps its returned value in a Promise.</div>
+</div>
+
+<div class="topic">
+<h5>Q7. What is the difference between .then() and await?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Both work with Promises. <code>.then()</code> uses callback-style Promise chaining, while <code>await</code> lets code inside an async function be written in a more sequential style.<br><br><strong>Why?</strong> They are different syntax styles built around the same Promise-based asynchronous model.</div>
+</div>
+
+<div class="topic">
+<h5>Q8. What happens if an awaited Promise rejects?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The <code>await</code> expression throws the rejection reason, which can be handled with <code>try/catch</code>.<br><br><strong>Why?</strong> This gives async/await a familiar synchronous-looking error-handling style.</div>
+</div>
+
+<div class="topic">
+<h5>Q9. Predict the output.</h5>
+<pre><code>async function test() {
+  console.log("A");
+  await Promise.resolve();
+  console.log("B");
+}
+
+console.log("C");
+test();
+console.log("D");</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Output:</strong>
+<pre><code>C
+A
+D
+B</code></pre>
+<strong>Why?</strong> <code>test()</code> starts synchronously and prints A. The await pauses the async function until its Promise continuation is scheduled, so the outer synchronous code prints D first.</div>
+</div>
+
+<div class="topic">
+<h5>Q10. What is Promise.all()?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It returns a Promise that fulfills when all input Promises fulfill and rejects when any input Promise rejects.<br><br><strong>Why?</strong> It is useful when multiple independent results are all required.</div>
+</div>
+
+<div class="topic">
+<h5>Q11. Promise.all() vs Promise.allSettled()?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Promise.all fails when one input rejects. Promise.allSettled waits for every input and returns each outcome.<br><br><strong>Why?</strong> Choose all when every result is required; choose allSettled when you need a complete success/failure report.</div>
+</div>
+
+<div class="topic">
+<h5>Q12. Promise.race() vs Promise.any()?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> race settles on the first settled Promise, whether fulfilled or rejected. any fulfills on the first fulfilled Promise and rejects only if all reject.<br><br><strong>Why?</strong> This distinction is a common interview trap.</div>
+</div>
+
+<div class="topic">
+<h5>Q13. Does Promise.race() cancel the other Promises?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> No. Promise.race only settles its returned Promise based on the first settled input. The other operations may continue unless you explicitly support cancellation.<br><br><strong>Why?</strong> Promise coordination and operation cancellation are separate concepts.</div>
+</div>
+
+<div class="topic">
+<h5>Q14. Which is faster?</h5>
+<pre><code>const a = await getA();
+const b = await getB();</code></pre>
+<pre><code>const [a, b] = await Promise.all([
+  getA(),
+  getB()
+]);</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> If getA and getB are independent, the second version can complete sooner because both operations can be started without waiting for the first result.<br><br><strong>Why?</strong> Sequential code waits for A before starting B; Promise.all coordinates both operations together.</div>
+</div>
+
+<div class="topic">
+<h5>Q15. What is wrong with this?</h5>
+<pre><code>ids.forEach(async (id) =&gt; {
+  await getUser(id);
+});
+
+console.log("Done");</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>forEach()</code> does not await the Promises returned by its async callback. “Done” can print before the async operations finish.<br><br><strong>Why?</strong> Use <code>for...of</code> for sequential async work or <code>map()</code> + <code>Promise.all()</code> for concurrent work.</div>
+</div>
+
+<div class="topic">
+<h5>Q16. How do you run async operations sequentially?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Use <code>await</code> one operation at a time, commonly inside an async function and a <code>for...of</code> loop.<br><br><strong>Why?</strong> Sequential execution is useful when one operation depends on the result of the previous operation.</div>
+</div>
+
+<div class="topic">
+<h5>Q17. How do you run independent operations concurrently?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Start the Promises and coordinate them with <code>Promise.all()</code> when all results are required.<br><br><strong>Why?</strong> This avoids unnecessary waiting between independent operations.</div>
+</div>
+
+<div class="topic">
+<h5>Q18. What happens when an error is thrown inside an async function?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The async function's returned Promise becomes rejected with that error.<br><br><strong>Why?</strong> Callers can handle it with <code>await try/catch</code> or Promise <code>.catch()</code>.</div>
+</div>
+
+<div class="topic">
+<h5>Q19. What does finally() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It runs after the Promise settles, regardless of fulfillment or rejection.<br><br><strong>Why?</strong> It is ideal for cleanup tasks such as hiding loading indicators or releasing resources.</div>
+</div>
+
+<div class="topic">
+<h5>Q20. What is the difference between concurrency and parallelism in async Node.js?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Concurrency means multiple operations can be in progress during overlapping periods. Parallelism means actual simultaneous execution on separate execution resources.<br><br><strong>Why?</strong> Promise.all can coordinate concurrent I/O operations without making CPU-bound JavaScript automatically run in parallel.</div>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">22. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>Callback</strong><br>Function called later.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Promise</strong><br>Represents a future result.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>async</strong><br>Always returns a Promise.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>await</strong><br>Waits inside an async function without blocking the whole process like synchronous waiting.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>Promise.all</strong><br>All must fulfill.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>allSettled</strong><br>Wait for every outcome.</div></div>
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>race</strong><br>First settled wins.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>any</strong><br>First fulfilled wins.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Sequential</strong><br>One operation after another.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>Concurrent</strong><br>Independent operations started together.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>Error propagation</strong><br>Rejections can move to callers.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>Async loops</strong><br>for...of for sequential; map + all for concurrent.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">23. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ol>
+<li>Explain synchronous vs asynchronous programming.</li>
+<li>Explain callbacks and callback hell.</li>
+<li>Explain error-first callbacks.</li>
+<li>Explain Promise states.</li>
+<li>Explain <code>.then()</code>, <code>.catch()</code>, and <code>.finally()</code>.</li>
+<li>Explain Promise chaining and why returning a Promise matters.</li>
+<li>Explain async/await.</li>
+<li>Explain why async functions always return Promises.</li>
+<li>Explain error propagation.</li>
+<li>Compare Promise.all and Promise.allSettled.</li>
+<li>Compare Promise.race and Promise.any.</li>
+<li>Explain sequential vs concurrent operations.</li>
+<li>Predict async output questions.</li>
+<li>Explain async loops.</li>
+<li>Explain the <code>forEach(async ...)</code> mistake.</li>
+<li>Explain why unnecessary sequential awaits can hurt performance.</li>
+</ol>
+<div class="interview"><strong>Strong interview summary:</strong><br>
+“Node.js uses asynchronous programming heavily for I/O. Callbacks are the older pattern, while Promises provide structured asynchronous composition and async/await makes Promise-based flows easier to read. Promise.all is useful for independent operations when all results are needed, allSettled collects every outcome, race settles on the first settled operation, and any waits for the first successful operation. Correct error propagation and choosing sequential versus concurrent execution are key to writing reliable Node.js code.”</div>
+</div>
+</section>
+
+<section class="card shadow-sm">
+<div class="card-header bg-dark text-white">24. Final Visual Map</div>
+<div class="card-body">
+<div class="topic">
+<div class="flow">CALLBACKS
+   ↓
+Nested callbacks
+   ↓
+Callback hell risk
+
+PROMISE
+   ↓
+pending
+   ├──→ fulfilled → then()
+   └──→ rejected  → catch()
+                ↓
+             finally()
+
+ASYNC / AWAIT
+   ↓
+async function → always Promise
+   ↓
+await Promise
+   ↓
+function pauses at await
+   ↓
+Promise settles
+   ↓
+function continues
+
+INDEPENDENT OPERATIONS
+   ├── P1 ─┐
+   ├── P2 ─┼→ Promise.all()
+   └── P3 ─┘
+
+SEQUENTIAL
+P1 → await → P2 → await → P3
+
+CONCURRENT
+P1 ───────┐
+P2 ───────┼→ coordinate results
+P3 ───────┘</div>
+</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 12 — Asynchronous Programming • Interview Preparation
+</footer>
+</div>
+<script>
+function toggle(btn){
+ const a=btn.nextElementSibling;
+ const hidden=getComputedStyle(a).display==="none";
+ a.style.display=hidden?"block":"none";
+ btn.textContent=hidden?"Hide Answer":"Show Answer";
+}
+</script>
+</body>
+</html>

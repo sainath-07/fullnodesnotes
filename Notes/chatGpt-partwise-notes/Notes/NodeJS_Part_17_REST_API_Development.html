@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 17 — REST API Development</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif;line-height:1.65}
+.hero{background:linear-gradient(135deg,#164e63,#0f766e);color:#fff;border-radius:18px}
+.card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);margin-bottom:24px}
+.card-header{font-weight:700;color:#fff}
+.h-blue{background:#1769aa}.h-green{background:#198754}.h-purple{background:#6f42c1}.h-orange{background:#d97706}.h-red{background:#c0392b}.h-dark{background:#343a40}
+code{color:#b42318}.codebox{background:#17202a;color:#f8f9fa;border-radius:10px;padding:16px;overflow:auto}
+.flow{background:#eef6ff;border:1px solid #cfe5ff;border-radius:12px;padding:18px;font-weight:600;white-space:pre-line}
+.tip{border-left:5px solid #0d6efd;background:#eaf3ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.question{border-left:5px solid #198754;background:#f2fbf6;padding:15px;border-radius:8px}
+.answer{display:none;background:#f8f9fa;border:1px solid #dee2e6;border-radius:9px;padding:15px;margin-top:12px}
+.btn-toggle{border:1px solid #0d6efd;background:#fff;color:#0d6efd;border-radius:7px;padding:7px 14px}
+</style>
+</head>
+<body>
+<div class="container py-4">
+
+<section class="hero p-4 p-md-5 mb-4">
+<h1>🟢 Part 17 — REST API Development ⭐⭐⭐</h1>
+<p class="lead mb-2">Build clean, predictable APIs using REST principles and practical Node.js/Express patterns.</p>
+<p class="mb-0">Simple English • CRUD • HTTP methods • validation • errors • pagination • filtering • sorting • searching</p>
+</section>
+
+<section class="card">
+<div class="card-header h-blue">1. What is REST?</div>
+<div class="card-body">
+<p><strong>REST</strong> means <strong>Representational State Transfer</strong>. It is a set of principles for designing web APIs around resources.</p>
+<p>In simple words, instead of creating a different URL for every action, we identify a resource and use HTTP methods to describe what we want to do.</p>
+<div class="alert alert-info"><strong>Layman example:</strong> Think of a library. <code>/books</code> is the book collection. GET can read books, POST can add a book, PUT/PATCH can update a book, and DELETE can remove one.</div>
+<div class="flow">Client
+  ↓
+HTTP Request
+  ↓
+REST API
+  ↓
+Resource / Controller / Database
+  ↓
+JSON Response
+  ↓
+Client</div>
+<div class="tip mt-3"><strong>Interview line:</strong> “REST is an architectural style where APIs expose resources through URLs and use standard HTTP methods and status codes to represent operations and results.”</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-green">2. Resources</div>
+<div class="card-body">
+<p>A <strong>resource</strong> is a thing your API manages, such as users, products, orders, or books.</p>
+<table class="table table-bordered">
+<thead><tr><th>Resource</th><th>Collection URL</th><th>Single resource URL</th></tr></thead>
+<tbody>
+<tr><td>Users</td><td><code>/users</code></td><td><code>/users/101</code></td></tr>
+<tr><td>Products</td><td><code>/products</code></td><td><code>/products/501</code></td></tr>
+<tr><td>Orders</td><td><code>/orders</code></td><td><code>/orders/9001</code></td></tr>
+</tbody>
+</table>
+<p><strong>Good REST naming:</strong> use nouns such as <code>/users</code>, not action words such as <code>/getUsers</code>.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header h-purple">3. HTTP Methods and CRUD</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Method</th><th>Common meaning</th><th>CRUD</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>GET</td><td>Read resource(s)</td><td>Read</td><td><code>GET /users</code></td></tr>
+<tr><td>POST</td><td>Create a new resource</td><td>Create</td><td><code>POST /users</code></td></tr>
+<tr><td>PUT</td><td>Replace a resource representation</td><td>Update</td><td><code>PUT /users/101</code></td></tr>
+<tr><td>PATCH</td><td>Partially update a resource</td><td>Update</td><td><code>PATCH /users/101</code></td></tr>
+<tr><td>DELETE</td><td>Delete a resource</td><td>Delete</td><td><code>DELETE /users/101</code></td></tr>
+</tbody>
+</table>
+<div class="warn"><strong>Interview point:</strong> PUT is commonly described as replacement/update of the target representation, while PATCH is intended for partial modification. Exact application semantics should be documented by the API.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-blue">4. CRUD API Example with Express</div>
+<div class="card-body">
+<pre class="codebox">const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+app.get("/users", (req, res) =&gt; {
+  res.json([{ id: 1, name: "Sam" }]);
+});
+
+app.post("/users", (req, res) =&gt; {
+  const user = req.body;
+  res.status(201).json(user);
+});
+
+app.put("/users/:id", (req, res) =&gt; {
+  res.json({ message: "User replaced", id: req.params.id });
+});
+
+app.patch("/users/:id", (req, res) =&gt; {
+  res.json({ message: "User partially updated", id: req.params.id });
+});
+
+app.delete("/users/:id", (req, res) =&gt; {
+  res.status(204).end();
+});</pre>
+<div class="flow">POST /users → Create
+GET /users → Read collection
+GET /users/1 → Read one
+PUT/PATCH /users/1 → Update
+DELETE /users/1 → Delete</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-orange">5. Request Headers</div>
+<div class="card-body">
+<p>Headers carry extra information about an HTTP request.</p>
+<pre class="codebox">GET /users HTTP/1.1
+Host: example.com
+Accept: application/json
+Authorization: Bearer TOKEN123</pre>
+<p>In Express:</p>
+<pre class="codebox">app.get("/users", (req, res) =&gt; {
+  console.log(req.headers);
+  console.log(req.get("Authorization"));
+  res.json([]);
+});</pre>
+<p>Common headers include <code>Content-Type</code>, <code>Accept</code>, <code>Authorization</code>, and caching-related headers.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header h-green">6. Request Body</div>
+<div class="card-body">
+<p>The request body usually carries data sent to the server, especially for POST, PUT, and PATCH.</p>
+<pre class="codebox">POST /users
+Content-Type: application/json
+
+{
+  "name": "Sam",
+  "email": "sam@example.com"
+}</pre>
+<pre class="codebox">app.use(express.json());
+
+app.post("/users", (req, res) =&gt; {
+  console.log(req.body);
+  res.status(201).json(req.body);
+});</pre>
+<div class="warn"><strong>Common mistake:</strong> Forgetting <code>express.json()</code> can cause JSON request bodies not to be parsed into <code>req.body</code>.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-purple">7. Response Body and JSON</div>
+<div class="card-body">
+<p>REST APIs commonly return JSON because it is easy for frontend applications and other services to consume.</p>
+<pre class="codebox">res.status(200).json({
+  success: true,
+  data: {
+    id: 101,
+    name: "Sam"
+  }
+});</pre>
+<p>A useful response structure should be consistent across the API.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header h-red">8. HTTP Status Codes ⭐⭐⭐</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Status</th><th>Meaning</th><th>Typical API use</th></tr></thead>
+<tbody>
+<tr><td>200</td><td>OK</td><td>Successful read/update</td></tr>
+<tr><td>201</td><td>Created</td><td>Successful resource creation</td></tr>
+<tr><td>204</td><td>No Content</td><td>Successful operation with no response body</td></tr>
+<tr><td>400</td><td>Bad Request</td><td>Invalid request data</td></tr>
+<tr><td>401</td><td>Unauthorized</td><td>Authentication required/invalid</td></tr>
+<tr><td>403</td><td>Forbidden</td><td>Authenticated but not allowed</td></tr>
+<tr><td>404</td><td>Not Found</td><td>Resource does not exist</td></tr>
+<tr><td>409</td><td>Conflict</td><td>Resource/state conflict</td></tr>
+<tr><td>422</td><td>Unprocessable Content</td><td>Request understood but validation/business rules fail</td></tr>
+<tr><td>500</td><td>Internal Server Error</td><td>Unexpected server failure</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>Interview tip:</strong> Do not return <code>200</code> for every situation. Status codes communicate the result of the HTTP operation.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-blue">9. REST API Naming Rules</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Avoid</th><th>Prefer</th></tr></thead>
+<tbody>
+<tr><td><code>GET /getUsers</code></td><td><code>GET /users</code></td></tr>
+<tr><td><code>POST /createUser</code></td><td><code>POST /users</code></td></tr>
+<tr><td><code>POST /deleteUser/10</code></td><td><code>DELETE /users/10</code></td></tr>
+<tr><td><code>GET /user</code> for a collection</td><td><code>GET /users</code></td></tr>
+<tr><td><code>GET /users/getActive</code></td><td><code>GET /users?status=active</code></td></tr>
+</tbody>
+</table>
+<p>Use resource-oriented names and let the HTTP method describe the main operation.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header h-green">10. API Validation</div>
+<div class="card-body">
+<p>Validation checks whether incoming data is acceptable before processing or saving it.</p>
+<pre class="codebox">function validateUser(req, res, next) {
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({
+      message: "name and email are required"
+    });
+  }
+
+  if (!email.includes("@")) {
+    return res.status(400).json({
+      message: "Invalid email"
+    });
+  }
+
+  next();
+}
+
+app.post("/users", validateUser, createUser);</pre>
+<div class="flow">Request → Parse body → Validate → Business logic → Database → Response</div>
+<div class="alert alert-warning"><strong>Security rule:</strong> Never assume data is valid just because it came from your own frontend. A client can call your API directly.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-red">11. API Errors</div>
+<div class="card-body">
+<p>A good API returns a useful status code and a safe, consistent error response.</p>
+<pre class="codebox">app.get("/users/:id", async (req, res, next) =&gt; {
+  try {
+    const user = await findUser(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: "USER_NOT_FOUND",
+          message: "User not found"
+        }
+      });
+    }
+
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+});</pre>
+<div class="warn"><strong>Do not expose sensitive internal details</strong> such as database stack traces, passwords, tokens, or secret configuration values in production responses.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-purple">12. Pagination ⭐⭐⭐</div>
+<div class="card-body">
+<p>Pagination prevents the server from returning thousands or millions of records in one response.</p>
+<p>Example:</p>
+<pre class="codebox">GET /products?page=2&amp;limit=10</pre>
+<p>Concept:</p>
+<pre class="codebox">page 1 → records 1–10
+page 2 → records 11–20
+page 3 → records 21–30</pre>
+<p>Example response:</p>
+<pre class="codebox">{
+  "data": [ ... ],
+  "pagination": {
+    "page": 2,
+    "limit": 10,
+    "totalItems": 57,
+    "totalPages": 6
+  }
+}</pre>
+<div class="tip"><strong>Interview point:</strong> Always define limits. Do not allow a client to request an unlimited number of records.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-orange">13. Filtering</div>
+<div class="card-body">
+<p>Filtering selects resources that match conditions.</p>
+<pre class="codebox">GET /products?category=mobile
+GET /products?status=active
+GET /products?category=mobile&amp;status=active</pre>
+<p>In Express:</p>
+<pre class="codebox">app.get("/products", (req, res) =&gt; {
+  const { category, status } = req.query;
+
+  // Build database filters from validated values.
+  res.json({ category, status });
+});</pre>
+</div></section>
+
+<section class="card">
+<div class="card-header h-blue">14. Sorting</div>
+<div class="card-body">
+<p>Sorting controls the order of returned resources.</p>
+<pre class="codebox">GET /products?sort=price
+GET /products?sort=-price
+GET /products?sort=name</pre>
+<p>A common convention is using <code>-</code> to mean descending order, but your API should document its exact syntax.</p>
+<div class="warn"><strong>Security/performance:</strong> Allow sorting only on known fields instead of blindly accepting any field from the client.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-green">15. Searching</div>
+<div class="card-body">
+<p>Searching looks for resources matching a text or search condition.</p>
+<pre class="codebox">GET /products?search=iphone</pre>
+<p>Do not confuse searching with exact filtering:</p>
+<pre class="codebox">filter: category=mobile
+search: search=iphone</pre>
+<p>The database query should be designed carefully so search remains fast as data grows.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header h-purple">16. Combining Pagination + Filtering + Sorting + Searching</div>
+<div class="card-body">
+<pre class="codebox">GET /products
+  ?page=2
+  &amp;limit=20
+  &amp;category=mobile
+  &amp;search=iphone
+  &amp;sort=-price</pre>
+<div class="flow">Client
+  ↓
+Parse query parameters
+  ↓
+Validate allowed values
+  ↓
+Build filter
+  ↓
+Apply search
+  ↓
+Apply sort
+  ↓
+Apply pagination
+  ↓
+Database
+  ↓
+JSON response</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-dark">17. A Simple REST API Structure</div>
+<div class="card-body">
+<pre class="codebox">src/
+├── routes/
+│   └── user.routes.js
+├── controllers/
+│   └── user.controller.js
+├── services/
+│   └── user.service.js
+├── models/
+│   └── user.model.js
+├── middleware/
+│   └── validation.js
+└── app.js</pre>
+<p>For larger applications, separating routing, validation, business logic, and data access makes the code easier to maintain.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header h-red">18. Common REST API Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Using action-heavy URLs such as <code>/getUsers</code> everywhere.</li>
+<li>Returning <code>200</code> for every success and error.</li>
+<li>Using the wrong HTTP method.</li>
+<li>Not validating request body and query parameters.</li>
+<li>Returning huge collections without pagination.</li>
+<li>Allowing arbitrary sort fields without validation.</li>
+<li>Exposing database errors or stack traces to clients.</li>
+<li>Using inconsistent response shapes.</li>
+<li>Ignoring authentication and authorization where required.</li>
+<li>Allowing clients to request unlimited page sizes.</li>
+<li>Confusing filtering, searching, sorting, and pagination.</li>
+<li>Trusting frontend validation as the only validation layer.</li>
+</ol>
+</div></section>
+
+<section class="card">
+<div class="card-header h-blue">19. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>REST APIs are resource-oriented.</li>
+<li>URLs identify resources; HTTP methods describe operations.</li>
+<li>GET reads, POST creates, PUT/PATCH updates, DELETE removes.</li>
+<li>Headers carry metadata about requests and responses.</li>
+<li>Request bodies commonly carry JSON for create/update operations.</li>
+<li>Status codes communicate the result.</li>
+<li>Validation protects API correctness and security.</li>
+<li>Pagination controls response size.</li>
+<li>Filtering narrows results by conditions.</li>
+<li>Sorting controls result order.</li>
+<li>Searching finds matching text/conditions.</li>
+</ul>
+</div></section>
+
+<section class="card">
+<div class="card-header h-green">20. Interview-Ready Checklist</div>
+<div class="card-body">
+<div class="alert alert-success">
+<strong>Be ready to explain:</strong>
+<ul class="mb-0">
+<li>What REST means.</li>
+<li>What a resource is.</li>
+<li>GET vs POST vs PUT vs PATCH vs DELETE.</li>
+<li>PUT vs PATCH.</li>
+<li>Why REST URLs usually use nouns.</li>
+<li>Request headers vs request body.</li>
+<li>Important HTTP status codes.</li>
+<li>How to design CRUD APIs.</li>
+<li>Why API-side validation is necessary.</li>
+<li>How to design pagination.</li>
+<li>Filtering vs searching vs sorting.</li>
+<li>How to handle API errors consistently.</li>
+</ul>
+</div>
+</div></section>
+
+<section class="card">
+<div class="card-header h-dark">21. Interview Questions — Show / Hide Answers</div>
+<div class="card-body">
+
+<div class="question mb-3"><strong>Q1. What is REST?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer"><strong>Answer:</strong> REST is an architectural style for designing network APIs around resources, HTTP methods, representations, and stateless communication.<br><strong>Why?</strong> It gives APIs a predictable structure that clients can understand and use.</div></div>
+
+<div class="question mb-3"><strong>Q2. Why is <code>/users</code> usually better than <code>/getUsers</code>?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer"><strong>Answer:</strong> <code>/users</code> represents the resource while GET already communicates the read operation.<br><strong>Why?</strong> The URL stays focused on the resource and the HTTP method expresses the operation.</div></div>
+
+<div class="question mb-3"><strong>Q3. What is the difference between PUT and PATCH?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer"><strong>Answer:</strong> PUT is commonly used for replacing/updating a full representation, while PATCH is for partial modification.<br><strong>Why?</strong> PATCH is useful when only a few fields need to change.</div></div>
+
+<div class="question mb-3"><strong>Q4. Which status code should commonly be returned after creating a resource?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="answer"><strong>Answer:</strong> <code>201 Created</code>.<br><strong>Why?</strong> It explicitly tells the client that a new resource was successfully created.</div></div>
+
+<div class="question mb-3"><strong>Q5. Find the API design problem.</strong>
+<pre class="codebox mt-2">GET /getAllProducts
+POST /createProduct
+POST /updateProduct/10
+POST /deleteProduct/10</pre>
+<button class="btn-toggle" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="answer"><strong>Answer:</strong> The URLs use action names and POST for operations that have standard HTTP methods.<br><strong>Better:</strong><pre class="codebox">GET    /products
+POST   /products
+PATCH  /products/10
+DELETE /products/10</pre><strong>Why?</strong> The resource is represented by the URL and the method communicates the operation.</div></div>
+
+<div class="question mb-3"><strong>Q6. Why is API validation required when the frontend already validates data?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="answer"><strong>Answer:</strong> The frontend cannot be trusted because clients can bypass it and call the API directly.<br><strong>Why?</strong> The server is the final authority for validating incoming data.</div></div>
+
+<div class="question mb-3"><strong>Q7. What is the purpose of pagination?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="answer"><strong>Answer:</strong> Pagination divides a large collection into smaller pages.<br><strong>Why?</strong> It reduces response size, database work, memory usage, and frontend rendering work.</div></div>
+
+<div class="question mb-3"><strong>Q8. What is the difference between filtering and searching?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="answer"><strong>Answer:</strong> Filtering usually applies structured conditions such as <code>status=active</code> or <code>category=mobile</code>. Searching usually looks for a text/query match such as <code>search=iphone</code>.<br><strong>Why?</strong> They solve different query needs even though both narrow results.</div></div>
+
+<div class="question mb-3"><strong>Q9. What is the difference between request headers and request body?</strong><br>
+<button class="btn-toggle" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="answer"><strong>Answer:</strong> Headers carry metadata such as authorization and content type. The body carries the main data being submitted.<br><strong>Why?</strong> Keeping metadata and content separate follows HTTP's message structure.</div></div>
+
+<div class="question mb-3"><strong>Q10. What status code would you use if a requested user does not exist?</strong><br>
+<button class="btn-toggle" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="answer"><strong>Answer:</strong> <code>404 Not Found</code>.<br><strong>Why?</strong> The requested resource could not be found.</div></div>
+
+<div class="question mb-3"><strong>Q11. What status code is commonly used when the user is authenticated but not allowed to access a resource?</strong><br>
+<button class="btn-toggle" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="answer"><strong>Answer:</strong> <code>403 Forbidden</code>.<br><strong>Why?</strong> The server understands who the caller is but refuses access.</div></div>
+
+<div class="question mb-3"><strong>Q12. Design an endpoint to get active products.</strong><br>
+<button class="btn-toggle" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="answer"><strong>Answer:</strong><pre class="codebox">GET /products?status=active</pre><strong>Why?</strong> Status is a filter on the products collection, so a query parameter is appropriate.</div></div>
+
+<div class="question mb-3"><strong>Q13. Design an endpoint for page 3 with 20 products per page.</strong><br>
+<button class="btn-toggle" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="answer"><strong>Answer:</strong><pre class="codebox">GET /products?page=3&amp;limit=20</pre><strong>Why?</strong> Pagination controls belong naturally in query parameters.</div></div>
+
+<div class="question mb-3"><strong>Q14. How would you add sorting by price descending?</strong><br>
+<button class="btn-toggle" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="answer"><strong>Answer:</strong><pre class="codebox">GET /products?sort=-price</pre><strong>Why?</strong> Query parameters are suitable for optional result-ordering instructions. The exact syntax should be documented and validated.</div></div>
+
+<div class="question mb-3"><strong>Q15. What is wrong with allowing <code>limit=1000000</code>?</strong><br>
+<button class="btn-toggle" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="answer"><strong>Answer:</strong> It can create excessive database work, memory use, network traffic, and response time.<br><strong>Fix:</strong> Validate the limit and enforce a reasonable maximum.</div></div>
+
+<div class="question mb-3"><strong>Q16. What should an API do when a request body is invalid?</strong><br>
+<button class="btn-toggle" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="answer"><strong>Answer:</strong> Reject it with an appropriate 4xx status and a clear, safe error response.<br><strong>Why?</strong> The client needs to know that its request was invalid and what it needs to correct.</div></div>
+
+<div class="question mb-3"><strong>Q17. Why should API errors have consistent structure?</strong><br>
+<button class="btn-toggle" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="answer"><strong>Answer:</strong> Consistent errors make frontend handling, logging, testing, and debugging easier.<br><strong>Why?</strong> Clients can rely on predictable fields such as <code>code</code> and <code>message</code>.</div></div>
+
+<div class="question mb-3"><strong>Q18. Predict the response status.</strong>
+<pre class="codebox mt-2">app.post("/users", (req, res) =&gt; {
+  // user successfully saved
+  res.status(201).json({ id: 10 });
+});</pre>
+<button class="btn-toggle" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="answer"><strong>Answer:</strong> <code>201 Created</code>.<br><strong>Why?</strong> The endpoint successfully created a new user.</div></div>
+
+<div class="question mb-3"><strong>Q19. Why should a REST API use status codes instead of always returning 200?</strong><br>
+<button class="btn-toggle" onclick="toggle('a19',this)">Show Answer</button>
+<div id="a19" class="answer"><strong>Answer:</strong> Status codes communicate the class and outcome of the HTTP operation.<br><strong>Why?</strong> Clients, monitoring tools, proxies, and developers can understand success, client errors, and server errors without parsing only the response body.</div></div>
+
+<div class="question mb-3"><strong>Q20. Design a single request that filters, searches, sorts, and paginates products.</strong><br>
+<button class="btn-toggle" onclick="toggle('a20',this)">Show Answer</button>
+<div id="a20" class="answer"><strong>Answer:</strong><pre class="codebox">GET /products?page=2&amp;limit=20&amp;category=mobile&amp;search=iphone&amp;sort=-price</pre><strong>Why?</strong> These are optional query controls applied to the same products collection.</div></div>
+
+</div></section>
+
+<section class="card">
+<div class="card-header h-dark">22. Final Interview Lines</div>
+<div class="card-body">
+<ul>
+<li><strong>REST:</strong> “Resources are identified by URLs, and HTTP methods represent operations on those resources.”</li>
+<li><strong>CRUD:</strong> “GET reads, POST creates, PUT/PATCH update, DELETE removes.”</li>
+<li><strong>Validation:</strong> “Server-side validation is mandatory because clients cannot be trusted.”</li>
+<li><strong>Pagination:</strong> “Pagination limits the amount of data returned in one request.”</li>
+<li><strong>Filtering:</strong> “Filtering narrows resources using structured conditions.”</li>
+<li><strong>Sorting:</strong> “Sorting controls the order of returned resources.”</li>
+<li><strong>Searching:</strong> “Searching finds resources matching a search query.”</li>
+<li><strong>Error handling:</strong> “A good API uses meaningful status codes and consistent, safe error bodies.”</li>
+</ul>
+</div></section>
+
+<footer class="text-center text-secondary py-4">
+<p class="mb-1"><strong>Node.js Interview Preparation — Part 17</strong></p>
+<p class="mb-0">REST API Development • Learn the design decisions, not only the syntax.</p>
+</footer>
+</div>
+<script>
+function toggle(id, btn) {
+  const el = document.getElementById(id);
+  const open = el.style.display === "block";
+  el.style.display = open ? "none" : "block";
+  btn.textContent = open ? "Show Answer" : "Hide Answer";
+}
+</script>
+</body>
+</html>

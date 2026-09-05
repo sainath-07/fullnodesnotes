@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 4 — File System (fs)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}
+.hero{background:linear-gradient(135deg,#111827,#0d6efd,#198754);color:#fff;border-radius:18px}
+.card,.topic{border:0;border-radius:14px}
+.card{overflow:hidden}.card-header{font-weight:700}
+.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}
+.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}
+.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}
+.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}
+.compare{background:#f8f9fa;border-radius:12px;padding:18px}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 4</span>
+<h1 class="display-6 fw-bold">🟢 File System (fs)</h1>
+<p class="lead mb-0">Learn how Node.js reads, writes, updates, deletes, and manages files and folders.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What is the File System (fs) module?</div>
+<div class="card-body">
+<div class="topic">
+<h5>What?</h5>
+<p>The Node.js <code>fs</code> module provides APIs for working with files and directories on the computer's file system.</p>
+<h5>Why / purpose?</h5>
+<ul>
+<li>Read files.</li>
+<li>Create and write files.</li>
+<li>Append content.</li>
+<li>Delete and rename files.</li>
+<li>Create and inspect directories.</li>
+<li>Read file information.</li>
+<li>Work with streams, buffers, and file descriptors.</li>
+</ul>
+<h5>How to import?</h5>
+<pre><code>const fs = require("fs");</code></pre>
+<p>With CommonJS you can use <code>require()</code>. In an ES module project:</p>
+<pre><code>import fs from "node:fs";</code></pre>
+<div class="flow">Node.js application
+       ↓
+     fs module
+       ↓
+Operating system file system
+       ↓
+Files / folders / metadata</div>
+<h5>Layman example</h5>
+<p>Think of <code>fs</code> as a librarian who can open a book, write a note in it, rename it, move it, or tell you information about it.</p>
+<div class="interview"><strong>Interview-ready:</strong> “The Node.js fs module provides APIs to interact with files and directories on the operating system.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. Reading Files</div>
+<div class="card-body">
+<div class="topic">
+<h5>Asynchronous callback method</h5>
+<pre><code>const fs = require("node:fs");
+
+fs.readFile("notes.txt", "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log(data);
+});</code></pre>
+<p><code>"utf8"</code> tells Node.js to return text rather than a raw <code>Buffer</code>.</p>
+<h5>Promise-based method</h5>
+<pre><code>const fs = require("node:fs/promises");
+
+async function readNotes() {
+  try {
+    const data = await fs.readFile("notes.txt", "utf8");
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+readNotes();</code></pre>
+<h5>Synchronous method</h5>
+<pre><code>const fs = require("node:fs");
+
+const data = fs.readFileSync("notes.txt", "utf8");
+console.log(data);</code></pre>
+<div class="warn"><strong>Common mistake:</strong> Using <code>readFileSync()</code> inside a high-traffic server request can block the JavaScript thread while the file operation completes.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">3. Writing Files</div>
+<div class="card-body">
+<div class="topic">
+<p><code>writeFile()</code> creates a file if needed and writes content to it. If the file already contains data, the normal behavior is to replace that content.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.writeFile("message.txt", "Hello Node.js", "utf8", (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log("File written");
+});</code></pre>
+<p>Promise version:</p>
+<pre><code>const fs = require("node:fs/promises");
+
+await fs.writeFile("message.txt", "Hello Node.js", "utf8");</code></pre>
+<div class="tip"><strong>Remember:</strong> <code>writeFile()</code> is different from <code>appendFile()</code>. Write normally replaces the existing file content; append adds content to the end.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">4. Appending Files</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>appendFile()</code> when you want to add content without replacing the existing content.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.appendFile("app.log", "User logged in\n", "utf8", (err) => {
+  if (err) {
+    console.error(err);
+  }
+});</code></pre>
+<p>Promise version:</p>
+<pre><code>const fs = require("node:fs/promises");
+
+await fs.appendFile("app.log", "Another event\n", "utf8");</code></pre>
+<h5>When to use?</h5>
+<p>Appending is useful for simple log files, audit text, or data that should be added to the end of an existing file.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">5. Deleting Files</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>unlink()</code> to remove a file.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.unlink("old.txt", (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log("File deleted");
+});</code></pre>
+<p>Promise version:</p>
+<pre><code>const fs = require("node:fs/promises");
+
+await fs.unlink("old.txt");</code></pre>
+<div class="warn"><strong>Common mistake:</strong> Always handle errors. The file may not exist, or the process may not have permission to remove it.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">6. Renaming Files</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>rename()</code> to rename or move a file.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.rename("old.txt", "new.txt", (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log("Renamed");
+});</code></pre>
+<p>Promise version:</p>
+<pre><code>const fs = require("node:fs/promises");
+
+await fs.rename("old.txt", "new.txt");</code></pre>
+<div class="interview"><strong>Interview-ready:</strong> “fs.rename can rename a file and can also be used to move a file when the destination path is different.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">7. Creating Directories</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>mkdir()</code> to create a directory.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.mkdir("uploads", { recursive: true }, (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log("Directory ready");
+});</code></pre>
+<p><code>recursive: true</code> allows Node.js to create missing parent directories as needed.</p>
+<pre><code>const fs = require("node:fs/promises");
+
+await fs.mkdir("uploads/images", { recursive: true });</code></pre>
+<div class="tip"><strong>When to use?</strong> Use recursive directory creation when your application cannot assume that parent folders already exist.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">8. Reading Directories</div>
+<div class="card-body">
+<div class="topic">
+<p>Use <code>readdir()</code> to get entries inside a directory.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.readdir("uploads", (err, files) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log(files);
+});</code></pre>
+<p>It can return names, or with options you can ask for directory entry objects.</p>
+<pre><code>const fs = require("node:fs/promises");
+
+const entries = await fs.readdir("uploads", {
+  withFileTypes: true
+});
+
+for (const entry of entries) {
+  console.log(entry.name, entry.isDirectory());
+}</code></pre>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">9. File Statistics — stat()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>stat()</code> gives metadata about a file or directory.</p>
+<pre><code>const fs = require("node:fs/promises");
+
+const info = await fs.stat("notes.txt");
+
+console.log(info.size);
+console.log(info.isFile());
+console.log(info.isDirectory());
+console.log(info.mtime);</code></pre>
+<h5>Useful information</h5>
+<ul>
+<li><code>size</code> — size in bytes.</li>
+<li><code>mtime</code> — last modification time.</li>
+<li><code>isFile()</code> — checks whether the path is a file.</li>
+<li><code>isDirectory()</code> — checks whether the path is a directory.</li>
+</ul>
+<div class="interview"><strong>Interview tip:</strong> <code>stat()</code> reads metadata. It does not mean “read the entire file contents.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">10. Synchronous vs Asynchronous fs Methods</div>
+<div class="card-body">
+<div class="topic">
+<h5>Synchronous</h5>
+<pre><code>const data = fs.readFileSync("notes.txt", "utf8");
+console.log(data);
+console.log("Next");</code></pre>
+<p>The current JavaScript execution waits until the operation finishes.</p>
+
+<h5>Asynchronous callback</h5>
+<pre><code>fs.readFile("notes.txt", "utf8", (err, data) => {
+  if (err) return console.error(err);
+  console.log(data);
+});
+
+console.log("Next");</code></pre>
+<p>The callback is called after the file operation completes. Other JavaScript work can continue while Node.js handles the I/O.</p>
+
+<h5>Promise-based</h5>
+<pre><code>const fs = require("node:fs/promises");
+
+async function main() {
+  const data = await fs.readFile("notes.txt", "utf8");
+  console.log(data);
+}
+
+main();</code></pre>
+<p>Promises provide a modern way to write asynchronous filesystem code, especially with <code>async/await</code>.</p>
+
+<div class="flow">Synchronous
+JavaScript
+  ↓
+fs.readFileSync()
+  ↓
+WAIT
+  ↓
+Continue
+
+
+Async callback
+JavaScript
+  ↓
+start file I/O
+  ↓
+continue other work
+  ↓
+I/O completes
+  ↓
+callback runs
+
+
+Promise
+JavaScript
+  ↓
+start file I/O
+  ↓
+await / promise pending
+  ↓
+I/O completes
+  ↓
+promise resolves
+  ↓
+continuation runs</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">11. Callback vs Promise vs Synchronous — Interview Focus ⭐⭐⭐</div>
+<div class="card-body">
+<div class="topic">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Style</th><th>Example</th><th>Execution idea</th><th>Good use</th></tr></thead>
+<tbody>
+<tr><td>Synchronous</td><td><code>readFileSync()</code></td><td>Waits before continuing</td><td>Small scripts, startup/configuration cases when blocking is acceptable</td></tr>
+<tr><td>Callback async</td><td><code>readFile()</code></td><td>Starts I/O and calls callback later</td><td>Legacy code and callback-based APIs</td></tr>
+<tr><td>Promise async</td><td><code>fs/promises.readFile()</code></td><td>Returns a Promise</td><td>Modern async/await code</td></tr>
+</tbody>
+</table>
+<div class="interview"><strong>Strong interview answer:</strong> “Synchronous fs methods block the current JavaScript execution until the operation finishes. Callback-based methods are asynchronous and report completion through a callback. Promise-based methods are also asynchronous but return Promises, which work naturally with async/await.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">12. fs/promises</div>
+<div class="card-body">
+<div class="topic">
+<p><code>node:fs/promises</code> exposes promise-based filesystem APIs.</p>
+<pre><code>const fs = require("node:fs/promises");
+
+async function createFile() {
+  try {
+    await fs.writeFile("hello.txt", "Hello");
+    const data = await fs.readFile("hello.txt", "utf8");
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+createFile();</code></pre>
+<h5>Why use it?</h5>
+<ul>
+<li>Works naturally with <code>async/await</code>.</li>
+<li>Avoids deeply nested callbacks.</li>
+<li>Errors can be handled with <code>try/catch</code> around awaited operations.</li>
+</ul>
+<div class="tip"><strong>Memory:</strong> <code>fs</code> contains callback and synchronous APIs; <code>fs/promises</code> provides promise-based APIs.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">13. Error-First Callbacks</div>
+<div class="card-body">
+<div class="topic">
+<p>Many Node.js callback APIs follow the <strong>error-first callback</strong> pattern:</p>
+<pre><code>fs.readFile("notes.txt", "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log(data);
+});</code></pre>
+<p>The first callback parameter is normally the error. If the operation succeeds, it is usually <code>null</code> or <code>undefined</code>, and the result is passed in a later parameter.</p>
+<div class="flow">(err, data)
+   │
+   ├── err exists → handle error
+   │
+   └── no error → use data</div>
+<div class="warn"><strong>Common mistake:</strong> Ignoring <code>err</code> and immediately using <code>data</code>. File operations can fail for many reasons.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">14. Encoding and Buffers</div>
+<div class="card-body">
+<div class="topic">
+<h5>Without encoding</h5>
+<pre><code>const fs = require("node:fs");
+
+fs.readFile("photo.jpg", (err, data) => {
+  if (err) throw err;
+
+  console.log(Buffer.isBuffer(data)); // true
+});</code></pre>
+<p>Without a text encoding, file content is commonly returned as a <code>Buffer</code>.</p>
+<h5>With UTF-8 encoding</h5>
+<pre><code>fs.readFile("message.txt", "utf8", (err, data) => {
+  if (err) throw err;
+
+  console.log(typeof data); // string
+});</code></pre>
+<h5>What is a Buffer?</h5>
+<p>A Buffer represents raw binary data. It is useful for images, PDFs, videos, compressed data, and other non-text content.</p>
+<div class="flow">File on disk
+    ↓
+raw bytes
+    ↓
+Buffer
+    ↓
+optional decoding
+    ↓
+string / application data</div>
+<div class="interview"><strong>Interview-ready:</strong> “A Buffer is used to represent raw binary data in Node.js. When reading text, passing an encoding such as utf8 lets the API return a string.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">15. File Descriptors</div>
+<div class="card-body">
+<div class="topic">
+<p>A <strong>file descriptor</strong> is a small operating-system-level identifier for an open file or resource.</p>
+<pre><code>const fs = require("node:fs");
+
+fs.open("notes.txt", "r", (err, fd) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  console.log("File descriptor:", fd);
+
+  fs.close(fd, (closeErr) => {
+    if (closeErr) console.error(closeErr);
+  });
+});</code></pre>
+<div class="flow">Application
+   ↓
+fs.open()
+   ↓
+Operating system opens file
+   ↓
+file descriptor (fd)
+   ↓
+read / write operations
+   ↓
+fs.close(fd)</div>
+<div class="warn"><strong>Common mistake:</strong> Forgetting to close manually opened file descriptors can waste OS resources.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">16. Streams with Files</div>
+<div class="card-body">
+<div class="topic">
+<p>For large files, reading everything into memory at once may be inefficient. A readable stream can process data in chunks.</p>
+<pre><code>const fs = require("node:fs");
+
+const stream = fs.createReadStream("large-video.mp4");
+
+stream.on("data", (chunk) => {
+  console.log("Received chunk:", chunk.length);
+});
+
+stream.on("end", () => {
+  console.log("Finished");
+});</code></pre>
+<div class="flow">Large file
+████████████████████████
+        ↓
+  createReadStream()
+        ↓
+ chunk → chunk → chunk → chunk
+        ↓
+ process progressively
+        ↓
+     end</div>
+<h5>When to use?</h5>
+<p>Streams are useful when working with large files or data that should be processed progressively instead of loading the entire content into memory.</p>
+<div class="interview"><strong>Interview tip:</strong> For a large file, explain why a stream can reduce peak memory usage: the application processes chunks instead of holding the entire file in memory at once.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">17. Writing with a Stream</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>const fs = require("node:fs");
+
+const output = fs.createWriteStream("output.txt");
+
+output.write("First line\n");
+output.write("Second line\n");
+output.end("Last line\n");</code></pre>
+<p>A writable stream accepts chunks of data over time.</p>
+<div class="tip"><strong>Important:</strong> Streams are especially useful when data is large or arrives progressively, such as file uploads, downloads, or media processing.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">18. Practical File Operations</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>const fs = require("node:fs/promises");
+
+async function manageFile() {
+  try {
+    // Create / write
+    await fs.writeFile("data.txt", "Hello");
+
+    // Append
+    await fs.appendFile("data.txt", "\nNode.js");
+
+    // Read
+    const content = await fs.readFile("data.txt", "utf8");
+    console.log(content);
+
+    // Metadata
+    const stats = await fs.stat("data.txt");
+    console.log(stats.size);
+
+    // Rename
+    await fs.rename("data.txt", "final.txt");
+
+    // Delete
+    await fs.unlink("final.txt");
+  } catch (error) {
+    console.error("File operation failed:", error);
+  }
+}
+
+manageFile();</code></pre>
+<div class="flow">writeFile
+   ↓
+appendFile
+   ↓
+readFile
+   ↓
+stat
+   ↓
+rename
+   ↓
+unlink</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">19. Interview Output / Code Questions ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="topic">
+<h5>Question 1</h5>
+<pre><code>const fs = require("node:fs");
+
+console.log("A");
+
+fs.readFile("data.txt", "utf8", (err, data) => {
+  console.log("B");
+});
+
+console.log("C");</code></pre>
+<p><strong>Question:</strong> What is the likely order of <code>A</code>, <code>B</code>, and <code>C</code> if the read operation completes asynchronously?</p>
+<p><strong>Answer:</strong> <code>A → C → B</code>.</p>
+<p><strong>Why?</strong> <code>readFile()</code> starts the asynchronous file operation and its callback runs after the operation completes.</p>
+</div>
+
+<div class="topic">
+<h5>Question 2</h5>
+<pre><code>const fs = require("node:fs");
+
+console.log("A");
+
+const data = fs.readFileSync("data.txt", "utf8");
+
+console.log("B");</code></pre>
+<p><strong>Question:</strong> Does <code>B</code> print before the file read finishes?</p>
+<p><strong>Answer:</strong> No.</p>
+<p><strong>Why?</strong> <code>readFileSync()</code> blocks the current JavaScript execution until the operation completes.</p>
+</div>
+
+<div class="topic">
+<h5>Question 3</h5>
+<pre><code>const fs = require("node:fs");
+
+fs.readFile("missing.txt", "utf8", (err, data) => {
+  console.log(data);
+});</code></pre>
+<p><strong>Question:</strong> What is the developer mistake?</p>
+<p><strong>Answer:</strong> The callback does not check <code>err</code>.</p>
+<p><strong>Why?</strong> The file may not exist or may not be readable. In an error-first callback, the error must be checked before using the result.</p>
+</div>
+
+<div class="topic">
+<h5>Question 4</h5>
+<pre><code>const fs = require("node:fs");
+
+fs.readFile("image.png", (err, data) => {
+  console.log(Buffer.isBuffer(data));
+});</code></pre>
+<p><strong>Question:</strong> What is the expected value when the read succeeds?</p>
+<p><strong>Answer:</strong> <code>true</code>.</p>
+<p><strong>Why?</strong> No text encoding was supplied, so file data is returned as a Buffer.</p>
+</div>
+
+<div class="topic">
+<h5>Question 5</h5>
+<pre><code>const fs = require("node:fs/promises");
+
+async function test() {
+  const data = await fs.readFile("data.txt", "utf8");
+  console.log(data);
+}</code></pre>
+<p><strong>Question:</strong> What does <code>await</code> wait for?</p>
+<p><strong>Answer:</strong> It waits for the Promise returned by <code>readFile()</code> to settle.</p>
+<p><strong>Why?</strong> The promise-based fs API returns a Promise, and <code>await</code> pauses the async function's continuation until that Promise settles. It does not block the whole Node.js process in the same way as <code>readFileSync()</code>.</p>
+</div>
+
+<div class="topic">
+<h5>Question 6 — Interview favorite</h5>
+<p><strong>Question:</strong> Which is better for a high-traffic Node.js server: <code>readFileSync()</code> or asynchronous <code>readFile()</code>?</p>
+<p><strong>Answer:</strong> Usually the asynchronous API.</p>
+<p><strong>Why?</strong> Synchronous filesystem operations block the current JavaScript execution. Asynchronous I/O lets Node.js continue handling other work while the operating system performs the I/O.</p>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">20. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Using synchronous file methods in performance-sensitive server request paths.</li>
+<li>Forgetting to handle callback errors.</li>
+<li>Forgetting <code>try/catch</code> around awaited Promise-based fs operations.</li>
+<li>Using a text encoding for binary files when a Buffer is required.</li>
+<li>Reading huge files completely into memory instead of considering streams.</li>
+<li>Forgetting to close manually opened file descriptors.</li>
+<li>Assuming <code>writeFile()</code> appends; it normally replaces file content.</li>
+<li>Assuming <code>readFile()</code> is suitable for every file size.</li>
+<li>Using relative paths without understanding the process working directory.</li>
+<li>Not checking whether a directory exists before an operation when the code requires it.</li>
+<li>Ignoring permissions and operating-system errors.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">21. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>fs</strong><br>Node.js filesystem API.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>readFile</strong><br>Read file asynchronously.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>readFileSync</strong><br>Read file synchronously and block.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>writeFile</strong><br>Create/replace file content.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>appendFile</strong><br>Add content to the end.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>unlink</strong><br>Delete a file.</div></div>
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>rename</strong><br>Rename or move a file.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>mkdir</strong><br>Create directories.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>readdir</strong><br>Read directory entries.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>stat</strong><br>Read file metadata.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>fs/promises</strong><br>Promise-based fs APIs.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>Buffer</strong><br>Raw binary data.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">22. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ol>
+<li>What is the Node.js <code>fs</code> module?</li>
+<li>How do you read a file asynchronously?</li>
+<li>What is the difference between <code>readFile()</code> and <code>readFileSync()</code>?</li>
+<li>What does <code>writeFile()</code> do?</li>
+<li>What is the difference between <code>writeFile()</code> and <code>appendFile()</code>?</li>
+<li>How do you delete a file?</li>
+<li>How do you rename a file?</li>
+<li>How do you create a directory?</li>
+<li>What does <code>readdir()</code> return?</li>
+<li>What is <code>stat()</code> used for?</li>
+<li>What is <code>fs/promises</code>?</li>
+<li>What is an error-first callback?</li>
+<li>Why does reading a binary file often return a Buffer?</li>
+<li>What is a file descriptor?</li>
+<li>Why should a manually opened file descriptor be closed?</li>
+<li>What are streams and why are they useful for large files?</li>
+<li>Compare synchronous, callback-based, and Promise-based fs APIs.</li>
+<li>Why can synchronous filesystem APIs be risky in a high-traffic Node.js server?</li>
+<li>How do you handle errors with callback-based fs APIs?</li>
+<li>How do you handle errors with Promise-based fs APIs?</li>
+</ol>
+<div class="interview"><strong>Top interview topic:</strong><br>
+If asked “callback vs promise vs synchronous filesystem operations,” do not only define them. Explain <strong>when the code continues, how errors are handled, and why synchronous I/O can block the JavaScript execution.</strong></div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">23. Final Visual Map</div>
+<div class="card-body">
+<div class="flow">                         Node.js fs
+                             │
+          ┌──────────────────┼──────────────────┐
+          ↓                  ↓                  ↓
+       Files             Directories        Metadata
+          │                  │                  │
+   ┌──────┼──────┐       mkdir/readdir        stat
+   ↓      ↓      ↓
+ read   write   delete
+          │
+     ┌────┴────┐
+     ↓         ↓
+ append      rename
+
+Execution styles
+     │
+ ┌───┼──────────────┐
+ ↓   ↓              ↓
+Sync Callback     Promise
+ ↓      ↓            ↓
+blocks  async       async
+       callback    async/await
+
+Large files
+     ↓
+Streams
+     ↓
+chunk → chunk → chunk
+     ↓
+lower peak memory than loading the entire file at once</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 4 — File System (fs) • Interview Preparation
+</footer>
+
+</div>
+</body>
+</html>

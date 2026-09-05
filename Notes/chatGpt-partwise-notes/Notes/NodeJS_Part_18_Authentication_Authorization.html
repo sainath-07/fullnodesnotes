@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Node.js Part 18 — Authentication & Authorization</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif;line-height:1.65}
+.hero{background:linear-gradient(135deg,#172554,#4f46e5);color:#fff;border-radius:18px}
+.card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);margin-bottom:24px}
+.card-header{font-weight:700;color:#fff}.blue{background:#1769aa}.green{background:#198754}.purple{background:#6f42c1}.orange{background:#d97706}.red{background:#c0392b}.dark{background:#343a40}
+.codebox{background:#17202a;color:#f8f9fa;border-radius:10px;padding:16px;overflow:auto}
+.flow{background:#eef6ff;border:1px solid #cfe5ff;border-radius:12px;padding:18px;font-weight:600;white-space:pre-line}
+.tip{border-left:5px solid #0d6efd;background:#eaf3ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.danger{border-left:5px solid #dc3545;background:#fff0f1;padding:14px;border-radius:8px}
+.question{border-left:5px solid #198754;background:#f2fbf6;padding:15px;border-radius:8px}
+.answer{display:none;background:#f8f9fa;border:1px solid #dee2e6;border-radius:9px;padding:15px;margin-top:12px}
+.btn-toggle{border:1px solid #0d6efd;background:#fff;color:#0d6efd;border-radius:7px;padding:7px 14px}
+</style>
+</head>
+<body>
+<div class="container py-4">
+
+<section class="hero p-4 p-md-5 mb-4">
+<h1>🟢 Part 18 — Authentication & Authorization ⭐⭐⭐</h1>
+<p class="lead mb-2">Learn how Node.js applications identify users and control what they are allowed to do.</p>
+<p class="mb-0">Simple English • Passwords • bcrypt • JWT • Access/Refresh Tokens • Cookies • Roles • Permissions</p>
+</section>
+
+<section class="card">
+<div class="card-header blue">1. Authentication vs Authorization</div>
+<div class="card-body">
+<table class="table table-bordered">
+<tr><th>Concept</th><th>Simple meaning</th><th>Example</th></tr>
+<tr><td><strong>Authentication</strong></td><td>“Who are you?”</td><td>Login with email and password</td></tr>
+<tr><td><strong>Authorization</strong></td><td>“What are you allowed to do?”</td><td>Only admins can delete users</td></tr>
+</table>
+<div class="alert alert-info"><strong>Layman example:</strong> A security guard first checks your ID. That is authentication. Then the guard checks whether your ID allows you into the server room. That is authorization.</div>
+<div class="flow">User
+ ↓
+Login credentials
+ ↓
+Authentication → Identity confirmed
+ ↓
+Authorization → Check role/permission
+ ↓
+Protected resource</div>
+<div class="tip mt-3"><strong>Interview line:</strong> “Authentication verifies identity; authorization decides whether that authenticated identity can perform an action.”</div>
+</div></section>
+
+<section class="card">
+<div class="card-header green">2. Registration</div>
+<div class="card-body">
+<p>Registration creates a new account. The important security rule is: <strong>never store the user's plain password.</strong></p>
+<pre class="codebox">const bcrypt = require("bcrypt");
+
+app.post("/register", async (req, res) =&gt; {
+  const { email, password } = req.body;
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  // Save email + passwordHash, NOT the plain password.
+  // await User.create({ email, passwordHash });
+
+  res.status(201).json({ message: "Registered" });
+});</pre>
+<p>The number <code>12</code> is the bcrypt cost factor used in this example. Choose a cost appropriate for your application's performance and security requirements.</p>
+<div class="warn"><strong>Common mistake:</strong> Saving <code>password</code> directly in MongoDB/MySQL. Password hashing must happen before storage.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">3. Password Hashing with bcrypt</div>
+<div class="card-body">
+<p><strong>Hashing</strong> converts a password into a one-way value. bcrypt is designed for password hashing and includes a salt as part of its process.</p>
+<div class="flow">Plain password
+     ↓
+ bcrypt.hash()
+     ↓
+Password hash
+     ↓
+Database</div>
+<p>During login:</p>
+<div class="flow">Entered password
+     ↓
+ bcrypt.compare()
+     ↓
+Matches stored hash?
+   ↙          ↘
+ YES          NO
+ ↓             ↓
+Login       Reject</div>
+<pre class="codebox">const isValid = await bcrypt.compare(
+  password,
+  user.passwordHash
+);
+
+if (!isValid) {
+  return res.status(401).json({
+    message: "Invalid credentials"
+  });
+}</pre>
+<div class="tip"><strong>Important:</strong> You do not “decrypt” a bcrypt password hash. You compare the entered password with the stored hash.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header orange">4. Login Flow</div>
+<div class="card-body">
+<pre class="codebox">app.post("/login", async (req, res) =&gt; {
+  const { email, password } = req.body;
+
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    return res.status(401).json({
+      message: "Invalid credentials"
+    });
+  }
+
+  const valid = await bcrypt.compare(
+    password,
+    user.passwordHash
+  );
+
+  if (!valid) {
+    return res.status(401).json({
+      message: "Invalid credentials"
+    });
+  }
+
+  // Create access/refresh tokens here.
+
+  res.json({ message: "Login successful" });
+});</pre>
+<div class="tip"><strong>Security tip:</strong> Many systems use the same generic message such as “Invalid credentials” for unknown users and wrong passwords, reducing unnecessary account-enumeration information.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">5. JWT — JSON Web Token</div>
+<div class="card-body">
+<p>A JWT is a signed token often used to carry claims between a client and server.</p>
+<p>A JWT normally has three dot-separated parts:</p>
+<pre class="codebox">HEADER.PAYLOAD.SIGNATURE</pre>
+<table class="table table-bordered">
+<tr><th>Part</th><th>Purpose</th></tr>
+<tr><td>Header</td><td>Describes token metadata such as the signing algorithm.</td></tr>
+<tr><td>Payload</td><td>Contains claims such as user ID, role, and expiration.</td></tr>
+<tr><td>Signature</td><td>Allows the server to verify that the token was signed with the expected secret/key.</td></tr>
+</table>
+<div class="danger"><strong>Important:</strong> A normal JWT payload is encoded, not encrypted. Do not put passwords, secrets, or sensitive private data in it.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header green">6. JWT Payload and Expiration</div>
+<div class="card-body">
+<pre class="codebox">const jwt = require("jsonwebtoken");
+
+const token = jwt.sign(
+  {
+    sub: user.id,
+    role: user.role
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "15m"
+  }
+);</pre>
+<p>Typical useful claims include <code>sub</code> for the subject/user identity and <code>exp</code> for expiration, depending on the JWT library and configuration.</p>
+<div class="warn"><strong>Do not put sensitive information in the payload.</strong> Anyone holding a normal JWT can decode its header and payload even though they cannot create a valid signature without the required signing key.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">7. Access Token vs Refresh Token ⭐⭐⭐</div>
+<div class="card-body">
+<table class="table table-bordered">
+<tr><th>Access token</th><th>Refresh token</th></tr>
+<tr><td>Used to access protected APIs</td><td>Used to obtain a new access token</td></tr>
+<tr><td>Usually short-lived</td><td>Usually longer-lived</td></tr>
+<tr><td>Sent frequently to APIs</td><td>Used less frequently</td></tr>
+<tr><td>Limits exposure if stolen</td><td>Needs stronger protection because it can create new access tokens</td></tr>
+</table>
+<div class="flow">Login
+ ↓
+Access token + Refresh token
+ ↓
+Access token → API requests
+ ↓
+Access token expires
+ ↓
+Refresh token → Token endpoint
+ ↓
+New access token</div>
+<div class="tip"><strong>Interview line:</strong> “A short-lived access token limits the lifetime of API access, while a refresh token can be used to obtain a new access token without asking the user to log in again.”</div>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">8. JWT Signature</div>
+<div class="card-body">
+<p>The signature helps the server detect whether the signed token was altered.</p>
+<div class="flow">Header + Payload
+       ↓
+ Signing key
+       ↓
+   Signature
+
+Received JWT
+       ↓
+Verify signature
+   ↙          ↘
+Valid        Invalid
+ ↓             ↓
+Continue     Reject</div>
+<pre class="codebox">const decoded = jwt.verify(
+  token,
+  process.env.JWT_SECRET
+);</pre>
+<div class="danger"><strong>Never trust a decoded JWT by itself.</strong> Decoding reads claims. Verification checks the signature and relevant token validity.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header green">9. Protected Routes</div>
+<div class="card-body">
+<pre class="codebox">function authenticate(req, res, next) {
+  const header = req.get("Authorization");
+
+  if (!header || !header.startsWith("Bearer ")) {
+    return res.status(401).json({
+      message: "Authentication required"
+    });
+  }
+
+  const token = header.slice(7);
+
+  try {
+    req.user = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+    next();
+  } catch {
+    return res.status(401).json({
+      message: "Invalid or expired token"
+    });
+  }
+}
+
+app.get("/profile", authenticate, (req, res) =&gt; {
+  res.json({ user: req.user });
+});</pre>
+<div class="flow">Request
+ ↓
+authenticate middleware
+ ↓
+Token present?
+ ↓
+Verify token
+ ↓
+Attach user to req
+ ↓
+next()
+ ↓
+Controller</div>
+</div></section>
+
+<section class="card">
+<div class="card-header orange">10. Authorization Middleware</div>
+<div class="card-body">
+<pre class="codebox">function requireRole(...allowedRoles) {
+  return (req, res, next) =&gt; {
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Forbidden"
+      });
+    }
+
+    next();
+  };
+}
+
+app.delete(
+  "/users/:id",
+  authenticate,
+  requireRole("admin"),
+  deleteUser
+);</pre>
+<p>Notice the difference:</p>
+<div class="flow">authenticate → Who is the user?
+       ↓
+requireRole → Is this role allowed?
+       ↓
+deleteUser → Perform the action</div>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">11. Role-Based Authorization</div>
+<div class="card-body">
+<p>Role-based access control, or RBAC, assigns permissions through roles.</p>
+<table class="table table-bordered">
+<tr><th>Role</th><th>Example permissions</th></tr>
+<tr><td>user</td><td>Read own profile, create own orders</td></tr>
+<tr><td>editor</td><td>Create/update content</td></tr>
+<tr><td>admin</td><td>Manage users and system resources</td></tr>
+</table>
+<div class="warn"><strong>Do not rely only on the frontend.</strong> Hiding an “Admin” button does not protect an API. The server must enforce authorization.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">12. Permissions</div>
+<div class="card-body">
+<p>Permissions can be more precise than roles.</p>
+<pre class="codebox">const permissions = {
+  admin: ["users:read", "users:delete", "posts:write"],
+  editor: ["posts:read", "posts:write"],
+  user: ["posts:read"]
+};</pre>
+<p>A permission check can answer questions such as: “Can this user delete users?” instead of only asking “Is this user an admin?”</p>
+</div></section>
+
+<section class="card">
+<div class="card-header green">13. Cookies</div>
+<div class="card-body">
+<p>Cookies are small pieces of data that a browser can store and send with matching requests.</p>
+<pre class="codebox">res.cookie("refreshToken", refreshToken, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+});</pre>
+<p>Cookies are especially useful when the browser should automatically send authentication/session information to the appropriate origin.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">14. HttpOnly, Secure, SameSite</div>
+<div class="card-body">
+<table class="table table-bordered">
+<tr><th>Attribute</th><th>Meaning</th><th>Why it matters</th></tr>
+<tr><td><code>HttpOnly</code></td><td>JavaScript cannot read the cookie through <code>document.cookie</code>.</td><td>Helps reduce token theft through some XSS scenarios.</td></tr>
+<tr><td><code>Secure</code></td><td>Cookie is sent only over HTTPS.</td><td>Protects cookie transmission over insecure HTTP.</td></tr>
+<tr><td><code>SameSite</code></td><td>Controls when cookies are sent in cross-site contexts.</td><td>Helps reduce CSRF risk and controls cross-site cookie behavior.</td></tr>
+</table>
+<div class="tip"><strong>Important:</strong> Cookie security depends on the whole application design. These flags are protections, not a complete authentication system.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header red">15. Authentication + Authorization Full Flow</div>
+<div class="card-body">
+<div class="flow">REGISTER
+ ↓
+Hash password with bcrypt
+ ↓
+Store password hash
+ ↓
+LOGIN
+ ↓
+Find user
+ ↓
+bcrypt.compare()
+ ↓
+Create access + refresh tokens
+ ↓
+Client stores/sends credentials safely
+ ↓
+Protected API request
+ ↓
+Authentication middleware
+ ↓
+Verify token
+ ↓
+Identify user
+ ↓
+Authorization middleware
+ ↓
+Check role / permission
+ ↓
+Controller
+ ↓
+Response</div>
+</div></section>
+
+<section class="card">
+<div class="card-header dark">16. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Storing plain-text passwords.</li>
+<li>Trying to decrypt bcrypt hashes.</li>
+<li>Putting passwords or secrets in JWT payloads.</li>
+<li>Decoding a JWT and treating it as verified.</li>
+<li>Using a weak or exposed JWT signing secret.</li>
+<li>Making access tokens unnecessarily long-lived.</li>
+<li>Not protecting refresh tokens carefully.</li>
+<li>Checking authorization only in React/frontend code.</li>
+<li>Returning <code>401</code> and <code>403</code> interchangeably.</li>
+<li>Forgetting token expiration and revocation strategy.</li>
+<li>Using cookies without understanding <code>HttpOnly</code>, <code>Secure</code>, and <code>SameSite</code>.</li>
+<li>Logging passwords, access tokens, or refresh tokens.</li>
+<li>Returning detailed authentication errors that help attackers enumerate accounts.</li>
+<li>Not validating request data before authentication-related operations.</li>
+</ol>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">17. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li><strong>Authentication:</strong> verifies identity.</li>
+<li><strong>Authorization:</strong> checks permission.</li>
+<li><strong>bcrypt:</strong> hashes passwords and compares entered passwords with stored hashes.</li>
+<li><strong>JWT:</strong> commonly carries signed claims.</li>
+<li><strong>Payload:</strong> readable claims; never treat it as secret storage.</li>
+<li><strong>Signature:</strong> lets the server verify token integrity.</li>
+<li><strong>Expiration:</strong> limits how long a token is valid.</li>
+<li><strong>Access token:</strong> short-lived API credential in many designs.</li>
+<li><strong>Refresh token:</strong> used to obtain new access tokens.</li>
+<li><strong>Authentication middleware:</strong> identifies the caller.</li>
+<li><strong>Authorization middleware:</strong> checks roles/permissions.</li>
+<li><strong>HttpOnly:</strong> blocks JavaScript access to a cookie.</li>
+<li><strong>Secure:</strong> sends a cookie only over HTTPS.</li>
+<li><strong>SameSite:</strong> controls cross-site cookie sending.</li>
+</ul>
+</div></section>
+
+<section class="card">
+<div class="card-header green">18. Interview-Ready Checklist</div>
+<div class="card-body">
+<div class="alert alert-success">
+<strong>Be ready to explain:</strong>
+<ul class="mb-0">
+<li>Authentication vs authorization.</li>
+<li>Registration and secure password storage.</li>
+<li>How bcrypt hashing and comparison work.</li>
+<li>JWT header, payload, and signature.</li>
+<li>Why JWT payload data should not be considered secret.</li>
+<li>JWT verification vs decoding.</li>
+<li>Access token vs refresh token.</li>
+<li>JWT expiration.</li>
+<li>Protected route middleware.</li>
+<li>Role-based authorization and permissions.</li>
+<li>401 vs 403.</li>
+<li>HttpOnly, Secure, and SameSite cookies.</li>
+</ul>
+</div>
+</div></section>
+
+<section class="card">
+<div class="card-header dark">19. Interview Questions — Show / Hide Answers</div>
+<div class="card-body">
+
+<div class="question mb-3"><strong>Q1. What is the difference between authentication and authorization?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer"><strong>Answer:</strong> Authentication verifies who the user is. Authorization checks what that user is allowed to do.<br><strong>Why?</strong> A valid identity does not automatically mean the user has permission for every operation.</div></div>
+
+<div class="question mb-3"><strong>Q2. Why should passwords be hashed instead of encrypted?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer"><strong>Answer:</strong> Password storage normally needs a one-way password hash, not reversible encryption.<br><strong>Why?</strong> The server only needs to verify a password, not recover the original password. bcrypt is designed for this purpose.</div></div>
+
+<div class="question mb-3"><strong>Q3. Can you decrypt a bcrypt password hash?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer"><strong>Answer:</strong> No. You use <code>bcrypt.compare()</code> to test an entered password against the stored hash.<br><strong>Why?</strong> bcrypt is a one-way password hashing scheme.</div></div>
+
+<div class="question mb-3"><strong>Q4. What are the three parts of a JWT?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="answer"><strong>Answer:</strong> Header, payload, and signature.<br><strong>Why?</strong> The header describes token metadata, the payload carries claims, and the signature provides integrity verification.</div></div>
+
+<div class="question mb-3"><strong>Q5. Is a JWT payload encrypted?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="answer"><strong>Answer:</strong> A normal signed JWT is not encrypted; its payload is encoded and readable.<br><strong>Why?</strong> Anyone holding the token can decode the payload. The signature prevents undetected modification when properly verified.</div></div>
+
+<div class="question mb-3"><strong>Q6. What is the difference between decoding and verifying a JWT?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="answer"><strong>Answer:</strong> Decoding reads the token contents. Verification checks the signature and token validity according to the verification rules.<br><strong>Why?</strong> Reading a token does not prove that it was issued by your trusted server.</div></div>
+
+<div class="question mb-3"><strong>Q7. Why are access tokens often short-lived?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="answer"><strong>Answer:</strong> A short lifetime limits the period in which a stolen access token can be used.<br><strong>Why?</strong> It reduces the impact window of token exposure.</div></div>
+
+<div class="question mb-3"><strong>Q8. What is the purpose of a refresh token?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="answer"><strong>Answer:</strong> It can be used to obtain a new access token after the access token expires, depending on the authentication design.<br><strong>Why?</strong> Users can remain signed in without sending their password again.</div></div>
+
+<div class="question mb-3"><strong>Q9. Find the security problem.</strong>
+<pre class="codebox mt-2">const token = jwt.sign({
+  userId: user.id,
+  password: user.password,
+  creditCard: user.card
+}, secret);</pre>
+<button class="btn-toggle" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="answer"><strong>Answer:</strong> Sensitive data is being placed in the JWT payload.<br><strong>Fix:</strong> Keep claims minimal, for example a subject/user ID and required non-sensitive authorization claims.<br><strong>Why?</strong> Normal JWT payloads can be decoded by anyone holding the token.</div></div>
+
+<div class="question mb-3"><strong>Q10. What is the purpose of <code>Authorization: Bearer token</code>?</strong><br><button class="btn-toggle mt-2" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="answer"><strong>Answer:</strong> It is a common HTTP header format for sending a bearer access token to an API.<br><strong>Why?</strong> The server can extract and verify the token before allowing protected operations.</div></div>
+
+<div class="question mb-3"><strong>Q11. What should happen here?</strong>
+<pre class="codebox mt-2">app.delete("/users/:id",
+  authenticate,
+  requireRole("admin"),
+  deleteUser
+);</pre>
+<button class="btn-toggle" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="answer"><strong>Answer:</strong> Authentication runs first, then authorization checks the admin role, and only then does <code>deleteUser</code> run.<br><strong>Why?</strong> The server must identify the caller before checking whether the caller is allowed to perform the operation.</div></div>
+
+<div class="question mb-3"><strong>Q12. What is the difference between HTTP 401 and 403?</strong><br><button class="btn-toggle" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="answer"><strong>Answer:</strong> 401 means the request lacks valid authentication credentials or requires authentication. 403 means the server understood the caller but refuses access to the resource/action.<br><strong>Why?</strong> They communicate different security states.</div></div>
+
+<div class="question mb-3"><strong>Q13. Why is frontend-only authorization insecure?</strong><br><button class="btn-toggle" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="answer"><strong>Answer:</strong> Users can bypass frontend code and directly call the backend API.<br><strong>Why?</strong> The backend is the trusted enforcement point for authorization.</div></div>
+
+<div class="question mb-3"><strong>Q14. What does <code>HttpOnly</code> do?</strong><br><button class="btn-toggle" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="answer"><strong>Answer:</strong> It prevents normal client-side JavaScript from reading that cookie through <code>document.cookie</code>.<br><strong>Why?</strong> This can reduce the ability of injected JavaScript to directly steal a cookie value.</div></div>
+
+<div class="question mb-3"><strong>Q15. What does <code>Secure</code> do on a cookie?</strong><br><button class="btn-toggle" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="answer"><strong>Answer:</strong> It tells the browser to send the cookie only over a secure HTTPS connection.<br><strong>Why?</strong> It helps protect cookie transmission from being sent over plain HTTP.</div></div>
+
+<div class="question mb-3"><strong>Q16. What does <code>SameSite</code> control?</strong><br><button class="btn-toggle" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="answer"><strong>Answer:</strong> It controls when a browser includes the cookie in cross-site request contexts.<br><strong>Why?</strong> It is an important part of controlling cross-site cookie behavior and reducing CSRF risk.</div></div>
+
+<div class="question mb-3"><strong>Q17. Predict the result.</strong>
+<pre class="codebox mt-2">const passwordHash = await bcrypt.hash("hello123", 12);
+const ok = await bcrypt.compare("hello123", passwordHash);
+console.log(ok);</pre>
+<button class="btn-toggle" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="answer"><strong>Answer:</strong> <code>true</code>.<br><strong>Why?</strong> The original password matches the generated bcrypt hash.</div></div>
+
+<div class="question mb-3"><strong>Q18. Predict the result.</strong>
+<pre class="codebox mt-2">const passwordHash = await bcrypt.hash("hello123", 12);
+const ok = await bcrypt.compare("hello124", passwordHash);
+console.log(ok);</pre>
+<button class="btn-toggle" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="answer"><strong>Answer:</strong> <code>false</code>.<br><strong>Why?</strong> The entered password is different from the password used to create the stored hash.</div></div>
+
+<div class="question mb-3"><strong>Q19. Where should authorization be checked in a Node.js API?</strong><br><button class="btn-toggle" onclick="toggle('a19',this)">Show Answer</button>
+<div id="a19" class="answer"><strong>Answer:</strong> On the server, before the protected operation is executed.<br><strong>Why?</strong> Client-side checks can be bypassed. Middleware or service-level authorization provides a trusted enforcement point.</div></div>
+
+<div class="question mb-3"><strong>Q20. Design the secure flow for an admin-only delete API.</strong><br><button class="btn-toggle" onclick="toggle('a20',this)">Show Answer</button>
+<div id="a20" class="answer"><strong>Answer:</strong><div class="flow">DELETE /users/10
+ ↓
+Authenticate token
+ ↓
+Verify signature + expiration
+ ↓
+Identify user
+ ↓
+Check admin role/permission
+ ↓
+Delete user
+ ↓
+Return response</div><strong>Why?</strong> Authentication answers “who?”, authorization answers “allowed to delete?”, and only then should the destructive operation execute.</div></div>
+
+</div></section>
+
+<section class="card">
+<div class="card-header dark">20. Final Interview Lines</div>
+<div class="card-body">
+<ul>
+<li><strong>Authentication:</strong> “Authentication verifies identity.”</li>
+<li><strong>Authorization:</strong> “Authorization checks permissions after identity is established.”</li>
+<li><strong>bcrypt:</strong> “Passwords are hashed and later checked with bcrypt.compare(); they are not decrypted.”</li>
+<li><strong>JWT:</strong> “A signed JWT contains a header, payload, and signature.”</li>
+<li><strong>JWT security:</strong> “A normal JWT payload is readable, so sensitive secrets should never be stored there.”</li>
+<li><strong>Access token:</strong> “Usually short-lived and used for API access.”</li>
+<li><strong>Refresh token:</strong> “Used to obtain a new access token in designs that support refresh tokens.”</li>
+<li><strong>401 vs 403:</strong> “401 is an authentication problem; 403 is an authorization refusal.”</li>
+<li><strong>Cookies:</strong> “HttpOnly limits JavaScript access, Secure requires HTTPS, and SameSite controls cross-site sending behavior.”</li>
+</ul>
+</div></section>
+
+<footer class="text-center text-secondary py-4">
+<strong>Node.js Interview Preparation — Part 18</strong><br>
+Authentication & Authorization • Learn the security flow, not just the syntax.
+</footer>
+</div>
+<script>
+function toggle(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

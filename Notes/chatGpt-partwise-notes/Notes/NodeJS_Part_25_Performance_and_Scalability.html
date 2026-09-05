@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 25 — Performance & Scalability</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff;padding:46px 0}
+.card-doc{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);overflow:hidden;margin-bottom:24px}
+.card-header{font-weight:700;padding:16px 20px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;overflow:auto;font-size:.9rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:18px 0}
+.flow .box{padding:12px 16px;border-radius:10px;background:#e8f0fe;border:1px solid #b8ccf5;font-weight:600}
+.arrow{font-size:22px;font-weight:bold}
+.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.danger{border-left:5px solid #dc3545;background:#fff0f1;padding:14px;border-radius:8px}
+.answer{display:none}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="container">
+<h1>🟢 Part 25 — Performance & Scalability ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how to make Node.js applications faster, safer under load and easier to scale.</p>
+</div>
+</header>
+
+<main class="container py-4">
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">1. What is Performance?</div>
+<div class="card-body">
+<p><strong>What:</strong> Performance is how efficiently an application uses time, CPU, memory, network and database resources.</p>
+<p><strong>Why:</strong> A fast application gives users quicker responses and can serve more requests with the same infrastructure.</p>
+<p><strong>Layman example:</strong> A restaurant that serves 100 customers using the same kitchen more efficiently has better performance.</p>
+<div class="flow">
+<div class="box">Request</div><div class="arrow">→</div><div class="box">Node.js</div><div class="arrow">→</div><div class="box">DB / CPU / Network</div><div class="arrow">→</div><div class="box">Response</div>
+</div>
+<div class="alert alert-info"><strong>Interview line:</strong> Performance optimization should start with measurement. Do not optimize code blindly; identify the actual bottleneck first.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">2. Blocking Operations & Event Loop Blocking ⭐⭐⭐</div>
+<div class="card-body">
+<p>Node.js runs JavaScript on an event loop. If JavaScript performs a long CPU-heavy or synchronous operation, the event loop cannot handle other JavaScript callbacks during that time.</p>
+<div class="code">const fs = require("node:fs");
+
+// Blocking operation:
+const data = fs.readFileSync("large-file.txt", "utf8");
+
+console.log(data);</div>
+<div class="flow">
+<div class="box">Request A</div><div class="arrow">→</div><div class="box">Long blocking task</div><div class="arrow">→</div><div class="box">Request B waits</div>
+</div>
+<div class="danger"><strong>Common mistake:</strong> Thinking "Node.js is non-blocking" means every Node.js operation is automatically non-blocking. Synchronous APIs and CPU-heavy JavaScript can still block the event loop.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">3. CPU-Heavy Tasks</div>
+<div class="card-body">
+<p>Examples include large calculations, image processing, compression of large data, encryption work and complex loops.</p>
+<div class="code">function expensiveWork() {
+  let result = 0;
+
+  for (let i = 0; i &lt; 1e9; i++) {
+    result += i;
+  }
+
+  return result;
+}</div>
+<p><strong>When to use:</strong> CPU-heavy work should be kept away from the main JavaScript execution path when it can significantly delay other requests.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">4. Worker Threads</div>
+<div class="card-body">
+<p><strong>What:</strong> Worker threads allow JavaScript CPU-heavy work to run in separate threads instead of occupying the main JavaScript thread.</p>
+<div class="code">const { Worker } = require("node:worker_threads");
+
+const worker = new Worker("./worker.js");
+
+worker.on("message", (result) => {
+  console.log("Result:", result);
+});</div>
+<div class="flow">
+<div class="box">Main thread</div><div class="arrow">→</div><div class="box">Worker thread</div><div class="arrow">→</div><div class="box">CPU-heavy task</div>
+</div>
+<div class="tip"><strong>Interview point:</strong> Worker threads are mainly useful for CPU-intensive JavaScript work. They are not a replacement for normal asynchronous I/O APIs.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">5. Cluster</div>
+<div class="card-body">
+<p><strong>What:</strong> Node.js cluster can run multiple Node.js processes that can share a server port.</p>
+<div class="flow">
+<div class="box">Incoming traffic</div><div class="arrow">→</div><div class="box">Load distribution</div>
+</div>
+<div class="flow">
+<div class="box">Process 1</div><div class="box">Process 2</div><div class="box">Process 3</div><div class="box">Process 4</div>
+</div>
+<p><strong>Important:</strong> Cluster uses separate processes, while worker threads use threads within a Node.js process.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">6. Vertical vs Horizontal Scaling ⭐⭐⭐</div>
+<div class="card-body">
+<table class="table table-bordered">
+<thead><tr><th>Scaling</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Vertical</td><td>Make one machine stronger</td><td>More CPU/RAM</td></tr>
+<tr><td>Horizontal</td><td>Add more application instances</td><td>Run 5 API servers</td></tr>
+</tbody>
+</table>
+<div class="flow">
+<div class="box">Vertical: Bigger server</div><div class="arrow">vs</div><div class="box">Horizontal: More servers</div>
+</div>
+<p><strong>Interview line:</strong> Horizontal scaling can improve capacity and availability, but it requires the application to handle distributed state correctly.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">7. Caching</div>
+<div class="card-body">
+<p><strong>What:</strong> Caching stores frequently used data closer to where it is needed so expensive work can be avoided or reduced.</p>
+<div class="flow">
+<div class="box">Request</div><div class="arrow">→</div><div class="box">Cache?</div><div class="arrow">→</div><div class="box">Yes → Fast response</div>
+</div>
+<div class="flow">
+<div class="box">Cache miss</div><div class="arrow">→</div><div class="box">Database / service</div><div class="arrow">→</div><div class="box">Store result in cache</div>
+</div>
+<p><strong>When to use:</strong> Frequently requested data that does not change every second is often a good caching candidate.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">8. Redis</div>
+<div class="card-body">
+<p>Redis is an in-memory data store commonly used for caching, counters, sessions and other fast-access data structures.</p>
+<div class="code">Request
+  ↓
+Redis cache
+  ↓ cache hit → return data
+  ↓ cache miss
+Database
+  ↓
+store result in Redis</div>
+<div class="warn"><strong>Common mistake:</strong> Treating cached data as permanently correct. Cache invalidation, expiration and consistency must be designed deliberately.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">9. HTTP Caching</div>
+<div class="card-body">
+<p>Browsers and intermediary caches can reuse responses based on HTTP caching headers.</p>
+<div class="code">res.setHeader("Cache-Control", "public, max-age=3600");
+res.json(data);</div>
+<p><strong>Purpose:</strong> Reduce repeated network requests and server work for cacheable resources.</p>
+<div class="tip"><strong>Interview point:</strong> Application caching such as Redis and HTTP caching solve related but different problems. HTTP caching operates through HTTP cache semantics; Redis is an application-side data store.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">10. Compression</div>
+<div class="card-body">
+<p>Compression reduces response size before sending data over the network. This can improve transfer time, especially for large text responses.</p>
+<div class="code">const compression = require("compression");
+app.use(compression());</div>
+<p><strong>Trade-off:</strong> Compression uses CPU. Measure whether the CPU cost is worth the network savings for your workload.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">11. Streaming</div>
+<div class="card-body">
+<p>Streaming sends or processes data in smaller pieces instead of loading the entire content into memory first.</p>
+<div class="code">const fs = require("node:fs");
+
+app.get("/download", (req, res) => {
+  const stream = fs.createReadStream("large-video.mp4");
+  stream.pipe(res);
+});</div>
+<div class="flow">
+<div class="box">Large file</div><div class="arrow">→</div><div class="box">Small chunks</div><div class="arrow">→</div><div class="box">HTTP response</div>
+</div>
+<div class="tip"><strong>Why:</strong> Streaming can reduce memory pressure for large files and long-running data flows.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">12. Pagination ⭐⭐⭐</div>
+<div class="card-body">
+<p>Pagination prevents an API from returning thousands or millions of records in one response.</p>
+<div class="code">GET /products?page=2&amp;limit=20</div>
+<div class="flow">
+<div class="box">Client</div><div class="arrow">→</div><div class="box">20 records</div><div class="arrow">→</div><div class="box">Next page</div>
+</div>
+<p><strong>Why:</strong> Smaller responses reduce database work, memory use, network transfer and frontend rendering cost.</p>
+<div class="warn"><strong>Common mistake:</strong> Allowing the client to request an unlimited page size such as <code>limit=1000000</code>.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">13. Database Indexing ⭐⭐⭐</div>
+<div class="card-body">
+<p>An index helps a database find matching records more efficiently for suitable queries.</p>
+<div class="code">// MongoDB example
+db.users.createIndex({ email: 1 });</div>
+<div class="flow">
+<div class="box">Query</div><div class="arrow">→</div><div class="box">Index</div><div class="arrow">→</div><div class="box">Matching records</div>
+</div>
+<p><strong>Trade-off:</strong> Indexes can improve reads but consume storage and add work to writes/updates.</p>
+<div class="alert alert-warning"><strong>Interview line:</strong> Do not say "add indexes to every column." Indexes should match actual query patterns and be measured.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-success text-white">14. Connection Pooling</div>
+<div class="card-body">
+<p>A connection pool keeps a controlled number of reusable database connections.</p>
+<div class="flow">
+<div class="box">Request A</div><div class="box">Request B</div><div class="box">Request C</div>
+<div class="arrow">→</div><div class="box">Connection pool</div><div class="arrow">→</div><div class="box">Database</div>
+</div>
+<p><strong>Why:</strong> Reusing connections avoids repeatedly paying the cost of creating connections and protects the database from uncontrolled connection growth.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">15. Rate Limiting</div>
+<div class="card-body">
+<p>Rate limiting restricts how many requests a client can make during a period.</p>
+<div class="code">Example:
+100 requests / minute / IP</div>
+<div class="flow">
+<div class="box">Client</div><div class="arrow">→</div><div class="box">Rate limiter</div><div class="arrow">→</div><div class="box">API</div>
+</div>
+<p><strong>Purpose:</strong> Protect APIs from abuse, accidental traffic spikes and some brute-force attacks.</p>
+<div class="tip"><strong>Scaling note:</strong> In a multi-instance deployment, rate limiting often needs shared state such as Redis rather than only in-memory counters in one process.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-info text-dark">16. Load Balancing ⭐⭐⭐</div>
+<div class="card-body">
+<p>A load balancer distributes incoming traffic across multiple application instances.</p>
+<div class="flow">
+<div class="box">Users</div><div class="arrow">→</div><div class="box">Load Balancer</div>
+</div>
+<div class="flow">
+<div class="box">API 1</div><div class="box">API 2</div><div class="box">API 3</div><div class="box">API 4</div>
+</div>
+<p><strong>Benefits:</strong> More capacity, better availability and easier horizontal scaling.</p>
+<div class="warn"><strong>Important:</strong> Do not rely on process memory for shared application state when requests may reach different instances.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">17. Memory Leaks</div>
+<div class="card-body">
+<p>A memory leak happens when objects that are no longer needed remain reachable and therefore cannot be garbage-collected.</p>
+<div class="code">const listeners = [];
+
+function addUser(user) {
+  listeners.push(user); // grows forever if never removed
+}</div>
+<p><strong>Common causes:</strong> global collections that grow forever, forgotten event listeners, timers, caches without limits and references that should have been released.</p>
+<div class="danger"><strong>Interview point:</strong> A memory leak is not simply "using a lot of memory." It is unwanted retention of memory that should have become reclaimable.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">18. Performance Profiling</div>
+<div class="card-body">
+<p>Profiling means measuring where CPU time, memory or latency is actually being spent.</p>
+<div class="flow">
+<div class="box">Measure</div><div class="arrow">→</div><div class="box">Find bottleneck</div><div class="arrow">→</div><div class="box">Optimize</div><div class="arrow">→</div><div class="box">Measure again</div>
+</div>
+<p>Useful Node.js tools and techniques include the Node.js inspector, CPU profiles, heap snapshots, application metrics and load testing.</p>
+<div class="tip"><strong>Golden rule:</strong> Measure before and after optimization. An optimization that sounds good can make another part of the system worse.</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-secondary text-white">19. Putting the Pieces Together</div>
+<div class="card-body">
+<div class="flow">
+<div class="box">Users</div><div class="arrow">→</div>
+<div class="box">Load Balancer</div><div class="arrow">→</div>
+<div class="box">Node.js instances</div><div class="arrow">→</div>
+<div class="box">Redis cache</div><div class="arrow">→</div>
+<div class="box">Database pool</div><div class="arrow">→</div>
+<div class="box">Indexed DB</div>
+</div>
+<p>For large systems, performance usually comes from several small improvements working together rather than one magic optimization.</p>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-danger text-white">20. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Using synchronous APIs in high-throughput request handlers without a good reason.</li>
+<li>Running huge CPU loops on the main JavaScript thread.</li>
+<li>Adding caching without an invalidation or expiration strategy.</li>
+<li>Adding too many database indexes without measuring their write/storage cost.</li>
+<li>Returning huge datasets without pagination.</li>
+<li>Creating a new database connection for every request.</li>
+<li>Using only in-memory rate limiting when the API has multiple instances.</li>
+<li>Keeping unlimited in-memory caches.</li>
+<li>Assuming compression is always beneficial without considering CPU cost.</li>
+<li>Profiling only after production incidents instead of monitoring important metrics.</li>
+<li>Keeping application state in one process when requests can be routed to other instances.</li>
+<li>Scaling horizontally without thinking about sessions, caches, jobs and shared state.</li>
+</ol>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-dark text-white">21. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>Do not block the Node.js event loop with long synchronous or CPU-heavy work.</li>
+<li>Use worker threads for suitable CPU-intensive JavaScript tasks.</li>
+<li>Cluster uses multiple Node.js processes; worker threads use threads.</li>
+<li>Vertical scaling means a stronger machine; horizontal scaling means more instances.</li>
+<li>Caching can avoid repeated expensive work.</li>
+<li>Redis is commonly used as a fast shared cache.</li>
+<li>HTTP caching can reduce repeated network and server work.</li>
+<li>Compression reduces response size but uses CPU.</li>
+<li>Streaming is useful for large data without loading everything into memory.</li>
+<li>Pagination protects APIs from huge responses.</li>
+<li>Database indexes can speed suitable queries but have storage/write costs.</li>
+<li>Connection pools reuse database connections.</li>
+<li>Rate limiting protects APIs from excessive traffic.</li>
+<li>Load balancers distribute traffic across instances.</li>
+<li>Profile first; optimize based on measured bottlenecks.</li>
+</ul>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-primary text-white">22. Interview-Ready Points ⭐⭐⭐</div>
+<div class="card-body">
+<div class="tip">
+<ul class="mb-0">
+<li><strong>Why can Node.js be blocked?</strong> JavaScript execution is concentrated on the event loop thread; long synchronous/CPU work prevents other callbacks from running.</li>
+<li><strong>Worker threads vs cluster:</strong> worker threads use threads for CPU work; cluster runs separate processes.</li>
+<li><strong>Horizontal vs vertical scaling:</strong> more instances vs a stronger machine.</li>
+<li><strong>Why caching?</strong> Reduce repeated expensive computation, database work or network calls.</li>
+<li><strong>Why Redis?</strong> Fast shared in-memory storage, commonly used for cache and distributed counters/state.</li>
+<li><strong>Why pagination?</strong> Prevent huge queries and responses.</li>
+<li><strong>Why indexes?</strong> Speed suitable query patterns at the cost of storage and write overhead.</li>
+<li><strong>Why connection pooling?</strong> Efficiently reuse a controlled number of DB connections.</li>
+<li><strong>Why rate limiting?</strong> Protect resources and reduce abuse.</li>
+<li><strong>How do you optimize?</strong> Measure → identify bottleneck → change → benchmark/profile again.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card-doc">
+<div class="card-header bg-warning text-dark">23. Interview Questions — Click to Show / Hide Answer</div>
+<div class="card-body" id="questions"></div>
+</section>
+
+</main>
+
+<script>
+const questions = [
+["Q1. Why can CPU-heavy JavaScript block a Node.js application?",
+"JavaScript callbacks run on the main event-loop thread. A long CPU operation occupies that thread and prevents other callbacks from running.",
+"Node.js can be excellent for I/O-heavy workloads, but CPU-heavy JavaScript still needs careful handling."],
+["Q2. What is event loop blocking?",
+"It happens when a synchronous or long-running operation prevents the event loop from processing other callbacks promptly.",
+"Blocking increases latency for unrelated requests because they must wait."],
+["Q3. When would you use worker_threads?",
+"For CPU-intensive JavaScript work that would otherwise occupy the main event-loop thread for a significant amount of time.",
+"Workers provide another thread where suitable CPU work can execute."],
+["Q4. What is the difference between worker threads and cluster?",
+"Worker threads use multiple threads within a process. Cluster creates multiple Node.js processes.",
+"Threads and processes have different memory and isolation characteristics."],
+["Q5. What is horizontal scaling?",
+"Adding more application instances or machines to handle traffic.",
+"It increases capacity by distributing work across multiple instances."],
+["Q6. What is vertical scaling?",
+"Increasing the resources of one machine, such as CPU or RAM.",
+"It can be simple but has physical/resource limits and can leave a single large instance as a bottleneck."],
+["Q7. What is caching?",
+"Storing frequently needed data so future requests can retrieve it faster without repeating the expensive operation.",
+"It can reduce database load and response latency."],
+["Q8. Why is Redis commonly used for caching?",
+"Redis provides very fast in-memory data access and can be shared by multiple application instances.",
+"Shared cache state is useful when requests can reach different Node.js processes or servers."],
+["Q9. What is cache invalidation?",
+"It is the process of removing or updating cached data when the underlying source changes.",
+"Without a good invalidation/expiration strategy, an application can return stale data."],
+["Q10. What is the difference between HTTP caching and Redis caching?",
+"HTTP caching uses HTTP cache semantics and can allow browsers or intermediary caches to reuse responses. Redis is an application-side data store commonly used for cached data.",
+"They operate at different layers of the system."],
+["Q11. Why is pagination important for APIs?",
+"It limits how many records are fetched and returned at once.",
+"It reduces database work, memory usage, network transfer and client-side rendering cost."],
+["Q12. What is a database index?",
+"An index is an additional data structure that helps a database find records efficiently for suitable query patterns.",
+"Indexes can speed reads but consume storage and add work to writes."],
+["Q13. Should you create an index for every database field?",
+"No. Indexes should be based on real query patterns and measured performance needs.",
+"Every index has storage and write/update maintenance costs."],
+["Q14. What is connection pooling?",
+"A pool maintains reusable database connections and limits how many connections are active at a time.",
+"It reduces connection creation overhead and protects the database from uncontrolled connection growth."],
+["Q15. What is rate limiting?",
+"Rate limiting restricts how many requests a client can make within a defined period.",
+"It protects APIs from abuse, accidental spikes and some brute-force traffic."],
+["Q16. Why can in-memory rate limiting fail in a horizontally scaled API?",
+"Each Node.js instance may have its own counter, so a client can effectively get a separate limit on each instance.",
+"Shared storage such as Redis can provide coordinated rate-limit state."],
+["Q17. What does a load balancer do?",
+"It distributes incoming requests across multiple application instances.",
+"It supports horizontal scaling and can improve availability."],
+["Q18. Why can streaming improve memory usage?",
+"Streaming processes or sends data in chunks rather than requiring the entire payload to be held in memory at once.",
+"This is useful for large files and long-running data flows."],
+["Q19. What is a memory leak?",
+"It is unwanted retention of objects that are no longer needed, preventing garbage collection from reclaiming their memory.",
+"Growing global arrays, listeners, timers or unlimited caches can cause leaks."],
+["Q20. How should you approach a performance problem in Node.js?",
+"Measure the application, identify the bottleneck, make a targeted change and measure again.",
+"Profiling and metrics prevent guesses and help confirm whether the optimization actually worked."],
+["Q21. Does compression always improve performance?",
+"No. It reduces network transfer size but consumes CPU to compress and decompress data.",
+"The correct choice depends on response size, CPU availability, network conditions and workload."],
+["Q22. What is the difference between a slow database query and event-loop blocking?",
+"A slow database query is I/O waiting; an event-loop block is work that prevents the JavaScript thread from processing other callbacks.",
+"An async database call can wait without blocking JavaScript, while a large synchronous CPU loop can block it."],
+["Q23. Why can application state be a problem with horizontal scaling?",
+"Different requests from the same user can reach different instances, so state stored only in one process may not be available on another.",
+"Shared storage or stateless designs are commonly used for distributed state."],
+["Q24. What is the performance optimization golden rule?",
+"Measure before optimizing, make a targeted change, then measure again.",
+"Optimization without evidence can add complexity without improving the actual bottleneck."]
+];
+
+const root=document.getElementById("questions");
+questions.forEach((q,i)=>{
+ const id="answer"+i;
+ root.innerHTML += `<div class="border rounded-3 p-3 mb-3">
+ <h6 class="fw-bold">${q[0]}</h6>
+ <button class="btn btn-outline-primary btn-sm" onclick="toggleAnswer('${id}',this)">Show Answer</button>
+ <div id="${id}" class="answer mt-3">
+  <div class="alert alert-success"><strong>Answer:</strong> ${q[1]}</div>
+  <div class="alert alert-info mb-0"><strong>Why?</strong> ${q[2]}</div>
+ </div>
+ </div>`;
+});
+function toggleAnswer(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 9 — Node.js HTTP Module Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#202938}.hero{background:linear-gradient(135deg,#0f172a,#0d6efd);color:#fff}.cardx{border:0;border-radius:16px;box-shadow:0 8px 24px #0001;overflow:hidden;margin-bottom:24px}.code{background:#0f172a;color:#e5e7eb;border-radius:10px;padding:15px;white-space:pre-wrap;font-family:Consolas,monospace;overflow:auto}.flow{background:#eef5ff;border:1px dashed #0d6efd;border-radius:12px;padding:18px;text-align:center;font-weight:600;line-height:1.9}.label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#64748b}.tip{border-left:5px solid #0d6efd}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4"><div class="container">
+<span class="badge bg-light text-dark mb-2">Node.js • HTTP • APIs • Request/Response • MAANG • FANG • MNC</span>
+<h1 class="display-6 fw-bold">Part 9 — HTTP Module ⭐⭐⭐</h1>
+<p class="lead mb-0">Understand how a Node.js HTTP server receives a request, processes it and sends a response.</p>
+</div></header>
+<main class="container pb-5">
+
+<section><div class="card cardx"><div class="card-header bg-primary text-white fw-bold">1. What is the Node.js HTTP Module?</div><div class="card-body">
+<p><b>What:</b> Node.js provides the built-in <code>http</code> module for creating HTTP servers and working directly with HTTP requests and responses.</p>
+<p><b>Why:</b> It gives you low-level control over the request/response lifecycle. Frameworks such as Express build many convenient features on top of these Node.js HTTP capabilities.</p>
+<p><b>Layman example:</b> Think of a restaurant. The browser is the customer, the HTTP request is the order, the server is the kitchen, and the HTTP response is the completed order.</p>
+<div class="flow">Client / Browser<br>↓ HTTP Request<br>Node.js HTTP Server<br>↓ route + logic<br>HTTP Response<br>↓<br>Client</div>
+<p class="label mt-3">Q1 — Why would you use the built-in http module instead of Express?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="alert alert-success mt-2 d-none"><b>Answer:</b> The <code>http</code> module gives lower-level control and is useful for learning HTTP internals, small servers, custom networking behavior and framework-level understanding. Express provides routing, middleware and many conveniences on top.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-success text-white fw-bold">2. Creating an HTTP Server</div><div class="card-body">
+<div class="code">const http = require("http");
+
+const server = http.createServer((req, res) =&gt; {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/plain");
+  res.end("Hello from Node.js");
+});
+
+server.listen(3000, () =&gt; {
+  console.log("Server running");
+});</div>
+<p class="label">Q2 — What does createServer() do?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="alert alert-success mt-2 d-none"><b>Answer:</b> It creates an HTTP server. Its callback runs when the server receives an HTTP request, receiving the request object and response object.</div>
+<p class="label mt-3">Q3 — When does the createServer callback execute?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="alert alert-success mt-2 d-none"><b>Answer:</b> The callback executes for incoming requests handled by that server.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-info text-dark fw-bold">3. Request Object — req</div><div class="card-body">
+<p>The request object contains information sent by the client.</p>
+<table class="table table-bordered">
+<tr><th>Property</th><th>Meaning</th></tr>
+<tr><td><code>req.url</code></td><td>Request URL/path and query portion as received.</td></tr>
+<tr><td><code>req.method</code></td><td>HTTP method such as GET or POST.</td></tr>
+<tr><td><code>req.headers</code></td><td>Request headers sent by the client.</td></tr>
+</table>
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  console.log(req.url);
+  console.log(req.method);
+  console.log(req.headers);
+});</div>
+<p class="label">Q4 — What is the difference between req.url and req.method?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>req.url</code> describes the requested URL/path and query portion, while <code>req.method</code> tells what HTTP operation was requested, such as GET, POST, PUT or DELETE.</div>
+<p class="label mt-3">Q5 — Where would you read an Authorization token?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="alert alert-success mt-2 d-none"><b>Answer:</b> Usually from a request header, for example <code>req.headers.authorization</code>. The exact authentication design depends on the API.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-warning text-dark fw-bold">4. Response Object — res</div><div class="card-body">
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json");
+
+  res.write(JSON.stringify({ message: "OK" }));
+  res.end();
+});</div>
+<p class="label">Q6 — What is the purpose of res.statusCode?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="alert alert-success mt-2 d-none"><b>Answer:</b> It sets the HTTP status code that will be sent in the response, such as 200, 201, 400 or 404.</div>
+<p class="label mt-3">Q7 — What is the difference between res.write() and res.end()?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>res.write()</code> can send response data in chunks. <code>res.end()</code> finishes the response and can optionally send the final chunk.</div>
+<p class="label mt-3">Q8 — What happens if you forget res.end()?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="alert alert-success mt-2 d-none"><b>Answer:</b> If no other mechanism finishes the response, the client may continue waiting because the response has not been completed.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-danger text-white fw-bold">5. Request/Response Lifecycle ⭐⭐⭐⭐⭐</div><div class="card-body">
+<div class="flow">1. Client sends HTTP request<br>↓<br>2. Node server accepts request<br>↓<br>3. createServer callback receives req + res<br>↓<br>4. Read method / URL / headers / body<br>↓<br>5. Route and execute application logic<br>↓<br>6. Set status + headers<br>↓<br>7. Write/send response<br>↓<br>8. res.end() completes response<br>↓<br>9. Client receives response</div>
+<p class="label mt-3">Q9 — Explain the HTTP request/response lifecycle in Node.js.</p>
+<button class="btn btn-outline-primary" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="alert alert-success mt-2 d-none"><b>Answer:</b> The client sends a request. Node receives it and invokes the server callback with <code>req</code> and <code>res</code>. The server examines the request, performs routing/business logic, sets the response status and headers, sends the body and finishes with <code>res.end()</code>. The client then receives the response.</div>
+<p class="label mt-3">Q10 — Why should headers normally be set before sending the body?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="alert alert-success mt-2 d-none"><b>Answer:</b> HTTP response headers are sent before the response body. Once the response headers have been sent, changing them is generally too late and can cause an error.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-secondary text-white fw-bold">6. Manual Routing</div><div class="card-body">
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  if (req.method === "GET" &amp;&amp; req.url === "/users") {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    return res.end(JSON.stringify([{ id: 1, name: "Sam" }]));
+  }
+
+  res.statusCode = 404;
+  res.end("Not Found");
+});</div>
+<p class="label">Q11 — What does manual routing mean?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="alert alert-success mt-2 d-none"><b>Answer:</b> It means checking values such as <code>req.method</code> and <code>req.url</code> yourself and deciding which code should handle the request.</div>
+<p class="label mt-3">Q12 — Why can manual routing become difficult in a large application?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="alert alert-success mt-2 d-none"><b>Answer:</b> Many conditions can become difficult to read, maintain and test. Frameworks such as Express provide routing abstractions that make larger applications easier to organize.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-primary text-white fw-bold">7. Query Strings and URLSearchParams</div><div class="card-body">
+<div class="code">const { URL } = require("url");
+
+const server = http.createServer((req, res) =&gt; {
+  const url = new URL(req.url, "http://localhost:3000");
+
+  const name = url.searchParams.get("name");
+
+  res.end(`Hello ${name || "Guest"}`);
+});</div>
+<p class="label">Q13 — Why is URLSearchParams useful?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="alert alert-success mt-2 d-none"><b>Answer:</b> It provides a convenient API for reading and manipulating query parameters instead of manually splitting strings.</div>
+<p class="label mt-3">Q14 — For /products?page=2&amp;limit=10, what are page and limit?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="alert alert-success mt-2 d-none"><b>Answer:</b> They are query parameters. <code>page</code> has value <code>2</code> and <code>limit</code> has value <code>10</code>.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-success text-white fw-bold">8. Request Body and JSON</div><div class="card-body">
+<p>HTTP request bodies arrive as stream chunks. You commonly collect those chunks and then parse JSON when the request says it contains JSON.</p>
+<div class="code">let body = "";
+
+req.on("data", chunk =&gt; {
+  body += chunk;
+});
+
+req.on("end", () =&gt; {
+  try {
+    const data = JSON.parse(body);
+    console.log(data);
+  } catch {
+    res.statusCode = 400;
+    return res.end("Invalid JSON");
+  }
+
+  res.end("OK");
+});</div>
+<p class="label">Q15 — Why can JSON.parse(body) fail?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="alert alert-success mt-2 d-none"><b>Answer:</b> The body may be incomplete, malformed or not actually JSON. JSON parsing should therefore be handled safely, and the server should validate the received data.</div>
+<p class="label mt-3">Q16 — Why is the request body handled through data/end events?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="alert alert-success mt-2 d-none"><b>Answer:</b> The request is a readable stream, so body data may arrive in multiple chunks. <code>end</code> indicates that all request body data has arrived.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-info text-dark fw-bold">9. HTTP Methods and Status Codes</div><div class="card-body">
+<table class="table table-bordered">
+<tr><th>Method</th><th>Common purpose</th></tr>
+<tr><td>GET</td><td>Retrieve a resource</td></tr>
+<tr><td>POST</td><td>Create or submit data</td></tr>
+<tr><td>PUT</td><td>Replace/update a resource representation</td></tr>
+<tr><td>PATCH</td><td>Partially update a resource</td></tr>
+<tr><td>DELETE</td><td>Delete a resource</td></tr>
+</table>
+<table class="table table-bordered">
+<tr><th>Status</th><th>Meaning</th></tr>
+<tr><td>200</td><td>Success</td></tr>
+<tr><td>201</td><td>Created</td></tr>
+<tr><td>204</td><td>Success with no response body</td></tr>
+<tr><td>400</td><td>Bad request</td></tr>
+<tr><td>401</td><td>Authentication required/failed</td></tr>
+<tr><td>403</td><td>Forbidden</td></tr>
+<tr><td>404</td><td>Resource not found</td></tr>
+<tr><td>500</td><td>Server-side error</td></tr>
+</table>
+<p class="label">Q17 — A POST successfully creates a user. Which status code is a strong choice?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>201 Created</code> is the conventional choice when a resource has been successfully created.</div>
+<p class="label mt-3">Q18 — What is the difference between 401 and 403?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="alert alert-success mt-2 d-none"><b>Answer:</b> 401 generally means the request lacks valid authentication credentials. 403 means the server understood the request but refuses to authorize the action.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-warning text-dark fw-bold">10. HTTP vs HTTPS</div><div class="card-body">
+<div class="flow">HTTP: Client ⇄ Server<br>Data is sent without TLS encryption<br><br>HTTPS: Client ⇄ TLS ⇄ Server<br>Encrypted connection + server authentication</div>
+<p><b>HTTP</b> is the basic application protocol. <b>HTTPS</b> is HTTP carried over a TLS-secured connection.</p>
+<p class="label">Q19 — Why is HTTPS preferred for production APIs?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a19',this)">Show Answer</button>
+<div id="a19" class="alert alert-success mt-2 d-none"><b>Answer:</b> HTTPS protects data in transit with TLS, helps prevent interception and tampering, and provides server authentication through certificates.</div>
+<p class="label mt-3">Q20 — Does HTTPS change the HTTP request methods?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a20',this)">Show Answer</button>
+<div id="a20" class="alert alert-success mt-2 d-none"><b>Answer:</b> No. Methods such as GET, POST, PUT and DELETE are still HTTP methods. HTTPS adds TLS security around the HTTP communication.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-danger text-white fw-bold">11. REST vs RESTful APIs</div><div class="card-body">
+<p><b>REST</b> is an architectural style with constraints for designing networked systems. A <b>RESTful API</b> is an API that follows REST principles to a reasonable degree.</p>
+<div class="flow">Resource-oriented design<br>/users → collection<br>/users/42 → one user<br><br>GET /users/42 → retrieve<br>PATCH /users/42 → update part<br>DELETE /users/42 → delete</div>
+<p class="label">Q21 — Is every HTTP API automatically RESTful?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a21',this)">Show Answer</button>
+<div id="a21" class="alert alert-success mt-2 d-none"><b>Answer:</b> No. Using HTTP does not automatically make an API RESTful. REST involves architectural constraints such as resource-oriented identification and a stateless client-server interaction model.</div>
+<p class="label mt-3">Q22 — Why is /users/42 generally more REST-friendly than /getUser?id=42?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a22',this)">Show Answer</button>
+<div id="a22" class="alert alert-success mt-2 d-none"><b>Answer:</b> <code>/users/42</code> identifies a resource and lets the HTTP method express the operation. For example, GET retrieves it and DELETE removes it. This is more resource-oriented.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-dark text-white fw-bold">12. MAANG / FANG / MNC Code & Output Questions ⭐⭐⭐</div><div class="card-body">
+<p class="label">Q23 — What is printed?</p>
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  console.log(req.method, req.url);
+  res.end("OK");
+});</div>
+<button class="btn btn-outline-primary" onclick="toggle('a23',this)">Show Answer</button>
+<div id="a23" class="alert alert-success mt-2 d-none"><b>Answer:</b> Nothing is printed merely by calling <code>createServer()</code>. The callback runs when an incoming request reaches the server. Then it prints that request's method and URL.</div>
+
+<p class="label mt-4">Q24 — Find the bug</p>
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  res.setHeader("Content-Type", "application/json");
+  res.end({ message: "hello" });
+});</div>
+<button class="btn btn-outline-primary" onclick="toggle('a24',this)">Show Answer</button>
+<div id="a24" class="alert alert-success mt-2 d-none"><b>Answer:</b> The response body should be a supported data type such as a string, Buffer or typed array. Use <code>JSON.stringify({ message: "hello" })</code> before sending JSON.</div>
+
+<p class="label mt-4">Q25 — Find the lifecycle problem</p>
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  res.statusCode = 404;
+  res.end("Not Found");
+
+  res.statusCode = 200;
+  res.end("OK");
+});</div>
+<button class="btn btn-outline-primary" onclick="toggle('a25',this)">Show Answer</button>
+<div id="a25" class="alert alert-success mt-2 d-none"><b>Answer:</b> The response is already ended after the first <code>res.end()</code>. The second response operation is invalid. A route should choose one response path, usually with <code>return</code> when needed.</div>
+
+<p class="label mt-4">Q26 — Why can this API hang?</p>
+<div class="code">const server = http.createServer((req, res) =&gt; {
+  if (req.url === "/users") {
+    console.log("users");
+  }
+});</div>
+<button class="btn btn-outline-primary" onclick="toggle('a26',this)">Show Answer</button>
+<div id="a26" class="alert alert-success mt-2 d-none"><b>Answer:</b> The matching branch does not send or end a response. The client can keep waiting. The handler must eventually send a response such as <code>res.end()</code>.</div>
+
+<p class="label mt-4">Q27 — Output/body question</p>
+<div class="code">res.setHeader("Content-Type", "application/json");
+res.write(JSON.stringify({ ok: true }));
+res.end();</div>
+<button class="btn btn-outline-primary" onclick="toggle('a27',this)">Show Answer</button>
+<div id="a27" class="alert alert-success mt-2 d-none"><b>Answer:</b> The client receives a JSON response body containing <code>{"ok":true}</code>, assuming no error occurs. The response ends after <code>res.end()</code>.</div>
+
+<p class="label mt-4">Q28 — Interview scenario: GET /users?page=2</p>
+<button class="btn btn-outline-primary" onclick="toggle('a28',this)">Show Answer</button>
+<div id="a28" class="alert alert-success mt-2 d-none"><b>Answer:</b> The method is GET. <code>/users</code> is the path and <code>page=2</code> is a query parameter. The server can parse it and use it for pagination.</div>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-secondary text-white fw-bold">13. Common Developer Mistakes</div><div class="card-body">
+<ul>
+<li>Forgetting <code>res.end()</code> and leaving clients waiting.</li>
+<li>Trying to modify headers after response data has already been sent.</li>
+<li>Sending an object directly instead of serializing JSON.</li>
+<li>Not handling request body chunks correctly.</li>
+<li>Parsing malformed JSON without error handling.</li>
+<li>Mixing multiple response paths without returning after one response.</li>
+<li>Confusing a URL path with query parameters.</li>
+<li>Using 200 for every situation instead of meaningful status codes.</li>
+<li>Assuming HTTP and HTTPS provide the same transport security.</li>
+<li>Calling every HTTP API “RESTful” without considering REST principles.</li>
+</ul>
+</div></div></section>
+
+<section><div class="card cardx"><div class="card-header bg-success text-white fw-bold">14. Quick Recap & Interview Ready</div><div class="card-body">
+<table class="table table-bordered align-middle">
+<tr><th>Topic</th><th>Interview-ready point</th></tr>
+<tr><td><code>http.createServer()</code></td><td>Creates an HTTP server and handles incoming requests.</td></tr>
+<tr><td><code>req</code></td><td>Contains request information and is a readable stream for the request body.</td></tr>
+<tr><td><code>res</code></td><td>Used to construct and finish the response.</td></tr>
+<tr><td><code>req.method</code></td><td>HTTP method such as GET or POST.</td></tr>
+<tr><td><code>req.url</code></td><td>Requested URL/path and query portion.</td></tr>
+<tr><td><code>req.headers</code></td><td>Request metadata such as content type and authorization.</td></tr>
+<tr><td><code>res.statusCode</code></td><td>Sets HTTP response status.</td></tr>
+<tr><td><code>res.setHeader()</code></td><td>Sets a response header.</td></tr>
+<tr><td><code>res.write()</code></td><td>Sends response data without ending the response.</td></tr>
+<tr><td><code>res.end()</code></td><td>Finishes the response.</td></tr>
+<tr><td>Request body</td><td>Arrives as chunks because the request is a stream.</td></tr>
+<tr><td>HTTPS</td><td>HTTP over a TLS-secured connection.</td></tr>
+<tr><td>RESTful</td><td>API design that follows REST constraints/principles.</td></tr>
+</table>
+<div class="alert alert-warning"><b>Golden interview answer:</b> “An HTTP request enters the Node.js server and invokes the request handler with <code>req</code> and <code>res</code>. I inspect the method, URL, headers and, when needed, the streamed request body. I route the request, perform the required logic, set the response status and headers, send the response body and finish with <code>res.end()</code>. The client then receives the completed HTTP response.”</div>
+<div class="alert alert-info"><b>Fast memory trick:</b> Request = method + URL + headers + body stream → Route → Logic → status + headers + body → <code>res.end()</code>.</div>
+</div></div></section>
+
+</main>
+<script>
+function toggle(id,b){const e=document.getElementById(id);const hidden=e.classList.toggle("d-none");b.textContent=hidden?"Show Answer":"Hide Answer";}
+</script>
+</body>
+</html>

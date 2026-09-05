@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 18 — Authentication & Authorization</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.section-title{border-left:5px solid #2563eb;padding-left:14px}
+.card{border:0}.card-header{font-weight:700}.code{background:#17202a;color:#e8f5e9;border-radius:10px;padding:16px;overflow:auto}
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}.box{background:#e8f0fe;border:1px solid #9db7ef;border-radius:10px;padding:12px 16px;font-weight:600}.arrow{font-size:22px;color:#2563eb}
+.toggle{border:0;background:#2563eb;color:#fff;padding:8px 14px;border-radius:7px}.answer,.why{display:none;margin-top:12px}.tip{border-left:4px solid #0d6efd}.danger{border-left:4px solid #dc3545}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4">
+<div class="container">
+<span class="badge bg-warning text-dark mb-2">Node.js + Express.js Interview Preparation</span>
+<h1>Part 18 — Authentication &amp; Authorization ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how applications verify users, protect routes, and control what each user is allowed to do.</p>
+</div>
+</header>
+
+<main class="container pb-5">
+
+<section class="mb-4">
+<div class="alert alert-primary shadow-sm"><strong>Interview goal:</strong> Do not only memorize JWT or bcrypt syntax. Be able to explain the complete flow from registration to a protected API and clearly separate authentication from authorization.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">1. Authentication vs Authorization</h2>
+<div class="row g-4">
+<div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header bg-primary text-white">Authentication — “Who are you?”</div><div class="card-body"><p>Authentication verifies the identity of a user.</p><div class="alert alert-light">Example: A user enters email and password. The server checks whether those credentials belong to the user.</div></div></div></div>
+<div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header bg-success text-white">Authorization — “What can you do?”</div><div class="card-body"><p>Authorization checks whether an authenticated user has permission to perform an action.</p><div class="alert alert-light">Example: A normal employee may read reports, while an admin may delete reports.</div></div></div></div>
+</div>
+<div class="alert alert-warning mt-3"><strong>Layman example:</strong> Showing your ID at a building entrance is authentication. Being allowed into the server room is authorization.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">2. Complete Authentication Flow</h2>
+<p><strong>What:</strong> A typical application first creates an account, then verifies credentials during login, creates a token/session, and checks that identity on protected requests.</p>
+<div class="flow my-4">
+<div class="box">Register</div><div class="arrow">→</div><div class="box">Hash password</div><div class="arrow">→</div><div class="box">Store user</div><div class="arrow">→</div><div class="box">Login</div><div class="arrow">→</div><div class="box">Verify password</div><div class="arrow">→</div><div class="box">Issue token</div><div class="arrow">→</div><div class="box">Protected request</div><div class="arrow">→</div><div class="box">Verify token</div><div class="arrow">→</div><div class="box">Authorize</div>
+</div>
+<div class="alert alert-info"><strong>Why?</strong> The server should never trust a username or role sent directly by the browser. It must establish identity and then make authorization decisions from trusted server-side verification.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">3. Registration and Password Hashing</h2>
+<p><strong>Purpose:</strong> Passwords should not be stored as plain text. <code>bcrypt</code> creates a password hash that can be stored safely enough for normal application use.</p>
+<pre class="code"><code>const bcrypt = require("bcrypt");
+
+const password = "MyPassword123";
+
+const hash = await bcrypt.hash(password, 12);
+
+console.log(hash);
+// Store hash in the database, not the original password.</code></pre>
+<button class="toggle" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer alert alert-success"><strong>Answer:</strong> The original password is converted into a bcrypt hash before storage. The number <code>12</code> is the cost factor used here.</div>
+<button class="toggle mt-2" onclick="toggle('w1',this)">Show Why?</button>
+<div id="w1" class="why alert alert-info"><strong>Why?</strong> If a database is exposed, plain-text passwords would immediately reveal user credentials. Hashing avoids storing the original password. Password hashing is one-way; during login we compare the supplied password against the stored hash.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">4. Password Comparison During Login</h2>
+<pre class="code"><code>const isValid = await bcrypt.compare(
+  req.body.password,
+  user.passwordHash
+);
+
+if (!isValid) {
+  return res.status(401).json({ message: "Invalid credentials" });
+}
+
+res.json({ message: "Login successful" });</code></pre>
+<button class="toggle" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer alert alert-success">The submitted password is compared with the stored bcrypt hash. We do not decrypt the hash or compare two plain strings.</div>
+<button class="toggle mt-2" onclick="toggle('w2',this)">Show Why?</button>
+<div id="w2" class="why alert alert-info">bcrypt knows how to use the salt and cost information stored in the hash and checks whether the supplied password produces a matching result.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">5. JWT — Access Token</h2>
+<p><strong>JWT</strong> stands for JSON Web Token. A signed JWT can carry claims such as a user ID and role. The server verifies the signature before trusting those claims.</p>
+<pre class="code"><code>const jwt = require("jsonwebtoken");
+
+const token = jwt.sign(
+  { userId: user._id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: "15m" }
+);</code></pre>
+<div class="row g-3 mt-2">
+<div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-header bg-dark text-white">Header</div><div class="card-body">Token metadata, such as the signing algorithm.</div></div></div>
+<div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-header bg-primary text-white">Payload</div><div class="card-body">Claims such as user ID, role, and expiration.</div></div></div>
+<div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-header bg-success text-white">Signature</div><div class="card-body">Allows the server to detect token tampering.</div></div></div>
+</div>
+<div class="alert alert-warning mt-3"><strong>Important:</strong> A JWT payload is normally readable by anyone who has the token. Do not put passwords, secrets, or sensitive data in the payload.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">6. JWT Expiration and Refresh Tokens</h2>
+<p>An <strong>access token</strong> is normally short-lived. A <strong>refresh token</strong> can be used to obtain a new access token without forcing the user to log in again.</p>
+<div class="flow my-4"><div class="box">Login</div><div class="arrow">→</div><div class="box">Access token</div><div class="arrow">→</div><div class="box">API requests</div><div class="arrow">→</div><div class="box">Access token expires</div><div class="arrow">→</div><div class="box">Refresh token</div><div class="arrow">→</div><div class="box">New access token</div></div>
+<div class="alert alert-info"><strong>Interview point:</strong> Short access-token lifetime limits the window in which a stolen access token can be used. Refresh-token handling needs stronger protection and a revocation/rotation strategy in production systems.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">7. Protected Route + Authorization Middleware</h2>
+<pre class="code"><code>function authenticate(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Login required" });
+  }
+
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+}
+
+function requireAdmin(req, res, next) {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+  next();
+}
+
+app.delete("/users/:id", authenticate, requireAdmin, deleteUser);</code></pre>
+<button class="toggle" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer alert alert-success"><strong>Flow:</strong> The request first passes authentication. If the JWT is valid, the decoded user information is placed on <code>req.user</code>. Then authorization checks the role. Only an admin reaches <code>deleteUser</code>.</div>
+<button class="toggle mt-2" onclick="toggle('w3',this)">Show Why?</button>
+<div id="w3" class="why alert alert-info"><strong>Why 401 vs 403?</strong> <code>401</code> means the request does not have valid authentication. <code>403</code> means the identity is known, but the user is not allowed to perform that action.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">8. Cookies and Security Attributes</h2>
+<table class="table table-bordered bg-white shadow-sm">
+<thead class="table-dark"><tr><th>Attribute</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>HttpOnly</td><td>Prevents JavaScript from reading the cookie through <code>document.cookie</code>.</td></tr>
+<tr><td>Secure</td><td>Sends the cookie only over HTTPS.</td></tr>
+<tr><td>SameSite</td><td>Controls when the browser sends the cookie in cross-site requests and helps reduce CSRF risk.</td></tr>
+</tbody>
+</table>
+<pre class="code"><code>res.cookie("refreshToken", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+});</code></pre>
+<div class="alert alert-warning"><strong>Common mistake:</strong> Putting long-lived authentication tokens in normal JavaScript-readable storage without understanding the XSS risk. Cookie strategy depends on the application architecture and CSRF protections.</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">9. Code-Based Interview Questions</h2>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q1. What is the output?</div><div class="card-body">
+<pre class="code"><code>const token = jwt.sign(
+  { userId: 10, role: "admin" },
+  "secret",
+  { expiresIn: "1s" }
+);
+
+setTimeout(() => {
+  try {
+    console.log(jwt.verify(token, "secret"));
+  } catch (err) {
+    console.log(err.name);
+  }
+}, 1500);</code></pre>
+<button class="toggle" onclick="toggle('q1a',this)">Show Answer</button><div id="q1a" class="answer alert alert-success">It prints <code>TokenExpiredError</code>.</div>
+<button class="toggle mt-2" onclick="toggle('q1w',this)">Show Why?</button><div id="q1w" class="why alert alert-info">The token expires after one second, but verification happens after about 1.5 seconds.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q2. What is wrong with this login code?</div><div class="card-body">
+<pre class="code"><code>if (req.body.password === user.passwordHash) {
+  return res.json({ message: "Login successful" });
+}</code></pre>
+<button class="toggle" onclick="toggle('q2a',this)">Show Answer</button><div id="q2a" class="answer alert alert-success">The code compares a plain password directly with a bcrypt hash. It should use <code>bcrypt.compare()</code>.</div>
+<button class="toggle mt-2" onclick="toggle('q2w',this)">Show Why?</button><div id="q2w" class="why alert alert-info">A bcrypt hash is not the original password. Password verification must use the hashing library's comparison function.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q3. What status code should this middleware return?</div><div class="card-body">
+<pre class="code"><code>function adminOnly(req, res, next) {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+  next();
+}</code></pre>
+<button class="toggle" onclick="toggle('q3a',this)">Show Answer</button><div id="q3a" class="answer alert alert-success"><code>403 Forbidden</code>.</div>
+<button class="toggle mt-2" onclick="toggle('q3w',this)">Show Why?</button><div id="q3w" class="why alert alert-info">The user is already authenticated, but does not have the required permission.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q4. What happens if authenticate middleware does not call next()?</div><div class="card-body">
+<button class="toggle" onclick="toggle('q4a',this)">Show Answer</button><div id="q4a" class="answer alert alert-success">The next middleware or route handler will not execute, so the request can remain pending if no response is sent.</div>
+<button class="toggle mt-2" onclick="toggle('q4w',this)">Show Why?</button><div id="q4w" class="why alert alert-info">Express moves through middleware when a middleware sends a response or calls <code>next()</code>. Forgetting both can leave the request hanging.</div>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-header bg-primary text-white">Q5. Is this JWT payload secret?</div><div class="card-body">
+<pre class="code"><code>{
+  userId: 25,
+  role: "admin"
+}</code></pre>
+<button class="toggle" onclick="toggle('q5a',this)">Show Answer</button><div id="q5a" class="answer alert alert-success">No. JWT payload data should be treated as readable, not secret.</div>
+<button class="toggle mt-2" onclick="toggle('q5w',this)">Show Why?</button><div id="q5w" class="why alert alert-info">JWT signing protects integrity. It does not automatically encrypt the payload.</div>
+</div></div>
+
+<div class="card shadow-sm"><div class="card-header bg-primary text-white">Q6. Which middleware order is correct?</div><div class="card-body">
+<pre class="code"><code>app.get("/admin", requireAdmin, authenticate, handler);
+
+// OR
+
+app.get("/admin", authenticate, requireAdmin, handler);</code></pre>
+<button class="toggle" onclick="toggle('q6a',this)">Show Answer</button><div id="q6a" class="answer alert alert-success">The second order is correct: <code>authenticate → requireAdmin → handler</code>.</div>
+<button class="toggle mt-2" onclick="toggle('q6w',this)">Show Why?</button><div id="q6w" class="why alert alert-info"><code>requireAdmin</code> needs <code>req.user</code>, which is normally created by authentication middleware.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">10. Common Developer Mistakes</h2>
+<div class="alert alert-danger shadow-sm">
+<ul class="mb-0">
+<li>Storing plain-text passwords.</li>
+<li>Putting passwords or secrets inside JWT payloads.</li>
+<li>Using a weak or hard-coded JWT secret.</li>
+<li>Using very long-lived access tokens without a reason.</li>
+<li>Confusing <code>401</code> with <code>403</code>.</li>
+<li>Checking only authentication and forgetting authorization.</li>
+<li>Forgetting to call <code>next()</code> in middleware.</li>
+<li>Trusting a role sent directly by the client.</li>
+<li>Ignoring token expiration and verification errors.</li>
+<li>Using cookies without understanding HttpOnly, Secure, SameSite and CSRF protection.</li>
+</ul>
+</div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">11. Quick Recap</h2>
+<div class="card shadow-sm"><div class="card-body">
+<ul>
+<li><strong>Authentication:</strong> verifies identity.</li>
+<li><strong>Authorization:</strong> checks permissions.</li>
+<li><strong>bcrypt:</strong> hashes and verifies passwords.</li>
+<li><strong>JWT:</strong> signed token carrying claims.</li>
+<li><strong>Access token:</strong> normally short-lived.</li>
+<li><strong>Refresh token:</strong> helps obtain a new access token.</li>
+<li><strong>401:</strong> authentication is missing or invalid.</li>
+<li><strong>403:</strong> authenticated but not allowed.</li>
+<li><strong>HttpOnly:</strong> JavaScript cannot read the cookie.</li>
+<li><strong>Secure:</strong> cookie is sent only over HTTPS.</li>
+<li><strong>SameSite:</strong> controls cross-site cookie sending.</li>
+</ul>
+</div></div>
+</section>
+
+<section class="mb-5">
+<h2 class="section-title mb-3">12. Interview-Ready Answers</h2>
+<div class="alert alert-success shadow-sm">
+<p><strong>Q: Explain authentication and authorization.</strong><br>
+Authentication verifies who the user is. Authorization decides what that authenticated user is allowed to do.</p>
+<p><strong>Q: Why hash passwords?</strong><br>
+We should not store original passwords. A password hashing algorithm such as bcrypt stores a derived hash and lets the server verify a password without storing the original value.</p>
+<p><strong>Q: Explain JWT.</strong><br>
+A JWT contains a header, payload and signature. The server verifies the signature and validates claims such as expiration before trusting the token.</p>
+<p class="mb-0"><strong>Q: 401 vs 403?</strong><br>
+401 means valid authentication is missing or failed. 403 means the user is authenticated but does not have permission.</p>
+</div>
+</section>
+
+<section>
+<h2 class="section-title mb-3">Interview Checklist</h2>
+<div class="card shadow-sm"><div class="card-body">
+<div class="row g-2">
+<div class="col-md-6">✓ Explain login and registration flow</div>
+<div class="col-md-6">✓ Explain bcrypt hash vs compare</div>
+<div class="col-md-6">✓ Explain JWT header, payload and signature</div>
+<div class="col-md-6">✓ Explain access vs refresh tokens</div>
+<div class="col-md-6">✓ Write authentication middleware</div>
+<div class="col-md-6">✓ Write role-based authorization</div>
+<div class="col-md-6">✓ Explain 401 vs 403</div>
+<div class="col-md-6">✓ Explain HttpOnly, Secure and SameSite</div>
+</div>
+</div></div>
+</section>
+</main>
+
+<script>
+function toggle(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ btn.textContent=open?(btn.textContent.includes("Why")?"Show Why?":"Show Answer"):(btn.textContent.includes("Why")?"Hide Why?":"Hide Answer");
+}
+</script>
+</body>
+</html>

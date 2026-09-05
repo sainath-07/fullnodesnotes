@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 6 — Events & EventEmitter</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}
+.hero{background:linear-gradient(135deg,#111827,#198754,#0d6efd);color:#fff;border-radius:18px}
+.card,.topic{border:0;border-radius:14px}.card{overflow:hidden}
+.card-header{font-weight:700}.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+code{color:#b42318}.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}
+.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}
+.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}
+.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}
+.q{border:1px solid #dee2e6;border-radius:12px;padding:20px;margin-bottom:18px;background:#fff}
+.answer{display:none;margin-top:15px}
+.toggle{min-width:150px}
+.badge-topic{font-size:.82rem}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 6</span>
+<h1 class="display-6 fw-bold">🟢 Events & EventEmitter</h1>
+<p class="lead mb-0">Understand Node.js event-driven programming and master EventEmitter with practical interview questions.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What is Event-Driven Programming?</div>
+<div class="card-body">
+<div class="topic">
+<h5>What?</h5>
+<p>Event-driven programming means that code reacts when an event happens instead of continuously checking for that event.</p>
+<h5>Layman example</h5>
+<p>Think about a doorbell. You do not keep asking, “Did someone press the doorbell?” Instead, you wait. When someone presses it, the bell produces an event and your action runs.</p>
+<div class="flow">Something happens
+      ↓
+   Event occurs
+      ↓
+Event is emitted
+      ↓
+Registered listener runs
+      ↓
+Application performs an action</div>
+<h5>Why?</h5>
+<p>This model is useful for servers because many things can happen at different times: a request arrives, a file finishes reading, a connection closes, or a custom application event occurs.</p>
+<div class="interview"><strong>Interview-ready:</strong> “Node.js uses an event-driven programming model where code can register listeners for events and execute those listeners when the corresponding events occur.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. What is EventEmitter?</div>
+<div class="card-body">
+<div class="topic">
+<p><code>EventEmitter</code> is a Node.js class used to create objects that can emit named events and allow functions to listen for those events.</p>
+<pre><code>const EventEmitter = require("node:events");
+
+const emitter = new EventEmitter();
+
+emitter.on("login", () =&gt; {
+  console.log("User logged in");
+});
+
+emitter.emit("login");</code></pre>
+<div class="flow">EventEmitter object
+      │
+      ├── on("login", listener)
+      │
+      └── emit("login")
+                ↓
+          listener executes</div>
+<div class="tip"><strong>Important:</strong> <code>on()</code> registers a listener. <code>emit()</code> triggers the event.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">3. emit()</div>
+<div class="card-body">
+<div class="topic">
+<h5>What?</h5>
+<p><code>emit()</code> triggers an event and can pass arguments to listeners.</p>
+<pre><code>const EventEmitter = require("node:events");
+const emitter = new EventEmitter();
+
+emitter.on("message", (name) =&gt; {
+  console.log("Hello", name);
+});
+
+emitter.emit("message", "Sainath");</code></pre>
+<p><strong>Output:</strong> <code>Hello Sainath</code></p>
+<h5>How it works</h5>
+<div class="flow">emit("message", "Sainath")
+             ↓
+Find listeners for "message"
+             ↓
+Pass "Sainath" as argument
+             ↓
+Listener executes</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">4. on() — Register a Listener</div>
+<div class="card-body">
+<div class="topic">
+<p><code>on()</code> registers a function that runs every time the event is emitted.</p>
+<pre><code>emitter.on("data", () =&gt; {
+  console.log("Data received");
+});
+
+emitter.emit("data");
+emitter.emit("data");</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>Data received
+Data received</code></pre>
+<div class="interview"><strong>Interview-ready:</strong> “on() adds a persistent listener. The listener can execute every time that event is emitted.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">5. once() — Run Only Once</div>
+<div class="card-body">
+<div class="topic">
+<p><code>once()</code> registers a listener that automatically stops listening after its first execution.</p>
+<pre><code>emitter.once("welcome", () =&gt; {
+  console.log("Welcome!");
+});
+
+emitter.emit("welcome");
+emitter.emit("welcome");</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>Welcome!</code></pre>
+<div class="tip"><strong>When to use?</strong> Use <code>once()</code> for one-time initialization, one-time connection events, or actions that should happen only once.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">6. off() / removeListener()</div>
+<div class="card-body">
+<div class="topic">
+<p>Both can be used to remove a specific listener. The listener function reference must be available.</p>
+<pre><code>function handleLogin() {
+  console.log("Login");
+}
+
+emitter.on("login", handleLogin);
+
+emitter.emit("login");
+
+emitter.off("login", handleLogin);
+
+emitter.emit("login");</code></pre>
+<p>The second <code>emit()</code> does not call <code>handleLogin</code>.</p>
+<div class="interview"><strong>Interview-ready:</strong> “off() is an alias-style convenience for removeListener(). Both remove a specific registered listener.”</div>
+<div class="warn"><strong>Common mistake:</strong> This does not remove the listener because it creates a different function object:
+<pre><code>emitter.on("login", () =&gt; console.log("Login"));
+emitter.off("login", () =&gt; console.log("Login"));</code></pre>
+</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">7. removeAllListeners()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>removeAllListeners()</code> removes all listeners for an event, or all listeners from the emitter if no event name is supplied.</p>
+<pre><code>emitter.removeAllListeners("login");</code></pre>
+<p>After this, the emitter has no listeners for <code>login</code>.</p>
+<div class="warn"><strong>Use carefully:</strong> Removing all listeners can affect code you did not intend to remove, especially when several parts of an application share an emitter.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">8. listenerCount()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>listenerCount()</code> tells you how many listeners are currently registered for an event.</p>
+<pre><code>function one() {}
+function two() {}
+
+emitter.on("data", one);
+emitter.on("data", two);
+
+console.log(emitter.listenerCount("data"));
+// 2</code></pre>
+<div class="tip"><strong>When useful?</strong> It can help with debugging and checking whether listeners are being added repeatedly.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">9. Event Arguments</div>
+<div class="card-body">
+<div class="topic">
+<p>Arguments after the event name in <code>emit()</code> are passed to the listeners in the same order.</p>
+<pre><code>emitter.on("order", (id, amount, status) =&gt; {
+  console.log(id);
+  console.log(amount);
+  console.log(status);
+});
+
+emitter.emit("order", 101, 499, "paid");</code></pre>
+<div class="flow">emit("order", 101, 499, "paid")
+          ↓
+listener(id, amount, status)
+          ↓
+id = 101
+amount = 499
+status = "paid"</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">10. Multiple Listeners & Execution Order</div>
+<div class="card-body">
+<div class="topic">
+<p>You can register multiple listeners for the same event. For normal synchronous listeners, Node.js calls them in registration order.</p>
+<pre><code>emitter.on("save", () =&gt; console.log("First"));
+emitter.on("save", () =&gt; console.log("Second"));
+emitter.on("save", () =&gt; console.log("Third"));
+
+emitter.emit("save");</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>First
+Second
+Third</code></pre>
+<div class="interview"><strong>Interview-ready:</strong> “EventEmitter normally invokes listeners synchronously in the order in which they were registered.”</div>
+<div class="warn"><strong>Important:</strong> If a listener starts asynchronous work, that async work can finish later. This does not mean EventEmitter itself runs listeners in parallel.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">11. EventEmitter Error Event ⭐⭐⭐</div>
+<div class="card-body">
+<div class="topic">
+<p>The <code>"error"</code> event has special behavior. If an EventEmitter emits <code>"error"</code> and there is no error listener, Node.js throws the error and the process can terminate.</p>
+<pre><code>const EventEmitter = require("node:events");
+const emitter = new EventEmitter();
+
+emitter.on("error", (err) =&gt; {
+  console.log("Handled:", err.message);
+});
+
+emitter.emit("error", new Error("Something failed"));</code></pre>
+<div class="flow">emit("error", error)
+          ↓
+Is "error" listener registered?
+       ↙             ↘
+     YES              NO
+      ↓                ↓
+listener handles    uncaught error
+      ↓                ↓
+continues          process may terminate</div>
+<div class="interview"><strong>Very important:</strong> “The error event is special. An EventEmitter should have an error listener when errors may be emitted; otherwise an unhandled error event can terminate the Node.js process.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">12. Custom Events</div>
+<div class="card-body">
+<div class="topic">
+<p>Event names do not have to be built-in names. You can define events that match your application's needs.</p>
+<pre><code>const EventEmitter = require("node:events");
+
+class OrderService extends EventEmitter {
+  createOrder(id) {
+    console.log("Creating order...");
+    this.emit("orderCreated", id);
+  }
+}
+
+const orders = new OrderService();
+
+orders.on("orderCreated", (id) =&gt; {
+  console.log("Send email for order:", id);
+});
+
+orders.createOrder(5001);</code></pre>
+<div class="flow">createOrder(5001)
+      ↓
+OrderService
+      ↓
+emit("orderCreated", 5001)
+      ↓
+registered listener
+      ↓
+send email / log / notify</div>
+<div class="tip"><strong>When to use?</strong> Custom events are useful when one part of an application needs to notify other parts without tightly coupling all the actions together.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">13. EventEmitter Memory Warning</div>
+<div class="card-body">
+<div class="topic">
+<p>Node.js has a default listener warning threshold of <strong>10 listeners per event</strong>. Adding more than that does not automatically mean there is a memory leak, but Node.js warns because repeatedly adding listeners can be a sign of a bug.</p>
+<pre><code>for (let i = 0; i &lt; 11; i++) {
+  emitter.on("data", () =&gt; {});
+}</code></pre>
+<p>You may see a <code>MaxListenersExceededWarning</code>.</p>
+<div class="warn"><strong>Do not blindly fix this by increasing the limit.</strong> First check whether listeners are accidentally being registered again and again.</div>
+<h5>Possible cause</h5>
+<pre><code>function start() {
+  emitter.on("data", handleData);
+}
+
+start();
+start();
+start(); // listener added again</code></pre>
+<p>If <code>start()</code> is repeatedly called without cleanup, listeners can accumulate.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">14. EventEmitter + async Functions</div>
+<div class="card-body">
+<div class="topic">
+<p>EventEmitter does not automatically wait for an <code>async</code> listener's Promise.</p>
+<pre><code>emitter.on("task", async () =&gt; {
+  await new Promise(resolve =&gt; setTimeout(resolve, 100));
+  console.log("Async listener finished");
+});
+
+console.log("Before emit");
+
+emitter.emit("task");
+
+console.log("After emit");</code></pre>
+<p>The listener begins synchronously until it reaches the first <code>await</code>. Its continuation happens later.</p>
+<div class="flow">emit("task")
+   ↓
+async listener starts
+   ↓
+reaches await
+   ↓
+listener yields
+   ↓
+emit() itself does NOT await it
+   ↓
+later → async continuation runs</div>
+<div class="interview"><strong>Interview-ready:</strong> “EventEmitter does not automatically await async listeners. If the caller needs to wait for asynchronous work, the design should explicitly coordinate that Promise.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">15. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Confusing <code>on()</code> with <code>emit()</code>.</li>
+<li>Expecting <code>on()</code> to trigger the event immediately.</li>
+<li>Forgetting that <code>once()</code> removes itself after the first event.</li>
+<li>Trying to remove an anonymous listener using another anonymous function.</li>
+<li>Removing all listeners when only one listener should be removed.</li>
+<li>Ignoring the special <code>"error"</code> event.</li>
+<li>Assuming multiple listeners execute in parallel.</li>
+<li>Assuming EventEmitter automatically waits for async listeners.</li>
+<li>Adding listeners repeatedly inside functions and causing listener accumulation.</li>
+<li>Increasing the max listener limit without finding the real cause of listener growth.</li>
+<li>Using one global EventEmitter for unrelated application features, making dependencies difficult to understand.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">16. Interview Questions — Click to Show Answer + Why ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="q">
+<span class="badge bg-danger badge-topic mb-2">MAANG / Product Company</span>
+<h5>Q1. What is the output?</h5>
+<pre><code>const EventEmitter = require("node:events");
+const emitter = new EventEmitter();
+
+emitter.on("test", () =&gt; console.log("A"));
+emitter.on("test", () =&gt; console.log("B"));
+
+emitter.emit("test");</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong></p><pre><code>A
+B</code></pre>
+<p><strong>Why?</strong> Both listeners are registered for <code>test</code>. EventEmitter invokes normal synchronous listeners in registration order.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-warning text-dark badge-topic mb-2">Output-Based</span>
+<h5>Q2. How many times is the message printed?</h5>
+<pre><code>const EventEmitter = require("node:events");
+const emitter = new EventEmitter();
+
+emitter.once("login", () =&gt; {
+  console.log("Logged in");
+});
+
+emitter.emit("login");
+emitter.emit("login");
+emitter.emit("login");</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> It prints <code>Logged in</code> exactly once.</p>
+<p><strong>Why?</strong> <code>once()</code> removes its listener after the first invocation.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-success badge-topic mb-2">Core Node.js</span>
+<h5>Q3. What is the difference between on() and once()?</h5>
+<pre><code>emitter.on("data", listener);
+emitter.once("data", listener);</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> <code>on()</code> keeps the listener registered for future emissions. <code>once()</code> runs the listener only for the first matching emission.</p>
+<p><strong>Why?</strong> <code>once()</code> is designed for one-time events such as initialization or first connection.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-primary badge-topic mb-2">Output-Based</span>
+<h5>Q4. What is the output?</h5>
+<pre><code>const EventEmitter = require("node:events");
+const emitter = new EventEmitter();
+
+function handler() {
+  console.log("Hello");
+}
+
+emitter.on("greet", handler);
+emitter.emit("greet");
+
+emitter.off("greet", handler);
+emitter.emit("greet");</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong></p><pre><code>Hello</code></pre>
+<p><strong>Why?</strong> The first emission occurs while the listener is registered. <code>off()</code> removes the exact function reference, so the second emission has no <code>handler</code> listener.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-danger badge-topic mb-2">Important Trap</span>
+<h5>Q5. Why does this not remove the listener?</h5>
+<pre><code>emitter.on("data", () =&gt; console.log("data"));
+
+emitter.off("data", () =&gt; console.log("data"));</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> The original listener remains registered.</p>
+<p><strong>Why?</strong> Each arrow function expression creates a different function object. <code>off()</code> needs the same function reference that was originally passed to <code>on()</code>.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-info text-dark badge-topic mb-2">Arguments</span>
+<h5>Q6. What is printed?</h5>
+<pre><code>emitter.on("user", (name, age) =&gt; {
+  console.log(name, age);
+});
+
+emitter.emit("user", "Sam", 25);</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> <code>Sam 25</code></p>
+<p><strong>Why?</strong> Values after the event name in <code>emit()</code> are passed to the listener in the same order.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-warning text-dark badge-topic mb-2">Execution Order</span>
+<h5>Q7. What is the output?</h5>
+<pre><code>emitter.on("event", () =&gt; {
+  console.log("First");
+});
+
+emitter.on("event", () =&gt; {
+  console.log("Second");
+});
+
+console.log("Before");
+emitter.emit("event");
+console.log("After");</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong></p><pre><code>Before
+First
+Second
+After</code></pre>
+<p><strong>Why?</strong> <code>emit()</code> invokes the registered synchronous listeners during the call. They execute in registration order before <code>emit()</code> returns.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-danger badge-topic mb-2">Very Important</span>
+<h5>Q8. What happens if an EventEmitter emits "error" without an error listener?</h5>
+<pre><code>const EventEmitter = require("node:events");
+const emitter = new EventEmitter();
+
+emitter.emit("error", new Error("Failed"));</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> Node.js treats the unhandled <code>"error"</code> event as an uncaught error; the process can terminate.</p>
+<p><strong>Why?</strong> The <code>"error"</code> event has special EventEmitter semantics. Add an appropriate error listener when your emitter can emit errors.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-success badge-topic mb-2">Debugging</span>
+<h5>Q9. Why can MaxListenersExceededWarning appear?</h5>
+<pre><code>for (let i = 0; i &lt; 11; i++) {
+  emitter.on("data", () =&gt; {});
+}</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> More than the default listener threshold has been added for the event.</p>
+<p><strong>Why?</strong> Node.js warns because repeatedly adding listeners can indicate accidental listener accumulation or a memory leak. It is a warning, not proof that a leak exists.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-primary badge-topic mb-2">Async Trap</span>
+<h5>Q10. Does emit() wait for an async listener?</h5>
+<pre><code>emitter.on("task", async () =&gt; {
+  await doSomething();
+  console.log("Done");
+});
+
+emitter.emit("task");
+console.log("After");</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> <code>emit()</code> does not automatically wait for the Promise returned by the async listener. “After” can print before “Done”.</p>
+<p><strong>Why?</strong> EventEmitter does not define <code>emit()</code> as an async-await operation. The async listener's continuation resumes later after its awaited operation completes.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-dark badge-topic mb-2">Architecture</span>
+<h5>Q11. Why is EventEmitter useful in Node.js?</h5>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> It provides a simple publish/subscribe-style mechanism inside an application: one component emits an event and other components listen for it.</p>
+<p><strong>Why?</strong> This can reduce direct coupling between components. Node.js itself uses event-based APIs in many places.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-info text-dark badge-topic mb-2">Listener Count</span>
+<h5>Q12. What is the output?</h5>
+<pre><code>function a() {}
+function b() {}
+
+emitter.on("data", a);
+emitter.on("data", b);
+
+console.log(emitter.listenerCount("data"));</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> <code>2</code></p>
+<p><strong>Why?</strong> Two listeners have been registered for the <code>data</code> event.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-secondary badge-topic mb-2">Advanced</span>
+<h5>Q13. What is the risk in this pattern?</h5>
+<pre><code>function start() {
+  emitter.on("request", handleRequest);
+}
+
+app.on("request", start);</code></pre>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> If <code>start()</code> is called repeatedly, the same listener can be added repeatedly.</p>
+<p><strong>Why?</strong> EventEmitter does not automatically deduplicate listeners. Repeated registration can cause duplicate work and listener warnings.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-danger badge-topic mb-2">Conceptual Trap</span>
+<h5>Q14. Are EventEmitter listeners executed in parallel?</h5>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> No. Normal listeners are invoked synchronously and sequentially by <code>emit()</code>.</p>
+<p><strong>Why?</strong> An async operation started by a listener can continue later, but that is different from EventEmitter invoking the listeners themselves in parallel.</p>
+</div>
+</div>
+
+<div class="q">
+<span class="badge bg-warning text-dark badge-topic mb-2">API Knowledge</span>
+<h5>Q15. What is the difference between removeListener() and removeAllListeners()?</h5>
+<button class="btn btn-primary toggle" onclick="toggleAnswer(this)">Show Answer</button>
+<div class="answer">
+<p><strong>Code Answer:</strong> <code>removeListener()</code> removes a specific listener for an event. <code>removeAllListeners()</code> removes all listeners for an event, or all listeners from the emitter if no event is supplied.</p>
+<p><strong>Why?</strong> Use the narrower operation when possible so you do not accidentally remove listeners owned by other parts of your application.</p>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">17. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>emit()</strong><br>Triggers an event.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>on()</strong><br>Registers a repeating listener.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>once()</strong><br>Registers a one-time listener.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>off()</strong><br>Removes a specific listener.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>removeAllListeners()</strong><br>Removes all matching listeners.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>listenerCount()</strong><br>Counts listeners for an event.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>"error"</strong><br>Special EventEmitter event.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Listeners</strong><br>Normally run synchronously in registration order.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>Async listeners</strong><br>emit() does not automatically await them.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">18. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ol>
+<li>What is event-driven programming?</li>
+<li>What is EventEmitter in Node.js?</li>
+<li>What is the difference between <code>emit()</code> and <code>on()</code>?</li>
+<li>What is the difference between <code>on()</code> and <code>once()</code>?</li>
+<li>How do you remove a specific listener?</li>
+<li>Why does <code>off()</code> require the same function reference?</li>
+<li>What does <code>removeAllListeners()</code> do?</li>
+<li>What does <code>listenerCount()</code> return?</li>
+<li>How are event arguments passed?</li>
+<li>In what order are synchronous listeners executed?</li>
+<li>Why is the <code>"error"</code> event special?</li>
+<li>What happens when an error event has no listener?</li>
+<li>What causes <code>MaxListenersExceededWarning</code>?</li>
+<li>Does EventEmitter automatically wait for async listeners?</li>
+<li>How can EventEmitter be used to create custom application events?</li>
+</ol>
+<div class="interview"><strong>Top interview line:</strong><br>
+“EventEmitter provides a way to emit named events and register listeners for those events. Normal listeners are called synchronously in registration order, while async work started inside a listener is not automatically awaited by emit().”</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">19. Final Visual Map</div>
+<div class="card-body">
+<div class="flow">                         EventEmitter
+                              │
+                 ┌────────────┴────────────┐
+                 ↓                         ↓
+              on()                     once()
+                 │                         │
+          register listener        register one-time listener
+                 │                         │
+                 └────────────┬────────────┘
+                              ↓
+                         emit(event)
+                              ↓
+                    listeners are invoked
+                              ↓
+                 arguments are passed along
+                              │
+             ┌────────────────┼────────────────┐
+             ↓                ↓                ↓
+           off()       removeAllListeners  listenerCount()
+             │
+       remove listener
+
+Special:
+emit("error")
+      ↓
+error listener? ── YES → handle
+      │
+      NO
+      ↓
+uncaught error / process may terminate
+
+Async:
+async listener
+      ↓
+await
+      ↓
+emit() does NOT automatically wait</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 6 — Events & EventEmitter • Interview Preparation
+</footer>
+</div>
+
+<script>
+function toggleAnswer(button){
+  const answer = button.nextElementSibling;
+  const open = answer.style.display === "block";
+  answer.style.display = open ? "none" : "block";
+  button.textContent = open ? "Show Answer" : "Hide Answer";
+}
+</script>
+</body>
+</html>

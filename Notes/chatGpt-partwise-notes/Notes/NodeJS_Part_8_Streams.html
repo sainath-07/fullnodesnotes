@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Node.js Part 8 — Streams</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#263238;line-height:1.7}
+.hero{background:linear-gradient(135deg,#111827,#0d6efd,#198754);color:#fff;border-radius:18px}
+.card,.topic{border:0;border-radius:14px}.card{overflow:hidden}
+.card-header{font-weight:700}.topic{background:#fff;padding:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+code{color:#b42318}.flow{background:#eef6ff;border-left:5px solid #0d6efd;padding:18px;border-radius:10px;white-space:pre-wrap;font-family:monospace}
+.tip{background:#fff8e1;border-left:5px solid #ffc107;padding:16px;border-radius:10px}
+.warn{background:#fff3e0;border-left:5px solid #fd7e14;padding:16px;border-radius:10px}
+.interview{background:#e8f5e9;border-left:5px solid #198754;padding:16px;border-radius:10px}
+.answer{display:none;margin-top:15px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:10px;padding:15px}
+.table code{color:#b42318}
+</style>
+</head>
+<body>
+<div class="container py-4 py-lg-5">
+
+<header class="hero p-4 p-lg-5 mb-4 shadow">
+<span class="badge bg-warning text-dark mb-3">Node.js Interview Preparation • Part 8</span>
+<h1 class="display-6 fw-bold">🟢 Streams</h1>
+<p class="lead mb-0">Learn how Node.js processes large or continuous data in small pieces instead of loading everything into memory at once.</p>
+</header>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What Are Streams?</div>
+<div class="card-body">
+<div class="topic">
+<p>A <strong>stream</strong> is a way to process data gradually, piece by piece, instead of waiting for the complete data to be available.</p>
+<h5>Layman example</h5>
+<p>Imagine drinking water from a tap. You do not need to collect all the water in a huge tank before drinking it. Water arrives continuously and you consume it as it arrives.</p>
+<div class="flow">Large data source
+      ↓
+ small chunk
+      ↓
+ process chunk
+      ↓
+ next chunk
+      ↓
+ process chunk
+      ↓
+      ...
+</div>
+<p>In Node.js, streams are useful for files, HTTP requests/responses, compression, and other continuous data.</p>
+<div class="interview"><strong>Interview-ready:</strong> “A stream is an interface for processing data incrementally. It avoids the need to load the entire data source into memory before processing it.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">2. Why Use Streams?</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Handle large files without loading the complete file into memory.</li>
+<li>Process HTTP data as it arrives.</li>
+<li>Send data while it is still being produced.</li>
+<li>Build processing pipelines.</li>
+<li>Support backpressure between fast and slow parts of a system.</li>
+</ul>
+<div class="flow">Without stream:
+Large file → load everything → memory → process
+
+With stream:
+Large file → chunk → process → chunk → process → ...
+</div>
+<div class="tip"><strong>When to use:</strong> Streams are especially useful when data is large, continuous, or produced faster than the consumer can handle.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">3. Four Main Types of Streams</div>
+<div class="card-body">
+<div class="topic">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><strong>Readable</strong></td><td>Data can be read from it.</td><td>File read stream</td></tr>
+<tr><td><strong>Writable</strong></td><td>Data can be written to it.</td><td>File write stream</td></tr>
+<tr><td><strong>Duplex</strong></td><td>Can both read and write.</td><td>TCP socket</td></tr>
+<tr><td><strong>Transform</strong></td><td>Duplex stream that can change data while it passes through.</td><td>Compression stream</td></tr>
+</tbody>
+</table>
+<div class="flow">Readable ─────→ data comes out
+
+Writable ←───── data goes in
+
+Duplex  ←──────→ data goes both ways
+
+Transform ─────→ input → transform → output</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">4. Readable Streams</div>
+<div class="card-body">
+<div class="topic">
+<p>A readable stream provides data to your program.</p>
+<pre><code>const fs = require("node:fs");
+
+const stream = fs.createReadStream("large.txt");
+
+stream.on("data", (chunk) =&gt; {
+  console.log("Received:", chunk.length, "bytes");
+});
+
+stream.on("end", () =&gt; {
+  console.log("Finished reading");
+});
+
+stream.on("error", (err) =&gt; {
+  console.error(err);
+});</code></pre>
+<p>The <code>data</code> event is emitted when a chunk is available. The <code>end</code> event means no more data is coming.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">5. Writable Streams</div>
+<div class="card-body">
+<div class="topic">
+<p>A writable stream accepts data.</p>
+<pre><code>const fs = require("node:fs");
+
+const output = fs.createWriteStream("output.txt");
+
+output.write("Hello\n");
+output.write("Node.js\n");
+output.end("Done\n");</code></pre>
+<p><code>write()</code> sends data into the stream. <code>end()</code> tells the stream that no more data will be written.</p>
+<div class="warn"><strong>Common mistake:</strong> Calling <code>write()</code> after <code>end()</code> is invalid because the writable stream has already been told that writing is complete.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">6. read(), write(), end()</div>
+<div class="card-body">
+<div class="topic">
+<h5>read()</h5>
+<p>Readable streams can expose a <code>read()</code> method in paused/readable mode to request available data.</p>
+<pre><code>const fs = require("node:fs");
+
+const stream = fs.createReadStream("large.txt");
+
+stream.on("readable", () =&gt; {
+  let chunk;
+  while ((chunk = stream.read()) !== null) {
+    console.log(chunk);
+  }
+});</code></pre>
+<h5>write()</h5>
+<pre><code>const writable = fs.createWriteStream("output.txt");
+writable.write("Hello");</code></pre>
+<h5>end()</h5>
+<pre><code>writable.end("Final data");</code></pre>
+<div class="interview"><strong>Remember:</strong> <code>write()</code> adds data; <code>end()</code> finishes writing. A readable stream's <code>read()</code> retrieves available data in the appropriate stream mode.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">7. Events: data, end, error, drain</div>
+<div class="card-body">
+<div class="topic">
+<table class="table table-bordered">
+<thead><tr><th>Event</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>data</code></td><td>A readable stream has a chunk of data.</td></tr>
+<tr><td><code>end</code></td><td>A readable stream has no more data.</td></tr>
+<tr><td><code>error</code></td><td>An error occurred.</td></tr>
+<tr><td><code>drain</code></td><td>A writable stream can accept more data after backpressure.</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>Important:</strong> Always consider error handling when working with streams. Unhandled stream errors can terminate the process.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">8. Backpressure ⭐⭐⭐ — Most Important Interview Topic</div>
+<div class="card-body">
+<div class="topic">
+<p><strong>Backpressure</strong> happens when the producer creates data faster than the consumer can process it.</p>
+<h5>Layman example</h5>
+<p>Imagine a person filling bottles from a very fast water pipe while another person closes the bottles slowly. If water keeps arriving at the same speed, bottles pile up. The producer needs to slow down or wait.</p>
+<div class="flow">FAST PRODUCER
+     │
+     │ chunks quickly
+     ↓
+┌─────────────────┐
+│ Writable buffer │  ← fills up
+└─────────────────┘
+     │
+     │ slow processing
+     ↓
+  CONSUMER
+
+Backpressure = producer is told to slow down / wait</div>
+<p>In Node.js, <code>writable.write()</code> returns a Boolean value.</p>
+<ul>
+<li><code>true</code> → the writable stream can currently accept more data.</li>
+<li><code>false</code> → internal buffering has reached its threshold; the producer should wait.</li>
+</ul>
+<pre><code>const ok = writable.write(chunk);
+
+if (!ok) {
+  // Stop writing temporarily.
+  writable.once("drain", () =&gt; {
+    // Continue writing here.
+  });
+}</code></pre>
+<p>When the writable stream is ready again, it emits <code>drain</code>.</p>
+<div class="interview"><strong>Best interview answer:</strong> “Backpressure is the mechanism that prevents a fast producer from overwhelming a slow consumer. In a writable stream, when <code>write()</code> returns false, the producer should wait for the <code>drain</code> event before continuing.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">9. highWaterMark</div>
+<div class="card-body">
+<div class="topic">
+<p><code>highWaterMark</code> is a threshold used by Node.js streams to control internal buffering behavior. It does <strong>not</strong> mean “the maximum size of the stream”.</p>
+<pre><code>const fs = require("node:fs");
+
+const stream = fs.createWriteStream("output.txt", {
+  highWaterMark: 16 * 1024
+});</code></pre>
+<p>When the internal buffered amount reaches the relevant threshold, <code>write()</code> can return <code>false</code>, creating backpressure.</p>
+<div class="warn"><strong>Interview trap:</strong> Do not say “highWaterMark is always the maximum memory used by a stream.” It is a buffering threshold and its exact behavior depends on the stream type.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">10. pipe()</div>
+<div class="card-body">
+<div class="topic">
+<p><code>pipe()</code> connects a readable stream to a writable stream.</p>
+<pre><code>const fs = require("node:fs");
+
+const source = fs.createReadStream("input.txt");
+const destination = fs.createWriteStream("copy.txt");
+
+source.pipe(destination);</code></pre>
+<div class="flow">Readable
+input.txt
+   │
+   │ pipe()
+   ↓
+Writable
+copy.txt
+
+pipe() helps connect the flow and handles backpressure between the streams.</div>
+<div class="interview"><strong>Interview-ready:</strong> “pipe() connects a readable stream to a writable stream and manages the flow of data, including backpressure.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning text-dark">11. Stream Chaining</div>
+<div class="card-body">
+<div class="topic">
+<p>Streams can be connected one after another to create a pipeline.</p>
+<div class="flow">File
+ ↓
+Readable Stream
+ ↓
+Transform Stream
+ ↓
+Writable Stream
+ ↓
+Output File</div>
+<pre><code>readable
+  .pipe(transform)
+  .pipe(writable);</code></pre>
+<p>This is useful for tasks such as reading, compressing, encrypting, transforming, and writing data.</p>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">12. Transform Streams</div>
+<div class="card-body">
+<div class="topic">
+<p>A Transform stream is both readable and writable. It receives data, changes it, and produces output.</p>
+<pre><code>const { Transform } = require("node:stream");
+
+const upper = new Transform({
+  transform(chunk, encoding, callback) {
+    const result = chunk.toString().toUpperCase();
+    callback(null, result);
+  }
+});</code></pre>
+<div class="flow">input chunk
+    ↓
+Transform
+    ↓
+changed chunk
+    ↓
+output</div>
+<div class="tip"><strong>Examples:</strong> compression, decompression, encryption, decryption, formatting, and data conversion.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">13. File Streams</div>
+<div class="card-body">
+<div class="topic">
+<pre><code>const fs = require("node:fs");
+
+const readStream = fs.createReadStream("large.mp4");
+const writeStream = fs.createWriteStream("copy.mp4");
+
+readStream.pipe(writeStream);</code></pre>
+<p>Instead of loading the entire video into a Buffer, the file is transferred in chunks.</p>
+<div class="flow">large.mp4
+  ↓
+small chunk
+  ↓
+small chunk
+  ↓
+small chunk
+  ↓
+copy.mp4</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">14. HTTP Streams</div>
+<div class="card-body">
+<div class="topic">
+<p>HTTP request and response objects are stream-like interfaces. This allows Node.js to process request/response data incrementally.</p>
+<pre><code>const http = require("node:http");
+
+http.createServer((req, res) =&gt; {
+  req.on("data", chunk =&gt; {
+    console.log("Received:", chunk.length);
+  });
+
+  req.on("end", () =&gt; {
+    res.end("Request complete");
+  });
+}).listen(3000);</code></pre>
+<div class="interview"><strong>Interview point:</strong> HTTP data can arrive in multiple chunks. Do not assume the complete request body arrives in one <code>data</code> event.</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">15. Compression Streams</div>
+<div class="card-body">
+<div class="topic">
+<p>Node.js provides compression streams through modules such as <code>node:zlib</code>.</p>
+<pre><code>const fs = require("node:fs");
+const zlib = require("node:zlib");
+
+fs.createReadStream("large.txt")
+  .pipe(zlib.createGzip())
+  .pipe(fs.createWriteStream("large.txt.gz"));</code></pre>
+<div class="flow">large.txt
+   ↓
+Read Stream
+   ↓
+Gzip Transform
+   ↓
+Write Stream
+   ↓
+large.txt.gz</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">16. Streams vs Buffer ⭐⭐⭐</div>
+<div class="card-body">
+<div class="topic">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Buffer</th><th>Stream</th></tr></thead>
+<tbody>
+<tr><td>Stores bytes in memory.</td><td>Processes data gradually.</td></tr>
+<tr><td>Useful when data is already available or manageable in memory.</td><td>Useful for large or continuous data.</td></tr>
+<tr><td>Can represent a complete file's bytes.</td><td>Can process a file in chunks.</td></tr>
+<tr><td>May require large memory for huge data.</td><td>Can reduce memory pressure.</td></tr>
+</tbody>
+</table>
+<div class="interview"><strong>Simple interview answer:</strong> “A Buffer is a container for bytes, while a Stream is a mechanism for processing data over time in chunks.”</div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-danger text-white">17. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="topic">
+<ul>
+<li>Loading a huge file completely into memory when a stream is better.</li>
+<li>Ignoring the return value of <code>write()</code> when manually writing many chunks.</li>
+<li>Continuing to write after <code>write()</code> returns <code>false</code> instead of waiting for <code>drain</code>.</li>
+<li>Thinking <code>highWaterMark</code> is a hard maximum memory limit.</li>
+<li>Assuming one <code>data</code> event contains the complete HTTP request.</li>
+<li>Forgetting stream error handling.</li>
+<li>Calling <code>end()</code> and then trying to write more data.</li>
+<li>Using streams without understanding whether the stream is readable, writable, duplex, or transform.</li>
+<li>Confusing Buffer with Stream. A Buffer holds bytes; a Stream manages data flow.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">18. Interview Questions — Click to Show Answer + Why ⭐⭐⭐</div>
+<div class="card-body">
+
+<div class="topic">
+<h5>Q1. What is a stream in Node.js?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> A stream processes data incrementally in chunks instead of requiring the entire data to be loaded first.<br><br><strong>Why?</strong> This is useful for large files, HTTP data, and continuous data because it can reduce memory usage and support data flow.</div>
+</div>
+
+<div class="topic">
+<h5>Q2. What are the four main types of streams?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Readable, Writable, Duplex, and Transform.<br><br><strong>Why?</strong> They represent different directions and behaviors of data flow.</div>
+</div>
+
+<div class="topic">
+<h5>Q3. What is the difference between Readable and Writable streams?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> A Readable stream provides data to the application; a Writable stream accepts data from the application.<br><br><strong>Why?</strong> They are the two basic directions of data flow.</div>
+</div>
+
+<div class="topic">
+<h5>Q4. What is backpressure? Give a real Node.js example.</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Backpressure occurs when a producer creates data faster than the consumer can process it. In a writable stream, <code>write()</code> can return <code>false</code>; the producer should wait for <code>drain</code> before continuing.<br><br><strong>Why?</strong> Without backpressure, internal buffers can grow and cause excessive memory usage.</div>
+</div>
+
+<div class="topic">
+<h5>Q5. What does writable.write() returning false mean?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It means the writable stream has reached its buffering threshold and the producer should slow down or wait.<br><br><strong>Why?</strong> Waiting lets the consumer catch up instead of continuously adding more data.</div>
+</div>
+
+<div class="topic">
+<h5>Q6. When should you listen for drain?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> When a writable stream's <code>write()</code> returns <code>false</code> and you are manually managing the writes.<br><br><strong>Why?</strong> The <code>drain</code> event tells you that it is appropriate to resume writing.</div>
+</div>
+
+<div class="topic">
+<h5>Q7. What is the output?</h5>
+<pre><code>const fs = require("node:fs");
+
+const stream = fs.createReadStream("file.txt");
+
+stream.on("data", chunk =&gt; {
+  console.log("chunk");
+});
+
+stream.on("end", () =&gt; {
+  console.log("done");
+});</code></pre>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>chunk</code> can be printed multiple times, followed by <code>done</code>.<br><br><strong>Why?</strong> The file can be delivered in multiple chunks. The <code>end</code> event occurs after all chunks have been delivered.</div>
+</div>
+
+<div class="topic">
+<h5>Q8. Does one data event contain the complete HTTP request body?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> No.<br><br><strong>Why?</strong> Network data can arrive in multiple chunks. You normally collect/process chunks until the <code>end</code> event.</div>
+</div>
+
+<div class="topic">
+<h5>Q9. What does pipe() do?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> <code>pipe()</code> connects a readable stream to a writable stream and manages the data flow between them.<br><br><strong>Why?</strong> It makes common stream pipelines simple and handles backpressure between the connected streams.</div>
+</div>
+
+<div class="topic">
+<h5>Q10. What is a Transform stream?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> A Transform stream is a Duplex stream that reads input, transforms it, and produces output.<br><br><strong>Why?</strong> It is useful for compression, encryption, formatting, and other data transformations.</div>
+</div>
+
+<div class="topic">
+<h5>Q11. What is highWaterMark?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> It is a threshold used by Node.js streams for internal buffering and flow control.<br><br><strong>Why?</strong> It helps streams decide when buffering has become large enough to apply backpressure.</div>
+</div>
+
+<div class="topic">
+<h5>Q12. Why are streams better than reading a huge file into a Buffer?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Streams process the file in chunks, so the whole file does not need to be held in memory at once.<br><br><strong>Why?</strong> This can significantly reduce memory pressure for large files.</div>
+</div>
+
+<div class="topic">
+<h5>Q13. What happens if you call write() after end()?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> The writable stream has already been ended, so further writes are invalid and can result in an error.<br><br><strong>Why?</strong> <code>end()</code> signals that no more data should be written.</div>
+</div>
+
+<div class="topic">
+<h5>Q14. Write code that manually respects backpressure.</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Code Answer:</strong>
+<pre><code>function writeChunks(writable, chunks) {
+  let i = 0;
+
+  function writeMore() {
+    while (i &lt; chunks.length) {
+      const canContinue = writable.write(chunks[i++]);
+
+      if (!canContinue) {
+        writable.once("drain", writeMore);
+        return;
+      }
+    }
+
+    writable.end();
+  }
+
+  writeMore();
+}</code></pre>
+<strong>Why?</strong> Once <code>write()</code> returns false, the function stops writing and resumes only after <code>drain</code>.</div>
+</div>
+
+<div class="topic">
+<h5>Q15. Explain Buffer vs Stream in one interview answer.</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> “A Buffer stores a sequence of bytes, while a Stream provides a way to process or transfer data incrementally over time. Buffers are data containers; streams are data-flow mechanisms.”<br><br><strong>Why?</strong> This distinction is important when choosing between loading data into memory and processing it progressively.</div>
+</div>
+
+<div class="topic">
+<h5>Q16. Why can streams improve application performance?</h5>
+<button class="btn btn-primary" onclick="toggle(this)">Show Answer</button>
+<div class="answer"><strong>Answer:</strong> Streams can reduce memory usage and allow processing to begin before all data has arrived.<br><br><strong>Why?</strong> Data is handled progressively instead of waiting for the complete data set.</div>
+</div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info text-dark">19. Quick Recap</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>Stream</strong><br>Processes data in chunks.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>Readable</strong><br>Data comes out.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Writable</strong><br>Data goes in.</div></div>
+<div class="col-md-4"><div class="alert alert-info h-100"><strong>Duplex</strong><br>Read and write.</div></div>
+<div class="col-md-4"><div class="alert alert-secondary h-100"><strong>Transform</strong><br>Read, change, and output.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>Backpressure</strong><br>Slow the producer when the consumer cannot keep up.</div></div>
+<div class="col-md-4"><div class="alert alert-primary h-100"><strong>write()</strong><br>Returns false when flow should slow down.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>drain</strong><br>Signals that writing can resume.</div></div>
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>pipe()</strong><br>Connects streams.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">20. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<ol>
+<li>What is a stream?</li>
+<li>Why are streams useful in Node.js?</li>
+<li>Readable vs Writable?</li>
+<li>Duplex vs Transform?</li>
+<li>What does <code>read()</code> do?</li>
+<li>What does <code>write()</code> do?</li>
+<li>What does <code>end()</code> do?</li>
+<li>What do <code>data</code>, <code>end</code>, <code>error</code>, and <code>drain</code> mean?</li>
+<li>What is backpressure?</li>
+<li>What does <code>write() === false</code> mean?</li>
+<li>When should you wait for <code>drain</code>?</li>
+<li>What is <code>highWaterMark</code>?</li>
+<li>What does <code>pipe()</code> do?</li>
+<li>How are streams used with files?</li>
+<li>How are streams used with HTTP?</li>
+<li>How are compression streams created?</li>
+<li>Buffer vs Stream?</li>
+</ol>
+<div class="interview"><strong>Top interview line:</strong><br>
+“Node.js streams process data incrementally. Their biggest advantage is efficient handling of large or continuous data, and backpressure prevents a fast producer from overwhelming a slower consumer.”</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">21. Final Visual Map</div>
+<div class="card-body">
+<div class="flow">                         STREAMS
+                            │
+        ┌───────────────────┼───────────────────┐
+        ↓                   ↓                   ↓
+    Readable             Writable             Duplex
+        │                   │                   │
+        └───────────────────┼───────────────────┘
+                            ↓
+                        Transform
+                            │
+                            ↓
+                 process data in chunks
+                            │
+             ┌──────────────┼──────────────┐
+             ↓              ↓              ↓
+           Files           HTTP        Compression
+                            │
+                            ↓
+                       Backpressure
+                            │
+               write() returns false
+                            ↓
+                         wait
+                            ↓
+                         drain
+                            ↓
+                       continue</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+Node.js • Part 8 — Streams • Interview Preparation
+</footer>
+</div>
+<script>
+function toggle(btn){
+ const a=btn.nextElementSibling;
+ const hidden=getComputedStyle(a).display==="none";
+ a.style.display=hidden?"block":"none";
+ btn.textContent=hidden?"Hide Answer":"Show Answer";
+}
+</script>
+</body>
+</html>

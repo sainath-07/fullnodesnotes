@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 2 — Node.js Modules Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#1f2937}.hero{background:linear-gradient(135deg,#111827,#0d6efd);color:#fff}
+.cardx{border:0;border-radius:16px;box-shadow:0 8px 24px #0001;overflow:hidden;margin-bottom:24px}
+.code{background:#0f172a;color:#e5e7eb;border-radius:10px;padding:15px;white-space:pre-wrap;font-family:Consolas,monospace}
+.flow{background:#eef4ff;border:1px dashed #4d7cff;border-radius:12px;padding:18px;text-align:center;font-weight:600;line-height:1.9}
+.label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#64748b}
+.blue{background:#0d6efd;color:#fff}.green{background:#198754;color:#fff}.purple{background:#6f42c1;color:#fff}
+.orange{background:#fd7e14;color:#fff}.teal{background:#0f766e;color:#fff}.dark{background:#212529;color:#fff}.red{background:#dc3545;color:#fff}
+.tip{border-left:5px solid #0d6efd}.small-note{font-size:.95rem}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4">
+<div class="container">
+<span class="badge bg-light text-dark mb-2">Node.js • MAANG • FANG • MNC</span>
+<h1 class="display-6 fw-bold">Part 2 — Node.js Modules ⭐⭐⭐</h1>
+<p class="lead mb-0">Learn how Node loads, executes, caches and shares code.</p>
+</div></header>
+<main class="container pb-5">
+
+<section>
+<div class="card cardx"><div class="card-header blue fw-bold">1. What is a Module?</div><div class="card-body">
+<p><b>What:</b> A module is a separate unit of code that can contain variables, functions, classes or other logic.</p>
+<p><b>Why / purpose:</b> Modules keep large applications organized. They make code easier to test, reuse and maintain.</p>
+<p><b>Layman example:</b> Think of a toolbox. Each tool has a separate purpose. You take only the tool you need.</p>
+<div class="flow">main.js → loads module → module executes → exported value is received → main.js uses it</div>
+<div class="alert alert-info tip mt-3"><b>Interview point:</b> Modules provide boundaries between pieces of code and let one file expose selected functionality to another.</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header green fw-bold">2. Types of Node.js Modules</div><div class="card-body">
+<table class="table table-bordered align-middle">
+<tr><th>Type</th><th>Example</th><th>Meaning</th></tr>
+<tr><td>Built-in</td><td><code>fs</code>, <code>path</code>, <code>http</code></td><td>Provided by Node.js</td></tr>
+<tr><td>Local</td><td><code>./math.js</code></td><td>Your own application module</td></tr>
+<tr><td>Third-party</td><td><code>express</code>, <code>axios</code></td><td>Installed from a package registry</td></tr>
+</table>
+<p class="label">Q1 — Identify the module type</p>
+<div class="code">const fs = require("fs");
+const math = require("./math");
+const express = require("express");</div>
+<button class="btn btn-outline-primary" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> <code>fs</code> is built-in, <code>./math</code> is local, and <code>express</code> is third-party.<br>
+<b>Why?</b> Built-in modules come with Node, paths beginning with <code>./</code> or <code>../</code> point to local modules, and package names normally resolve through installed dependencies.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header purple fw-bold">3. CommonJS — require() and module.exports</div><div class="card-body">
+<p>CommonJS is Node's traditional module system. It commonly uses <code>require()</code> to load a module and <code>module.exports</code> to expose a value.</p>
+<div class="code">// math.js
+function add(a,b){ return a+b; }
+module.exports = add;
+
+// app.js
+const add = require("./math");
+console.log(add(2,3));</div>
+<p class="label mt-3">Q2 — What is printed?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="alert alert-success mt-2 d-none">
+<div class="code">5</div>
+<b>Why?</b> <code>module.exports</code> exposes the <code>add</code> function. <code>require()</code> receives that exported function.
+</div>
+<p class="label mt-3">Q3 — What does require() conceptually do?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> It resolves the module, loads it if needed, executes it, gets its exports and returns the exported value. Loaded CommonJS modules are cached.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header orange fw-bold">4. module.exports vs exports</div><div class="card-body">
+<p><code>exports</code> starts as a reference to <code>module.exports</code>. Adding properties through <code>exports.x</code> works, but assigning a new value to <code>exports</code> does not replace what the module exports.</p>
+<p class="label">Q4 — Tricky output</p>
+<div class="code">// test.js
+exports.a = 10;
+exports = { b: 20 };
+
+// app.js
+const value = require("./test");
+console.log(value);</div>
+<button class="btn btn-outline-primary" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="alert alert-success mt-2 d-none">
+<div class="code">{ a: 10 }</div>
+<b>Why?</b> Reassigning <code>exports</code> only changes the local variable. It does not replace <code>module.exports</code>.
+</div>
+<p class="label mt-3">Q5 — Fix the mistake</p>
+<div class="code">exports = function greet(){ return "hello"; };</div>
+<button class="btn btn-outline-primary" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="alert alert-success mt-2 d-none">
+<div class="code">module.exports = function greet(){ return "hello"; };</div>
+<b>Why?</b> Reassign <code>module.exports</code> when exporting a complete function, class or other single value.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header teal fw-bold">5. Module Loading, Execution and Caching</div><div class="card-body">
+<p>A CommonJS module normally executes when it is first loaded. Node then stores its exports in the module cache. Later <code>require()</code> calls can reuse the cached module.</p>
+<div class="flow">require("./counter") → resolve → load → execute once → cache exports → reuse cached exports</div>
+<p class="label mt-3">Q6 — Predict the output</p>
+<div class="code">// counter.js
+console.log("counter module executed");
+module.exports = { value: 1 };
+
+// app.js
+const a = require("./counter");
+const b = require("./counter");
+console.log(a === b);</div>
+<button class="btn btn-outline-primary" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="alert alert-success mt-2 d-none">
+<div class="code">counter module executed
+true</div>
+<b>Why?</b> The first <code>require()</code> executes and caches the module. The second gets the cached export. Both variables refer to the same exported object.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header blue fw-bold">6. require.cache</div><div class="card-body">
+<p><code>require.cache</code> contains cached CommonJS modules for the current process. It can be inspected and, carefully, manipulated.</p>
+<p class="label">Q7 — What does this do?</p>
+<div class="code">const path = require.resolve("./counter");
+delete require.cache[path];
+const again = require("./counter");</div>
+<button class="btn btn-outline-primary" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> It removes the resolved module from the CommonJS cache, so the next <code>require()</code> loads and executes it again.<br>
+<b>Why?</b> Without the cache entry, Node does not reuse the previous cached module instance.
+</div>
+<div class="alert alert-warning mt-3"><b>Interview warning:</b> Do not use cache deletion as a normal application design. It can create confusing state and side effects.</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header red fw-bold">7. Circular Dependencies</div><div class="card-body">
+<p>A circular dependency happens when module A loads B while B directly or indirectly loads A.</p>
+<div class="flow">A → require(B) → B → require(A) → A again</div>
+<p>CommonJS can expose partially initialized exports during a cycle. This can produce surprising <code>undefined</code> values.</p>
+<p class="label">Q8 — Why can this be surprising?</p>
+<div class="code">// a.js
+exports.name = "A";
+const b = require("./b");
+console.log("A sees:", b.name);
+
+// b.js
+const a = require("./a");
+exports.name = a.name;</div>
+<button class="btn btn-outline-primary" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> The exact result depends on initialization order. During a cycle, one module can receive an incomplete export object.<br>
+<b>Why?</b> CommonJS may return the currently available cached module exports before that module has finished executing.
+</div>
+<div class="alert alert-danger mt-3"><b>Best practice:</b> Break large circular dependencies by extracting shared logic into a third module.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header green fw-bold">8. ES Modules — import and export</div><div class="card-body">
+<p>ES Modules (ESM) are JavaScript's standard module system. Node supports ESM with <code>.mjs</code> or with <code>"type":"module"</code> in <code>package.json</code>.</p>
+<div class="code">// math.js
+export function add(a,b){ return a+b; }
+export const version = 1;
+
+// app.js
+import { add, version } from "./math.js";
+console.log(add(2,3), version);</div>
+<p class="label">Q9 — Output</p>
+<button class="btn btn-outline-primary" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="alert alert-success mt-2 d-none">
+<div class="code">5 1</div>
+<b>Why?</b> The named exports <code>add</code> and <code>version</code> are imported by their names.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header purple fw-bold">9. Named Export vs Default Export</div><div class="card-body">
+<div class="code">// named
+export const add = (a,b) =&gt; a+b;
+
+// default
+export default function multiply(a,b){
+  return a*b;
+}</div>
+<p><b>Named import:</b> <code>import { add } from "./math.js"</code></p>
+<p><b>Default import:</b> <code>import multiply from "./math.js"</code></p>
+<p class="label">Q10 — Is this valid?</p>
+<div class="code">export default function test(){}
+export default function another(){}</div>
+<button class="btn btn-outline-primary" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> No. A module can have only one default export.<br>
+<b>Why?</b> The default export represents the module's single default value. It can have many named exports.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header orange fw-bold">10. .mjs and "type": "module"</div><div class="card-body">
+<p>Node can identify ESM using the <code>.mjs</code> extension. A package can also use <code>"type":"module"</code> so its <code>.js</code> files are treated as ESM.</p>
+<p class="label">Q11 — Which statement is correct?</p>
+<ul>
+<li><code>file.mjs</code> → ESM</li>
+<li><code>package.json</code> with <code>"type":"module"</code> → <code>.js</code> files in that package scope are ESM</li>
+<li>CommonJS commonly uses <code>.cjs</code> when an explicit CommonJS extension is useful in a module package</li>
+</ul>
+<button class="btn btn-outline-primary" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="alert alert-success mt-2 d-none"><b>Interview answer:</b> <code>.mjs</code> explicitly marks an ES module; <code>"type":"module"</code> changes the interpretation of <code>.js</code> files within the package scope.</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header teal fw-bold">11. CommonJS vs ES Modules</div><div class="card-body">
+<table class="table table-bordered">
+<tr><th>CommonJS</th><th>ES Modules</th></tr>
+<tr><td><code>require()</code></td><td><code>import</code></td></tr>
+<tr><td><code>module.exports</code></td><td><code>export</code></td></tr>
+<tr><td>Traditional Node module system</td><td>JavaScript standard module system</td></tr>
+<tr><td>Commonly <code>.cjs</code> when explicit</td><td><code>.mjs</code> or <code>"type":"module"</code></td></tr>
+<tr><td>Can be loaded conditionally with ordinary runtime code</td><td>Static imports are normally analyzed before module execution</td></tr>
+</table>
+<p class="label">Q12 — Spot the module-system issue</p>
+<div class="code">// package.json
+{ "type": "module" }
+
+// app.js
+const fs = require("fs");</div>
+<button class="btn btn-outline-primary" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> In a normal ESM file, <code>require</code> is not available as the CommonJS loader.<br>
+<b>Why?</b> <code>"type":"module"</code> makes <code>app.js</code> an ES module. Use <code>import fs from "node:fs"</code> / appropriate ESM syntax, or intentionally use a CommonJS file such as <code>.cjs</code>.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header blue fw-bold">12. Interoperability</div><div class="card-body">
+<p>Interoperability means CommonJS and ESM code can work together, but the rules are not identical in both directions.</p>
+<div class="flow">CommonJS ↔ ESM<br><small>Supported paths exist, but module format, package type, exports and import rules matter.</small></div>
+<p class="label mt-3">Q13 — Conceptual interview question</p>
+<p>Can you always replace <code>require()</code> with <code>import</code> by changing one word?</p>
+<button class="btn btn-outline-primary" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="alert alert-success mt-2 d-none">
+<b>Answer:</b> No.<br><b>Why?</b> Module format, file extension, package configuration, export shape, resolution rules and whether the dependency is CommonJS or ESM can affect the result.
+</div>
+<p class="label mt-3">Q14 — Dynamic import</p>
+<div class="code">async function load(){
+  const mod = await import("./math.js");
+  console.log(mod.add(2,3));
+}
+load();</div>
+<button class="btn btn-outline-primary" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="alert alert-success mt-2 d-none">
+<div class="code">5</div>
+<b>Why?</b> <code>import()</code> returns a Promise for the module namespace object. The named export is accessed as <code>mod.add</code>.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header red fw-bold">13. Interview-Level Code Questions</div><div class="card-body">
+
+<p class="label">Q15 — Same object or different object?</p>
+<div class="code">// user.js
+module.exports = { count: 0 };
+
+// app.js
+const a = require("./user");
+const b = require("./user");
+a.count++;
+console.log(b.count);</div>
+<button class="btn btn-outline-primary" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="alert alert-success mt-2 d-none">
+<div class="code">1</div>
+<b>Why?</b> Both <code>require()</code> calls receive the same cached exported object for that module instance.
+</div>
+
+<p class="label mt-4">Q16 — Export reassignment</p>
+<div class="code">// test.js
+exports.name = "Sainath";
+module.exports = { name: "Node" };
+
+// app.js
+const x = require("./test");
+console.log(x.name);</div>
+<button class="btn btn-outline-primary" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="alert alert-success mt-2 d-none">
+<div class="code">Node</div>
+<b>Why?</b> The final value assigned to <code>module.exports</code> is what <code>require()</code> returns. The earlier property added through <code>exports</code> is no longer the exported object.
+</div>
+
+<p class="label mt-4">Q17 — What does this export?</p>
+<div class="code">// test.js
+module.exports.a = 10;
+module.exports.b = 20;
+
+// app.js
+const { a, b } = require("./test");
+console.log(a + b);</div>
+<button class="btn btn-outline-primary" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="alert alert-success mt-2 d-none">
+<div class="code">30</div>
+<b>Why?</b> The module exports an object with properties <code>a</code> and <code>b</code>, which are destructured in <code>app.js</code>.
+</div>
+
+<p class="label mt-4">Q18 — Module executes how many times?</p>
+<div class="code">// logger.js
+console.log("loaded");
+module.exports = {};
+
+// app.js
+require("./logger");
+require("./logger");
+require("./logger");</div>
+<button class="btn btn-outline-primary" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="alert alert-success mt-2 d-none">
+<div class="code">loaded</div>
+<b>Why?</b> CommonJS caches the module after its first load, so later <code>require()</code> calls reuse the cached module.
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header green fw-bold">14. Common Developer Mistakes</div><div class="card-body">
+<ul>
+<li>Confusing <code>exports</code> with <code>module.exports</code> after reassigning one of them.</li>
+<li>Assuming every <code>require()</code> executes the module again.</li>
+<li>Forgetting CommonJS caching when a module contains mutable state.</li>
+<li>Creating circular dependencies without understanding initialization order.</li>
+<li>Mixing ESM and CommonJS syntax without checking package configuration.</li>
+<li>Assuming <code>"type":"module"</code> affects only one file instead of the package scope.</li>
+<li>Assuming named and default exports are interchangeable.</li>
+<li>Thinking dynamic <code>import()</code> returns the module synchronously.</li>
+</ul>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header dark fw-bold">15. Visual Flow — CommonJS</div><div class="card-body">
+<div class="flow">
+main.js<br>
+↓<br>
+require("./user")<br>
+↓<br>
+Resolve module<br>
+↓<br>
+Load + execute first time<br>
+↓<br>
+module.exports created<br>
+↓<br>
+Cache module<br>
+↓<br>
+Return exports<br>
+↓<br>
+Later require() → reuse cache
+</div>
+</div></div>
+</section>
+
+<section>
+<div class="card cardx"><div class="card-header purple fw-bold">16. Quick Recap — Interview Ready</div><div class="card-body">
+<ul>
+<li><b>Module:</b> A reusable unit of code with a clear boundary.</li>
+<li><b>Built-in:</b> Comes with Node.js.</li>
+<li><b>Local:</b> Your own module.</li>
+<li><b>Third-party:</b> Installed dependency such as Express.</li>
+<li><b>CommonJS:</b> <code>require()</code> + <code>module.exports</code>.</li>
+<li><b>exports:</b> Initially points to <code>module.exports</code>; reassigning it does not replace the exported value.</li>
+<li><b>Cache:</b> CommonJS modules are cached after loading.</li>
+<li><b>Circular dependency:</b> A module dependency cycle that can expose partially initialized exports.</li>
+<li><b>ESM:</b> <code>import</code> + <code>export</code>.</li>
+<li><b>ESM activation:</b> <code>.mjs</code> or <code>"type":"module"</code>.</li>
+<li><b>Named export:</b> Many are allowed and imported by name.</li>
+<li><b>Default export:</b> One default value per module.</li>
+<li><b>Dynamic import:</b> <code>import()</code> returns a Promise and loads a module asynchronously.</li>
+<li><b>Interoperability:</b> CJS and ESM can interact, but resolution and export rules must be respected.</li>
+</ul>
+<div class="alert alert-warning"><b>Top interview tip:</b> If asked “What happens when require() is called?”, explain the sequence: <b>resolve → load → wrap/execute → cache → return exports</b>. Then mention that a later require normally uses the cache.</div>
+<div class="alert alert-success"><b>Golden interview line:</b> “CommonJS uses require and module.exports, and Node caches a module after its first execution. ES Modules use import/export and follow standard JavaScript module semantics. Mixing the two requires understanding Node's module-resolution and interoperability rules.”</div>
+</div></div>
+</section>
+
+</main>
+<script>
+function toggle(id,b){
+ const e=document.getElementById(id);
+ const hidden=e.classList.toggle("d-none");
+ b.textContent=hidden?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

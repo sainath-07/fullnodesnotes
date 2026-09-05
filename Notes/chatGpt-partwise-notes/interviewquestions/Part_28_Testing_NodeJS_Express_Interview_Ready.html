@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Part 28 — Testing Node.js + Express</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#202938;font-family:Arial,sans-serif;line-height:1.6}.hero{background:linear-gradient(135deg,#0d6efd,#173b75);color:white;padding:42px 0}section{margin:28px 0}.card{border:0;border-radius:14px;overflow:hidden}.shadow-soft{box-shadow:0 8px 25px #14285018}.card-header{font-weight:700}.code{background:#172033;color:#e8eef8;border-radius:10px;padding:16px;white-space:pre-wrap;font-family:Consolas,monospace;font-size:.9rem}.flow{background:#eef5ff;border:1px solid #cfe0ff;border-radius:12px;padding:20px;text-align:center;font-weight:600}.answer,.why{display:none}.toggle-btn{min-width:125px}.tip{border-left:5px solid #0d6efd;background:#eef5ff;padding:15px;border-radius:8px}.mistake{border-left:5px solid #dc3545;background:#fff1f2;padding:15px;border-radius:8px}.question{border:1px solid #e5e7eb;border-radius:12px}
+</style></head><body>
+<header class="hero"><div class="container"><span class="badge bg-light text-primary">NODE.JS + EXPRESS INTERVIEW PREPARATION</span><h1 class="mt-3 fw-bold">Part 28 — Testing Node.js + Express</h1><p class="lead mb-0">Interview-ready notes, diagrams, and code/output questions for MAANG, product companies, and MNC interviews.</p></div></header>
+<main class="container py-4">
+
+<section><div class="card shadow-soft"><div class="card-header bg-primary text-white">1. What is Testing?</div><div class="card-body">
+<p><b>What:</b> Testing checks whether application code behaves as expected.</p><p><b>Why:</b> Tests catch bugs early, protect existing behavior, and make refactoring safer.</p><p><b>Layman example:</b> Before selling a car, you check the brakes, lights, engine, and steering. Software tests do similar checks for code.</p><div class="flow">Code → Test → Expected result = Pass<br>Code → Test → Unexpected result = Fail</div><div class="alert alert-info mt-3"><b>Interview line:</b> Good tests should be repeatable, isolated, focused, and clear about the behavior they verify.</div>
+</div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-success text-white">2. Unit vs Integration vs API Testing</div><div class="card-body"><table class="table table-bordered"><tr><th>Type</th><th>What it tests</th><th>Example</th></tr><tr><td>Unit</td><td>One small unit in isolation</td><td>Password validation function</td></tr><tr><td>Integration</td><td>Several parts working together</td><td>Service + repository + test DB</td></tr><tr><td>API</td><td>HTTP behavior of an endpoint</td><td>POST /users returns 201</td></tr></table><div class="tip"><b>Interview tip:</b> Unit tests are usually fast and isolated. Integration tests verify collaboration. API tests verify behavior through the HTTP boundary.</div></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-info">3. Jest, Node Test Runner, and Supertest</div><div class="card-body">
+<p><b>Jest:</b> Popular JavaScript testing framework with assertions, mocking, spies, setup/teardown, and coverage support.</p><p><b>Node test runner:</b> Node provides a built-in runner through <code>node:test</code>.</p><p><b>Supertest:</b> Commonly used to test HTTP servers and Express applications.</p>
+<div class="code">import request from "supertest";
+import app from "./app.js";
+
+const response = await request(app).get("/users");
+console.log(response.status);</div>
+<div class="alert alert-primary"><b>Important:</b> Keep the Express app separate from the file that calls <code>listen()</code>. Tests can then import the app without starting a production server.</div></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-warning">4. Test Structure and Lifecycle</div><div class="card-body"><div class="flow">Arrange → Act → Assert</div><ul class="mt-3"><li><b>Arrange:</b> Prepare input, mocks, fixtures, and state.</li><li><b>Act:</b> Call the function or API.</li><li><b>Assert:</b> Check the result.</li></ul><div class="flow">beforeAll → beforeEach → test → afterEach → afterAll</div><p class="mt-3"><b>Why:</b> Lifecycle hooks prepare and clean state so tests do not depend on execution order.</p></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-secondary text-white">5. Mocking and Spies</div><div class="card-body"><p><b>Mock:</b> Replaces a dependency with controlled behavior.</p><p><b>Spy:</b> Observes whether a function was called and can be configured depending on the framework.</p><div class="code">const emailService = {
+  send: () => Promise.resolve(true)
+};
+// Unit test can replace or spy on send()
+// so no real email is sent.</div><div class="alert alert-warning"><b>Interview point:</b> Mock external dependencies when the unit test should focus on the unit rather than a database, email server, payment service, or network.</div></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-dark text-white">6. Test Fixtures and Test Database</div><div class="card-body"><p><b>Fixture:</b> Known test data used to make a test predictable.</p><p><b>Test database:</b> Separate database environment for tests.</p><div class="flow">Test starts → Create isolated data → Run test → Verify → Clean data</div><div class="alert alert-danger mt-3"><b>Never:</b> Point automated tests at a production database.</div></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-danger text-white">7. Authentication and Error Testing</div><div class="card-body"><p>Test both successful and unsuccessful access.</p><div class="code">GET /profile + valid token → 200 OK
+GET /profile + missing token → 401 Unauthorized
+GET /admin + valid user token → 403 Forbidden</div><p class="mt-3"><b>Error testing:</b> Verify status code, safe response format, and important failure behavior. Production responses should not expose stack traces or secrets.</p></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-primary text-white">8. Middleware, Controller, and Service Testing</div><div class="card-body"><div class="flow">Request → Middleware → Controller → Service → Repository / DB → Response</div><ul class="mt-3"><li><b>Middleware test:</b> Authentication, validation, logging, and <code>next()</code> behavior.</li><li><b>Controller test:</b> HTTP input, service call, and response.</li><li><b>Service test:</b> Business rules without requiring HTTP.</li></ul><div class="tip"><b>Best practice:</b> Keep business logic in services rather than putting large amounts of logic inside route handlers.</div></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-success text-white">9. Async Testing</div><div class="card-body"><div class="code">test("returns user", async () => {
+  const user = await getUser(10);
+  expect(user.id).toBe(10);
+});</div><div class="alert alert-warning mt-3"><b>Common mistake:</b> Forgetting to await or return a Promise can make a test finish before the assertion runs.</div></div></div></section>
+
+<section><div class="card shadow-soft"><div class="card-header bg-info">10. Code / Output Interview Questions</div><div class="card-body">
+<div class="question card mb-4"><div class="card-body"><h5>Q1. What type of test is this?</h5><div class="code">function add(a, b) { return a + b; }
+test("adds numbers", () => { expect(add(2, 3)).toBe(5); });</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a1',this,'answer')">Show Answer</button>
+<div id="a1" class="answer alert alert-success mt-3"><b>Answer:</b> A unit test.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w1',this,'why')">Show Why?</button>
+<div id="w1" class="why alert alert-info mt-3"><b>Why:</b> It tests one small function directly without HTTP, a database, or another external dependency.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q2. What status code should this successful create API normally return?</h5><div class="code">const response = await request(app)
+  .post("/users")
+  .send({ name: "Sam" });
+console.log(response.status);</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a2',this,'answer')">Show Answer</button>
+<div id="a2" class="answer alert alert-success mt-3"><b>Answer:</b> Commonly 201 Created when a new resource is successfully created.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w2',this,'why')">Show Why?</button>
+<div id="w2" class="why alert alert-info mt-3"><b>Why:</b> HTTP 201 communicates that the request successfully created a resource. The API contract should define the exact response.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q3. What is the problem with this async test?</h5><div class="code">test("loads user", () => {
+  getUser().then(user => {
+    expect(user.name).toBe("Sam");
+  });
+});</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a3',this,'answer')">Show Answer</button>
+<div id="a3" class="answer alert alert-success mt-3"><b>Answer:</b> The test does not return or await the Promise.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w3',this,'why')">Show Why?</button>
+<div id="w3" class="why alert alert-info mt-3"><b>Why:</b> The test can finish before the Promise callback runs. Use async/await or return the Promise.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q4. What should the test verify for this protected route?</h5><div class="code">const response = await request(app).get("/profile");
+console.log(response.status);</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a4',this,'answer')">Show Answer</button>
+<div id="a4" class="answer alert alert-success mt-3"><b>Answer:</b> A request without valid authentication should normally be rejected with 401 Unauthorized.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w4',this,'why')">Show Why?</button>
+<div id="w4" class="why alert alert-info mt-3"><b>Why:</b> A protected endpoint should not allow an unauthenticated caller to access protected resources.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q5. What is the difference between mocking and integration testing here?</h5><div class="code">service.createUser = jest.fn()
+  .mockResolvedValue({ id: 1, name: "Sam" });</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a5',this,'answer')">Show Answer</button>
+<div id="a5" class="answer alert alert-success mt-3"><b>Answer:</b> This replaces a dependency with controlled behavior, typical of an isolated unit test.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w5',this,'why')">Show Why?</button>
+<div id="w5" class="why alert alert-info mt-3"><b>Why:</b> The test does not need the real dependency. Integration testing verifies real component interaction.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q6. What is the likely test isolation problem?</h5><div class="code">let user;
+test("creates user", async () => { user = await createUser("Sam"); });
+test("updates user", async () => { await updateUser(user.id); });</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a6',this,'answer')">Show Answer</button>
+<div id="a6" class="answer alert alert-success mt-3"><b>Answer:</b> The second test depends on state created by the first test.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w6',this,'why')">Show Why?</button>
+<div id="w6" class="why alert alert-info mt-3"><b>Why:</b> Tests should be independently runnable. If the first test fails, the second can fail for the wrong reason.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q7. What should you test when an Express controller calls a service that rejects?</h5><div class="code">try {
+  const user = await userService.findById(req.params.id);
+  res.json(user);
+} catch (err) {
+  next(err);
+}</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a7',this,'answer')">Show Answer</button>
+<div id="a7" class="answer alert alert-success mt-3"><b>Answer:</b> Test that the error reaches the error handler and the API returns the expected safe HTTP error response.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w7',this,'why')">Show Why?</button>
+<div id="w7" class="why alert alert-info mt-3"><b>Why:</b> Error paths are part of application behavior. Testing only success cases leaves important failures unverified.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q8. What does this test mainly verify?</h5><div class="code">const response = await request(app)
+  .get("/users?page=2&limit=10");
+expect(response.status).toBe(200);
+expect(response.body.items).toHaveLength(10);</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a8',this,'answer')">Show Answer</button>
+<div id="a8" class="answer alert alert-success mt-3"><b>Answer:</b> API/integration-style testing of HTTP behavior and pagination output.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w8',this,'why')">Show Why?</button>
+<div id="w8" class="why alert alert-info mt-3"><b>Why:</b> The test enters through the HTTP boundary and checks status and response body.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q9. What is the purpose of a test fixture?</h5><div class="code">const userFixture = {
+  name: "Test User",
+  email: "test@example.com"
+};</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a9',this,'answer')">Show Answer</button>
+<div id="a9" class="answer alert alert-success mt-3"><b>Answer:</b> It provides predictable test data.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w9',this,'why')">Show Why?</button>
+<div id="w9" class="why alert alert-info mt-3"><b>Why:</b> Known input makes tests repeatable and easier to understand.</div></div></div><div class="question card mb-4"><div class="card-body"><h5>Q10. What does test coverage tell you?</h5><div class="code">Statements: 90%
+Branches:   80%
+Functions:  95%
+Lines:      91%</div>
+<button class="btn btn-primary btn-sm mt-3 toggle-btn" onclick="toggle('a10',this,'answer')">Show Answer</button>
+<div id="a10" class="answer alert alert-success mt-3"><b>Answer:</b> Coverage measures which instrumented code areas were executed by the test suite.</div>
+<button class="btn btn-outline-secondary btn-sm toggle-btn" onclick="toggle('w10',this,'why')">Show Why?</button>
+<div id="w10" class="why alert alert-info mt-3"><b>Why:</b> High coverage can reveal untested areas, but coverage percentage alone does not prove tests are meaningful or correct.</div></div></div></div></div></section>
+<section><div class="card shadow-soft"><div class="card-header bg-warning">11. Common Developer Mistakes</div><div class="card-body">
+<div class="mistake mb-3"><b>Mistake 1:</b> Testing only success cases.<br><b>Correct:</b> Test validation, authentication, authorization, database failures, and unexpected errors.</div>
+<div class="mistake mb-3"><b>Mistake 2:</b> Forgetting <code>await</code> in async tests.<br><b>Correct:</b> Make the test wait for the Promise.</div>
+<div class="mistake mb-3"><b>Mistake 3:</b> Sharing mutable state between tests.<br><b>Correct:</b> Create and clean test data per test or use controlled fixtures.</div>
+<div class="mistake mb-3"><b>Mistake 4:</b> Using a production database.<br><b>Correct:</b> Use an isolated test database/environment.</div>
+<div class="mistake mb-3"><b>Mistake 5:</b> Mocking everything.<br><b>Correct:</b> Mock for isolation, but keep integration/API tests to verify real component interaction.</div>
+<div class="mistake"><b>Mistake 6:</b> Chasing coverage percentage only.<br><b>Correct:</b> Test important behavior, edge cases, and failure paths.</div>
+</div></div></section>
+<section><div class="card shadow-soft"><div class="card-header bg-secondary text-white">12. Interview Testing Strategy</div><div class="card-body">
+<div class="flow">Unit tests → Fast feedback<br>Integration tests → Component collaboration<br>API tests → HTTP contract<br>End-to-end tests → Full user flow</div>
+<ul class="mt-3"><li>Keep unit tests focused.</li><li>Mock external systems when isolation is the goal.</li><li>Use a separate test database for database integration tests.</li><li>Test success and failure paths.</li><li>Keep tests independent.</li><li>Test asynchronous behavior correctly.</li><li>Use coverage to find gaps, not as the only quality metric.</li></ul>
+</div></div></section>
+<section><div class="card shadow-soft"><div class="card-header bg-primary text-white">13. Quick Recap — Interview Ready</div><div class="card-body">
+<ul><li><b>Unit:</b> one unit in isolation.</li><li><b>Integration:</b> multiple components working together.</li><li><b>API testing:</b> verify HTTP request/response behavior.</li><li><b>Jest:</b> popular testing framework.</li><li><b>node:test:</b> Node.js built-in test runner.</li><li><b>Supertest:</b> useful for Express HTTP/API testing.</li><li><b>Mock:</b> replaces a dependency with controlled behavior.</li><li><b>Spy:</b> observes calls and can be configured.</li><li><b>Fixture:</b> predictable test data.</li><li><b>Isolation:</b> one test should not depend on another test's state.</li><li><b>Async tests:</b> await or return Promises.</li><li><b>Coverage:</b> shows executed code areas; it does not guarantee quality.</li></ul>
+<div class="alert alert-success"><b>30-second interview answer:</b> “In Node.js and Express, I separate unit, integration, and API tests. Unit tests isolate functions and mock external dependencies. Integration tests verify multiple components together, while Supertest can verify Express HTTP behavior. I keep tests isolated with controlled fixtures and a separate test database, test success and error paths, correctly await asynchronous operations, and use coverage to identify gaps rather than treating coverage percentage as proof of quality.”</div>
+</div></div></section>
+</main><footer class="text-center py-4 text-secondary">Part 28 — Testing Node.js + Express • Interview Preparation</footer>
+<script>
+function toggle(id,btn,type){const e=document.getElementById(id),show=e.style.display!=="block";e.style.display=show?"block":"none";btn.textContent=show?(type==="answer"?"Hide Answer":"Hide Why?"):(type==="answer"?"Show Answer":"Show Why?")}
+</script></body></html>

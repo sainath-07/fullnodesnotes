@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 25 — Node.js Performance & Scalability Interview Guide</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#243044;font-family:Arial,sans-serif}
+section{scroll-margin-top:20px}
+.hero{background:linear-gradient(135deg,#172554,#1d4ed8);color:white}
+.card{border:0;border-radius:14px;overflow:hidden}
+.card-header{font-weight:700}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:16px;white-space:pre-wrap;font-family:Consolas,monospace;font-size:.9rem}
+.diagram{background:#eef4ff;border:1px dashed #93c5fd;border-radius:12px;padding:18px;text-align:center;font-weight:600}
+.answer,.why{display:none}
+.tip{border-left:5px solid #0d6efd;background:#eef6ff}
+.warn{border-left:5px solid #ffc107;background:#fff8df}
+.good{border-left:5px solid #198754;background:#effaf3}
+.btn-toggle{min-width:120px}
+.small-label{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#64748b;font-weight:700}
+</style>
+</head>
+<body>
+<div class="container py-4">
+
+<section class="hero rounded-4 shadow p-4 p-md-5 mb-4">
+  <div class="small-label text-white-50">Node.js + Express.js Interview Preparation</div>
+  <h1 class="display-6 fw-bold mt-2">Part 25 — Performance & Scalability ⭐⭐⭐</h1>
+  <p class="lead mb-0">Interview-ready notes and code-based questions for MAANG, FANG and MNC-style interviews.</p>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">1. What are Performance and Scalability?</div>
+<div class="card-body">
+<p><strong>Performance</strong> means how quickly and efficiently one application handles work.</p>
+<p><strong>Scalability</strong> means how well the application continues to work when users, requests or data increase.</p>
+<div class="diagram">User requests → Load Balancer → Node.js instances → Cache / Database → Response</div>
+<div class="alert alert-info mt-3"><strong>Layman example:</strong> Performance is how quickly one cashier serves a customer. Scalability is how easily you can open more checkout counters when the queue grows.</div>
+<h5>Why / Purpose</h5>
+<p>Good performance improves response time and user experience. Good scalability prevents one server from becoming a bottleneck as traffic grows.</p>
+<h5>When to think about it</h5>
+<p>When traffic, database load, CPU usage, memory usage or response time starts increasing.</p>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-dark text-white">2. Core Concepts — What, Why and How</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Blocking operations</h5><p>A long synchronous operation keeps JavaScript execution busy and prevents the event loop from handling other work.</p><div class="code">const fs = require("fs");
+const data = fs.readFileSync("large.txt");</div><p class="mb-0"><strong>Better:</strong> prefer asynchronous APIs for normal I/O.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>CPU-heavy tasks</h5><p>Large calculations can keep the JavaScript thread busy. Use worker threads for suitable CPU-bound work.</p><div class="code">const { Worker } = require("node:worker_threads");</div></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Worker threads</h5><p>Run CPU-heavy JavaScript work in another thread so the main event loop can remain responsive.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Cluster</h5><p>Run multiple Node.js processes so work can use multiple CPU cores. Each worker is a separate process.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Horizontal vs Vertical scaling</h5><p><strong>Vertical:</strong> give one machine more CPU/RAM. <strong>Horizontal:</strong> add more application instances.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Caching</h5><p>Keep frequently used data closer to the application so repeated requests do not always hit the database.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Redis</h5><p>A fast in-memory data store often used for caching, counters, sessions and other low-latency use cases.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>HTTP caching</h5><p>Use response headers such as Cache-Control and ETag where appropriate so clients or intermediaries can reuse responses.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Compression</h5><p>Compress suitable HTTP responses to reduce network transfer size. Compression costs CPU, so measure it.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Streaming</h5><p>Send large data in chunks instead of loading the complete payload into memory first.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Pagination</h5><p>Return a limited part of a large result set instead of sending every record at once.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Database indexing</h5><p>Indexes can make lookups much faster, but they use storage and can add write/update cost.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Connection pooling</h5><p>Reuse a controlled set of database connections instead of opening a new connection for every request.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Rate limiting</h5><p>Limit how many requests a client can make in a time window to protect the API.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Load balancing</h5><p>Distribute incoming traffic across healthy application instances.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Memory leaks</h5><p>Memory that is still reachable but no longer useful can accumulate and increase memory usage.</p></div></div></div>
+<div class="col-md-6"><div class="card h-100 border"><div class="card-body"><h5>Performance profiling</h5><p>Measure CPU, memory, event-loop delay, database time and request latency before optimizing.</p></div></div></div>
+</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">3. Scalability Flow</div>
+<div class="card-body">
+<div class="diagram">
+Client<br>↓<br>Load Balancer<br>↓<br>┌──────────────┬──────────────┬──────────────┐<br>Node Instance 1 &nbsp; Node Instance 2 &nbsp; Node Instance 3<br>↓<br>Cache / Redis → Database Connection Pool → Database
+</div>
+<div class="alert alert-warning mt-3 mb-0"><strong>Interview point:</strong> Adding more Node.js instances is horizontal scaling. A load balancer is commonly used to distribute traffic between them.</div>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-info">4. Interview Questions — Code Based</div>
+<div class="card-body">
+
+<!-- Q1 -->
+<div class="card border mb-3">
+<div class="card-header">Q1. What is wrong with this Node.js API?</div>
+<div class="card-body">
+<div class="code">app.get("/report", (req, res) =&gt; {
+  const result = fs.readFileSync("./large-report.json", "utf8");
+  res.json(JSON.parse(result));
+});
+
+app.get("/health", (req, res) =&gt; {
+  res.send("OK");
+});</div>
+<p><strong>Question:</strong> Why can <code>/health</code> become slow while <code>/report</code> is running?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a1')">Show Answer</button>
+<div id="a1" class="answer mt-3"><strong>Answer:</strong> <code>readFileSync()</code> is synchronous. It blocks the JavaScript thread while the file is read. During that time, the event loop cannot process the <code>/health</code> request normally.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w1')">Show Why?</button>
+<div id="w1" class="why mt-3"><strong>Why?</strong> Node.js can handle many I/O operations efficiently when they are asynchronous, but synchronous work keeps the main JavaScript execution path busy.</div>
+</div></div>
+
+<!-- Q2 -->
+<div class="card border mb-3">
+<div class="card-header">Q2. How would you fix the blocking file operation?</div>
+<div class="card-body">
+<div class="code">app.get("/report", async (req, res, next) =&gt; {
+  try {
+    const result = await fs.promises.readFile(
+      "./large-report.json",
+      "utf8"
+    );
+    res.json(JSON.parse(result));
+  } catch (err) {
+    next(err);
+  }
+});</div>
+<p><strong>Question:</strong> Explain why this version is safer for the event loop.</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a2')">Show Answer</button>
+<div id="a2" class="answer mt-3"><strong>Answer:</strong> The promise-based file API does not use a synchronous file read. While the I/O is being handled, Node.js can continue processing other work.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w2')">Show Why?</button>
+<div id="w2" class="why mt-3"><strong>Why?</strong> The goal is not simply “async is always faster.” The goal is to avoid unnecessarily blocking the main JavaScript execution path.</div>
+</div></div>
+
+<!-- Q3 -->
+<div class="card border mb-3">
+<div class="card-header">Q3. When should you use worker_threads?</div>
+<div class="card-body">
+<div class="code">const { Worker } = require("node:worker_threads");
+
+const worker = new Worker("./heavy-work.js");
+
+worker.on("message", result =&gt; {
+  console.log(result);
+});</div>
+<p><strong>Question:</strong> Why can a worker thread help with a CPU-heavy calculation?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a3')">Show Answer</button>
+<div id="a3" class="answer mt-3"><strong>Answer:</strong> A worker can perform CPU-heavy JavaScript work outside the main JavaScript execution thread, allowing the main event loop to remain more responsive.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w3')">Show Why?</button>
+<div id="w3" class="why mt-3"><strong>Why?</strong> CPU-heavy JavaScript can occupy the main thread for a long time. Moving suitable computation to a worker separates that work from request handling.</div>
+</div></div>
+
+<!-- Q4 -->
+<div class="card border mb-3">
+<div class="card-header">Q4. Identify the scalability strategy.</div>
+<div class="card-body">
+<div class="code">Internet
+   |
+Load Balancer
+   |
++---------+---------+
+|                   |
+Node #1             Node #2</div>
+<p><strong>Question:</strong> Is this vertical or horizontal scaling? What does the load balancer do?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a4')">Show Answer</button>
+<div id="a4" class="answer mt-3"><strong>Answer:</strong> This is horizontal scaling because multiple application instances are running. The load balancer distributes incoming requests among available instances.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w4')">Show Why?</button>
+<div id="w4" class="why mt-3"><strong>Why?</strong> Horizontal scaling increases capacity by adding machines/processes/instances rather than making only one machine larger.</div>
+</div></div>
+
+<!-- Q5 -->
+<div class="card border mb-3">
+<div class="card-header">Q5. Find the database performance problem.</div>
+<div class="card-body">
+<div class="code">app.get("/users", async (req, res) =&gt; {
+  const users = await User.find({
+    email: req.query.email
+  });
+
+  res.json(users);
+});</div>
+<p><strong>Question:</strong> If <code>email</code> is queried very frequently on a huge collection, what database-level improvement might you consider?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a5')">Show Answer</button>
+<div id="a5" class="answer mt-3"><strong>Answer:</strong> Consider an appropriate database index on the queried field, after checking the query pattern and measuring the result.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w5')">Show Why?</button>
+<div id="w5" class="why mt-3"><strong>Why?</strong> An index can avoid scanning every document/row for many lookup patterns. However, indexes are not free; they add storage and write/update overhead.</div>
+</div></div>
+
+<!-- Q6 -->
+<div class="card border mb-3">
+<div class="card-header">Q6. What is wrong with opening a new DB connection per request?</div>
+<div class="card-body">
+<div class="code">app.get("/orders", async (req, res) =&gt; {
+  const db = await connectToDatabase();
+  const orders = await db.query("SELECT * FROM orders");
+  await db.close();
+  res.json(orders);
+});</div>
+<p><strong>Question:</strong> Why is a connection pool usually a better design for a busy API?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a6')">Show Answer</button>
+<div id="a6" class="answer mt-3"><strong>Answer:</strong> A pool maintains a controlled number of reusable database connections. Requests can borrow and release connections instead of repeatedly creating new ones.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w6')">Show Why?</button>
+<div id="w6" class="why mt-3"><strong>Why?</strong> Creating connections has cost. A pool reduces repeated setup work and prevents uncontrolled connection creation.</div>
+</div></div>
+
+<!-- Q7 -->
+<div class="card border mb-3">
+<div class="card-header">Q7. How can caching reduce database load?</div>
+<div class="card-body">
+<div class="code">const cached = await redis.get("product:42");
+
+if (cached) {
+  return res.json(JSON.parse(cached));
+}
+
+const product = await Product.findById(42);
+
+await redis.setEx(
+  "product:42",
+  60,
+  JSON.stringify(product)
+);
+
+res.json(product);</div>
+<p><strong>Question:</strong> Explain the request flow and one important risk.</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a7')">Show Answer</button>
+<div id="a7" class="answer mt-3"><strong>Answer:</strong> First check Redis. If data exists, return it without querying the database. If not, query the database, store the result temporarily, and return it. A major risk is stale data if cache invalidation is not designed correctly.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w7')">Show Why?</button>
+<div id="w7" class="why mt-3"><strong>Why?</strong> Frequently requested data can be served from memory faster than repeatedly performing the same database query. The trade-off is cache consistency and invalidation complexity.</div>
+</div></div>
+
+<!-- Q8 -->
+<div class="card border mb-3">
+<div class="card-header">Q8. Why is pagination important?</div>
+<div class="card-body">
+<div class="code">app.get("/products", async (req, res) =&gt; {
+  const page = Number(req.query.page) || 1;
+  const limit = Math.min(Number(req.query.limit) || 20, 100);
+
+  const skip = (page - 1) * limit;
+
+  const products = await Product.find()
+    .skip(skip)
+    .limit(limit);
+
+  res.json(products);
+});</div>
+<p><strong>Question:</strong> Why is returning 1,000,000 products in one response a bad idea?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a8')">Show Answer</button>
+<div id="a8" class="answer mt-3"><strong>Answer:</strong> A huge result can consume database resources, server memory, CPU, network bandwidth and client memory. Pagination limits the amount of data processed and transferred per request.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w8')">Show Why?</button>
+<div id="w8" class="why mt-3"><strong>Why?</strong> Performance is affected by the entire request path: database → Node.js → network → browser. Pagination controls the size of that work.</div>
+</div></div>
+
+<!-- Q9 -->
+<div class="card border mb-3">
+<div class="card-header">Q9. What performance issue can this create?</div>
+<div class="card-body">
+<div class="code">const cache = new Map();
+
+app.get("/user/:id", async (req, res) =&gt; {
+  const user = await getUser(req.params.id);
+  cache.set(req.params.id, user);
+  res.json(user);
+});</div>
+<p><strong>Question:</strong> If user IDs are continuously different, what memory problem could happen?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a9')">Show Answer</button>
+<div id="a9" class="answer mt-3"><strong>Answer:</strong> The Map can grow continuously because entries are never removed. If the process keeps receiving new IDs, memory usage can grow significantly. This can become a memory leak or unbounded cache.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w9')">Show Why?</button>
+<div id="w9" class="why mt-3"><strong>Why?</strong> Objects stored in a reachable Map remain reachable, so garbage collection cannot remove them just because they are no longer useful to the application.</div>
+</div></div>
+
+<!-- Q10 -->
+<div class="card border mb-3">
+<div class="card-header">Q10. Rate limiting and scalability</div>
+<div class="card-body">
+<div class="code">POST /login
+POST /login
+POST /login
+...
+POST /login  // thousands of attempts</div>
+<p><strong>Question:</strong> Why should a login API use rate limiting?</p>
+<button class="btn btn-primary btn-sm btn-toggle" onclick="toggle(this,'a10')">Show Answer</button>
+<div id="a10" class="answer mt-3"><strong>Answer:</strong> Rate limiting reduces abuse such as brute-force attempts and helps protect server resources. In a multi-instance deployment, the rate-limit state often needs a shared store or infrastructure-aware design.</div>
+<button class="btn btn-outline-secondary btn-sm btn-toggle mt-2" onclick="toggle(this,'w10')">Show Why?</button>
+<div id="w10" class="why mt-3"><strong>Why?</strong> An in-memory counter inside one Node.js process does not automatically coordinate limits across several instances. A shared store such as Redis can be used when appropriate.</div>
+</div></div>
+
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-warning">5. Common Developer Mistakes</div>
+<div class="card-body">
+<ul>
+<li>Using synchronous file-system or crypto operations inside request paths without a good reason.</li>
+<li>Doing CPU-heavy calculations on the main event-loop thread.</li>
+<li>Adding indexes everywhere without checking query patterns and write cost.</li>
+<li>Creating a new database connection for every request.</li>
+<li>Using an unlimited in-memory cache.</li>
+<li>Sending huge API responses instead of using pagination or streaming.</li>
+<li>Adding caching without an invalidation or expiry strategy.</li>
+<li>Scaling horizontally without considering shared sessions, cache state and database limits.</li>
+<li>Compressing everything without measuring CPU and network trade-offs.</li>
+<li>Optimizing before measuring the actual bottleneck.</li>
+</ul>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-secondary text-white">6. Interview-Ready Comparison</div>
+<div class="card-body table-responsive">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Topic</th><th>Main purpose</th><th>Interview line</th></tr></thead>
+<tbody>
+<tr><td>Worker Threads</td><td>CPU-heavy JavaScript work</td><td>Keep suitable CPU work away from the main event loop.</td></tr>
+<tr><td>Cluster</td><td>Multiple Node processes</td><td>Use multiple processes to utilize CPU cores.</td></tr>
+<tr><td>Horizontal scaling</td><td>Add instances</td><td>Increase capacity by adding more instances.</td></tr>
+<tr><td>Vertical scaling</td><td>Increase machine resources</td><td>Give the existing machine more CPU/RAM.</td></tr>
+<tr><td>Redis cache</td><td>Fast shared data access</td><td>Reduce repeated database work for cacheable data.</td></tr>
+<tr><td>Pagination</td><td>Limit result size</td><td>Protect database, server and network from huge result sets.</td></tr>
+<tr><td>Connection pool</td><td>Reuse DB connections</td><td>Control and reuse database connections.</td></tr>
+<tr><td>Rate limiting</td><td>Control request volume</td><td>Protect APIs from abuse and excessive traffic.</td></tr>
+<tr><td>Load balancing</td><td>Distribute traffic</td><td>Send requests across healthy instances.</td></tr>
+<tr><td>Profiling</td><td>Find bottlenecks</td><td>Measure first, then optimize the real bottleneck.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-primary text-white">7. Quick Recap</div>
+<div class="card-body">
+<div class="good p-3 mb-3"><strong>Remember:</strong> Node.js performance is strongly connected to keeping the event loop responsive, avoiding unnecessary CPU/blocking work, and controlling I/O and memory.</div>
+<ul>
+<li><strong>Blocking:</strong> delays other JavaScript work.</li>
+<li><strong>Workers:</strong> useful for CPU-heavy tasks.</li>
+<li><strong>Horizontal scaling:</strong> add instances.</li>
+<li><strong>Cache:</strong> reduce repeated expensive work.</li>
+<li><strong>Pagination/streaming:</strong> control large data transfer.</li>
+<li><strong>Indexes:</strong> speed suitable database queries.</li>
+<li><strong>Pooling:</strong> reuse controlled database connections.</li>
+<li><strong>Rate limiting:</strong> control abusive or excessive traffic.</li>
+<li><strong>Profiling:</strong> measure before changing code.</li>
+</ul>
+</div>
+</section>
+
+<section class="card shadow-sm mb-4">
+<div class="card-header bg-success text-white">8. Final Interview Checklist</div>
+<div class="card-body">
+<p>Be ready to explain these without memorizing definitions:</p>
+<ul>
+<li>Why can synchronous code block Node.js?</li>
+<li>When would you choose worker threads?</li>
+<li>Cluster vs worker threads?</li>
+<li>Horizontal vs vertical scaling?</li>
+<li>Why use Redis?</li>
+<li>What makes cache invalidation difficult?</li>
+<li>Why are database indexes useful and what is their cost?</li>
+<li>Why use connection pooling?</li>
+<li>How does pagination improve API performance?</li>
+<li>What is a memory leak in Node.js?</li>
+<li>Why is rate limiting important?</li>
+<li>What does a load balancer solve?</li>
+<li>How would you investigate a slow API?</li>
+</ul>
+<div class="alert alert-info mb-0"><strong>Strong interview answer pattern:</strong> First identify the bottleneck → measure it → explain the trade-off → choose the smallest suitable optimization → measure again.</div>
+</div>
+</section>
+
+<footer class="text-center text-secondary py-3">
+Part 25 — Performance & Scalability • Node.js + Express.js Interview Preparation
+</footer>
+</div>
+
+<script>
+function toggle(button,id){
+  const el=document.getElementById(id);
+  const visible=el.style.display==="block";
+  el.style.display=visible?"none":"block";
+  const isWhy=el.classList.contains("why");
+  button.textContent=(visible?"Show ":"Hide ")+(isWhy?"Why?":"Answer");
+}
+</script>
+</body>
+</html>

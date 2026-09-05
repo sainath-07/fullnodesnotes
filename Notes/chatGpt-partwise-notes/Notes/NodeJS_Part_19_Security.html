@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Node.js Part 19 — Security</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:Arial,sans-serif;line-height:1.65}
+.hero{background:linear-gradient(135deg,#111827,#b91c1c);color:#fff;border-radius:18px}
+.card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.08);margin-bottom:24px}
+.card-header{font-weight:700;color:#fff}.blue{background:#1769aa}.green{background:#198754}.purple{background:#6f42c1}.orange{background:#d97706}.red{background:#c0392b}.dark{background:#343a40}
+.codebox{background:#17202a;color:#f8f9fa;border-radius:10px;padding:16px;overflow:auto}
+.flow{background:#eef6ff;border:1px solid #cfe5ff;border-radius:12px;padding:18px;font-weight:600;white-space:pre-line}
+.tip{border-left:5px solid #0d6efd;background:#eaf3ff;padding:14px;border-radius:8px}
+.warn{border-left:5px solid #ffc107;background:#fff8df;padding:14px;border-radius:8px}
+.danger{border-left:5px solid #dc3545;background:#fff0f1;padding:14px;border-radius:8px}
+.question{border-left:5px solid #198754;background:#f2fbf6;padding:15px;border-radius:8px}
+.answer{display:none;background:#f8f9fa;border:1px solid #dee2e6;border-radius:9px;padding:15px;margin-top:12px}
+.btn-toggle{border:1px solid #0d6efd;background:#fff;color:#0d6efd;border-radius:7px;padding:7px 14px}
+.badge-topic{font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="container py-4">
+
+<section class="hero p-4 p-md-5 mb-4">
+<h1>🟢 Part 19 — Security ⭐⭐⭐</h1>
+<p class="lead mb-2">Learn the most important security ideas for Node.js and Express applications.</p>
+<p class="mb-0">Simple English • Attack prevention • Secure configuration • Authentication security • API protection</p>
+</section>
+
+<section class="card">
+<div class="card-header blue">1. What is Web Security?</div>
+<div class="card-body">
+<p><strong>Web security</strong> means protecting an application, its users, data, and APIs from unauthorized access, malicious input, and unsafe behavior.</p>
+<div class="alert alert-info"><strong>Layman example:</strong> Think of your application as a house. Authentication checks who is entering, authorization checks which rooms they can enter, and security controls are the locks, alarms, gates, and visitor rules.</div>
+<div class="flow">Browser / Client
+      ↓
+HTTPS
+      ↓
+Security headers
+      ↓
+CORS / CSRF controls
+      ↓
+Rate limiting
+      ↓
+Input validation
+      ↓
+Authentication
+      ↓
+Authorization
+      ↓
+Application
+      ↓
+Database</div>
+<div class="tip mt-3"><strong>Interview line:</strong> “Security is a layered process. No single library or header can secure an entire application.”</div>
+</div></section>
+
+<section class="card">
+<div class="card-header red">2. CORS — Cross-Origin Resource Sharing</div>
+<div class="card-body">
+<p><strong>CORS</strong> is a browser security mechanism that controls whether a web page from one origin can make certain requests to another origin.</p>
+<p>An origin is based on the combination of <strong>scheme + host + port</strong>.</p>
+<pre class="codebox">const cors = require("cors");
+
+app.use(cors({
+  origin: "https://myfrontend.example.com"
+}));</pre>
+<div class="flow">Frontend
+https://frontend.example
+       ↓
+ API request
+       ↓
+https://api.example
+       ↓
+Browser checks CORS rules
+       ↓
+Allowed / Blocked</div>
+<div class="warn"><strong>Common mistake:</strong> Using <code>origin: "*"</code> everywhere without understanding the application's authentication and credential requirements. CORS is a browser policy; it is not a replacement for API authentication.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header orange">3. CSRF — Cross-Site Request Forgery</div>
+<div class="card-body">
+<p><strong>CSRF</strong> tricks a user's browser into sending an unwanted request to a site where the user is already authenticated.</p>
+<div class="alert alert-warning"><strong>Layman example:</strong> You are logged into your bank. A malicious page tries to make your browser send a money-transfer request. If the server accepts the browser's automatic credentials without enough protection, the unwanted action may succeed.</div>
+<p>Common defenses include:</p>
+<ul>
+<li>CSRF tokens for state-changing requests.</li>
+<li>Appropriate <code>SameSite</code> cookie settings.</li>
+<li>Checking request origin/referer where appropriate.</li>
+<li>Using a secure application architecture.</li>
+</ul>
+<div class="danger"><strong>Important:</strong> CSRF protection depends strongly on how authentication credentials are transported. Do not blindly copy one defense to every architecture.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">4. XSS — Cross-Site Scripting</div>
+<div class="card-body">
+<p><strong>XSS</strong> happens when attacker-controlled content is treated as executable HTML/JavaScript in another user's browser.</p>
+<pre class="codebox">// Dangerous pattern when userInput is untrusted:
+element.innerHTML = userInput;</pre>
+<p>Safer approaches include:</p>
+<ul>
+<li>Prefer <code>textContent</code> when inserting plain text.</li>
+<li>Escape output for its specific context.</li>
+<li>Sanitize HTML only when HTML is genuinely required.</li>
+<li>Use a suitable Content Security Policy where possible.</li>
+<li>Avoid unsafe HTML insertion APIs with untrusted data.</li>
+</ul>
+<div class="flow">Untrusted input
+      ↓
+Validation / output encoding / sanitization
+      ↓
+Safe rendering
+      ↓
+Browser</div>
+</div></section>
+
+<section class="card">
+<div class="card-header red">5. SQL Injection</div>
+<div class="card-body">
+<p><strong>SQL injection</strong> occurs when untrusted input changes the meaning of an SQL query.</p>
+<div class="danger"><strong>Dangerous idea:</strong> Building SQL statements by directly concatenating user input.</div>
+<pre class="codebox">// Bad idea
+const sql = "SELECT * FROM users WHERE email = '" + email + "'";</pre>
+<p>Use parameterized queries or prepared statements:</p>
+<pre class="codebox">// Example shape
+const result = await db.query(
+  "SELECT * FROM users WHERE email = ?",
+  [email]
+);</pre>
+<div class="tip"><strong>Interview line:</strong> “Parameterized queries keep user data separate from SQL instructions.”</div>
+</div></section>
+
+<section class="card">
+<div class="card-header red">6. NoSQL Injection</div>
+<div class="card-body">
+<p><strong>NoSQL injection</strong> can happen when an application accepts attacker-controlled objects/operators where it expected simple values.</p>
+<pre class="codebox">// Risky idea
+User.findOne(req.body);</pre>
+<p>If the API expects an email string, explicitly validate that it is a string and construct the allowed query fields yourself.</p>
+<pre class="codebox">const { email } = req.body;
+
+if (typeof email !== "string") {
+  return res.status(400).json({
+    message: "Invalid email"
+  });
+}
+
+const user = await User.findOne({ email });</pre>
+<div class="warn"><strong>Common mistake:</strong> Treating the entire request body as a database query object.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">7. HTTP Security Headers</div>
+<div class="card-body">
+<p>Security headers tell browsers how they should handle certain parts of an application.</p>
+<table class="table table-bordered">
+<tr><th>Header</th><th>Simple purpose</th></tr>
+<tr><td>Content-Security-Policy</td><td>Controls which content/resources the browser may load and execute.</td></tr>
+<tr><td>Strict-Transport-Security</td><td>Tells browsers to use HTTPS for the site for a specified period.</td></tr>
+<tr><td>X-Content-Type-Options</td><td>Helps prevent MIME-type sniffing.</td></tr>
+<tr><td>Referrer-Policy</td><td>Controls referrer information sent with requests.</td></tr>
+<tr><td>Permissions-Policy</td><td>Controls access to selected browser features.</td></tr>
+</table>
+<div class="tip">Exact headers and policies should match the application's needs. Security headers can improve defense, but they do not fix server-side authorization or injection bugs.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header green">8. Helmet</div>
+<div class="card-body">
+<p><strong>Helmet</strong> is a Node.js/Express middleware package that helps set several HTTP security headers.</p>
+<pre class="codebox">const helmet = require("helmet");
+
+app.use(helmet());</pre>
+<div class="flow">Express request
+      ↓
+helmet()
+      ↓
+Security response headers
+      ↓
+Browser</div>
+<div class="warn"><strong>Important:</strong> Installing Helmet does not make an application automatically secure. You still need validation, authentication, authorization, safe database queries, secure cookies, rate limits, and other controls.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header orange">9. Rate Limiting</div>
+<div class="card-body">
+<p><strong>Rate limiting</strong> restricts how many requests a client can make within a time period.</p>
+<div class="flow">Client
+ ↓
+100 requests / minute allowed
+ ↓
+Request #101
+ ↓
+Rate limit reached
+ ↓
+429 Too Many Requests</div>
+<pre class="codebox">const rateLimit = require("express-rate-limit");
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100
+});
+
+app.use("/api", apiLimiter);</pre>
+<p>Use stricter limits for sensitive endpoints such as login, password reset, OTP, and account recovery.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header red">10. Brute-Force Protection</div>
+<div class="card-body">
+<p>A <strong>brute-force attack</strong> repeatedly tries passwords or codes until one works.</p>
+<p>Useful defenses include:</p>
+<ul>
+<li>Rate-limit login attempts.</li>
+<li>Use strong password hashing such as bcrypt.</li>
+<li>Use sensible account/identity-based controls, not only IP-based controls.</li>
+<li>Add additional verification for suspicious activity.</li>
+<li>Protect password-reset and OTP endpoints too.</li>
+</ul>
+<div class="tip"><strong>Interview point:</strong> “Rate limiting reduces the number of guesses an attacker can make, but the design should also consider distributed attacks and account recovery flows.”</div>
+</div></section>
+
+<section class="card">
+<div class="card-header green">11. Input Validation</div>
+<div class="card-body">
+<p><strong>Validation</strong> checks whether input follows the rules your application expects.</p>
+<pre class="codebox">const { email, age } = req.body;
+
+if (typeof email !== "string" || !email.includes("@")) {
+  return res.status(400).json({ message: "Invalid email" });
+}
+
+if (!Number.isInteger(age) || age < 18) {
+  return res.status(400).json({ message: "Invalid age" });
+}</pre>
+<div class="alert alert-info"><strong>Why?</strong> Validation prevents invalid data from reaching application logic and reduces the attack surface.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">12. Input Sanitization</div>
+<div class="card-body">
+<p><strong>Sanitization</strong> transforms or removes unsafe parts of input according to the context and expected data.</p>
+<p><strong>Validation asks:</strong> “Is this allowed?”</p>
+<p><strong>Sanitization asks:</strong> “How should this input be cleaned or normalized?”</p>
+<div class="warn">Do not blindly sanitize everything. The correct defense depends on the output context: HTML, SQL, shell commands, URLs, JSON, and other contexts have different rules.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">13. Password Security</div>
+<div class="card-body">
+<ul>
+<li>Never store plain-text passwords.</li>
+<li>Use a dedicated password hashing algorithm such as bcrypt, scrypt, or Argon2.</li>
+<li>Never log passwords.</li>
+<li>Use strong password policies without making recovery impossible.</li>
+<li>Protect password reset tokens.</li>
+<li>Do not return password hashes in API responses.</li>
+<li>Consider multi-factor authentication for sensitive applications.</li>
+</ul>
+<div class="flow">Password
+ ↓
+Password hashing algorithm
+ ↓
+Salted password hash
+ ↓
+Database
+
+Login password
+ ↓
+Compare with stored hash
+ ↓
+Match / Reject</div>
+</div></section>
+
+<section class="card">
+<div class="card-header purple">14. JWT Security</div>
+<div class="card-body">
+<ul>
+<li>Use strong signing keys and keep them secret.</li>
+<li>Verify signatures on the server.</li>
+<li>Validate expiration and other required claims.</li>
+<li>Keep payloads minimal.</li>
+<li>Do not store passwords or secrets in the payload.</li>
+<li>Use short-lived access tokens where appropriate.</li>
+<li>Protect refresh tokens carefully.</li>
+<li>Plan token revocation/rotation for the application's risk level.</li>
+</ul>
+<pre class="codebox">const claims = jwt.verify(
+  token,
+  process.env.JWT_SECRET
+);
+
+// Do not simply trust:
+const decoded = jwt.decode(token);</pre>
+<div class="danger"><strong>Interview trap:</strong> <code>decode()</code> is not a security check. Verification is required before trusting signed-token claims.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header dark">15. Secrets, .env and dotenv</div>
+<div class="card-body">
+<p>Secrets include database passwords, API keys, JWT signing keys, and private credentials.</p>
+<pre class="codebox"># .env
+PORT=5000
+JWT_SECRET=use-a-strong-secret
+DATABASE_URL=...</pre>
+<pre class="codebox">require("dotenv").config();
+
+console.log(process.env.PORT);</pre>
+<div class="danger"><strong>Never commit real secrets to Git.</strong> Add <code>.env</code> to <code>.gitignore</code> and use your deployment platform's secret/environment-variable system in production.</div>
+<div class="tip">If a real secret is accidentally committed, removing the file from the latest commit is not enough. Treat the secret as exposed and rotate it.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header green">16. Secure Cookies</div>
+<div class="card-body">
+<pre class="codebox">res.cookie("refreshToken", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+});</pre>
+<table class="table table-bordered">
+<tr><th>Option</th><th>Meaning</th></tr>
+<tr><td>HttpOnly</td><td>JavaScript cannot read the cookie through normal document.cookie APIs.</td></tr>
+<tr><td>Secure</td><td>Cookie is sent only over HTTPS.</td></tr>
+<tr><td>SameSite</td><td>Controls cross-site cookie sending behavior.</td></tr>
+</table>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">17. HTTPS</div>
+<div class="card-body">
+<p><strong>HTTPS</strong> is HTTP protected by TLS. It helps provide confidentiality and integrity for data in transit and authenticates the server through certificates.</p>
+<div class="flow">Client
+ ↓
+TLS handshake
+ ↓
+Encrypted connection
+ ↓
+HTTPS request/response
+ ↓
+Server</div>
+<div class="warn"><strong>Common mistake:</strong> Thinking HTTPS protects a vulnerable server from SQL injection or broken authorization. HTTPS protects the connection; application security still matters.</div>
+</div></section>
+
+<section class="card">
+<div class="card-header orange">18. Request Size Limits</div>
+<div class="card-body">
+<p>Attackers can send extremely large request bodies to consume memory, CPU, or network resources.</p>
+<pre class="codebox">app.use(express.json({
+  limit: "100kb"
+}));</pre>
+<p>Choose limits based on the actual API. File uploads should usually use dedicated upload handling and limits rather than allowing unlimited JSON bodies.</p>
+</div></section>
+
+<section class="card">
+<div class="card-header red">19. Security Best Practices</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Input</strong><br>Validate types, ranges, lengths, and allowed values.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Database</strong><br>Use parameterized SQL and safe NoSQL query construction.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Authentication</strong><br>Hash passwords and protect tokens.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Authorization</strong><br>Check permissions on the server.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Transport</strong><br>Use HTTPS and secure cookies.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Abuse</strong><br>Use rate limits and brute-force protection.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Secrets</strong><br>Keep credentials out of source control.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Dependencies</strong><br>Keep packages updated and review security advisories.</div></div>
+</div>
+</div></section>
+
+<section class="card">
+<div class="card-header dark">20. Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Using CORS as if it were authentication.</li>
+<li>Using <code>Access-Control-Allow-Origin: *</code> without understanding the application's needs.</li>
+<li>Storing plain-text passwords.</li>
+<li>Putting secrets inside JWT payloads.</li>
+<li>Using <code>jwt.decode()</code> and treating the result as trusted.</li>
+<li>Putting real secrets directly in source code.</li>
+<li>Committing <code>.env</code> to Git.</li>
+<li>Using weak JWT secrets.</li>
+<li>Not rate-limiting login and password-reset endpoints.</li>
+<li>Trusting the entire request body as a database query.</li>
+<li>Building SQL queries with string concatenation.</li>
+<li>Using <code>innerHTML</code> with untrusted content.</li>
+<li>Relying only on frontend authorization.</li>
+<li>Not limiting request body size.</li>
+<li>Assuming Helmet alone secures an application.</li>
+<li>Sending authentication cookies without appropriate security attributes.</li>
+<li>Logging passwords, tokens, API keys, or sensitive personal data.</li>
+</ol>
+</div></section>
+
+<section class="card">
+<div class="card-header blue">21. Quick Recap</div>
+<div class="card-body">
+<ul>
+<li><strong>CORS:</strong> browser cross-origin access control.</li>
+<li><strong>CSRF:</strong> unwanted authenticated actions caused through a user's browser.</li>
+<li><strong>XSS:</strong> attacker-controlled content executes in a user's browser.</li>
+<li><strong>SQL injection:</strong> untrusted input changes SQL meaning.</li>
+<li><strong>NoSQL injection:</strong> untrusted query objects/operators change database behavior.</li>
+<li><strong>Helmet:</strong> helps configure security-related HTTP headers.</li>
+<li><strong>Rate limiting:</strong> limits request frequency.</li>
+<li><strong>Validation:</strong> checks whether input is allowed.</li>
+<li><strong>Sanitization:</strong> cleans/transforms input for a specific context.</li>
+<li><strong>HTTPS:</strong> protects data in transit using TLS.</li>
+<li><strong>Secure cookies:</strong> use appropriate HttpOnly, Secure, and SameSite settings.</li>
+<li><strong>Secrets:</strong> keep them outside source code and rotate exposed credentials.</li>
+</ul>
+</div></section>
+
+<section class="card">
+<div class="card-header green">22. Interview-Ready Checklist ⭐⭐⭐</div>
+<div class="card-body">
+<div class="alert alert-success">
+<strong>Be ready to explain:</strong>
+<ul class="mb-0">
+<li>CORS vs CSRF.</li>
+<li>XSS and how output encoding helps.</li>
+<li>SQL injection and parameterized queries.</li>
+<li>NoSQL injection.</li>
+<li>Helmet and security headers.</li>
+<li>Rate limiting and brute-force protection.</li>
+<li>Validation vs sanitization.</li>
+<li>Password hashing.</li>
+<li>JWT verification and secure token handling.</li>
+<li>Why JWT payloads are not secret.</li>
+<li>Secrets and environment variables.</li>
+<li>HttpOnly, Secure, and SameSite.</li>
+<li>Why HTTPS is required.</li>
+<li>Request body size limits.</li>
+<li>Defense in depth.</li>
+</ul>
+</div>
+</div></section>
+
+<section class="card">
+<div class="card-header dark">23. Interview Questions — Show / Hide Answers</div>
+<div class="card-body">
+
+<div class="question mb-3"><strong>Q1. What is CORS? Is CORS an authentication mechanism?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="answer"><strong>Answer:</strong> CORS controls which browser origins are allowed to access resources across origins. It is not authentication.<br><strong>Why?</strong> An API must still authenticate and authorize users even when CORS is configured.</div></div>
+
+<div class="question mb-3"><strong>Q2. What is the difference between CORS and CSRF?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="answer"><strong>Answer:</strong> CORS controls browser cross-origin access. CSRF is an attack where a victim's browser is tricked into making an unwanted authenticated request.<br><strong>Why?</strong> They solve different security problems.</div></div>
+
+<div class="question mb-3"><strong>Q3. How does XSS happen?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="answer"><strong>Answer:</strong> XSS can happen when untrusted input is inserted into a page in a way that allows it to be interpreted as executable HTML/JavaScript.<br><strong>Why?</strong> The browser may execute attacker-controlled code in the application's security context.</div></div>
+
+<div class="question mb-3"><strong>Q4. Find the security problem.</strong>
+<pre class="codebox mt-2">element.innerHTML = req.body.comment;</pre>
+<button class="btn-toggle" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="answer"><strong>Answer:</strong> Untrusted input is being inserted as HTML.<br><strong>Fix:</strong> Use <code>textContent</code> for plain text, or use a carefully designed sanitization/encoding strategy when HTML is required.<br><strong>Why?</strong> Unsafe HTML insertion can create an XSS vulnerability.</div></div>
+
+<div class="question mb-3"><strong>Q5. Why are parameterized SQL queries safer?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="answer"><strong>Answer:</strong> They keep user data separate from SQL instructions.<br><strong>Why?</strong> User input is treated as data instead of changing the structure of the SQL statement.</div></div>
+
+<div class="question mb-3"><strong>Q6. Find the SQL injection problem.</strong>
+<pre class="codebox mt-2">const sql = "SELECT * FROM users WHERE name = '" + req.query.name + "'";</pre>
+<button class="btn-toggle" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="answer"><strong>Answer:</strong> User input is directly concatenated into SQL.<br><strong>Fix:</strong> Use the database driver's parameterized query/prepared statement mechanism.<br><strong>Why?</strong> Direct concatenation allows input to affect SQL syntax.</div></div>
+
+<div class="question mb-3"><strong>Q7. What is NoSQL injection?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="answer"><strong>Answer:</strong> It occurs when attacker-controlled values are interpreted as database operators or query objects instead of the simple data the API expected.<br><strong>Why?</strong> A query can behave differently from the developer's intended filter.</div></div>
+
+<div class="question mb-3"><strong>Q8. Find the risky NoSQL pattern.</strong>
+<pre class="codebox mt-2">const user = await User.findOne(req.body);</pre>
+<button class="btn-toggle" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="answer"><strong>Answer:</strong> The entire request body becomes the query object.<br><strong>Fix:</strong> Validate the expected fields and construct the query explicitly.<br><strong>Why?</strong> Attackers may supply unexpected operators or fields.</div></div>
+
+<div class="question mb-3"><strong>Q9. What does Helmet do?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="answer"><strong>Answer:</strong> Helmet helps an Express application set several security-related HTTP response headers.<br><strong>Why?</strong> These headers can enable browser-side protections and safer defaults, but they do not replace application-level security.</div></div>
+
+<div class="question mb-3"><strong>Q10. What is rate limiting and why is it important for login APIs?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="answer"><strong>Answer:</strong> Rate limiting restricts how many requests a client can make in a period. Login endpoints benefit because it slows repeated password guesses.<br><strong>Why?</strong> It reduces the number of brute-force attempts an attacker can make.</div></div>
+
+<div class="question mb-3"><strong>Q11. What is the difference between validation and sanitization?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="answer"><strong>Answer:</strong> Validation checks whether input meets expected rules. Sanitization transforms or removes unsafe content according to a specific context.<br><strong>Why?</strong> They address different parts of safe input handling.</div></div>
+
+<div class="question mb-3"><strong>Q12. Why should passwords be hashed?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="answer"><strong>Answer:</strong> Passwords should be stored using a dedicated password hashing algorithm such as bcrypt, scrypt, or Argon2 rather than plain text.<br><strong>Why?</strong> If the database is exposed, attackers should not immediately receive users' original passwords.</div></div>
+
+<div class="question mb-3"><strong>Q13. Is this JWT handling safe?</strong>
+<pre class="codebox mt-2">const payload = jwt.decode(token);
+if (payload.role === "admin") {
+  deleteUser();
+}</pre>
+<button class="btn-toggle" onclick="toggle('a13',this)">Show Answer</button>
+<div id="a13" class="answer"><strong>Answer:</strong> No. The code decodes the token without verifying its signature.<br><strong>Fix:</strong> Verify the JWT first, then use trusted claims from the verified result.<br><strong>Why?</strong> Decoding does not prove the token was issued by the trusted server.</div></div>
+
+<div class="question mb-3"><strong>Q14. Why should JWT payloads not contain passwords?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a14',this)">Show Answer</button>
+<div id="a14" class="answer"><strong>Answer:</strong> A normal JWT payload is readable by anyone holding the token.<br><strong>Why?</strong> JWT encoding is not the same as encryption.</div></div>
+
+<div class="question mb-3"><strong>Q15. Why should .env not be committed to Git?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a15',this)">Show Answer</button>
+<div id="a15" class="answer"><strong>Answer:</strong> It may contain passwords, API keys, database credentials, or signing secrets.<br><strong>Why?</strong> Source repositories can be copied, logged, or accessed by people who should not receive those credentials.</div></div>
+
+<div class="question mb-3"><strong>Q16. What should you do if a secret is committed to Git?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a16',this)">Show Answer</button>
+<div id="a16" class="answer"><strong>Answer:</strong> Treat it as exposed and rotate/revoke it immediately, then clean up repository history as appropriate.<br><strong>Why?</strong> Removing the visible line later does not guarantee that old copies, forks, caches, or clones no longer contain the secret.</div></div>
+
+<div class="question mb-3"><strong>Q17. What do HttpOnly, Secure, and SameSite mean?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a17',this)">Show Answer</button>
+<div id="a17" class="answer"><strong>Answer:</strong> HttpOnly limits JavaScript access, Secure restricts sending to HTTPS, and SameSite controls cross-site cookie sending behavior.<br><strong>Why?</strong> These attributes provide important protections for authentication cookies.</div></div>
+
+<div class="question mb-3"><strong>Q18. Why is HTTPS not enough to secure an API?</strong><br>
+<button class="btn-toggle mt-2" onclick="toggle('a18',this)">Show Answer</button>
+<div id="a18" class="answer"><strong>Answer:</strong> HTTPS protects data in transit, but it does not prevent SQL injection, broken authorization, weak passwords, XSS, or insecure business logic.<br><strong>Why?</strong> Transport security and application security solve different problems.</div></div>
+
+<div class="question mb-3"><strong>Q19. What problem does this configuration help prevent?</strong>
+<pre class="codebox mt-2">app.use(express.json({ limit: "100kb" }));</pre>
+<button class="btn-toggle" onclick="toggle('a19',this)">Show Answer</button>
+<div id="a19" class="answer"><strong>Answer:</strong> It limits the size of JSON request bodies accepted by that parser.<br><strong>Why?</strong> Reasonable request limits reduce resource-abuse risk from unexpectedly large payloads.</div></div>
+
+<div class="question mb-3"><strong>Q20. Design a secure login endpoint. What protections would you add?</strong><br>
+<button class="btn-toggle" onclick="toggle('a20',this)">Show Answer</button>
+<div id="a20" class="answer"><strong>Answer:</strong><div class="flow">HTTPS
+ ↓
+Request size limit
+ ↓
+Input validation
+ ↓
+Rate limiting
+ ↓
+Find user
+ ↓
+bcrypt password comparison
+ ↓
+Create short-lived access token
+ ↓
+Secure refresh-token handling
+ ↓
+Log safely — never passwords/tokens
+</div><strong>Why?</strong> Security is defense in depth. Multiple controls reduce the chance that one mistake becomes a complete account compromise.</div></div>
+
+</div></section>
+
+<section class="card">
+<div class="card-header dark">24. Final Interview Lines</div>
+<div class="card-body">
+<ul>
+<li><strong>CORS:</strong> “CORS is a browser cross-origin access control mechanism, not authentication.”</li>
+<li><strong>CSRF:</strong> “CSRF tricks an authenticated browser into making an unwanted state-changing request.”</li>
+<li><strong>XSS:</strong> “XSS occurs when untrusted content is executed as script in a user's browser.”</li>
+<li><strong>SQL injection:</strong> “Use parameterized queries so user input remains data, not SQL syntax.”</li>
+<li><strong>NoSQL injection:</strong> “Validate expected types and construct database queries explicitly.”</li>
+<li><strong>Helmet:</strong> “Helmet helps set security-related HTTP headers in Express.”</li>
+<li><strong>Rate limiting:</strong> “Rate limits reduce abuse and brute-force attempts.”</li>
+<li><strong>JWT:</strong> “Verify JWTs before trusting their claims; decoding alone is not authentication.”</li>
+<li><strong>Secrets:</strong> “Keep secrets outside source code and rotate them if exposed.”</li>
+<li><strong>HTTPS:</strong> “HTTPS protects data in transit, but it does not fix application vulnerabilities.”</li>
+<li><strong>Defense in depth:</strong> “Use multiple independent security layers instead of depending on one control.”</li>
+</ul>
+</div></section>
+
+<footer class="text-center text-secondary py-4">
+<strong>Node.js Interview Preparation — Part 19</strong><br>
+Security • Learn the attack, the defense, and the reason behind the defense.
+</footer>
+</div>
+<script>
+function toggle(id,btn){
+ const el=document.getElementById(id);
+ const open=el.style.display==="block";
+ el.style.display=open?"none":"block";
+ btn.textContent=open?"Show Answer":"Hide Answer";
+}
+</script>
+</body>
+</html>

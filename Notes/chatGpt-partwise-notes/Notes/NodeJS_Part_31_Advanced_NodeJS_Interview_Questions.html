@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 31 — Advanced Node.js Interview Questions</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#172033;font-family:Arial,sans-serif}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:white}
+.card{border:0;border-radius:14px;overflow:hidden}
+.card-header{font-weight:700}
+pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:10px;overflow:auto}
+code{color:#d63384}.diagram{background:#eef4ff;border:1px solid #cbdcfb;border-radius:12px;padding:16px;font-family:monospace;white-space:pre-wrap}
+.btn-toggle{min-width:130px}
+.small-label{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}
+.tip{border-left:5px solid #0d6efd;background:#eef6ff}
+.warn{border-left:5px solid #ffc107;background:#fff8df}
+</style>
+</head>
+<body>
+
+<header class="hero py-5 mb-4">
+<div class="container">
+<div class="small-label text-white-50">Node.js Interview Mastery</div>
+<h1 class="display-5 fw-bold">🔥 Part 31 — Advanced Node.js Interview Questions ⭐⭐⭐</h1>
+<p class="lead mb-0">Output questions and practical interview problems that combine the Node.js topics you studied.</p>
+</div>
+</header>
+
+<main class="container pb-5">
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white">How to Use This Lesson</div>
+<div class="card-body">
+<p>Do not try to memorize the answers. First predict the result, explain the execution flow, and then open the answer.</p>
+<div class="alert alert-info"><strong>Interview rule:</strong> For output questions, explain <em>why</em> the output happens. Interviewers usually care more about your reasoning than memorizing an output.</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white">Visual: Node.js Request + Async Flow</div>
+<div class="card-body">
+<div class="diagram">Client
+  ↓
+Express middleware
+  ↓
+Route handler
+  ↓
+Async operation ─────────→ OS / DB / File / Network
+  ↓                         ↓
+Response ←──── callback / promise result
+  ↓
+Event loop schedules JavaScript work
+
+CPU-heavy work
+  ↓
+Worker Thread / separate process
+  ↓
+Result back to main process</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-success text-white">Before You Answer: Mental Model</div>
+<div class="card-body">
+<ul>
+<li><strong>Call stack:</strong> runs JavaScript code currently being executed.</li>
+<li><strong>Event loop:</strong> helps Node.js schedule asynchronous callbacks.</li>
+<li><strong>nextTick:</strong> Node-specific queue with very high priority.</li>
+<li><strong>Promise microtasks:</strong> run after the current synchronous work and according to Node's scheduling rules.</li>
+<li><strong>Timers:</strong> become eligible after their delay; the delay is not a guaranteed execution time.</li>
+<li><strong>Streams:</strong> process data in chunks and can control memory through backpressure.</li>
+<li><strong>Workers:</strong> useful for CPU-heavy JavaScript work.</li>
+<li><strong>Cluster:</strong> uses multiple Node.js processes, giving process isolation.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- Question template -->
+<div id="questions"></div>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-warning">Quick Recap</div>
+<div class="card-body">
+<ul>
+<li>Do not confuse <code>process.nextTick()</code> with browser-style microtasks.</li>
+<li><code>setTimeout(fn, 0)</code> does not mean “run immediately.”</li>
+<li><code>setImmediate()</code> and timers can have different ordering depending on context.</li>
+<li>Backpressure prevents a fast producer from overwhelming a slower consumer.</li>
+<li>EventEmitter listeners run synchronously when an event is emitted.</li>
+<li>Promises provide concurrency tools such as <code>all</code>, <code>allSettled</code>, <code>race</code>, and <code>any</code>.</li>
+<li>Worker threads handle CPU-heavy JavaScript without blocking the main event loop.</li>
+<li>Cluster creates separate Node.js processes.</li>
+<li>Middleware order matters because Express processes middleware in registration order.</li>
+<li>Graceful shutdown means stopping new work, finishing important work, closing resources, and then exiting.</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-info">Interview-Ready Speaking Points</div>
+<div class="card-body">
+<div class="alert tip"><strong>Strong answer style:</strong> “First I identify synchronous code. Then I identify which queue or phase receives each asynchronous callback. Finally I explain when the event loop gets a chance to execute it.”</div>
+<ul>
+<li>“Node.js is single-threaded for normal JavaScript execution, but it can use the OS and other threads for asynchronous work.”</li>
+<li>“Backpressure is a flow-control mechanism that prevents a producer from sending data faster than the consumer can handle.”</li>
+<li>“EventEmitter is synchronous by default: listeners execute during the <code>emit()</code> call.”</li>
+<li>“Worker threads are for CPU-intensive JavaScript; ordinary I/O usually does not need a worker.”</li>
+<li>“Cluster gives multiple processes, while worker threads give multiple threads inside a process.”</li>
+<li>“Express middleware is order-dependent.”</li>
+<li>“Graceful shutdown protects in-flight requests and closes resources instead of killing the process immediately.”</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-danger text-white">Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Assuming a timer delay is an exact execution time.</li>
+<li>Using CPU-heavy loops on the main thread and blocking every request.</li>
+<li>Calling <code>process.nextTick()</code> recursively and starving the event loop.</li>
+<li>Ignoring stream backpressure.</li>
+<li>Adding EventEmitter listeners repeatedly without removing them.</li>
+<li>Using <code>Promise.all()</code> when partial success is required.</li>
+<li>Starting a worker for simple I/O work and adding unnecessary complexity.</li>
+<li>Assuming cluster shares all memory between workers.</li>
+<li>Registering a broad Express route or middleware before a more specific route.</li>
+<li>Returning detailed internal errors to production clients.</li>
+<li>Exiting immediately on SIGTERM instead of performing graceful shutdown.</li>
+</ol>
+</div>
+</div>
+</section>
+
+</main>
+
+<script>
+const qs = [
+{
+n:1,t:"Event Loop Output",d:"Predict the output order.",
+c:`console.log("A");
+
+setTimeout(() => console.log("B"), 0);
+
+Promise.resolve().then(() => console.log("C"));
+
+process.nextTick(() => console.log("D"));
+
+console.log("E");`,
+a:`A
+E
+D
+C
+B`,
+w:"A and E are synchronous. process.nextTick() runs before Promise microtasks in Node.js. The timer runs later when the timers phase gets a chance to execute it."
+},
+{
+n:2,t:"nextTick() vs Promise",d:"Which callback runs first?",
+c:`Promise.resolve().then(() => console.log("Promise"));
+
+process.nextTick(() => console.log("nextTick"));`,
+a:"nextTick\nPromise",
+w:"In Node.js, process.nextTick() callbacks have priority over the Promise microtask queue after the current JavaScript execution completes."
+},
+{
+n:3,t:"setTimeout() vs setImmediate()",d:"Is this output guaranteed?",
+c:`setTimeout(() => console.log("timeout"), 0);
+setImmediate(() => console.log("immediate"));`,
+a:"No single order is guaranteed in this top-level example.",
+w:"Both are scheduled asynchronously. Their relative order can depend on the environment and timing. Inside an I/O callback, setImmediate() commonly runs before a zero-delay timer."
+},
+{
+n:4,t:"setImmediate() inside I/O",d:"Which one normally runs first?",
+c:`const fs = require("node:fs");
+
+fs.readFile(__filename, () => {
+  setTimeout(() => console.log("timeout"), 0);
+  setImmediate(() => console.log("immediate"));
+});`,
+a:"immediate\ntimeout",
+w:"The callback is executing from an I/O cycle. setImmediate() is designed for execution in the check phase after the poll phase, so it normally runs before the timer scheduled from that callback."
+},
+{
+n:5,t:"Streams + Backpressure",d:"Why is this safer than manually pushing unlimited chunks?",
+c:`const fs = require("node:fs");
+
+const source = fs.createReadStream("large.log");
+const destination = fs.createWriteStream("copy.log");
+
+source.pipe(destination);`,
+a:"pipe() manages the flow between the readable and writable streams.",
+w:"When the writable stream cannot keep up, Node.js can pause the readable side and resume it when the destination is ready. This is the core idea of backpressure."
+},
+{
+n:6,t:"EventEmitter Listener Order",d:"What is printed?",
+c:`const { EventEmitter } = require("node:events");
+const e = new EventEmitter();
+
+e.on("login", () => console.log("first"));
+e.on("login", () => console.log("second"));
+
+console.log("before");
+e.emit("login");
+console.log("after");`,
+a:"before\nfirst\nsecond\nafter",
+w:"EventEmitter listeners execute synchronously by default and in registration order."
+},
+{
+n:7,t:"EventEmitter Memory Warning",d:"Why can this become a problem?",
+c:`setInterval(() => {
+  emitter.on("data", handler);
+}, 1000);`,
+a:"A new listener is added every second.",
+w:"Repeatedly adding listeners without removing them can cause listener growth, duplicated work, and memory problems. EventEmitter may warn when too many listeners are attached to one event."
+},
+{
+n:8,t:"Closure + Timer",d:"What is printed?",
+c:`function createTimer() {
+  let count = 0;
+
+  return () => {
+    count++;
+    console.log(count);
+  };
+}
+
+const timer = createTimer();
+
+setTimeout(timer, 0);
+setTimeout(timer, 0);`,
+a:"1\n2",
+w:"The returned function closes over count. Both timer callbacks use the same closed-over variable, so the first call changes it to 1 and the second changes it to 2."
+},
+{
+n:9,t:"Promise Concurrency",d:"How many seconds approximately?",
+c:`const wait = ms => new Promise(r => setTimeout(r, ms));
+
+await Promise.all([
+  wait(1000),
+  wait(2000),
+  wait(1500)
+]);`,
+a:"About 2 seconds.",
+w:"The three operations start together. Promise.all() waits for the slowest operation, not the sum of all delays."
+},
+{
+n:10,t:"Sequential vs Parallel",d:"Which version is faster for independent requests?",
+c:`const a = await getA();
+const b = await getB();
+const c = await getC();`,
+a:"For independent operations, a parallel form is usually faster:\nconst [a,b,c] = await Promise.all([getA(), getB(), getC()]);",
+w:"The sequential version waits for each operation before starting the next. Promise.all() can start independent operations together."
+},
+{
+n:11,t:"Async Race Condition",d:"What is the bug in this search UI?",
+c:`async function search(term) {
+  const result = await api.search(term);
+  results.innerHTML = render(result);
+}
+
+search("java");
+search("javascript");`,
+a:"An older request may finish after the newer request and overwrite the UI.",
+w:"Network completion order is not guaranteed. A common fix is cancellation with AbortController or tracking a request ID and ignoring stale responses."
+},
+{
+n:12,t:"Worker Threads",d:"When should a worker thread be considered?",
+c:`for (let i = 0; i < 10_000_000_000; i++) {
+  // expensive calculation
+}`,
+a:"Move the CPU-heavy calculation to a worker thread when it would block the main event loop.",
+w:"CPU-heavy JavaScript keeps the main thread busy and prevents it from serving other callbacks efficiently. Worker threads allow the calculation to run separately."
+},
+{
+n:13,t:"Cluster",d:"What is the main difference from a worker thread?",
+c:`// cluster
+Primary process
+  ├── Worker process
+  ├── Worker process
+  └── Worker process`,
+a:"Cluster uses multiple Node.js processes. Worker threads use multiple threads within a process.",
+w:"Processes have separate memory spaces, which gives stronger isolation. Worker threads can share memory using mechanisms such as SharedArrayBuffer."
+},
+{
+n:14,t:"Module Caching",d:"Why can this print the same counter value?",
+c:`// counter.js
+let count = 0;
+module.exports = () => ++count;
+
+// a.js
+const counter = require("./counter");
+console.log(counter());
+
+// b.js
+const counter = require("./counter");
+console.log(counter());`,
+a:"1\n2",
+w:"CommonJS caches a successfully loaded module. Both files receive the same cached module instance, so the closed-over count is shared."
+},
+{
+n:15,t:"Circular Dependencies",d:"Why are circular dependencies risky?",
+c:`a.js → require("./b")
+b.js → require("./a")`,
+a:"A module may receive a partially initialized export.",
+w:"Module A starts loading B while B starts loading A. Because the modules are not fully initialized yet, one side can observe incomplete exports. Avoid cycles or redesign the dependency structure."
+},
+{
+n:16,t:"Express Middleware Order",d:"Which response is sent?",
+c:`app.use((req, res, next) => {
+  console.log("middleware");
+  next();
+});
+
+app.get("/users", (req, res) => {
+  res.json({ ok: true });
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: "Not found" });
+});`,
+a:"GET /users → middleware → { ok: true }",
+w:"Express runs middleware and routes in registration order. The 404 handler is reached only when earlier handlers do not finish the response."
+},
+{
+n:17,t:"Async Middleware Error",d:"What should an Express application do with an async failure?",
+c:`app.get("/users", async (req, res, next) => {
+  try {
+    const users = await getUsers();
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
+});`,
+a:"Pass the error to the error-handling middleware with next(err).",
+w:"Centralized error middleware can then create a consistent HTTP response and log the failure. Do not silently ignore rejected promises."
+},
+{
+n:18,t:"Authentication Middleware",d:"Where should authentication usually happen?",
+c:`app.use(authenticate);
+
+app.get("/profile", controller);`,
+a:"The authentication middleware can verify the request before the controller runs.",
+w:"Authentication is a cross-cutting concern. Putting it before protected handlers prevents unauthenticated requests from reaching business logic."
+},
+{
+n:19,t:"Request Lifecycle",d:"Give the correct high-level flow.",
+c:`Client → ? → ? → ? → Database/Service → ? → Client`,
+a:"Client → middleware → route/controller → service/database → response → Client",
+w:"A request normally passes through middleware, reaches a matching route handler/controller, performs business work, and sends a response. Exact architecture varies by application."
+},
+{
+n:20,t:"Graceful Shutdown",d:"What should happen after SIGTERM?",
+c:`process.on("SIGTERM", async () => {
+  // shutdown
+});`,
+a:"Stop accepting new work, allow important in-flight work to finish when practical, close servers and resources, then exit.",
+w:"Immediate process termination can drop active requests and leave resources in a bad state. Graceful shutdown makes deployments and restarts safer."
+}
+];
+
+const root=document.getElementById("questions");
+qs.forEach(q=>{
+  root.insertAdjacentHTML("beforeend",`
+  <section class="mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">Question ${q.n}: ${q.t}</div>
+      <div class="card-body">
+        <p class="fw-semibold">${q.d}</p>
+        <pre><code>${escapeHtml(q.c)}</code></pre>
+        <button class="btn btn-outline-primary btn-sm btn-toggle" onclick="toggle('a${q.n}')">Show Answer</button>
+        <button class="btn btn-outline-secondary btn-sm btn-toggle ms-2" onclick="toggle('w${q.n}')">Show Why?</button>
+        <div id="a${q.n}" class="alert alert-success mt-3 d-none"><strong>Answer:</strong><pre class="mt-2 mb-0"><code>${escapeHtml(q.a)}</code></pre></div>
+        <div id="w${q.n}" class="alert alert-info mt-3 d-none"><strong>Why?</strong><br>${q.w}</div>
+      </div>
+    </div>
+  </section>`);
+});
+function escapeHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function toggle(id){
+ const el=document.getElementById(id);
+ el.classList.toggle("d-none");
+ const btn=event.currentTarget;
+ if(id.startsWith("a")) btn.textContent=el.classList.contains("d-none")?"Show Answer":"Hide Answer";
+ else btn.textContent=el.classList.contains("d-none")?"Show Why?":"Hide Why?";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 17 — REST API Development | Interview Ready</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#263238;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.hero{background:linear-gradient(135deg,#0d6efd,#174ea6);color:#fff}
+.section-card{border:0;border-radius:14px;overflow:hidden}
+.card-header{font-weight:700}
+pre{background:#17202a;color:#e8f1f8;padding:16px;border-radius:10px;overflow:auto}
+code{color:#d63384}
+.btn-toggle{min-width:145px}
+.diagram{background:#eef5ff;border-left:5px solid #0d6efd;border-radius:10px;padding:18px}
+.tip{border-left:5px solid #198754}
+.warn{border-left:5px solid #ffc107}
+.qnum{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#0d6efd;color:white;font-weight:700}
+.small-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6c757d}
+</style>
+</head>
+<body>
+<header class="hero py-5 mb-4">
+<div class="container">
+<div class="badge bg-warning text-dark mb-3">Node.js + Express.js Interview Preparation</div>
+<h1 class="display-5 fw-bold">Part 17 — REST API Development</h1>
+<p class="lead mb-1">Interview-ready concepts, code questions, answers and “Why?” explanations.</p>
+<p class="mb-0">Target: MAANG, FANG and strong MNC interviews • Simple English • Output/code focused</p>
+</div>
+</header>
+
+<main class="container pb-5">
+
+<section class="mb-4">
+<div class="alert alert-primary shadow-sm"><strong>Interview goal:</strong> Do not only memorize HTTP methods. Be able to design a clean API, choose the correct method and status code, validate input, handle errors, and explain pagination, filtering, sorting and searching.</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-dark text-white">1. REST — What, Why and How?</div>
+<div class="card-body">
+<p><strong>What?</strong> REST (Representational State Transfer) is a set of design principles for building web APIs around resources.</p>
+<p><strong>Why?</strong> It gives clients and servers a simple, predictable way to communicate over HTTP.</p>
+<p><strong>Layman example:</strong> Think of a library. A book is a resource. You can list books, get one book, add a book, update it or remove it.</p>
+<div class="diagram text-center fw-semibold">
+Client → HTTP Request → REST API → Business Logic → Database<br>
+Database → REST API → HTTP Response → Client
+</div>
+<p class="mt-3"><strong>Good resource naming:</strong> <code>/users</code>, <code>/users/42</code>, <code>/users/42/orders</code></p>
+<div class="alert alert-warning mt-3 mb-0"><strong>Mistake:</strong> Avoid action-heavy URLs such as <code>/getUsers</code> or <code>/deleteUser/42</code>. Prefer the resource name and let the HTTP method describe the action.</div>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-primary text-white">2. HTTP Methods + CRUD</div>
+<div class="card-body">
+<div class="table-responsive"><table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Method</th><th>Typical purpose</th><th>Example</th><th>Common success</th></tr></thead>
+<tbody>
+<tr><td>GET</td><td>Read resource(s)</td><td><code>GET /users/42</code></td><td>200</td></tr>
+<tr><td>POST</td><td>Create a resource / trigger a non-idempotent operation</td><td><code>POST /users</code></td><td>201</td></tr>
+<tr><td>PUT</td><td>Replace a resource representation</td><td><code>PUT /users/42</code></td><td>200 / 204</td></tr>
+<tr><td>PATCH</td><td>Partially update a resource</td><td><code>PATCH /users/42</code></td><td>200 / 204</td></tr>
+<tr><td>DELETE</td><td>Remove a resource</td><td><code>DELETE /users/42</code></td><td>204 / 200</td></tr>
+</tbody></table></div>
+<div class="alert alert-info"><strong>Interview point:</strong> PUT is normally used as a replacement operation and is idempotent. PATCH is intended for partial changes and may or may not be idempotent depending on the operation design.</div>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-success text-white">3. HTTP Status Codes You Must Know</div>
+<div class="card-body">
+<ul>
+<li><strong>200 OK</strong> — successful request with a response body.</li>
+<li><strong>201 Created</strong> — a new resource was created.</li>
+<li><strong>204 No Content</strong> — successful request with no response body.</li>
+<li><strong>400 Bad Request</strong> — invalid request data or malformed input.</li>
+<li><strong>401 Unauthorized</strong> — authentication is missing or invalid.</li>
+<li><strong>403 Forbidden</strong> — identity is known, but access is not allowed.</li>
+<li><strong>404 Not Found</strong> — requested resource does not exist.</li>
+<li><strong>409 Conflict</strong> — request conflicts with current resource state, such as a duplicate unique value.</li>
+<li><strong>422 Unprocessable Content</strong> — syntactically valid request but validation/business rules fail.</li>
+<li><strong>429 Too Many Requests</strong> — rate limit exceeded.</li>
+<li><strong>500 Internal Server Error</strong> — unexpected server-side failure.</li>
+</ul>
+<div class="alert alert-danger mb-0"><strong>Common mistake:</strong> Do not return <code>200</code> for every failure and put “error” in the JSON. HTTP status codes are part of the API contract.</div>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-info text-dark">4. Request Headers, Body and JSON</div>
+<div class="card-body">
+<p><strong>Headers</strong> carry metadata such as authentication, content type and client information.</p>
+<pre>Authorization: Bearer &lt;token&gt;
+Content-Type: application/json</pre>
+<p><strong>Request body</strong> carries data sent to the server, commonly with POST, PUT and PATCH.</p>
+<pre>{
+  "name": "Sam",
+  "email": "sam@example.com"
+}</pre>
+<p><strong>Response body</strong> contains the result sent back to the client.</p>
+<pre>{
+  "id": 42,
+  "name": "Sam"
+}</pre>
+<div class="alert alert-warning mb-0"><strong>Security tip:</strong> Never trust client input. Authentication, authorization and validation must happen on the server.</div>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-secondary text-white">5. REST Naming Rules</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="alert alert-success h-100"><strong>Good</strong><br><code>/users</code><br><code>/users/42</code><br><code>/users/42/orders</code><br><code>/products?category=books</code></div></div>
+<div class="col-md-6"><div class="alert alert-danger h-100"><strong>Avoid</strong><br><code>/getUsers</code><br><code>/createUser</code><br><code>/deleteUser/42</code><br><code>/userData</code> when the resource is users</div></div>
+</div>
+<p class="mb-0"><strong>Rule:</strong> Use nouns for resources; use HTTP methods for actions. Keep naming consistent and predictable.</p>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-warning">6. CRUD API Example in Express</div>
+<div class="card-body">
+<pre>const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+app.get("/users", (req, res) => {
+  res.status(200).json([{ id: 1, name: "Sam" }]);
+});
+
+app.post("/users", (req, res) => {
+  const user = { id: 2, ...req.body };
+  res.status(201).json(user);
+});
+
+app.patch("/users/:id", (req, res) => {
+  res.status(200).json({ id: req.params.id, ...req.body });
+});
+
+app.delete("/users/:id", (req, res) => {
+  res.status(204).end();
+});
+
+app.listen(3000);</pre>
+<div class="diagram"><strong>Flow:</strong> Client → Route matching → Validation → Controller/service → Database → Response</div>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-primary text-white">7. Validation and API Errors</div>
+<div class="card-body">
+<p>Validation checks whether incoming data follows the API rules before business logic or database work continues.</p>
+<pre>app.post("/users", (req, res) => {
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({
+      error: "name and email are required"
+    });
+  }
+
+  res.status(201).json({ name, email });
+});</pre>
+<p><strong>Why return after sending the error?</strong> It stops the handler from continuing and potentially sending another response.</p>
+<div class="alert alert-danger mb-0"><strong>Mistake:</strong> Validation is not only a frontend job. A user can call your API directly without using your UI.</div>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-success text-white">8. Pagination, Filtering, Sorting and Searching</div>
+<div class="card-body">
+<p>These are usually implemented with query parameters.</p>
+<pre>GET /products?page=2&amp;limit=20
+GET /products?category=phone
+GET /products?sort=price
+GET /products?search=iphone</pre>
+<p><strong>Pagination:</strong> return a manageable portion instead of thousands of records.</p>
+<pre>const page = Math.max(Number(req.query.page) || 1, 1);
+const limit = Math.min(Number(req.query.limit) || 20, 100);
+const skip = (page - 1) * limit;</pre>
+<div class="alert alert-info mb-0"><strong>Interview tip:</strong> Always discuss a maximum page size. Otherwise a client could request an extremely large result set and hurt performance.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-dark text-white">9. Code-Based Interview Questions</div>
+<div class="card-body">
+
+<div class="mb-4">
+<span class="qnum">1</span>
+<strong class="ms-2">What status code should this endpoint normally return after creating a user?</strong>
+<pre class="mt-3">app.post("/users", (req, res) => {
+  const user = createUser(req.body);
+  res.json(user);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a1',this)">Show Answer</button>
+<div id="a1" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> <code>201 Created</code> is the normal choice. For example: <code>res.status(201).json(user)</code>.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w1',this)">Show Why?</button>
+<div id="w1" class="mt-2 d-none alert alert-info">The request created a new resource. The status code communicates that fact clearly to the client.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">2</span>
+<strong class="ms-2">What is wrong with this validation code?</strong>
+<pre class="mt-3">app.post("/users", (req, res) => {
+  if (!req.body.email) {
+    res.status(400).json({ error: "Email required" });
+  }
+  saveUser(req.body);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a2',this)">Show Answer</button>
+<div id="a2" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> The handler continues after sending the error response. Use <code>return res.status(400)...</code> so <code>saveUser()</code> does not run.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w2',this)">Show Why?</button>
+<div id="w2" class="mt-2 d-none alert alert-info">Sending an HTTP response does not automatically stop your JavaScript function. Explicitly return from the handler.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">3</span>
+<strong class="ms-2">What does this route represent?</strong>
+<pre class="mt-3">app.get("/users/:id", (req, res) => {
+  console.log(req.params.id);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a3',this)">Show Answer</button>
+<div id="a3" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> It is a dynamic route for one user. In <code>/users/42</code>, <code>req.params.id</code> is <code>"42"</code>.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w3',this)">Show Why?</button>
+<div id="w3" class="mt-2 d-none alert alert-info">The <code>:id</code> part is a route parameter. It identifies a specific resource.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">4</span>
+<strong class="ms-2">What will be returned for this request?</strong>
+<pre class="mt-3">GET /products?page=3&amp;limit=10</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a4',this)">Show Answer</button>
+<div id="a4" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> The server can interpret it as page 3 with 10 records per page. The usual offset is <code>(3 - 1) * 10 = 20</code>.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w4',this)">Show Why?</button>
+<div id="w4" class="mt-2 d-none alert alert-info">The first two pages contain 20 records, so page 3 starts after those 20 records.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">5</span>
+<strong class="ms-2">Is this a good REST URL? Why?</strong>
+<pre class="mt-3">POST /createUser</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a5',this)">Show Answer</button>
+<div id="a5" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> It works technically, but it is not a clean REST-style name. Prefer <code>POST /users</code>.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w5',this)">Show Why?</button>
+<div id="w5" class="mt-2 d-none alert alert-info">REST uses resource nouns in URLs and HTTP methods to describe the operation. POST already means create/submit in this design.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">6</span>
+<strong class="ms-2">What is the difference between PUT and PATCH in an API?</strong>
+<pre class="mt-3">PUT   /users/10
+PATCH /users/10</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a6',this)">Show Answer</button>
+<div id="a6" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> PUT normally represents replacement of the resource. PATCH represents a partial update.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w6',this)">Show Why?</button>
+<div id="w6" class="mt-2 d-none alert alert-info">The distinction helps clients communicate whether they are replacing the representation or changing only selected fields.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">7</span>
+<strong class="ms-2">Which status should usually be returned here when the user does not exist?</strong>
+<pre class="mt-3">app.get("/users/:id", async (req, res) => {
+  const user = await findUser(req.params.id);
+
+  if (!user) {
+    // ???
+  }
+});</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a7',this)">Show Answer</button>
+<div id="a7" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> <code>404 Not Found</code>.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w7',this)">Show Why?</button>
+<div id="w7" class="mt-2 d-none alert alert-info">The endpoint was valid, but the requested resource could not be found.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">8</span>
+<strong class="ms-2">Find the bug in this pagination code.</strong>
+<pre class="mt-3">const page = Number(req.query.page);
+const limit = Number(req.query.limit);
+const skip = page * limit;</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a8',this)">Show Answer</button>
+<div id="a8" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> For 1-based pages, skip should normally be <code>(page - 1) * limit</code>. Also validate and cap the inputs.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w8',this)">Show Why?</button>
+<div id="w8" class="mt-2 d-none alert alert-info">With page 1 and limit 10, the current code skips 10 records and incorrectly starts at page 2.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">9</span>
+<strong class="ms-2">What is the difference between authentication and authorization in an API?</strong>
+<pre class="mt-3">Authorization: Bearer eyJ...</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a9',this)">Show Answer</button>
+<div id="a9" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> Authentication asks “Who are you?” Authorization asks “Are you allowed to do this?”</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w9',this)">Show Why?</button>
+<div id="w9" class="mt-2 d-none alert alert-info">A valid token can identify a user, but that does not automatically give the user permission to access every resource.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">10</span>
+<strong class="ms-2">What is the main problem with returning every database record from this endpoint?</strong>
+<pre class="mt-3">app.get("/products", async (req, res) => {
+  const products = await Product.find();
+  res.json(products);
+});</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a10',this)">Show Answer</button>
+<div id="a10" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> It can return a huge amount of data, increasing database work, memory use, response time and network traffic. Add pagination and allow controlled filtering.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w10',this)">Show Why?</button>
+<div id="w10" class="mt-2 d-none alert alert-info">Large result sets do not scale well. APIs should control result size and avoid unnecessary data transfer.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">11</span>
+<strong class="ms-2">Which URL is better for filtering products by category?</strong>
+<pre class="mt-3">A) GET /products/category/phones
+B) GET /products?category=phones</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a11',this)">Show Answer</button>
+<div id="a11" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> For a filter, <strong>B</strong> is usually cleaner: <code>/products?category=phones</code>.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w11',this)">Show Why?</button>
+<div id="w11" class="mt-2 d-none alert alert-info">The resource remains <code>products</code>; the query parameter changes which products are returned.</div></div>
+</div>
+
+<div class="mb-4">
+<span class="qnum">12</span>
+<strong class="ms-2">What should happen when a client sends invalid JSON or invalid input?</strong>
+<pre class="mt-3">POST /users
+Content-Type: application/json
+
+{ "email": "" }</pre>
+<button class="btn btn-outline-primary btn-toggle" onclick="toggle('a12',this)">Show Answer</button>
+<div id="a12" class="mt-3 d-none"><div class="alert alert-success"><strong>Answer:</strong> Validate the request and return a suitable 4xx response, commonly <code>400</code> or <code>422</code> depending on the API contract.</div>
+<button class="btn btn-outline-dark btn-toggle" onclick="toggle('w12',this)">Show Why?</button>
+<div id="w12" class="mt-2 d-none alert alert-info">The client sent data that cannot be accepted. A 4xx response tells the client the problem is with the request rather than an unexpected server failure.</div></div>
+</div>
+
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-dark text-white">10. Common Developer Mistakes</div>
+<div class="card-body">
+<ul>
+<li>Using verbs in every REST URL instead of resource nouns.</li>
+<li>Returning <code>200</code> for validation, authentication or not-found errors.</li>
+<li>Trusting client input without server-side validation.</li>
+<li>Returning all database rows without pagination.</li>
+<li>Allowing unlimited <code>limit</code> values.</li>
+<li>Confusing <code>401</code> with <code>403</code>.</li>
+<li>Using PUT when only a few fields need to be changed without understanding replacement semantics.</li>
+<li>Putting sensitive information into URLs because URLs may appear in logs and browser history.</li>
+<li>Not defining a consistent error response format.</li>
+</ul>
+</div></div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-danger text-white">11. Interview-Ready Quick Recap</div>
+<div class="card-body">
+<div class="alert alert-light border"><strong>REST:</strong> Design APIs around resources and standard HTTP behavior.</div>
+<ul>
+<li>GET = read</li>
+<li>POST = create/submit</li>
+<li>PUT = replace</li>
+<li>PATCH = partial update</li>
+<li>DELETE = remove</li>
+<li>Use correct HTTP status codes.</li>
+<li>Headers carry metadata; body carries request/response data.</li>
+<li>Use query parameters for filtering, sorting, searching and pagination.</li>
+<li>Validate all client input on the server.</li>
+<li>Keep API errors consistent and useful.</li>
+</ul>
+<div class="alert alert-success tip mb-0"><strong>Golden interview answer:</strong> “A good REST API models resources with predictable URLs, uses HTTP methods according to their meaning, returns correct status codes, validates input, handles errors consistently, and supports scalable access patterns such as pagination, filtering, sorting and searching.”</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow-sm section-card">
+<div class="card-header bg-primary text-white">12. Interview Checklist</div>
+<div class="card-body">
+<p>Before an interview, make sure you can explain these without memorizing:</p>
+<div class="row g-2">
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ GET vs POST vs PUT vs PATCH</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ 200 vs 201 vs 204</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ 400 vs 401 vs 403 vs 404</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ Route params vs query params</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ Validation and API errors</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ Pagination design</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ Filtering, sorting and searching</div></div>
+<div class="col-md-6"><div class="alert alert-secondary mb-0">✓ REST resource naming</div></div>
+</div>
+</div></div>
+</section>
+
+</main>
+
+<script>
+function toggle(id, btn){
+  const el=document.getElementById(id);
+  const hidden=el.classList.toggle("d-none");
+  btn.textContent=hidden ? (btn.textContent.startsWith("Show Why") ? "Show Why?" : "Show Answer") :
+    (btn.textContent.startsWith("Show Why") || btn.textContent.startsWith("Hide Why") ? "Hide Why?" : "Hide Answer");
+}
+</script>
+</body>
+</html>

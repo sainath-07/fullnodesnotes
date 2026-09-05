@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part 32 — Node.js + Express System Design</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f4f7fb;color:#243447;font-family:Arial,sans-serif;line-height:1.65}
+.hero{background:linear-gradient(135deg,#172554,#1d4ed8);color:#fff;border-radius:18px;padding:38px;margin-bottom:28px}
+.card{border:0;border-radius:15px;overflow:hidden}.topic{margin-bottom:25px}
+.card-header{font-weight:700}.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:15px;overflow:auto}
+.btn-toggle{margin:7px 7px 7px 0}.answer,.why{display:none;background:#f8fafc;padding:16px;border-radius:9px;margin-top:10px}
+.answer{border-left:4px solid #0d6efd}.why{border-left:4px solid #f59e0b}
+.flow{background:#eef4ff;border:1px dashed #6b9bea;border-radius:12px;padding:17px;text-align:center;font-weight:700}
+.tip{background:#e8fff3;border-left:5px solid #198754;padding:15px;border-radius:8px}
+.mistake{background:#fff4e5;border-left:5px solid #fd7e14;padding:15px;border-radius:8px}
+.arch{background:#0f172a;color:#e5e7eb;border-radius:12px;padding:18px;font-family:monospace;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="container py-4">
+<section class="hero shadow">
+<h1>🏆 Part 32 — Node.js + Express System Design</h1>
+<p class="lead">Interview-ready system design questions for intermediate and experienced backend interviews.</p>
+<p class="mb-0">Focus: requirements → API design → components → data → scaling → reliability → security → trade-offs.</p>
+</section>
+
+<section class="card shadow mb-4">
+<div class="card-header bg-primary text-white">How to Approach Any System Design Question</div>
+<div class="card-body">
+<div class="flow">Requirements → Capacity → API → Architecture → Database → Cache → Queue → Scaling → Security → Failure Handling → Trade-offs</div>
+<div class="alert alert-info mt-3"><b>Interview tip:</b> Start with requirements. Do not immediately draw technologies. Explain why each component exists.</div>
+<div class="arch">Client
+  ↓
+Load Balancer / API Gateway
+  ↓
+Express API instances
+  ├── Auth / Validation
+  ├── Cache
+  ├── Database
+  └── Queue → Workers → External services
+       ↓
+ Monitoring / Logs / Metrics</div>
+</div>
+</section>
+
+<div id="topics"></div>
+
+<section class="card shadow mb-4">
+<div class="card-header bg-success text-white">Quick Recap — System Design Interview Checklist</div>
+<div class="card-body">
+<ol>
+<li>Clarify users, traffic, latency, availability, storage and consistency needs.</li>
+<li>Define important APIs and request/response shapes.</li>
+<li>Keep Express instances stateless so they can scale horizontally.</li>
+<li>Use indexes for frequent database queries and pagination for large datasets.</li>
+<li>Use Redis carefully for hot data, rate limits, sessions, or distributed coordination.</li>
+<li>Use queues for slow, retryable, or asynchronous work.</li>
+<li>Use object storage for large files instead of storing file bytes in the application database.</li>
+<li>Add timeouts, retries with limits, idempotency, circuit-breaking patterns where appropriate.</li>
+<li>Protect APIs with authentication, authorization, validation, rate limiting and secure secrets.</li>
+<li>Explain the bottleneck and the trade-off of every scaling decision.</li>
+</ol>
+<div class="tip"><b>Strong interview structure:</b> “Here are the requirements. Here is the API. Here is the high-level architecture. Now I will explain data storage, scaling, failures, and security. Finally, here are the trade-offs.”</div>
+</div>
+</section>
+</div>
+
+<script>
+const items=[
+["1. Design a URL Shortener","Design a service that converts long URLs into short URLs and redirects users.","POST /api/urls\\n{ \"url\": \"https://example.com/very/long/path\" }\\n\\nGET /:code","Use a unique short code mapped to the original URL. Store the mapping in a database, cache popular codes in Redis, and redirect from the code.","Redirect traffic is usually read-heavy. Caching hot mappings reduces database load. A unique constraint prevents duplicate short codes.","Never generate short codes without handling collisions. Do not make every redirect depend on a slow database query."],
+["2. Design an Authentication System","Design registration, login, protected APIs, token refresh and logout.","POST /auth/register\\nPOST /auth/login\\nPOST /auth/refresh\\nPOST /auth/logout\\nGET /me","Hash passwords with a strong password-hashing algorithm such as bcrypt or Argon2. Issue short-lived access tokens and a controlled refresh mechanism. Protect refresh credentials appropriately.","Authentication is security-sensitive. Short access-token lifetime limits exposure, while refresh tokens avoid forcing users to log in repeatedly.","Never store plain passwords. Never trust user-supplied roles or permissions."],
+["3. Design a File Upload Service","Users upload profile images and large documents.","POST /files\\nContent-Type: multipart/form-data","Authenticate first, validate size/type, stream or upload to object storage, save metadata in a database, and return a file identifier or controlled URL.","Large files should not normally pass through application memory unnecessarily. Object storage provides scalable durable storage.","Do not trust only the filename extension. Validate content and enforce size limits."],
+["4. Design a Notification System","Send email, SMS, and push notifications without slowing the API request.","POST /notifications","API stores a notification job → queue → notification worker → provider → delivery status. Add retries and a dead-letter strategy for persistent failures.","External providers are slower and can fail. A queue separates user requests from delivery work and smooths traffic spikes.","Do not perform slow provider calls synchronously inside every Express request."],
+["5. Design a Distributed Rate Limiter","Limit requests per user or IP across many Express instances.","GET /api/resource\\nX-API-Key: ...","Use Redis with an atomic counter or a token-bucket/sliding-window approach. Return HTTP 429 when the limit is exceeded.","An in-memory counter works on one process but breaks when requests are distributed across multiple instances.","Do not rely on local memory when the API is horizontally scaled."],
+["6. Design an API Gateway","Create one controlled entry point for several backend services.","Client → Gateway → User / Order / Payment services","Gateway handles routing, authentication checks, rate limiting, request IDs, TLS termination and sometimes response aggregation.","Centralizing cross-cutting concerns can simplify services, while backend services remain responsible for business logic.","Do not turn the gateway into a giant business-logic service."],
+["7. Design a Logging System","Collect logs from many Node.js instances and make failures searchable.","Express → structured logs → log collector → storage/search → dashboard","Use structured JSON logs with timestamp, level, request ID, route, status and duration. Ship logs to centralized storage.","Multiple instances make local console output difficult to search. Correlation IDs let one request be traced across services.","Do not log passwords, tokens, payment secrets or sensitive personal data."],
+["8. Design a Caching Layer","Reduce database load for frequently requested data.","Client → Express → Redis → DB on cache miss","Use cache-aside: check Redis, return on hit, otherwise query DB, store with TTL, then return. Define invalidation rules.","Caching improves latency and reduces repeated database work, but stale data and invalidation become new design concerns.","Do not cache sensitive data without a clear security and invalidation strategy."],
+["9. Design a Job Queue","Process image resizing, reports and emails asynchronously.","Express → Queue → Worker processes → Result / DB","Create durable jobs with IDs, retries, visibility/timeouts where supported, and dead-letter handling. Make workers idempotent.","Queues absorb traffic spikes and move slow work away from request latency.","Never assume a job executes exactly once. Design important operations to tolerate retries."],
+["10. Design an Email Service","Build a reliable service for transactional emails.","API → email queue → workers → email provider → delivery events","Queue emails, retry temporary failures with backoff, track provider IDs/status, and make messages idempotent where needed.","Email providers can throttle or fail. Async processing protects API latency and allows controlled retries.","Do not retry permanent failures forever."],
+["11. Design a Payment API","Create payment creation and confirmation APIs safely.","POST /payments\\nPOST /payments/:id/confirm","Use idempotency keys, secure provider integration, webhook verification, persistent payment states, transaction boundaries and reconciliation jobs.","Clients can retry requests because of timeouts. Idempotency prevents duplicate charges or duplicate payment records.","Never treat a client redirect alone as proof of payment success."],
+["12. Design a Search API","Search products with filtering, sorting and pagination.","GET /products?q=phone&category=mobile&page=2&limit=20","For simple search, use database indexes. For advanced full-text search at scale, use a search engine and synchronize searchable data.","Search workloads can be very different from transactional database workloads. A dedicated search system can scale independently.","Do not run unindexed wildcard-heavy queries against a huge production table."],
+["13. Design a Chat Backend","Support real-time one-to-one and group messaging.","POST /messages\\nGET /conversations/:id/messages\\nWebSocket /ws","Use WebSockets for live delivery, a database for durable messages, Redis/pub-sub or a broker for multi-instance coordination, and offline message retrieval.","A single WebSocket server cannot own all connections after horizontal scaling. Shared coordination is needed.","Do not assume an in-memory connection map is globally available across instances."],
+["14. Design a Scalable REST API","Design an Express API expected to handle high traffic.","Client → LB → many stateless Express instances → Redis/DB/Queue","Keep instances stateless, load balance requests, cache hot data, paginate database reads, use connection pooling, add timeouts and monitor latency/errors.","Horizontal scaling works best when any instance can handle any request.","Do not store critical session state only in one Express process."],
+["15. Design a High-Traffic Express Application","How would you scale an Express application from one server to many servers?","Users → CDN/LB → Express instances → Redis → DB\\n                         ↓\\n                       Queue → Workers","Start with profiling and bottleneck measurement. Then scale horizontally, add a load balancer, cache hot reads, optimize DB indexes/pools, move slow work to queues, and use workers for CPU-heavy tasks.","Scaling without measuring can move the bottleneck from Node to the database, cache, network, or external provider.","Do not add Redis, workers, or microservices simply because traffic is high; identify the actual bottleneck first."]
+];
+
+const root=document.getElementById('topics');
+items.forEach((x,i)=>{
+ const s=document.createElement('section');
+ s.className='topic card shadow';
+ s.innerHTML=`<div class="card-header bg-dark text-white">${x[0]}</div>
+ <div class="card-body">
+ <div class="alert alert-primary"><b>System design question:</b> ${x[1]}</div>
+ <div class="code"><pre class="mb-0"></pre></div>
+ <button class="btn btn-outline-primary btn-toggle" onclick="toggleBox('a${i}',this,'Show Answer','Hide Answer')">Show Answer</button>
+ <button class="btn btn-outline-warning btn-toggle" onclick="toggleBox('w${i}',this,'Show Why?','Hide Why?')">Show Why?</button>
+ <div id="a${i}" class="answer"><b>Code / API Answer:</b><pre class="mb-0"></pre></div>
+ <div id="w${i}" class="why"><b>Why?</b><p class="mb-0"></p></div>
+ <div class="mt-3 mistake"><b>Common developer mistake:</b> <span></span></div>
+ </div>`;
+ s.querySelector('.code pre').textContent=x[2];
+ s.querySelector('.answer pre').textContent=x[2]+"\\n\\nArchitecture:\\n"+x[3];
+ s.querySelector('.why p').textContent=x[4];
+ s.querySelector('.mistake span').textContent=x[5];
+ root.appendChild(s);
+});
+function toggleBox(id,btn,show,hide){
+ const e=document.getElementById(id), open=e.style.display==='block';
+ e.style.display=open?'none':'block'; btn.textContent=open?show:hide;
+}
+</script>
+</body>
+</html>
