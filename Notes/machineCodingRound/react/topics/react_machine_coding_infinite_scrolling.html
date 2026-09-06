@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React Machine Coding Round - Infinite Scrolling</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  html { scroll-behavior:smooth; }
+  body { background:#f5f7fb; color:#1f2937; }
+  .topbar { position:sticky; top:0; z-index:1000; }
+  .sidebar { position:sticky; top:70px; height:calc(100vh - 86px); overflow:auto; }
+  .content-card { border:0; border-radius:16px; box-shadow:0 5px 20px rgba(0,0,0,.07); }
+  .nav-btn { width:100%; text-align:left; margin-bottom:8px; border-radius:10px; }
+  .section-head { border-radius:14px; }
+  .topic-section { animation:fade .18s ease-in; }
+  @keyframes fade { from {opacity:.5; transform:translateY(4px)} to {opacity:1; transform:none} }
+  pre { background:#111827; color:#e5e7eb; padding:18px; border-radius:12px; overflow:auto; }
+  code { font-family:Consolas, Monaco, monospace; }
+  .flow { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; }
+  .flow-box { padding:12px 16px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:12px; font-weight:600; text-align:center; }
+  .arrow { font-size:24px; color:#64748b; }
+  .mistake { border-left:5px solid #dc3545; }
+  .tip { border-left:5px solid #0d6efd; }
+  .best { border-left:5px solid #198754; }
+  .small-muted { color:#6b7280; font-size:.92rem; }
+  .answer-pane { min-height:72vh; }
+  @media(max-width:991px) {
+    .sidebar { position:static; height:auto; margin-bottom:18px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark topbar shadow-sm">
+  <div class="container-fluid px-4">
+    <span class="navbar-brand fw-bold">React Machine Coding Round</span>
+    <span class="text-white-50">Topic: Infinite Scrolling</span>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <aside class="col-lg-3">
+      <div class="card content-card sidebar p-3">
+        <h5 class="fw-bold">Infinite Scrolling</h5>
+        <p class="small-muted">Select a topic to show its related answer on the right.</p>
+
+        <button class="btn btn-primary nav-btn" onclick="showSection('question',this)">1. Question</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('answer',this)">2. Answer</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('interviewer',this)">3. How I Implemented</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('mistakes',this)">4. Common Developer Mistakes</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('full',this)">5. Show Full Answer</button>
+
+        <hr>
+        <div class="alert alert-info mb-0">
+          <strong>Scope:</strong> React frontend only. No backend code is included.
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT SIDE -->
+    <main class="col-lg-9">
+      <div class="card content-card answer-pane p-4">
+
+        <!-- QUESTION -->
+        <section id="question" class="topic-section">
+          <div class="section-head bg-primary text-white p-4 mb-4">
+            <h2>Machine Coding Question</h2>
+            <p class="mb-0">Implement Infinite Scrolling using React.</p>
+          </div>
+
+          <div class="card bg-light border-0 p-4 mb-4">
+            <h4>Question</h4>
+            <p>
+              Build a React page that displays a list of items. When the user reaches near the
+              bottom of the list, automatically load and append more items.
+            </p>
+            <h5>Requirements</h5>
+            <ul>
+              <li>Display a list of items.</li>
+              <li>Load the first batch when the component starts.</li>
+              <li>Detect when the user reaches the bottom or near-bottom of the list.</li>
+              <li>Load the next batch and append it to the existing items.</li>
+              <li>Show a loading indicator while loading.</li>
+              <li>Prevent duplicate loading.</li>
+              <li>Handle the end of the list.</li>
+              <li>Handle errors and allow retry.</li>
+              <li>Use React frontend logic only.</li>
+            </ul>
+          </div>
+
+          <div class="alert alert-warning">
+            <strong>Machine coding focus:</strong> The interviewer is mainly checking your
+            React state management, scroll detection, effect cleanup, loading control,
+            pagination logic, and ability to avoid unnecessary work.
+          </div>
+
+          <h4>Layman Example</h4>
+          <p>
+            Think about scrolling through Instagram, a shopping app, or a news feed.
+            You do not receive thousands of items at once. The application shows some items,
+            and when you get close to the bottom, it brings the next batch automatically.
+          </p>
+
+          <div class="flow my-4">
+            <div class="flow-box">Show 1st batch</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">User scrolls</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Near bottom</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Load next batch</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Append items</div>
+          </div>
+
+          <div class="alert alert-success">
+            <strong>Simple idea:</strong> "When the user is almost at the bottom, load more and
+            add the new items to the existing list."
+          </div>
+        </section>
+
+        <!-- ANSWER -->
+        <section id="answer" class="topic-section d-none">
+          <div class="section-head bg-success text-white p-4 mb-4">
+            <h2>Answer</h2>
+            <p class="mb-0">Understand the approach before writing the code.</p>
+          </div>
+
+          <h4>What is Infinite Scrolling?</h4>
+          <p>
+            Infinite scrolling is a UI pattern where more content is loaded automatically as
+            the user approaches the end of the currently visible list.
+          </p>
+
+          <h4 class="mt-4">Why do we use it?</h4>
+          <ul>
+            <li>It avoids loading a huge amount of data at one time.</li>
+            <li>It gives the user a smooth browsing experience.</li>
+            <li>It works well for feeds, product lists, search results, and social timelines.</li>
+            <li>It can reduce the amount of data initially rendered.</li>
+          </ul>
+
+          <h4 class="mt-4">What problem does it solve?</h4>
+          <p>
+            Imagine 10,000 products. Rendering all 10,000 products immediately can be expensive.
+            Infinite scrolling lets the UI work with smaller batches.
+          </p>
+
+          <div class="flow my-4">
+            <div class="flow-box">10,000 items available</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Render 20</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">User reaches bottom</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Add next 20</div>
+          </div>
+
+          <h4 class="mt-4">Common implementation approaches</h4>
+
+          <div class="card p-3 mb-3">
+            <h5>Approach 1 — Scroll Event</h5>
+            <p>
+              Listen to the window/container scroll event and check whether the user is near
+              the bottom.
+            </p>
+            <pre><code>window.addEventListener("scroll", handleScroll);
+
+const nearBottom =
+  window.innerHeight + window.scrollY >=
+  document.documentElement.scrollHeight - 200;</code></pre>
+            <p class="mb-0">
+              Easy to understand, but scroll events can fire very frequently, so careless
+              implementations can do unnecessary work.
+            </p>
+          </div>
+
+          <div class="card p-3 mb-3">
+            <h5>Approach 2 — IntersectionObserver ⭐</h5>
+            <p>
+              Put a small invisible/sentinel element at the bottom of the list. When that
+              element enters the viewport, load more items.
+            </p>
+            <pre><code>const observer = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    loadMore();
+  }
+});</code></pre>
+            <p class="mb-0">
+              This is generally the preferred modern frontend approach because the browser
+              handles visibility observation instead of us repeatedly calculating scroll position.
+            </p>
+          </div>
+
+          <div class="card p-3 mb-4">
+            <h5>Approach 3 — Scroll Container + Sentinel</h5>
+            <p>
+              Instead of observing the whole page, create a fixed-height scrollable container
+              and observe a sentinel at its bottom. This is useful when the machine-coding
+              requirement specifically asks for a scrollable panel.
+            </p>
+          </div>
+
+          <div class="card best p-3 mb-4">
+            <strong>Best interview approach:</strong>
+            Prefer <code>IntersectionObserver</code> when the requirement allows it.
+            Explain that a sentinel element is placed at the end of the list and the observer
+            triggers loading when it becomes visible. Also mention loading guards,
+            <code>hasMore</code>, cleanup, and error handling.
+          </div>
+
+          <h4>How it works</h4>
+          <div class="flow my-4">
+            <div class="flow-box">Items</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Sentinel at bottom</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Observer watches sentinel</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Sentinel visible</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">loadMore()</div>
+            <div class="arrow">→</div>
+            <div class="flow-box">Append items</div>
+          </div>
+
+          <h4 class="mt-4">Important React states</h4>
+          <ul>
+            <li><code>items</code> — stores all currently loaded items.</li>
+            <li><code>page</code> — tells us which batch/page should be loaded next.</li>
+            <li><code>loading</code> — prevents multiple loads at the same time.</li>
+            <li><code>hasMore</code> — tells us whether more items are available.</li>
+            <li><code>error</code> — stores an error message if loading fails.</li>
+          </ul>
+
+          <div class="alert alert-info tip">
+            <strong>Interview shortcut:</strong>
+            Remember this flow: <strong>List → Sentinel → Observer → Loading Guard → Next Page →
+            Append → Check hasMore</strong>.
+          </div>
+        </section>
+
+        <!-- INTERVIEWER -->
+        <section id="interviewer" class="topic-section d-none">
+          <div class="section-head bg-info text-dark p-4 mb-4">
+            <h2>How I Implemented This — Explanation to Interviewer</h2>
+            <p class="mb-0">A simple answer you can speak during the interview.</p>
+          </div>
+
+          <div class="card p-4 mb-4">
+            <p>
+              "I implemented infinite scrolling using React state and IntersectionObserver.
+              I keep the already loaded items in an array state."
+            </p>
+            <p>
+              "At the bottom of the list, I render a small sentinel element. I attach an
+              IntersectionObserver to this element."
+            </p>
+            <p>
+              "When the sentinel becomes visible, I check two conditions: whether another load
+              is already running and whether more items are available."
+            </p>
+            <p>
+              "If loading is allowed, I increase the page number and load the next batch.
+              The new items are appended to the previous items instead of replacing them."
+            </p>
+            <p>
+              "I also clean up the observer when the component unmounts or when the dependencies
+              change. Finally, I handle loading, error, retry, and the end-of-list state."
+            </p>
+          </div>
+
+          <h4>Visual implementation</h4>
+          <div class="flow my-4">
+            <div class="flow-box">1. Render items</div>
+            <div class="arrow">↓</div>
+            <div class="flow-box">2. Render sentinel</div>
+            <div class="arrow">↓</div>
+            <div class="flow-box">3. Observe sentinel</div>
+            <div class="arrow">↓</div>
+            <div class="flow-box">4. Sentinel visible</div>
+            <div class="arrow">↓</div>
+            <div class="flow-box">5. Check loading/hasMore</div>
+            <div class="arrow">↓</div>
+            <div class="flow-box">6. Load next batch</div>
+            <div class="arrow">↓</div>
+            <div class="flow-box">7. Append</div>
+          </div>
+
+          <h4 class="mt-4">Core React pattern</h4>
+          <pre><code>const [items, setItems] = useState([]);
+const [page, setPage] = useState(1);
+const [loading, setLoading] = useState(false);
+const [hasMore, setHasMore] = useState(true);
+const [error, setError] = useState("");
+
+const loadMore = async () => {
+  if (loading || !hasMore) return;
+
+  setLoading(true);
+  setError("");
+
+  try {
+    // Frontend practice:
+    // simulate getting the next batch
+    const nextItems = createItems(page);
+
+    setItems(prev => [...prev, ...nextItems]);
+
+    if (page >= 5) {
+      setHasMore(false);
+    } else {
+      setPage(prev => prev + 1);
+    }
+  } catch (err) {
+    setError("Unable to load more items.");
+  } finally {
+    setLoading(false);
+  }
+};</code></pre>
+
+          <div class="alert alert-warning">
+            <strong>Note:</strong> The sample above intentionally simulates data in the frontend.
+            In a real application, <code>loadMore()</code> could call an API, but backend code is
+            outside this practice task.
+          </div>
+        </section>
+
+        <!-- MISTAKES -->
+        <section id="mistakes" class="topic-section d-none">
+          <div class="section-head bg-danger text-white p-4 mb-4">
+            <h2>Common Developer Mistakes</h2>
+            <p class="mb-0">Important issues interviewers may look for.</p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>1. Loading multiple times</h5>
+            <p class="mb-0">
+              IntersectionObserver may trigger while the previous load is still running.
+              Always use a <code>loading</code> guard.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>2. Forgetting hasMore</h5>
+            <p class="mb-0">
+              When there are no more items, stop observing/loading. Otherwise the application
+              may keep trying forever.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>3. Replacing instead of appending</h5>
+            <p class="mb-0">
+              <code>setItems(nextItems)</code> removes previous items. Infinite scrolling normally
+              needs <code>setItems(prev =&gt; [...prev, ...nextItems])</code>.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>4. Creating observers repeatedly without cleanup</h5>
+            <p class="mb-0">
+              Always disconnect the observer in the effect cleanup. Otherwise multiple observers
+              can remain active.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>5. Using scroll events carelessly</h5>
+            <p class="mb-0">
+              Scroll events can fire very frequently. If using them, consider throttling,
+              debouncing where appropriate, and passive listeners.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>6. Incorrect useEffect dependencies</h5>
+            <p class="mb-0">
+              Incorrect dependencies can create stale values or repeatedly recreate the observer.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>7. Updating state after an invalid request</h5>
+            <p class="mb-0">
+              If the implementation becomes asynchronous, think about cleanup, cancellation,
+              and stale responses when the component unmounts or state changes.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>8. No loading/error UI</h5>
+            <p class="mb-0">
+              Users need feedback while more content is being loaded and a retry path when
+              something fails.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>9. Loading too early or too late</h5>
+            <p class="mb-0">
+              With IntersectionObserver, you can use <code>rootMargin</code> to start loading
+              before the user reaches the exact bottom.
+            </p>
+          </div>
+
+          <div class="card mistake p-3">
+            <h5>10. Forgetting accessibility and UX</h5>
+            <p class="mb-0">
+              Make sure the loading indicator and end-of-list message are understandable,
+              and do not make keyboard users depend entirely on scrolling.
+            </p>
+          </div>
+        </section>
+
+        <!-- FULL ANSWER -->
+        <section id="full" class="topic-section d-none">
+          <div class="section-head bg-dark text-white p-4 mb-4">
+            <h2>Show Full Answer</h2>
+            <p class="mb-0">Frontend-only React implementation using IntersectionObserver.</p>
+          </div>
+
+          <h4>Complete React Example</h4>
+          <pre><code>import { useEffect, useRef, useState } from "react";
+
+const createItems = (page) => {
+  return Array.from({ length: 10 }, (_, index) => ({
+    id: `${page}-${index}`,
+    title: `Item ${(page - 1) * 10 + index + 1}`
+  }));
+};
+
+export default function InfiniteScroll() {
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState("");
+
+  const sentinelRef = useRef(null);
+
+  const loadMore = async () => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Simulate frontend-only async work
+      await new Promise(resolve => setTimeout(resolve, 700));
+
+      const nextItems = createItems(page);
+
+      setItems(prev => [...prev, ...nextItems]);
+
+      if (page >= 5) {
+        setHasMore(false);
+      } else {
+        setPage(prev => prev + 1);
+      }
+    } catch (err) {
+      setError("Unable to load more items.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0];
+
+        if (entry.isIntersecting && !loading && hasMore) {
+          loadMore();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "200px",
+        threshold: 0
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [loading, hasMore, page]);
+
+  useEffect(() => {
+    loadMore();
+  }, []);
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Products&lt;/h2&gt;
+
+      {items.map(item =&gt; (
+        &lt;div key={item.id}&gt;
+          {item.title}
+        &lt;/div&gt;
+      ))}
+
+      {error &amp;&amp; (
+        &lt;div&gt;
+          &lt;p&gt;{error}&lt;/p&gt;
+          &lt;button onClick={loadMore}&gt;Retry&lt;/button&gt;
+        &lt;/div&gt;
+      )}
+
+      {loading &amp;&amp; &lt;p&gt;Loading more...&lt;/p&gt;}
+
+      {!hasMore &amp;&amp; &lt;p&gt;You reached the end.&lt;/p&gt;}
+
+      &lt;div ref={sentinelRef} style={{ height: 1 }} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+          <div class="alert alert-warning mt-4">
+            <strong>Important interview note:</strong>
+            For a production implementation, you would usually separate the data-loading logic
+            into a custom hook or data-fetching layer. For a machine-coding round, first make
+            the component correct and understandable, then refactor if time allows.
+          </div>
+
+          <h4 class="mt-4">Production-quality considerations</h4>
+          <ul>
+            <li>Use <code>IntersectionObserver</code> rather than manual scroll calculations when appropriate.</li>
+            <li>Use a sentinel element at the end of the list.</li>
+            <li>Use <code>rootMargin</code> to prefetch before the user reaches the bottom.</li>
+            <li>Prevent duplicate loads with a loading guard.</li>
+            <li>Stop when <code>hasMore</code> is false.</li>
+            <li>Handle errors and retry.</li>
+            <li>Clean up the observer.</li>
+            <li>For very large lists, consider virtualization/windowing so old DOM nodes are not all kept rendered.</li>
+            <li>For real async requests, consider cancellation and stale-response protection.</li>
+          </ul>
+
+          <div class="alert alert-success tip mt-4">
+            <strong>Final interview sentence:</strong>
+            "I prefer IntersectionObserver for infinite scrolling because I can observe a sentinel
+            at the bottom of the list instead of continuously calculating scroll position. I guard
+            against duplicate loads, append new items, stop when there is no more data, clean up the
+            observer, and handle loading and error states."
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+function showSection(id, clickedButton) {
+  document.querySelectorAll(".topic-section").forEach(section => {
+    section.classList.add("d-none");
+  });
+
+  document.getElementById(id).classList.remove("d-none");
+
+  document.querySelectorAll(".nav-btn").forEach(button => {
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-outline-primary");
+  });
+
+  clickedButton.classList.remove("btn-outline-primary");
+  clickedButton.classList.add("btn-primary");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

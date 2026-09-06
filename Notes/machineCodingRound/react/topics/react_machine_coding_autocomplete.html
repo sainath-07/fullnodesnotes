@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Machine Coding - Autocomplete</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background:#f5f7fb; color:#1f2937; }
+    .topbar { position:sticky; top:0; z-index:1000; }
+    .sidebar { position:sticky; top:72px; height:calc(100vh - 88px); overflow:auto; }
+    .nav-btn { text-align:left; width:100%; margin-bottom:8px; border-radius:10px; }
+    .content-card { border:0; border-radius:16px; box-shadow:0 4px 18px rgba(0,0,0,.07); }
+    .section-title { border-radius:14px 14px 0 0; }
+    pre { background:#111827; color:#e5e7eb; padding:18px; border-radius:12px; overflow:auto; }
+    code { font-family:Consolas, Monaco, monospace; }
+    .flow { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; }
+    .flow .box { padding:12px 16px; border-radius:12px; background:#eef2ff; border:1px solid #c7d2fe; font-weight:600; }
+    .arrow { font-size:24px; color:#64748b; }
+    .mistake { border-left:5px solid #dc3545; }
+    .best { border-left:5px solid #198754; }
+    .tip { border-left:5px solid #0d6efd; }
+    .answer-pane { min-height:70vh; }
+    .small-muted { color:#6b7280; font-size:.92rem; }
+    @media (max-width: 991px) {
+      .sidebar { position:static; height:auto; margin-bottom:20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark topbar shadow-sm">
+  <div class="container-fluid px-4">
+    <span class="navbar-brand fw-bold">React Machine Coding Round</span>
+    <span class="text-white-50">Topic: Autocomplete</span>
+  </div>
+</nav>
+
+<div class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="card content-card sidebar p-3">
+        <h5 class="fw-bold mb-3">Autocomplete</h5>
+        <p class="small-muted">Select a topic. The related answer appears on the right.</p>
+
+        <button class="btn btn-primary nav-btn" onclick="showSection('question')">1. Question</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('answer')">2. Answer</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('interviewer')">3. How I Implemented</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('mistakes')">4. Common Developer Mistakes</button>
+        <button class="btn btn-outline-primary nav-btn" onclick="showSection('full')">5. Show Full Answer</button>
+
+        <hr>
+        <div class="alert alert-info mb-0">
+          <strong>Interview goal:</strong> Build the autocomplete feature only with React frontend logic. No backend implementation is required.
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="col-lg-9">
+      <div id="answerPane" class="card content-card answer-pane p-4">
+
+        <section id="question" class="topic-section">
+          <div class="section-title bg-primary text-white p-4 mb-4 rounded">
+            <h2 class="mb-1">Machine Coding Question</h2>
+            <p class="mb-0">Implement an Autocomplete component using React.</p>
+          </div>
+
+          <div class="card border-0 bg-light p-4 mb-4">
+            <h4>Question</h4>
+            <p class="mb-2">
+              Build a reusable React autocomplete/search suggestion component.
+            </p>
+            <ul>
+              <li>Show an input field.</li>
+              <li>When the user types, display matching suggestions.</li>
+              <li>Show a loading state while suggestions are being prepared.</li>
+              <li>Allow the user to select a suggestion.</li>
+              <li>Close the suggestion list when an item is selected.</li>
+              <li>Handle empty input and no-result states.</li>
+              <li>Keep the implementation frontend-only.</li>
+            </ul>
+          </div>
+
+          <div class="alert alert-warning">
+            <strong>Important:</strong> In a real application suggestions may come from an API. For this machine-coding practice, we can simulate the data with a local array. The focus is React UI, state, filtering, debounce, and selection behavior.
+          </div>
+
+          <h4 class="mt-4">Layman Example</h4>
+          <p>
+            Think about Google Search. You type <strong>"rea"</strong>, and before you finish typing,
+            the UI may suggest words such as <strong>"react"</strong>, <strong>"react tutorial"</strong>,
+            or <strong>"real estate"</strong>.
+          </p>
+
+          <div class="flow my-4">
+            <div class="box">User types "rea"</div>
+            <div class="arrow">→</div>
+            <div class="box">React checks suggestions</div>
+            <div class="arrow">→</div>
+            <div class="box">Matching list appears</div>
+            <div class="arrow">→</div>
+            <div class="box">User selects one</div>
+          </div>
+        </section>
+
+        <section id="answer" class="topic-section d-none">
+          <div class="section-title bg-success text-white p-4 mb-4 rounded">
+            <h2 class="mb-1">Answer</h2>
+            <p class="mb-0">Different ways to build autocomplete.</p>
+          </div>
+
+          <h4>What is Autocomplete?</h4>
+          <p>
+            Autocomplete is a UI feature that gives the user suggestions while they type.
+            Instead of making the user type the complete value, the application predicts or
+            filters possible values and lets the user choose one.
+          </p>
+
+          <h4 class="mt-4">Why do we use it?</h4>
+          <ul>
+            <li>It makes searching faster.</li>
+            <li>It reduces typing effort.</li>
+            <li>It helps users find valid values.</li>
+            <li>It improves the user experience.</li>
+            <li>It reduces spelling mistakes when selecting from known options.</li>
+          </ul>
+
+          <h4 class="mt-4">What problem does it solve?</h4>
+          <p>
+            Without autocomplete, the user may need to remember and type the complete value.
+            With autocomplete, the UI narrows a large list into a small set of useful choices.
+          </p>
+
+          <div class="card best p-3 mb-4">
+            <strong>Industry interview recommendation:</strong>
+            For a frontend React machine-coding round, a good solution is a reusable component
+            using controlled input + filtered suggestions + debounce when the search operation
+            is expensive or represents an API-like operation. If asynchronous requests are
+            involved, also think about stale responses/race conditions.
+          </div>
+
+          <h4>Common ways to implement it</h4>
+
+          <div class="card p-3 mb-3">
+            <h5>Approach 1 — Filter a local array</h5>
+            <p>
+              Keep suggestions in memory and use <code>filter()</code> whenever the input changes.
+              This is the simplest approach for small/static data.
+            </p>
+            <pre><code>const filtered = options.filter(item =>
+  item.toLowerCase().includes(value.toLowerCase())
+);</code></pre>
+          </div>
+
+          <div class="card p-3 mb-3">
+            <h5>Approach 2 — Debounced autocomplete</h5>
+            <p>
+              Wait for the user to stop typing for a short time before calculating suggestions
+              or starting an API-like operation. This avoids doing expensive work on every keystroke.
+            </p>
+            <pre><code>const debouncedValue = useDebounce(value, 300);
+
+useEffect(() => {
+  // calculate or load suggestions
+}, [debouncedValue]);</code></pre>
+          </div>
+
+          <div class="card p-3 mb-4">
+            <h5>Approach 3 — Debounce + request cancellation/stale-response protection</h5>
+            <p>
+              This is useful when suggestions are asynchronous. Debounce reduces how many requests
+              start, while cancellation or stale-response protection prevents an older result from
+              incorrectly replacing a newer result.
+            </p>
+          </div>
+
+          <div class="alert alert-success">
+            <strong>Best interview answer:</strong>
+            Start simple. If the interviewer gives a local/static dataset, use filtering.
+            If they expect realistic search behavior, use a reusable <code>useDebounce</code> hook.
+            If asynchronous requests are part of the requirement, add <code>AbortController</code>
+            or another stale-response strategy.
+          </div>
+
+          <h4 class="mt-4">How autocomplete works</h4>
+          <div class="flow my-4">
+            <div class="box">Input state</div><div class="arrow">→</div>
+            <div class="box">Debounce</div><div class="arrow">→</div>
+            <div class="box">Find matches</div><div class="arrow">→</div>
+            <div class="box">Show dropdown</div><div class="arrow">→</div>
+            <div class="box">Select item</div>
+          </div>
+
+          <h4>Reusable useDebounce Hook</h4>
+          <pre><code>import { useEffect, useState } from "react";
+
+function useDebounce(value, delay = 300) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+export default useDebounce;</code></pre>
+        </section>
+
+        <section id="interviewer" class="topic-section d-none">
+          <div class="section-title bg-info text-dark p-4 mb-4 rounded">
+            <h2 class="mb-1">How I Implemented This — Interviewer Explanation</h2>
+            <p class="mb-0">A simple answer you can speak during the round.</p>
+          </div>
+
+          <div class="alert alert-primary">
+            <strong>Interview-ready explanation:</strong>
+          </div>
+
+          <div class="card p-4 mb-4">
+            <p>
+              "I implemented autocomplete as a controlled React input. The typed value is stored
+              in state. I keep the suggestion data separately and filter it based on the current
+              search value."
+            </p>
+            <p>
+              "To make the component more realistic and reusable, I can use a separate
+              <code>useDebounce</code> hook. It waits for the user to stop typing before the
+              suggestion calculation or API-like operation runs."
+            </p>
+            <p>
+              "The dropdown is shown only when there is a meaningful search value and matching
+              suggestions. When the user clicks a suggestion, I update the input with the selected
+              value and close the dropdown."
+            </p>
+            <p class="mb-0">
+              "I also handle empty input, no results, cleanup of the debounce timer, and loading
+              or error states if the data source becomes asynchronous."
+            </p>
+          </div>
+
+          <h4>Visual explanation</h4>
+          <div class="flow my-4">
+            <div class="box">1. User types</div>
+            <div class="arrow">↓</div>
+            <div class="box">2. setSearch(value)</div>
+            <div class="arrow">↓</div>
+            <div class="box">3. useDebounce waits</div>
+            <div class="arrow">↓</div>
+            <div class="box">4. Get filtered suggestions</div>
+            <div class="arrow">↓</div>
+            <div class="box">5. Render dropdown</div>
+            <div class="arrow">↓</div>
+            <div class="box">6. User selects item</div>
+          </div>
+
+          <h4 class="mt-4">Example Component</h4>
+          <pre><code>import { useMemo, useState } from "react";
+import useDebounce from "./useDebounce";
+
+const options = [
+  "React",
+  "React Native",
+  "Redux",
+  "JavaScript",
+  "TypeScript",
+  "Next.js"
+];
+
+function Autocomplete() {
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState("");
+
+  const debouncedSearch = useDebounce(search, 300);
+
+  const suggestions = useMemo(() => {
+    if (!debouncedSearch.trim()) return [];
+
+    return options.filter(item =>
+      item.toLowerCase().includes(debouncedSearch.toLowerCase())
+    );
+  }, [debouncedSearch]);
+
+  function handleSelect(item) {
+    setSearch(item);
+    setSelected(item);
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input
+        value={search}
+        onChange={(e) =&gt; setSearch(e.target.value)}
+        placeholder="Search technology..."
+      /&gt;
+
+      {debouncedSearch &amp;&amp; (
+        &lt;ul&gt;
+          {suggestions.length === 0 ? (
+            &lt;li&gt;No results found&lt;/li&gt;
+          ) : (
+            suggestions.map(item =&gt; (
+              &lt;li
+                key={item}
+                onClick={() =&gt; handleSelect(item)}
+              &gt;
+                {item}
+              &lt;/li&gt;
+            ))
+          )}
+        &lt;/ul&gt;
+      )}
+
+      {selected &amp;&amp; &lt;p&gt;Selected: {selected}&lt;/p&gt;}
+    &lt;/div&gt;
+  );
+}
+
+export default Autocomplete;</code></pre>
+        </section>
+
+        <section id="mistakes" class="topic-section d-none">
+          <div class="section-title bg-danger text-white p-4 mb-4 rounded">
+            <h2 class="mb-1">Common Developer Mistakes</h2>
+            <p class="mb-0">Things interviewers commonly notice.</p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>1. Filtering on every expensive operation</h5>
+            <p class="mb-0">
+              For a tiny local array this may be fine. For expensive computation or API search,
+              consider debounce.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>2. Putting debounce logic directly everywhere</h5>
+            <p class="mb-0">
+              If the same debounce behavior is needed in multiple components, create a reusable
+              <code>useDebounce</code> hook.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>3. Forgetting clearTimeout</h5>
+            <p class="mb-0">
+              Every new value should clear the previous timer. Otherwise multiple delayed callbacks
+              can run.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>4. Showing stale asynchronous results</h5>
+            <p class="mb-0">
+              Debounce does not automatically solve race conditions. If requests can overlap,
+              protect the UI from older responses.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>5. Forgetting the empty-input case</h5>
+            <p class="mb-0">
+              When the input is empty, do not show a meaningless suggestion dropdown.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>6. Missing stable keys</h5>
+            <p class="mb-0">
+              When rendering suggestions with <code>map()</code>, provide a stable React key.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>7. Not handling "No results"</h5>
+            <p class="mb-0">
+              A good autocomplete should clearly tell the user when there are no matching options.
+            </p>
+          </div>
+
+          <div class="card mistake p-3 mb-3">
+            <h5>8. Making the hook responsible for UI</h5>
+            <p class="mb-0">
+              A generic <code>useDebounce</code> hook should handle debounce behavior, not dropdown
+              rendering, selection, or API-specific UI.
+            </p>
+          </div>
+
+          <div class="card mistake p-3">
+            <h5>9. Ignoring keyboard accessibility</h5>
+            <p class="mb-0">
+              In a production-quality autocomplete, consider Arrow Up/Down, Enter, Escape,
+              focus management, and appropriate ARIA attributes.
+            </p>
+          </div>
+        </section>
+
+        <section id="full" class="topic-section d-none">
+          <div class="section-title bg-dark text-white p-4 mb-4 rounded">
+            <h2 class="mb-1">Show Full Answer</h2>
+            <p class="mb-0">A compact interview-ready implementation.</p>
+          </div>
+
+          <h4>1. useDebounce.js</h4>
+          <pre><code>import { useEffect, useState } from "react";
+
+export default function useDebounce(value, delay = 300) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}</code></pre>
+
+          <h4 class="mt-4">2. Autocomplete.jsx</h4>
+          <pre><code>import { useMemo, useState } from "react";
+import useDebounce from "./useDebounce";
+
+const options = [
+  "React",
+  "React Native",
+  "Redux",
+  "JavaScript",
+  "TypeScript",
+  "Next.js",
+  "Node.js",
+  "Django"
+];
+
+export default function Autocomplete() {
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState("");
+
+  const debouncedSearch = useDebounce(search, 300);
+
+  const suggestions = useMemo(() => {
+    const value = debouncedSearch.trim().toLowerCase();
+
+    if (!value) return [];
+
+    return options.filter(item =>
+      item.toLowerCase().includes(value)
+    );
+  }, [debouncedSearch]);
+
+  const handleSelect = (item) => {
+    setSearch(item);
+    setSelected(item);
+  };
+
+  return (
+    &lt;div className="autocomplete"&gt;
+      &lt;input
+        value={search}
+        onChange={(e) =&gt; {
+          setSearch(e.target.value);
+          setSelected("");
+        }}
+        placeholder="Search technology..."
+      /&gt;
+
+      {debouncedSearch.trim() &amp;&amp; (
+        &lt;div className="suggestions"&gt;
+          {suggestions.length === 0 ? (
+            &lt;div&gt;No results found&lt;/div&gt;
+          ) : (
+            suggestions.map(item =&gt; (
+              &lt;button
+                key={item}
+                type="button"
+                onClick={() =&gt; handleSelect(item)}
+              &gt;
+                {item}
+              &lt;/button&gt;
+            ))
+          )}
+        &lt;/div&gt;
+      )}
+
+      {selected &amp;&amp; (
+        &lt;p&gt;Selected: {selected}&lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+          <div class="alert alert-success mt-4">
+            <strong>Final interview summary:</strong>
+            "I used a controlled input for the search value, a reusable useDebounce hook to avoid
+            unnecessary work while typing, and filtering to generate suggestions. I handle empty
+            input, no results, selection, and timer cleanup. If suggestions come from asynchronous
+            requests, I would additionally handle request cancellation or stale responses."
+          </div>
+
+          <h4 class="mt-4">Production-level improvements</h4>
+          <ul>
+            <li>Keyboard navigation: Arrow Up / Arrow Down.</li>
+            <li>Enter to select the highlighted suggestion.</li>
+            <li>Escape to close the dropdown.</li>
+            <li>Click-outside handling.</li>
+            <li>ARIA roles and accessibility.</li>
+            <li>Loading and error states for async suggestions.</li>
+            <li>AbortController or stale-response protection for overlapping requests.</li>
+            <li>Virtualization if the suggestion list becomes very large.</li>
+          </ul>
+
+          <div class="alert alert-info tip mt-4">
+            <strong>Interview tip:</strong> Do not over-engineer the first version. Build the basic
+            autocomplete first, explain your state and data flow, then add debounce, async handling,
+            keyboard support, and accessibility if the interviewer asks for them.
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.topic-section').forEach(section => {
+      section.classList.add('d-none');
+    });
+
+    document.getElementById(id).classList.remove('d-none');
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline-primary');
+    });
+
+    const buttons = Array.from(document.querySelectorAll('.nav-btn'));
+    const map = {
+      question: 0,
+      answer: 1,
+      interviewer: 2,
+      mistakes: 3,
+      full: 4
+    };
+
+    buttons[map[id]].classList.remove('btn-outline-primary');
+    buttons[map[id]].classList.add('btn-primary');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

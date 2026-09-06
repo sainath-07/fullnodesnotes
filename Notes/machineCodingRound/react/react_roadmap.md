@@ -842,7 +842,7 @@ Countdown timer
 Password strength indicator
 
 # Intermediate → Advanced
-Debounced search
+Debounced search - completed
 Autocomplete
 Infinite scrolling
 Data table

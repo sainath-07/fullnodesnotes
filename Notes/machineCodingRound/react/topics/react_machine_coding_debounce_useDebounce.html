@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React Machine Coding - Debounce Feature</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#202733}
+.topbar{position:sticky;top:0;z-index:1000}
+.sidebar{position:sticky;top:76px;height:calc(100vh - 95px);overflow-y:auto}
+.cardx{border:0;border-radius:16px;box-shadow:0 6px 22px rgba(0,0,0,.07)}
+.nav-pills .nav-link{text-align:left;margin-bottom:7px;border-radius:10px;color:#394150}
+.nav-pills .nav-link.active{background:#0d6efd;color:#fff}
+.anchor{scroll-margin-top:90px}
+pre{background:#172033;color:#e9eef8;padding:18px;border-radius:12px;overflow:auto}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:9px}
+.step{background:#fff;border:1px solid #d9dfeb;border-radius:12px;padding:12px 15px;text-align:center;font-weight:600}
+.arrow{font-size:22px;color:#6c757d}
+.mistake{border-left:4px solid #dc3545}
+.interview{border-left:4px solid #0dcaf0}
+.good{border-left:4px solid #198754}
+.small-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+@media(max-width:991px){.sidebar{position:relative;top:0;height:auto}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark topbar shadow-sm">
+<div class="container-fluid px-4 py-2">
+<div>
+<span class="navbar-brand fw-bold">React Machine Coding Round</span>
+<div class="text-white-50 small">Debounce Feature • Reusable useDebounce Hook</div>
+</div>
+</div>
+</nav>
+
+<div class="container-fluid py-4">
+<div class="row g-4">
+
+<!-- LEFT SIDE -->
+<aside class="col-lg-3">
+<div class="card cardx sidebar p-3">
+<div class="small-label text-primary mb-1">Navigation</div>
+<h5 class="fw-bold mb-3">Machine Coding Topics</h5>
+<nav class="nav nav-pills flex-column">
+<a class="nav-link active" href="#question">1. Question</a>
+<a class="nav-link" href="#answer">2. Answer</a>
+<a class="nav-link" href="#interviewer">3. Explain to Interviewer</a>
+<a class="nav-link" href="#mistakes">4. Common Developer Mistakes</a>
+<a class="nav-link" href="#full">5. Show Full Answer</a>
+</nav>
+<hr>
+<div class="alert alert-info small mb-0">
+<strong>Pattern:</strong><br>
+Input → <code>useDebounce()</code> → Debounced Value → API / Action
+</div>
+</div>
+</aside>
+
+<!-- RIGHT SIDE -->
+<main class="col-lg-9">
+
+<section id="question" class="card cardx mb-4 anchor">
+<div class="card-header bg-primary text-white">
+<h4 class="mb-0">Question</h4>
+</div>
+<div class="card-body">
+<h5 class="fw-bold">Implement a Debounce Feature in React</h5>
+<p>
+Create a reusable custom hook called <code>useDebounce</code>. Use this hook in a React
+component so that an action, such as a search API call, happens only after the user
+stops typing for a specified amount of time.
+</p>
+
+<div class="alert alert-warning">
+<strong>Machine coding requirement:</strong>
+Do not write the debounce timer logic directly inside the search component.
+Create a separate <code>useDebounce</code> hook and reuse it.
+</div>
+
+<h6 class="fw-bold mt-4">Example requirement</h6>
+<ul>
+<li>User types continuously.</li>
+<li>Every new keystroke should reset the waiting time.</li>
+<li>When the user stops typing for 500 ms, the latest value should be returned.</li>
+<li>The component can then use that value to call an API or perform another action.</li>
+</ul>
+
+<h6 class="fw-bold mt-4">Simple visual</h6>
+<div class="flow my-3">
+<div class="step">User types<br><code>R</code></div>
+<div class="arrow">→</div>
+<div class="step">Start<br>500 ms timer</div>
+<div class="arrow">→</div>
+<div class="step">User types<br><code>Re</code></div>
+<div class="arrow">→</div>
+<div class="step">Clear old<br>timer</div>
+<div class="arrow">→</div>
+<div class="step">Start timer<br>again</div>
+<div class="arrow">→</div>
+<div class="step">User stops</div>
+<div class="arrow">→</div>
+<div class="step">Return<br><code>Re</code></div>
+</div>
+</div>
+</section>
+
+<section id="answer" class="card cardx mb-4 anchor">
+<div class="card-header bg-success text-white">
+<h4 class="mb-0">Answer</h4>
+</div>
+<div class="card-body">
+
+<h5 class="fw-bold">Step 1 — Create <code>useDebounce</code></h5>
+<pre><code>import { useEffect, useState } from "react";
+
+function useDebounce(value, delay = 500) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() =&gt; {
+    const timer = setTimeout(() =&gt; {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () =&gt; {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+export default useDebounce;</code></pre>
+
+<h5 class="fw-bold mt-4">Step 2 — Reuse the hook</h5>
+<pre><code>import { useEffect, useState } from "react";
+import useDebounce from "./useDebounce";
+
+function Search() {
+  const [search, setSearch] = useState("");
+
+  const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() =&gt; {
+    if (!debouncedSearch.trim()) return;
+
+    console.log("API call:", debouncedSearch);
+
+    // fetch(
+    //   `/api/search?q=${encodeURIComponent(debouncedSearch)}`
+    // );
+  }, [debouncedSearch]);
+
+  return (
+    &lt;input
+      value={search}
+      onChange={(e) =&gt; setSearch(e.target.value)}
+      placeholder="Search..."
+    /&gt;
+  );
+}
+
+export default Search;</code></pre>
+
+<div class="alert alert-success mt-3 mb-0">
+<strong>Important:</strong> The hook is responsible for waiting and returning the debounced value.
+The component is responsible for deciding what to do with that value.
+</div>
+</div>
+</section>
+
+<section id="interviewer" class="card cardx mb-4 anchor">
+<div class="card-header bg-info">
+<h4 class="mb-0">How I Have Implemented This — Explanation to Interviewer</h4>
+</div>
+<div class="card-body">
+
+<div class="card interview bg-light p-3 mb-4">
+<div class="fw-bold mb-2">Interview-ready answer</div>
+<p class="mb-0">
+“I separated the debounce logic into a reusable <code>useDebounce</code> custom hook.
+The hook accepts the current value and a delay. Whenever the value changes, I create a
+new timer. If another value arrives before the timer finishes, the cleanup function
+clears the previous timer. Once the user stops changing the value for the configured
+delay,
+the timer completes and I update the debounced value. The component consumes that
+debounced value and uses it to trigger the required action, such as an API call.”
+</p>
+</div>
+
+<h6 class="fw-bold">How it works in simple steps</h6>
+
+<div class="flow my-4">
+<div class="step"><span class="small-label text-primary">Step 1</span><br>User types</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 2</span><br><code>value</code> changes</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 3</span><br>Start timer</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 4</span><br>User types again</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 5</span><br>Clear old timer</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 6</span><br>Start new timer</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 7</span><br>User stops</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 8</span><br>Debounced value updates</div>
+<div class="arrow">→</div>
+<div class="step"><span class="small-label text-primary">Step 9</span><br>API / action runs</div>
+</div>
+
+<h6 class="fw-bold mt-4">Why use a separate custom hook?</h6>
+<ul>
+<li><strong>Reusable:</strong> the same debounce behavior can be used in many components.</li>
+<li><strong>Clean component:</strong> the component does not contain timer-management code.</li>
+<li><strong>Easy to configure:</strong> the delay can be passed as an argument.</li>
+<li><strong>Separation of responsibility:</strong> the hook handles debounce; the component handles business logic.</li>
+</ul>
+
+<h6 class="fw-bold mt-4">What does cleanup do?</h6>
+<p>
+The cleanup function runs before the effect runs again because the dependency changed.
+It calls <code>clearTimeout(timer)</code>, which removes the previous pending timer.
+Then a fresh timer is created for the latest value.
+</p>
+
+<div class="alert alert-primary">
+<strong>One-line explanation:</strong>
+“Every new input cancels the previous waiting timer, and only the latest value is emitted after the user becomes idle for the configured delay.”
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="card cardx mb-4 anchor">
+<div class="card-header bg-danger text-white">
+<h4 class="mb-0">Common Developer Mistakes</h4>
+</div>
+<div class="card-body">
+
+<div class="card mistake mb-3">
+<div class="card-body">
+<h6 class="fw-bold">1. Forgetting <code>clearTimeout</code></h6>
+<p class="mb-0">If the old timer is not cleared, multiple timers can complete. The debounce behavior will not work correctly.</p>
+</div>
+</div>
+
+<div class="card mistake mb-3">
+<div class="card-body">
+<h6 class="fw-bold">2. Putting debounce logic directly inside every component</h6>
+<p class="mb-0">This duplicates code. If debounce is needed in multiple places, create and reuse <code>useDebounce</code>.</p>
+</div>
+</div>
+
+<div class="card mistake mb-3">
+<div class="card-body">
+<h6 class="fw-bold">3. Putting API logic inside the generic hook</h6>
+<p class="mb-0">A reusable value-based debounce hook should normally return the debounced value. Let the component decide whether to call an API or perform another action.</p>
+</div>
+</div>
+
+<div class="card mistake mb-3">
+<div class="card-body">
+<h6 class="fw-bold">4. Forgetting the dependency array</h6>
+<p class="mb-0">Use <code>[value, delay]</code> so the effect responds to changes in the value or delay.</p>
+</div>
+</div>
+
+<div class="card mistake mb-3">
+<div class="card-body">
+<h6 class="fw-bold">5. Not handling empty search input</h6>
+<p class="mb-0">For search features, check <code>trim()</code> and decide whether an empty search should clear results or avoid an API call.</p>
+</div>
+</div>
+
+<div class="card mistake mb-3">
+<div class="card-body">
+<h6 class="fw-bold">6. Thinking debounce prevents API race conditions</h6>
+<p class="mb-0">Debounce controls how frequently requests start. If multiple requests can overlap, an older response can still arrive later. Use stale-response protection or <code>AbortController</code> when required.</p>
+</div>
+</div>
+
+<div class="card mistake">
+<div class="card-body">
+<h6 class="fw-bold">7. Using an unsuitable delay</h6>
+<p class="mb-0">A very short delay may create too many requests. A very long delay can make the UI feel slow. For search, a value around 300–500 ms is a common starting point, then adjust based on the product requirement.</p>
+</div>
+</div>
+
+</div>
+</section>
+
+<section id="full" class="card cardx mb-5 anchor">
+<div class="card-header bg-dark text-white">
+<h4 class="mb-0">Show Full Answer</h4>
+</div>
+<div class="card-body">
+
+<h6 class="fw-bold">useDebounce.js</h6>
+<pre><code>import { useEffect, useState } from "react";
+
+function useDebounce(value, delay = 500) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() =&gt; {
+    const timer = setTimeout(() =&gt; {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () =&gt; {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+export default useDebounce;</code></pre>
+
+<h6 class="fw-bold mt-4">Search.jsx</h6>
+<pre><code>import { useEffect, useState } from "react";
+import useDebounce from "./useDebounce";
+
+function Search() {
+  const [search, setSearch] = useState("");
+
+  const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() =&gt; {
+    if (!debouncedSearch.trim()) {
+      return;
+    }
+
+    async function searchProducts() {
+      try {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(debouncedSearch)}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    searchProducts();
+  }, [debouncedSearch]);
+
+  return (
+    &lt;div&gt;
+      &lt;input
+        value={search}
+        onChange={(e) =&gt; setSearch(e.target.value)}
+        placeholder="Search products..."
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Search;</code></pre>
+
+<div class="alert alert-success mt-4">
+<strong>Final interview summary:</strong>
+“I built debounce as a reusable custom hook. The hook starts a timer whenever the input
+value changes and clears the previous timer during cleanup. Only after the user stops
+typing for the configured delay does the debounced value update. The component reuses
+that value to trigger the required API call or action.”
+</div>
+
+<div class="card good p-3">
+<strong>Quick revision:</strong>
+<span class="ms-2"><code>Input → useDebounce → wait → latest value → API / action</code></span>
+</div>
+
+</div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
