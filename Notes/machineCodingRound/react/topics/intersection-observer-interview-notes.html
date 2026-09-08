@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IntersectionObserver — Interview Notes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#1f2937}
+    .sticky-nav{position:sticky;top:0;z-index:1030}
+    .hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+    .doc-card{border:0;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.08);overflow:hidden}
+    .card-header-custom{font-weight:700}
+    .left-panel{position:sticky;top:80px;max-height:calc(100vh - 95px);overflow:auto}
+    pre{background:#111827;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;font-size:.9rem}
+    code{color:#b91c1c}.flow code,pre code{color:inherit}
+    .step{border-left:4px solid #2563eb;background:#fff;padding:14px 16px;border-radius:10px;margin-bottom:10px}
+    .flow-box{border:2px dashed #93c5fd;background:#eff6ff;border-radius:12px;padding:14px;text-align:center;height:100%}
+    .arrow{text-align:center;font-size:1.5rem;font-weight:700}
+    .mistake{border-left:4px solid #dc3545}
+    .tip{border-left:4px solid #f59e0b}
+    .good{border-left:4px solid #198754}
+    .small-muted{color:#6b7280}
+    .toc a{text-decoration:none}
+    @media(max-width:991px){.left-panel{position:static;max-height:none}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-nav shadow">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="#">React Interview Notes</a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#what">What</a></li>
+        <li class="nav-item"><a class="nav-link" href="#works">How</a></li>
+        <li class="nav-item"><a class="nav-link" href="#syntax">Syntax</a></li>
+        <li class="nav-item"><a class="nav-link" href="#callbacks">Callbacks</a></li>
+        <li class="nav-item"><a class="nav-link" href="#options">Options</a></li>
+        <li class="nav-item"><a class="nav-link" href="#visual">Visual Flow</a></li>
+        <li class="nav-item"><a class="nav-link" href="#rules">Rules</a></li>
+        <li class="nav-item"><a class="nav-link" href="#cleanup">Cleanup</a></li>
+        <li class="nav-item"><a class="nav-link" href="#rootmargin">rootMargin</a></li>
+        <li class="nav-item"><a class="nav-link" href="#threshold">threshold</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero py-5">
+  <div class="container">
+    <span class="badge bg-light text-primary mb-3">Machine Coding + Frontend Interview</span>
+    <h1 class="display-6 fw-bold">IntersectionObserver()</h1>
+    <p class="lead mb-0">Simple, interview-ready notes covering the API, callbacks, options, cleanup, rootMargin, threshold and practical React usage.</p>
+  </div>
+</header>
+
+<main class="container-fluid px-3 px-lg-4 py-4">
+  <div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <aside class="col-lg-4">
+      <div class="left-panel">
+
+        <section class="card doc-card mb-4" id="what">
+          <div class="card-header bg-primary text-white card-header-custom">LEFT — What is IntersectionObserver?</div>
+          <div class="card-body">
+            <p><strong>IntersectionObserver</strong> is a browser API that lets JavaScript know when an element enters, leaves, or changes its visible intersection with another element or the viewport.</p>
+            <p>In simple words:</p>
+            <div class="alert alert-info"><strong>“Tell me when this element becomes visible.”</strong></div>
+            <p class="mb-0">It is especially useful for lazy loading, infinite scrolling, analytics visibility tracking, active navigation, and revealing content when it appears on screen.</p>
+          </div>
+        </section>
+
+        <section class="card doc-card mb-4" id="works">
+          <div class="card-header bg-success text-white card-header-custom">LEFT — How does it work?</div>
+          <div class="card-body">
+            <ol>
+              <li>Create an observer.</li>
+              <li>Give it a callback function.</li>
+              <li>Configure optional rules such as <code>root</code>, <code>rootMargin</code>, and <code>threshold</code>.</li>
+              <li>Tell the observer which element to watch using <code>observe()</code>.</li>
+              <li>The browser watches the element for you.</li>
+              <li>When the intersection crosses the configured threshold, the callback receives an entry.</li>
+            </ol>
+            <div class="alert alert-warning mb-0"><strong>Key idea:</strong> You do not continuously ask “is this element visible?” The browser reports relevant intersection changes to your callback.</div>
+          </div>
+        </section>
+
+        <section class="card doc-card mb-4">
+          <div class="card-header bg-dark text-white card-header-custom">LEFT — Interview Explanation</div>
+          <div class="card-body">
+            <div class="alert alert-light border">
+              “IntersectionObserver is a browser API used to observe the visibility or intersection of an element relative to a root, usually the viewport. I create an observer with a callback and options, observe a target element, and the browser calls my callback when the target crosses the configured threshold. This avoids manually calculating scroll position on every scroll event.”
+            </div>
+            <p><strong>For infinite scrolling:</strong></p>
+            <p class="mb-0">“I place a sentinel element at the bottom of the list. When that sentinel becomes visible, I fetch the next page and append the new records.”</p>
+          </div>
+        </section>
+
+        <section class="card doc-card mb-4">
+          <div class="card-header bg-secondary text-white card-header-custom">LEFT — When do you need it?</div>
+          <div class="card-body">
+            <ul>
+              <li>Infinite scrolling</li>
+              <li>Lazy loading images</li>
+              <li>Lazy loading components/content</li>
+              <li>Track whether an ad or section is visible</li>
+              <li>Analytics such as “section viewed”</li>
+              <li>Reveal animations when elements enter the viewport</li>
+              <li>Highlight the current section in a documentation page</li>
+              <li>Load more content before the user reaches the end</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="card doc-card mb-4">
+          <div class="card-header bg-warning text-dark card-header-custom">LEFT — What pairs well with it?</div>
+          <div class="card-body">
+            <ul>
+              <li><strong>useRef:</strong> access the DOM target/sentinel.</li>
+              <li><strong>useEffect:</strong> create and clean up the observer.</li>
+              <li><strong>useCallback:</strong> keep callback/fetch function identity stable when appropriate.</li>
+              <li><strong>AbortController:</strong> cancel in-flight network requests.</li>
+              <li><strong>Pagination:</strong> fetch the next chunk of data.</li>
+              <li><strong>Loading state:</strong> prevent duplicate requests.</li>
+              <li><strong>Virtualization:</strong> useful when the list becomes extremely large.</li>
+            </ul>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- RIGHT SIDE -->
+    <section class="col-lg-8">
+
+      <section class="card doc-card mb-4" id="syntax">
+        <div class="card-header bg-primary text-white card-header-custom">RIGHT — Basic Syntax</div>
+        <div class="card-body">
+<pre><code>const observer = new IntersectionObserver(
+  (entries, observer) =&gt; {
+    const entry = entries[0];
+
+    if (entry.isIntersecting) {
+      console.log("Element is visible");
+    }
+  },
+  {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0,
+  }
+);
+
+// Start watching the target.
+observer.observe(targetElement);
+
+// Stop watching one target.
+observer.unobserve(targetElement);
+
+// Stop the observer completely.
+observer.disconnect();</code></pre>
+          <div class="alert alert-info mb-0">
+            <strong>Remember:</strong> <code>new IntersectionObserver()</code> creates the observer. <code>observe()</code> starts watching a target.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="callbacks">
+        <div class="card-header bg-success text-white card-header-custom">RIGHT — Callback and IntersectionObserverEntry</div>
+        <div class="card-body">
+          <p>The callback is called when an observed target crosses one of the configured thresholds.</p>
+<pre><code>const observer = new IntersectionObserver((entries, observer) =&gt; {
+  entries.forEach((entry) =&gt; {
+    console.log(entry.target);        // observed element
+    console.log(entry.isIntersecting); // true / false
+    console.log(entry.intersectionRatio); // 0 to 1
+    console.log(entry.boundingClientRect);
+    console.log(entry.intersectionRect);
+    console.log(entry.rootBounds);
+  });
+});</code></pre>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card h-100 good">
+                <div class="card-body">
+                  <h6 class="fw-bold">entries</h6>
+                  <p class="mb-0">An array of <code>IntersectionObserverEntry</code> objects. One callback can contain entries for multiple observed targets.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 good">
+                <div class="card-body">
+                  <h6 class="fw-bold">observer</h6>
+                  <p class="mb-0">The observer instance. It can be used to stop observing a target or disconnect the observer.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-warning mt-3 mb-0">
+            <strong>Interview point:</strong> Do not assume <code>entries[0]</code> is always the only target. It is common when observing one sentinel, but <code>entries</code> is an array by design.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="options">
+        <div class="card-header bg-info text-dark card-header-custom">RIGHT — Options</div>
+        <div class="card-body">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr><th>Option</th><th>Meaning</th><th>Common value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>root</code></td><td>The element used as the viewport for intersection checks. <code>null</code> means the browser viewport.</td><td><code>null</code></td></tr>
+              <tr><td><code>rootMargin</code></td><td>Expands or shrinks the root's effective boundary before calculating intersection.</td><td><code>"400px"</code></td></tr>
+              <tr><td><code>threshold</code></td><td>Defines the visibility ratio(s) at which the callback should be notified.</td><td><code>0</code>, <code>0.5</code>, <code>1</code></td></tr>
+            </tbody>
+          </table>
+
+<pre><code>const observer = new IntersectionObserver(callback, {
+  root: null,
+  rootMargin: "200px 0px",
+  threshold: 0.1,
+});</code></pre>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="visual">
+        <div class="card-header bg-dark text-white card-header-custom">RIGHT — Visual Flow of IntersectionObserver</div>
+        <div class="card-body flow">
+          <div class="row g-3">
+            <div class="col-md-3"><div class="flow-box"><strong>1. Target</strong><br>Element exists in DOM<br><small>sentinel / image / section</small></div></div>
+            <div class="col-md-1 arrow align-self-center">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>2. Observe</strong><br><code>observer.observe(target)</code></div></div>
+            <div class="col-md-1 arrow align-self-center">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>3. Browser watches</strong><br>No manual scroll calculation</div></div>
+          </div>
+
+          <div class="arrow my-3">↓</div>
+
+          <div class="flow-box">
+            <strong>4. Intersection changes</strong><br>
+            Target crosses a configured threshold
+          </div>
+
+          <div class="arrow my-3">↓</div>
+
+          <div class="row g-3">
+            <div class="col-md-4"><div class="flow-box"><strong>5. Callback</strong><br><code>entries</code> received</div></div>
+            <div class="col-md-4"><div class="flow-box"><strong>6. Check</strong><br><code>entry.isIntersecting</code></div></div>
+            <div class="col-md-4"><div class="flow-box"><strong>7. Action</strong><br>fetch / load / animate / track</div></div>
+          </div>
+
+          <div class="alert alert-success mt-4 mb-0">
+            <strong>Infinite scroll example:</strong> target = sentinel → callback fires → fetch next page → append data → sentinel remains at the bottom → repeat.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="rules">
+        <div class="card-header bg-warning text-dark card-header-custom">RIGHT — Rules / Best Practices</div>
+        <div class="card-body">
+          <ol>
+            <li class="step"><strong>Observe a real DOM element.</strong><br>Call <code>observe(element)</code> only after you have a valid element.</li>
+            <li class="step"><strong>Keep the target stable when possible.</strong><br>For infinite scrolling, use one sentinel at the end instead of observing every list item.</li>
+            <li class="step"><strong>Guard expensive work.</strong><br>The callback can run many times. Prevent duplicate API calls with a loading flag/ref.</li>
+            <li class="step"><strong>Use the correct root.</strong><br>If the scrollable area is a container, set that container as <code>root</code> instead of assuming the window is the root.</li>
+            <li class="step"><strong>Choose threshold intentionally.</strong><br>Use <code>0</code> when you care about entering the root, and higher values when a specific amount of visibility matters.</li>
+            <li class="step"><strong>Use rootMargin for preloading.</strong><br>Load content before the user reaches the exact target position.</li>
+            <li class="step"><strong>Clean up.</strong><br>Stop observing when the component/effect is no longer active.</li>
+            <li class="step"><strong>Handle errors.</strong><br>Network failures should not leave the UI permanently stuck in a loading state.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="cleanup">
+        <div class="card-header bg-danger text-white card-header-custom">RIGHT — Cleanup in React</div>
+        <div class="card-body">
+          <p>When an observer is created inside <code>useEffect</code>, return a cleanup function.</p>
+<pre><code>useEffect(() =&gt; {
+  const observer = new IntersectionObserver(callback);
+
+  const target = targetRef.current;
+
+  if (target) {
+    observer.observe(target);
+  }
+
+  return () =&gt; {
+    if (target) {
+      observer.unobserve(target);
+    }
+
+    observer.disconnect();
+  };
+}, []);</code></pre>
+
+          <div class="alert alert-danger">
+            <strong>Why cleanup?</strong> It prevents the effect from leaving an observer active after the related React lifecycle/effect is finished. It also prevents unnecessary callbacks and retained references.
+          </div>
+
+          <div class="alert alert-info mb-0">
+            <strong>Network cleanup is separate:</strong> If the callback starts a fetch, consider <code>AbortController</code> when the request should be cancellable.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-secondary text-white card-header-custom">RIGHT — unobserve() vs disconnect()</div>
+        <div class="card-body">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr><th>Method</th><th>What it does</th><th>Use case</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>unobserve(target)</code></td>
+                <td>Stops observing one specific target element.</td>
+                <td>You want the observer to continue watching other targets.</td>
+              </tr>
+              <tr>
+                <td><code>disconnect()</code></td>
+                <td>Stops the observer from watching all targets.</td>
+                <td>Cleanup when the entire observer is no longer needed.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="alert alert-warning mb-0">
+            <strong>Simple memory trick:</strong> <code>unobserve = one target</code> • <code>disconnect = everything for this observer</code>
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="rootmargin">
+        <div class="card-header bg-primary text-white card-header-custom">RIGHT — rootMargin</div>
+        <div class="card-body">
+          <p><code>rootMargin</code> changes the effective boundary used for intersection calculations. Think of it as adding an invisible margin around the root.</p>
+<pre><code>const observer = new IntersectionObserver(callback, {
+  rootMargin: "400px 0px",
+});</code></pre>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="flow-box">
+                <strong>Without rootMargin</strong><br>
+                User reaches sentinel<br>
+                ↓<br>
+                Fetch starts
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <strong>With rootMargin: "400px"</strong><br>
+                Sentinel is still below viewport<br>
+                ↓<br>
+                Fetch can start earlier
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-success mt-3 mb-0">
+            <strong>Infinite-scroll tip:</strong> A positive bottom root margin is useful when you want to fetch the next page before the user reaches the end.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="threshold">
+        <div class="card-header bg-success text-white card-header-custom">RIGHT — threshold</div>
+        <div class="card-body">
+          <p><code>threshold</code> controls the visibility ratio at which the observer callback is notified.</p>
+          <table class="table table-bordered">
+            <thead class="table-light"><tr><th>Value</th><th>Simple meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>0</code></td><td>Notify when the target crosses from not intersecting to intersecting (and the reverse transition).</td></tr>
+              <tr><td><code>0.5</code></td><td>Notify when the intersection crosses about 50% visibility.</td></tr>
+              <tr><td><code>1</code></td><td>Notify when the target reaches full intersection with the root.</td></tr>
+              <tr><td><code>[0, 0.25, 0.5, 0.75, 1]</code></td><td>Notify at multiple visibility-ratio thresholds.</td></tr>
+            </tbody>
+          </table>
+
+<pre><code>const observer = new IntersectionObserver(callback, {
+  threshold: 0.5,
+});</code></pre>
+
+          <div class="alert alert-warning mb-0">
+            <strong>Interview note:</strong> Threshold is about the intersection ratio. It is different from <code>rootMargin</code>, which changes the root's effective boundary.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-danger text-white card-header-custom">RIGHT — Common Developer Mistakes</div>
+        <div class="card-body">
+          <div class="alert alert-danger mistake"><strong>1. Creating observers repeatedly without cleanup</strong><br>Always clean up observers created by an effect.</div>
+          <div class="alert alert-danger mistake"><strong>2. Forgetting to call observe()</strong><br>Creating the observer alone does not start watching a target.</div>
+          <div class="alert alert-danger mistake"><strong>3. Using the wrong root</strong><br>If a nested container scrolls, the container may need to be the root.</div>
+          <div class="alert alert-danger mistake"><strong>4. Triggering duplicate API requests</strong><br>Use a loading guard, request state, or ref when the callback starts network work.</div>
+          <div class="alert alert-danger mistake"><strong>5. Assuming entries always has one item</strong><br>The callback receives an array because one observer can watch multiple targets.</div>
+          <div class="alert alert-danger mistake"><strong>6. Using threshold as a preload distance</strong><br>Use <code>rootMargin</code> when the goal is to start earlier or later spatially.</div>
+          <div class="alert alert-danger mistake"><strong>7. Observing every list item unnecessarily</strong><br>For infinite scrolling, a single sentinel is usually enough.</div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-dark text-white card-header-custom">RIGHT — Quick Revision</div>
+        <div class="card-body">
+          <div class="row g-2 text-center">
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Create</strong><br>new Observer()</div></div>
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Observe</strong><br>observe(target)</div></div>
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Detect</strong><br>intersection</div></div>
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Act</strong><br>load / fetch / track</div></div>
+          </div>
+          <div class="alert alert-info mt-3 mb-0">
+            <strong>Remember:</strong>
+            <code>root</code> = where visibility is measured •
+            <code>rootMargin</code> = expands/shrinks that boundary •
+            <code>threshold</code> = how much intersection is required •
+            <code>observe</code> = watch one target •
+            <code>unobserve</code> = stop one target •
+            <code>disconnect</code> = stop all targets for that observer.
+          </div>
+        </div>
+      </section>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+  <small>IntersectionObserver Interview Notes • React / JavaScript</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

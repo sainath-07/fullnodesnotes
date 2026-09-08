@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debounce with useRef + useCallback</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#202733;font-family:Arial,sans-serif;line-height:1.6}
+.sticky{position:sticky;top:0;z-index:1000}
+.hero{background:linear-gradient(135deg,#172033,#40577f);color:#fff}
+.card{border:0;border-radius:14px}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:18px;overflow:auto;font-size:.9rem}
+.flow{background:#eef4ff;border-radius:14px;padding:20px}
+.flowbox{background:#fff;border:1px solid #d7e1ef;border-radius:12px;padding:14px;text-align:center;height:100%}
+.left{background:#fff8e7;border-left:5px solid #f0ad00}
+.right{background:#edf9f1;border-left:5px solid #198754}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky shadow">
+<div class="container">
+<a class="navbar-brand fw-bold" href="#">Debounce: useRef + useCallback</a>
+<div class="d-flex flex-wrap gap-2">
+<a class="nav-link text-white" href="#idea">Idea</a>
+<a class="nav-link text-white" href="#hooks">Hooks</a>
+<a class="nav-link text-white" href="#flow">Visual Flow</a>
+<a class="nav-link text-white" href="#code">Code</a>
+<a class="nav-link text-white" href="#interview">Interview</a>
+<a class="nav-link text-white" href="#mistakes">Mistakes</a>
+</div>
+</div>
+</nav>
+
+<header class="hero py-5">
+<div class="container">
+<h1 class="fw-bold">Debounce with useRef + useCallback</h1>
+<p class="lead mb-2">Machine Coding Round — React implementation without useState</p>
+<div class="alert alert-light mb-0">
+<strong>Goal:</strong> Keep the input value and timeout in refs, use useCallback for stable functions, and avoid a React state update for every keystroke.
+</div>
+</div>
+</header>
+
+<main class="container py-4">
+
+<section id="idea" class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h2 class="h4 mb-0">1. What are we building?</h2></div>
+<div class="card-body">
+<p>We want a debounced search/input handler:</p>
+<pre class="code"><code>User types:  r → re → rea → reac → react
+
+Do NOT run:
+API(r)
+API(re)
+API(rea)
+API(reac)
+API(react)
+
+Instead:
+wait until typing stops
+        ↓
+API(react)</code></pre>
+<p>The debounce algorithm remains the same: <strong>clear the previous timer → create a new timer → execute after the user pauses.</strong></p>
+<div class="alert alert-info mb-0">
+<strong>React-specific change:</strong> We will not use <code>useState</code> for the input value or timer. The DOM input is accessed with <code>useRef</code>.
+</div>
+</div>
+</div>
+</section>
+
+<section id="hooks" class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-success text-white"><h2 class="h4 mb-0">2. Why only useRef + useCallback?</h2></div>
+<div class="card-body">
+<div class="row g-4">
+<div class="col-md-6">
+<div class="p-4 border rounded h-100">
+<h3 class="h5"><code>useRef</code> — store values without re-rendering</h3>
+<pre class="code"><code>const inputRef = useRef(null);
+const timerRef = useRef(null);</code></pre>
+<ul>
+<li><code>inputRef</code> points to the DOM input.</li>
+<li><code>timerRef</code> stores the active timeout ID.</li>
+<li>Changing <code>.current</code> does not trigger a render.</li>
+</ul>
+</div>
+</div>
+<div class="col-md-6">
+<div class="p-4 border rounded h-100">
+<h3 class="h5"><code>useCallback</code> — keep function reference stable</h3>
+<pre class="code"><code>const debounceSearch = useCallback(
+  () =&gt; { ... },
+  []
+);</code></pre>
+<ul>
+<li>Memoizes the function reference.</li>
+<li>It does not create the debounce delay.</li>
+<li>The delay still comes from <code>setTimeout</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="alert alert-warning mt-4 mb-0">
+<strong>Remember:</strong> useRef = persistent mutable value. useCallback = memoized function. setTimeout = delay. Debounce = the behavior created by combining clearTimeout + setTimeout.
+</div>
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-info text-dark"><h2 class="h4 mb-0">3. Why avoid useState here?</h2></div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6">
+<div class="p-3 border rounded">
+<strong>With useState</strong>
+<pre class="code"><code>const [query, setQuery] = useState("");
+
+onChange:
+setQuery(value);
+
+→ state changes
+→ component renders again</code></pre>
+</div>
+</div>
+<div class="col-md-6">
+<div class="p-3 border rounded">
+<strong>With useRef</strong>
+<pre class="code"><code>const inputRef = useRef(null);
+
+onChange:
+inputRef.current.value
+
+→ no state update
+→ no render caused by the input value</code></pre>
+</div>
+</div>
+</div>
+<div class="alert alert-success mt-3 mb-0">
+This is appropriate when the input value does not need to be used to render React UI. If the UI must react to the value, state may still be the correct choice.
+</div>
+</div>
+</div>
+</section>
+
+<section id="flow" class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-warning"><h2 class="h4 mb-0">4. Visual Explanation — Simple Steps</h2></div>
+<div class="card-body">
+<div class="flow">
+<div class="row g-3">
+<div class="col-md-3"><div class="flowbox"><strong>1. Type</strong><br>User types into input</div></div>
+<div class="col-md-3"><div class="flowbox"><strong>2. Read ref</strong><br><code>inputRef.current.value</code></div></div>
+<div class="col-md-3"><div class="flowbox"><strong>3. Cancel</strong><br><code>clearTimeout(timerRef.current)</code></div></div>
+<div class="col-md-3"><div class="flowbox"><strong>4. Schedule</strong><br><code>setTimeout(...)</code></div></div>
+</div>
+<div class="text-center fs-2 my-3">↓</div>
+<div class="row g-3">
+<div class="col-md-4"><div class="flowbox"><strong>User types again</strong><br>Old timer is cancelled</div></div>
+<div class="col-md-4"><div class="flowbox"><strong>User pauses</strong><br>500ms passes</div></div>
+<div class="col-md-4"><div class="flowbox"><strong>Function executes</strong><br>Latest value is sent to API</div></div>
+</div>
+</div>
+<div class="alert alert-primary mt-3 mb-0">
+<strong>Simple example:</strong> Think of an elevator door. Every time someone enters, the closing countdown starts again. Only after nobody enters for the waiting period does the door close. Debounce works similarly.
+</div>
+</div>
+</div>
+</section>
+
+<section id="code" class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-primary text-white"><h2 class="h4 mb-0">5. Implementation Step-by-Step — No useState</h2></div>
+<div class="card-body">
+
+<h3 class="h5">Step 1 — Create the refs</h3>
+<pre class="code"><code>const inputRef = useRef(null);
+const timerRef = useRef(null);</code></pre>
+<p><code>inputRef</code> will point to the input element. <code>timerRef</code> will remember the current timeout.</p>
+
+<h3 class="h5 mt-4">Step 2 — Create the actual function</h3>
+<pre class="code"><code>const searchAPI = useCallback(async (value) =&gt; {
+  console.log("API call:", value);
+
+  const response = await fetch(
+    `/api/search?q=${encodeURIComponent(value)}`
+  );
+
+  const data = await response.json();
+
+  console.log(data);
+}, []);</code></pre>
+
+<h3 class="h5 mt-4">Step 3 — Create debounce with useCallback + useRef</h3>
+<pre class="code"><code>const debounceSearch = useCallback(() =&gt; {
+
+  // Read latest value directly from DOM
+  const value = inputRef.current.value;
+
+  // Cancel previous timer
+  clearTimeout(timerRef.current);
+
+  // Schedule latest call
+  timerRef.current = setTimeout(() =&gt; {
+    searchAPI(value);
+  }, 500);
+
+}, [searchAPI]);</code></pre>
+
+<h3 class="h5 mt-4">Step 4 — Connect ref to input</h3>
+<pre class="code"><code>&lt;input
+  ref={inputRef}
+  onChange={debounceSearch}
+  placeholder="Search..."
+/&gt;</code></pre>
+
+<h3 class="h5 mt-4">Step 5 — Cleanup</h3>
+<pre class="code"><code>useEffect(() =&gt; {
+  return () =&gt; {
+    clearTimeout(timerRef.current);
+  };
+}, []);</code></pre>
+
+<h3 class="h5 mt-4">Complete Example</h3>
+<pre class="code"><code>import {
+  useCallback,
+  useEffect,
+  useRef
+} from "react";
+
+function SearchBox() {
+  const inputRef = useRef(null);
+  const timerRef = useRef(null);
+
+  const searchAPI = useCallback(async (value) =&gt; {
+    if (!value.trim()) return;
+
+    console.log("API call:", value);
+
+    try {
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(value)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("API request failed");
+      }
+
+      const data = await response.json();
+      console.log("Result:", data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const debounceSearch = useCallback(() =&gt; {
+    const value = inputRef.current.value;
+
+    clearTimeout(timerRef.current);
+
+    timerRef.current = setTimeout(() =&gt; {
+      searchAPI(value);
+    }, 500);
+
+  }, [searchAPI]);
+
+  useEffect(() =&gt; {
+    return () =&gt; {
+      clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  return (
+    &lt;input
+      ref={inputRef}
+      onChange={debounceSearch}
+      placeholder="Search..."
+    /&gt;
+  );
+}
+
+export default SearchBox;</code></pre>
+
+<div class="alert alert-success">
+<strong>Notice:</strong> There is no <code>useState</code> in this implementation. The input value comes from <code>inputRef.current.value</code>, and the timer comes from <code>timerRef.current</code>.
+</div>
+</div>
+</div>
+</section>
+
+<section id="interview" class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white"><h2 class="h4 mb-0">6. Interview — Two-Side Explanation</h2></div>
+<div class="card-body">
+<div class="row g-4">
+
+<div class="col-lg-6">
+<div class="card left h-100 shadow-sm">
+<div class="card-body">
+<h2 class="h5">LEFT SIDE — Question → Answer → How I Explain</h2>
+
+<h3 class="h6 mt-4">Q1. How did you implement debounce?</h3>
+<p><strong>Answer:</strong> I store the timer ID in a ref and create the debounce handler using useCallback. On every input event, I clear the previous timeout and start a new timeout.</p>
+<p><strong>How I explain:</strong> “The debounce algorithm is clear previous timer, create a new timer, and execute after the user stops typing. I use a ref because the timer must survive renders without causing a render.”</p>
+
+<h3 class="h6 mt-4">Q2. Why don't you use state for the input?</h3>
+<p><strong>Answer:</strong> In this specific implementation, the input value is not required to drive React rendering.</p>
+<p><strong>How I explain:</strong> “I use an uncontrolled input and access its latest value through inputRef.current.value. This avoids a state update and React render for every keystroke.”</p>
+
+<h3 class="h6 mt-4">Q3. Why useCallback?</h3>
+<p><strong>Answer:</strong> To memoize the callback and keep its reference stable when dependencies do not change.</p>
+<p><strong>How I explain:</strong> “useCallback is not debounce. setTimeout provides the waiting period. useCallback keeps the function reference stable.”</p>
+
+<h3 class="h6 mt-4">Q4. Why useRef for timerId?</h3>
+<p><strong>Answer:</strong> The timer ID needs to persist but does not need to trigger UI updates.</p>
+<p><strong>How I explain:</strong> “I need the same timer reference on the next keystroke so I can call clearTimeout. useRef gives me that persistent mutable value without a re-render.”</p>
+
+<h3 class="h6 mt-4">Q5. What happens when the user types quickly?</h3>
+<p><strong>Answer:</strong> Each new event cancels the previous timer and schedules another one.</p>
+<p><strong>How I explain:</strong> “If the user types react quickly, only the final timer survives long enough to execute. Therefore the API is called after the pause with the latest value.”</p>
+</div>
+</div>
+</div>
+
+<div class="col-lg-6">
+<div class="card right h-100 shadow-sm">
+<div class="card-body">
+<h2 class="h5">RIGHT SIDE — Selected Related Answer</h2>
+
+<h3 class="h6">The mental model</h3>
+<pre class="code"><code>inputRef
+   ↓
+latest DOM value
+
+timerRef
+   ↓
+current timer ID
+
+useCallback
+   ↓
+stable functions
+
+setTimeout
+   ↓
+500ms delay
+
+clearTimeout
+   ↓
+cancel previous work</code></pre>
+
+<h3 class="h6 mt-4">The exact execution</h3>
+<pre class="code"><code>Type
+ ↓
+onChange
+ ↓
+debounceSearch()
+ ↓
+read inputRef.current.value
+ ↓
+clearTimeout(timerRef.current)
+ ↓
+setTimeout(...)
+ ↓
+wait 500ms
+ ↓
+searchAPI(latestValue)</code></pre>
+
+<h3 class="h6 mt-4">What is NOT happening?</h3>
+<ul>
+<li>No <code>setQuery()</code></li>
+<li>No input state update</li>
+<li>No render caused by typing</li>
+<li>No API call for every keystroke</li>
+</ul>
+
+<div class="alert alert-success">
+<strong>Best one-line interview answer:</strong><br>
+“I use an uncontrolled input with useRef, keep the timeout ID in another useRef, and use useCallback to create stable handlers. Each keystroke clears the previous timeout and schedules the latest API call.”
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-danger text-white"><h2 class="h4 mb-0">7. Common Developer Mistakes</h2></div>
+<div class="card-body">
+
+<div class="alert alert-danger">
+<strong>1. Saying useCallback is debounce</strong><br>
+Wrong. useCallback memoizes a function. setTimeout + clearTimeout create the debounce behavior.
+</div>
+
+<div class="alert alert-warning">
+<strong>2. Forgetting clearTimeout</strong><br>
+If you don't cancel the previous timer, multiple delayed calls can execute.
+</div>
+
+<div class="alert alert-warning">
+<strong>3. Using useState for timerId</strong><br>
+The timer ID is not UI state. useRef is a better fit for this mutable value.
+</div>
+
+<div class="alert alert-warning">
+<strong>4. Assuming useRef automatically means better performance</strong><br>
+Do not blindly replace state with refs. If the value must update the UI, state is usually appropriate.
+</div>
+
+<div class="alert alert-warning">
+<strong>5. Reading the ref too late</strong><br>
+Read the current input value when scheduling the debounce. Pass that value into the timeout callback.
+</div>
+
+<div class="alert alert-warning">
+<strong>6. Forgetting cleanup</strong><br>
+Cancel the pending timer when the component unmounts.
+</div>
+
+<div class="alert alert-warning">
+<strong>7. Ignoring API race conditions</strong><br>
+Debounce controls when a request starts. It does not guarantee that responses arrive in order. For real applications, consider AbortController or request/version checks.
+</div>
+
+<div class="alert alert-warning">
+<strong>8. Forgetting empty input</strong><br>
+Avoid unnecessary API requests for empty or whitespace-only values.
+</div>
+
+<div class="alert alert-warning mb-0">
+<strong>9. Overusing useCallback</strong><br>
+useCallback is not a performance magic switch. Use it when stable function identity is useful and explain the reason in the interview.
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="mb-4">
+<div class="card shadow-sm">
+<div class="card-header bg-secondary text-white"><h2 class="h4 mb-0">8. Important Trade-off</h2></div>
+<div class="card-body">
+<div class="alert alert-warning">
+<strong>No useState means React does not know about input changes.</strong>
+</div>
+<p>That is intentional here. This pattern is useful when the input is mainly an imperative source for an operation such as searching, logging, or triggering an API call.</p>
+<p>But if you need to show something like:</p>
+<pre class="code"><code>Searching for: react</code>
+
+or
+<button disabled={query.length &lt; 3}>Search</button></code></pre>
+<p>then React needs to render based on the value, and <code>useState</code> may be the better choice.</p>
+<div class="alert alert-primary mb-0">
+<strong>Interview maturity:</strong> Don't say “useRef is always better because it avoids renders.” Say “I chose useRef here because this value does not need to participate in rendering.”
+</div>
+</div>
+</div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow-sm">
+<div class="card-header bg-dark text-white"><h2 class="h4 mb-0">9. Final Interview Checklist</h2></div>
+<div class="card-body">
+<ul class="list-group">
+<li class="list-group-item">☑ Explain debounce before explaining hooks.</li>
+<li class="list-group-item">☑ Explain why the timer is stored in useRef.</li>
+<li class="list-group-item">☑ Explain that useCallback does not create debounce.</li>
+<li class="list-group-item">☑ Show clearTimeout before setTimeout.</li>
+<li class="list-group-item">☑ Show cleanup on unmount.</li>
+<li class="list-group-item">☑ Explain why no useState is used.</li>
+<li class="list-group-item">☑ Mention that refs are not suitable when the value must drive UI rendering.</li>
+<li class="list-group-item">☑ Be ready to discuss API cancellation and race conditions.</li>
+</ul>
+</div>
+</div>
+</section>
+
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+Debounce with useRef + useCallback · Machine Coding Round
+</footer>
+
+</body>
+</html>

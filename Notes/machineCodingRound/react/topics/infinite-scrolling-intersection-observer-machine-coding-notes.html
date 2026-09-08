@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Infinite Scrolling with IntersectionObserver - Machine Coding Notes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; color:#1f2937; }
+    .sticky-nav { position:sticky; top:0; z-index:1030; }
+    .hero { background:linear-gradient(135deg,#172554,#2563eb); color:#fff; }
+    .doc-card { border:0; border-radius:16px; box-shadow:0 5px 18px rgba(0,0,0,.08); overflow:hidden; }
+    .card-header-custom { font-weight:700; letter-spacing:.2px; }
+    .left-panel { position:sticky; top:82px; max-height:calc(100vh - 100px); overflow:auto; }
+    pre { background:#111827; color:#e5e7eb; padding:18px; border-radius:12px; font-size:.88rem; line-height:1.55; overflow:auto; }
+    code { color:#b91c1c; }
+    pre code { color:inherit; }
+    .step { border-left:4px solid #2563eb; padding:12px 16px; background:#fff; border-radius:10px; margin-bottom:10px; }
+    .flow-box { border:2px dashed #93c5fd; background:#eff6ff; border-radius:12px; padding:14px; text-align:center; }
+    .arrow { text-align:center; font-size:1.5rem; font-weight:700; }
+    .mistake { border-left:4px solid #dc3545; }
+    .good { border-left:4px solid #198754; }
+    .tip { border-left:4px solid #f59e0b; }
+    .small-muted { color:#6b7280; font-size:.92rem; }
+    .toc a { text-decoration:none; }
+    .badge-soft { background:#e0f2fe; color:#075985; }
+    @media (max-width: 991px) {
+      .left-panel { position:static; max-height:none; }
+    }
+  </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-nav shadow">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="#">Machine Coding Notes</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#question">Question</a></li>
+        <li class="nav-item"><a class="nav-link" href="#answer">Answer</a></li>
+        <li class="nav-item"><a class="nav-link" href="#visual">Visual</a></li>
+        <li class="nav-item"><a class="nav-link" href="#code">Code</a></li>
+        <li class="nav-item"><a class="nav-link" href="#mistakes">Mistakes</a></li>
+        <li class="nav-item"><a class="nav-link" href="#interviewer">Interview</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero py-5">
+  <div class="container">
+    <span class="badge bg-light text-primary mb-3">React Machine Coding Round</span>
+    <h1 class="display-6 fw-bold">Infinite Scrolling with IntersectionObserver()</h1>
+    <p class="lead mb-0">A practical, interview-ready implementation using useEffect, useRef, useCallback and AbortController.</p>
+  </div>
+</header>
+
+<main class="container-fluid px-3 px-lg-4 py-4">
+  <div class="row g-4">
+
+    <!-- LEFT: Question + Answer + Interview explanation -->
+    <aside class="col-lg-4">
+      <div class="left-panel">
+        <div class="card doc-card mb-4" id="question">
+          <div class="card-header bg-primary text-white card-header-custom">LEFT SIDE — Question</div>
+          <div class="card-body">
+            <h5>Build Infinite Scrolling in React</h5>
+            <p>Fetch products in small batches. When the user reaches the bottom of the list, automatically request the next batch without using a scroll event listener.</p>
+            <div class="alert alert-info mb-0">
+              <strong>Expected:</strong> Use <code>IntersectionObserver()</code>, maintain pagination state, show loading state, stop when all records are loaded, and clean up the observer/request.
+            </div>
+          </div>
+        </div>
+
+        <div class="card doc-card mb-4" id="answer">
+          <div class="card-header bg-success text-white card-header-custom">LEFT SIDE — Answer</div>
+          <div class="card-body">
+            <p><strong>Core idea:</strong> Put a tiny sentinel element after the last product.</p>
+            <ol class="mb-3">
+              <li>Fetch the first page.</li>
+              <li>Observe the sentinel using <code>IntersectionObserver</code>.</li>
+              <li>When the sentinel enters the viewport, fetch the next page.</li>
+              <li>Append the new products to the existing array.</li>
+              <li>Increase <code>skip</code> by <code>LIMIT</code>.</li>
+              <li>Stop observing/fetching when <code>skip &gt;= total</code>.</li>
+            </ol>
+            <div class="alert alert-warning mb-0">
+              <strong>Important:</strong> Do not start a second request while one request is already running.
+            </div>
+          </div>
+        </div>
+
+        <div class="card doc-card mb-4" id="interviewer">
+          <div class="card-header bg-dark text-white card-header-custom">LEFT SIDE — How I would explain it to the interviewer</div>
+          <div class="card-body">
+            <p>You can say:</p>
+            <div class="alert alert-light border">
+              “I will implement infinite scrolling using an <strong>IntersectionObserver</strong> instead of listening to the window scroll event. I render a small sentinel div after the last product and observe it. When it becomes visible, the observer callback requests the next page using the current skip value. I append the response to the existing products instead of replacing them. I also keep a loading guard so multiple observer callbacks cannot create duplicate requests. Once the API tells me that all records have been loaded, I stop triggering further requests. Finally, I clean up the observer and abort the request when the component unmounts.”
+            </div>
+            <h6 class="fw-bold">Why IntersectionObserver?</h6>
+            <ul>
+              <li>No manual <code>scroll</code> event calculation.</li>
+              <li>Browser efficiently detects visibility changes.</li>
+              <li>Cleaner React code.</li>
+              <li>Easy to preload using <code>rootMargin</code>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card doc-card mb-4">
+          <div class="card-header bg-secondary text-white card-header-custom">Selected Related Answer</div>
+          <div class="card-body">
+            <h6>What is the sentinel?</h6>
+            <p class="small-muted">A tiny DOM element placed after the list. We don't need to observe every product. We only observe this one element.</p>
+            <h6>What is <code>isIntersecting</code>?</h6>
+            <p class="small-muted">It tells us whether the observed sentinel is currently intersecting the observer's root/viewport.</p>
+            <h6>Why <code>useRef</code>?</h6>
+            <p class="small-muted">To keep a reference to the sentinel DOM node without causing a re-render.</p>
+            <h6>Why <code>useCallback</code>?</h6>
+            <p class="small-muted">To keep the fetch function's identity stable so the effect does not unnecessarily recreate the observer.</p>
+            <h6>Why <code>AbortController</code>?</h6>
+            <p class="small-muted">To cancel an in-flight request when the component is unmounted or when cleanup is required.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Detailed notes -->
+    <section class="col-lg-8">
+
+      <section class="card doc-card mb-4" id="visual">
+        <div class="card-header bg-info text-dark card-header-custom">RIGHT SIDE — Visual Explanation</div>
+        <div class="card-body">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-4"><div class="flow-box"><strong>1. Initial Render</strong><br>products = []<br>skip = 0</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-4"><div class="flow-box"><strong>2. Fetch</strong><br>limit = 10<br>skip = 0</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>3. Render</strong><br>10 items</div></div>
+          </div>
+          <div class="arrow my-2">↓</div>
+          <div class="flow-box">
+            <strong>Sentinel is at the bottom</strong><br>
+            <span class="small-muted">When the user reaches it, IntersectionObserver fires.</span>
+          </div>
+          <div class="arrow my-2">↓</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-md-4"><div class="flow-box"><strong>4. Visible?</strong><br>isIntersecting = true</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-4"><div class="flow-box"><strong>5. Next Fetch</strong><br>skip = 10<br>limit = 10</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>6. Append</strong><br>20 items</div></div>
+          </div>
+          <div class="alert alert-success mt-3 mb-0">
+            Repeat the cycle until <strong>nextSkip &gt;= total</strong>. Then <code>hasMore = false</code>.
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-primary text-white card-header-custom">RIGHT SIDE — Simple Mental Model</div>
+        <div class="card-body">
+          <div class="step"><strong>Step 1:</strong> “Give me the first 10 products.”</div>
+          <div class="step"><strong>Step 2:</strong> “Put a small watcher after the last product.”</div>
+          <div class="step"><strong>Step 3:</strong> “When the watcher becomes visible, get 10 more.”</div>
+          <div class="step"><strong>Step 4:</strong> “Append those products to the old products.”</div>
+          <div class="step"><strong>Step 5:</strong> “Move the pagination pointer forward by 10.”</div>
+          <div class="step"><strong>Step 6:</strong> “If there is nothing more to load, stop.”</div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="code">
+        <div class="card-header bg-dark text-white card-header-custom">RIGHT SIDE — Corrected Full Code</div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <strong>I checked your implementation.</strong> The overall approach is correct, but there are a few important React issues. The version below fixes them and is safer for an interview answer.
+          </div>
+
+<pre><code>import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+const LIMIT = 10;
+
+const InfiniteScrolling = () =&gt; {
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // DOM reference for the small element placed after the last product.
+  const sentinelRef = useRef(null);
+
+  // Keep pagination and loading status in refs.
+  // Refs give the observer callback the latest values
+  // without recreating the observer on every state change.
+  const skipRef = useRef(0);
+  const loadingRef = useRef(false);
+
+  const fetchProducts = useCallback(async (currentSkip, signal) =&gt; {
+    // Prevent duplicate API calls.
+    if (loadingRef.current) return;
+
+    loadingRef.current = true;
+    setIsLoading(true);
+
+    try {
+      const url =
+        `https://dummyjson.com/products?limit=${LIMIT}&amp;skip=${currentSkip}`;
+
+      const response = await fetch(url, { signal });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const output = await response.json();
+
+      setTotalCount(output.total);
+
+      // Append new products to the existing list.
+      setProducts((prev) =&gt; [...prev, ...output.products]);
+
+      const nextSkip = currentSkip + output.products.length;
+
+      // Update pagination only after the request succeeds.
+      skipRef.current = nextSkip;
+
+      // Stop after all products are loaded.
+      if (nextSkip &gt;= output.total || output.products.length === 0) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      // AbortError is expected when cleanup cancels the request.
+      if (error.name !== "AbortError") {
+        console.error("Failed to fetch products:", error);
+      }
+    } finally {
+      loadingRef.current = false;
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+
+    // Initial page.
+    fetchProducts(0, controller.signal);
+
+    return () =&gt; {
+      // Cancel the initial/in-flight request on unmount.
+      controller.abort();
+    };
+  }, [fetchProducts]);
+
+  useEffect(() =&gt; {
+    if (!hasMore) return;
+
+    const controller = new AbortController();
+
+    const observer = new IntersectionObserver(
+      (entries) =&gt; {
+        const entry = entries[0];
+
+        if (!entry.isIntersecting) return;
+
+        // Do not fetch while another request is running.
+        if (loadingRef.current) return;
+
+        fetchProducts(skipRef.current, controller.signal);
+      },
+      {
+        // 1.0 means the whole sentinel should be visible.
+        // For earlier loading, rootMargin can be used.
+        threshold: 1.0,
+
+        // Example:
+        // rootMargin: "400px",
+      }
+    );
+
+    const sentinel = sentinelRef.current;
+
+    if (sentinel) {
+      observer.observe(sentinel);
+    }
+
+    return () =&gt; {
+      // Stop observing the sentinel.
+      if (sentinel) {
+        observer.unobserve(sentinel);
+      }
+
+      // Stop observing all targets.
+      observer.disconnect();
+
+      // Cancel the request associated with this effect.
+      controller.abort();
+    };
+  }, [fetchProducts, hasMore]);
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Infinite Scrolling&lt;/h1&gt;
+
+      {products.map((product) =&gt; (
+        &lt;div
+          // product.id is better than product.title because
+          // title may not be unique.
+          key={product.id}
+          style={{
+            border: "1px solid #ccc",
+            margin: "5px",
+            padding: "10px",
+          }}
+        &gt;
+          &lt;p&gt;Title: {product.title}&lt;/p&gt;
+          &lt;p&gt;Brand: {product.brand}&lt;/p&gt;
+          &lt;p&gt;Category: {product.category}&lt;/p&gt;
+
+          &lt;img
+            src={product.thumbnail}
+            alt={product.title}
+            width="150"
+          /&gt;
+        &lt;/div&gt;
+      ))}
+
+      {isLoading &amp;&amp; (
+        &lt;h2 style={{ textAlign: "center" }}&gt;
+          Loading...
+        &lt;/h2&gt;
+      )}
+
+      {/* Sentinel: IntersectionObserver watches this element. */}
+      {hasMore &amp;&amp; (
+        &lt;div
+          ref={sentinelRef}
+          style={{ height: "20px" }}
+          aria-hidden="true"
+        /&gt;
+      )}
+
+      {!hasMore &amp;&amp; (
+        &lt;p style={{ textAlign: "center" }}&gt;
+          All {totalCount} products loaded.
+        &lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+
+export default InfiniteScrolling;</code></pre>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-warning text-dark card-header-custom">RIGHT SIDE — Problems in Your Original Code</div>
+        <div class="card-body">
+          <div class="alert alert-danger mistake">
+            <strong>1. Side effect inside setState updater</strong>
+            <p class="mb-1">Your code does this:</p>
+            <pre><code>setSkip((latestvalue) =&gt; {
+  if (!isLoading) {
+    fetchProducts(latestvalue);
+  }
+  return latestvalue;
+});</code></pre>
+            <p class="mb-0">Calling <code>fetchProducts()</code> inside a state updater is not a good pattern. React expects the updater to be pure, and development/Strict Mode can expose this problem. Use a ref or a separate effect instead.</p>
+          </div>
+
+          <div class="alert alert-danger mistake">
+            <strong>2. <code>isLoading</code> is stale inside the observer</strong>
+            <p class="mb-0">Your observer effect does not depend on <code>isLoading</code>, so the callback can keep the value captured when the effect was created. This makes the loading guard unreliable. A ref such as <code>loadingRef.current</code> gives the callback the latest value.</p>
+          </div>
+
+          <div class="alert alert-danger mistake">
+            <strong>3. Initial request can race with the observer</strong>
+            <p class="mb-0">The sentinel can be visible immediately, especially when the first page is short. That can trigger another fetch before the initial request finishes. The loading ref prevents this duplicate request.</p>
+          </div>
+
+          <div class="alert alert-danger mistake">
+            <strong>4. AbortController was created but never aborted</strong>
+            <p class="mb-0">You create <code>new AbortController()</code> inside <code>fetchProducts</code>, but the controller is not returned or aborted during cleanup. Therefore it does not provide the intended cancellation behavior.</p>
+          </div>
+
+          <div class="alert alert-danger mistake">
+            <strong>5. Dependency array is incomplete</strong>
+            <p class="mb-0">The observer effect uses <code>hasMore</code>, <code>isLoading</code> and <code>fetchProducts</code>. At minimum, <code>hasMore</code> must be represented in the effect lifecycle. In the corrected version, the loading state is deliberately moved to a ref so the observer can remain stable.</p>
+          </div>
+
+          <div class="alert alert-danger mistake">
+            <strong>6. <code>key={product.title}</code> may be unsafe</strong>
+            <p class="mb-0">A product title is not guaranteed to be unique. Prefer <code>key={product.id}</code>. This also connects to React's “Encountered two children with the same key” warning.</p>
+          </div>
+
+          <div class="alert alert-secondary">
+            <strong>7. Unused code</strong>
+            <p class="mb-0">Your imports contain <code>useReducer</code>, and <code>index</code> is declared in <code>map()</code> but not used. <code>totalcount</code> is also only stored, not meaningfully displayed. Remove unused pieces in an interview to keep the solution clean.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4" id="mistakes">
+        <div class="card-header bg-danger text-white card-header-custom">RIGHT SIDE — Common Developer Mistakes</div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Using scroll events unnecessarily:</strong> IntersectionObserver is simpler for detecting when the sentinel enters the viewport.</li>
+            <li class="list-group-item"><strong>Duplicate API calls:</strong> The observer may fire more than once. Always protect the request with a loading guard.</li>
+            <li class="list-group-item"><strong>Replacing instead of appending:</strong> Use <code>setProducts(prev =&gt; [...prev, ...newProducts])</code>.</li>
+            <li class="list-group-item"><strong>Wrong pagination:</strong> Keep the next skip value consistent with the number of records actually returned.</li>
+            <li class="list-group-item"><strong>Never stopping:</strong> Use the API's <code>total</code> or another server-provided signal to stop.</li>
+            <li class="list-group-item"><strong>Observing every list item:</strong> One sentinel after the list is enough.</li>
+            <li class="list-group-item"><strong>Wrong key:</strong> Avoid non-unique values such as title, name, category, or index when a stable ID exists.</li>
+            <li class="list-group-item"><strong>No cleanup:</strong> Disconnect the observer and abort in-flight requests when appropriate.</li>
+            <li class="list-group-item"><strong>Very strict threshold:</strong> <code>threshold: 1.0</code> waits until the entire sentinel is visible. A <code>rootMargin</code> can start loading earlier.</li>
+            <li class="list-group-item"><strong>No error handling:</strong> A production implementation should expose an error/retry UI rather than only logging to the console.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-success text-white card-header-custom">RIGHT SIDE — Important React Concepts</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card h-100 good">
+                <div class="card-body">
+                  <h6 class="fw-bold">useRef</h6>
+                  <p class="mb-0">Stores the sentinel DOM element and mutable values such as the latest pagination/loading state without causing a re-render.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 good">
+                <div class="card-body">
+                  <h6 class="fw-bold">useEffect</h6>
+                  <p class="mb-0">Creates the observer and performs cleanup when the component/effect lifecycle changes.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 good">
+                <div class="card-body">
+                  <h6 class="fw-bold">useCallback</h6>
+                  <p class="mb-0">Keeps the fetch function stable so it can safely be used as an effect dependency.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 good">
+                <div class="card-body">
+                  <h6 class="fw-bold">IntersectionObserver</h6>
+                  <p class="mb-0">Lets the browser tell us when the sentinel enters the viewport instead of repeatedly calculating scroll position ourselves.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-secondary text-white card-header-custom">RIGHT SIDE — Interview Follow-up Questions</div>
+        <div class="card-body">
+          <ol>
+            <li class="mb-2"><strong>Why not use a scroll event?</strong><br><span class="small-muted">You can, but you must calculate scroll position and potentially throttle/debounce the handler. IntersectionObserver is purpose-built for visibility detection.</span></li>
+            <li class="mb-2"><strong>Why use a sentinel?</strong><br><span class="small-muted">Only one element needs to be observed, which keeps the implementation simple.</span></li>
+            <li class="mb-2"><strong>Can the observer fire multiple times?</strong><br><span class="small-muted">Yes. That's why an in-flight loading guard is important.</span></li>
+            <li class="mb-2"><strong>What does rootMargin do?</strong><br><span class="small-muted">It expands or shrinks the observer's effective root boundary. For example, <code>rootMargin: "400px"</code> can trigger loading before the user actually reaches the bottom.</span></li>
+            <li class="mb-2"><strong>How would you improve this for production?</strong><br><span class="small-muted">Add retry UI, skeleton loaders, request deduplication, caching, virtualization for very large lists, and proper API pagination/error handling.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="card doc-card mb-4">
+        <div class="card-header bg-primary text-white card-header-custom">RIGHT SIDE — Quick Revision</div>
+        <div class="card-body">
+          <div class="row text-center g-2">
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Sentinel</strong><br>DOM ref</div></div>
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Observer</strong><br>visibility</div></div>
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Fetch</strong><br>next page</div></div>
+            <div class="col-6 col-md-3"><div class="flow-box"><strong>Append</strong><br>repeat</div></div>
+          </div>
+          <div class="alert alert-warning mt-3 mb-0">
+            <strong>One-line interview answer:</strong>
+            “I observe a sentinel at the bottom of the list; when it intersects the viewport, I fetch and append the next page, guard against duplicate requests, and stop when the server reports that all records are loaded.”
+          </div>
+        </div>
+      </section>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white py-4 mt-3">
+  <div class="container text-center">
+    <small>React Machine Coding Notes • Infinite Scrolling with IntersectionObserver()</small>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
