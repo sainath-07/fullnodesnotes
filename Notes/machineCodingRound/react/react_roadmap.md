@@ -842,9 +842,11 @@ Countdown timer
 Password strength indicator
 
 # Intermediate → Advanced
-Debounced search - completed
+Debounced search(3) - completed
 Autocomplete
-Infinite scrolling
+Infinite scrolling - completed
+lazy loading
+pagaination
 Data table
 Sort/filter/pagination table
 Shopping cart
