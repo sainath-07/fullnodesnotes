@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>React Drag & Drop — Machine Coding Round</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: #f5f7fb;
+        color: #1f2937;
+      }
+      .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        min-height: calc(100vh - 65px);
+      }
+      .sidebar {
+        background: #fff;
+        border-right: 1px solid #e5e7eb;
+        padding: 20px;
+        position: sticky;
+        top: 65px;
+        height: calc(100vh - 65px);
+        overflow: auto;
+      }
+      .sidebar .nav-link {
+        color: #374151;
+        text-align: left;
+        margin-bottom: 5px;
+        border-radius: 8px;
+      }
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active {
+        background: #e8f1ff;
+        color: #0d6efd;
+      }
+      main {
+        padding: 28px;
+        max-width: 1100px;
+        width: 100%;
+      }
+      .card {
+        border: 0;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+        margin-bottom: 22px;
+      }
+      .card-header {
+        font-weight: 700;
+      }
+      pre {
+        background: #111827;
+        color: #e5e7eb;
+        padding: 18px;
+        border-radius: 10px;
+        overflow: auto;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      code {
+        color: #d63384;
+      }
+      pre code {
+        color: inherit;
+      }
+      .flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .flow-box {
+        padding: 13px 17px;
+        border: 1px solid #dbe3ef;
+        border-radius: 10px;
+        background: #fff;
+        text-align: center;
+        min-width: 135px;
+      }
+      .arrow {
+        font-size: 22px;
+        color: #6b7280;
+      }
+      .demo {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 18px;
+      }
+      .demo-item {
+        border: 1px solid #d2d2d2;
+        background: #f2f3f4;
+        font-size: 18px;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 6px;
+        cursor: grab;
+      }
+      .demo-item.hovered {
+        background: #ffe2e2;
+        border-color: #dc3545;
+      }
+      .small-note {
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+      .mistake {
+        border-left: 4px solid #dc3545;
+        padding: 12px 15px;
+        background: #fff5f5;
+        margin-bottom: 10px;
+      }
+      .interviewer {
+        border-left: 4px solid #198754;
+        background: #f0fff6;
+        padding: 16px;
+        border-radius: 8px;
+      }
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: static;
+          height: auto;
+          border-right: 0;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        main {
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <div
+        class="container-fluid px-4 py-3 d-flex justify-content-between align-items-center"
+      >
+        <div>
+          <strong>React Machine Coding</strong>
+          <span class="text-secondary ms-2">Drag & Drop with useRef</span>
+        </div>
+        <span class="badge text-bg-primary">Interview Ready</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h6 class="text-uppercase text-secondary mb-3">Topics</h6>
+        <nav class="nav flex-column">
+          <a class="nav-link active" href="#what">What?</a>
+          <a class="nav-link" href="#why">Why?</a>
+          <a class="nav-link" href="#how">How?</a>
+          <a class="nav-link" href="#flow">Visual Explanation</a>
+          <a class="nav-link" href="#dragover">Why DragOver?</a>
+          <a class="nav-link" href="#code">Full Code</a>
+          <a class="nav-link" href="#mistakes">Common Developer Mistakes</a>
+          <a class="nav-link" href="#interviewer">How I Explain It</a>
+        </nav>
+      </aside>
+
+      <main>
+        <section id="what" class="card">
+          <div class="card-header bg-primary text-white">
+            1. What is Drag & Drop?
+          </div>
+          <div class="card-body">
+            <p>
+              Drag and drop lets a user pick one item, move the mouse over
+              another position, and place the item there.
+            </p>
+            <div class="alert alert-light border mb-0">
+              <strong>Our React example:</strong> We reorder products inside the
+              same list.
+            </div>
+          </div>
+        </section>
+
+        <section id="why" class="card">
+          <div class="card-header bg-success text-white">
+            2. Why use useRef?
+          </div>
+          <div class="card-body">
+            <p>We need to remember two temporary values while dragging:</p>
+            <ul>
+              <li>
+                <strong>dragItemIndexRef</strong> → index of the item being
+                dragged.
+              </li>
+              <li>
+                <strong>dragOnHoverIndexRef</strong> → index currently being
+                hovered.
+              </li>
+            </ul>
+            <div class="alert alert-info mb-0">
+              <strong>Why not state for both?</strong> Changing state causes a
+              React render. A ref can store a changing value without itself
+              causing a render. We use state only for the visual hover indicator
+              and for the final list update.
+            </div>
+          </div>
+        </section>
+
+        <section id="how" class="card">
+          <div class="card-header bg-info text-dark">3. How does it work?</div>
+          <div class="card-body">
+            <ol>
+              <li>
+                <strong>DragStart:</strong> store the dragged item's index in a
+                ref.
+              </li>
+              <li>
+                <strong>DragOver:</strong> prevent the browser's default
+                behavior and record the current target index.
+              </li>
+              <li>
+                <strong>Reorder:</strong> when the hovered position changes,
+                create a new array, remove the dragged item, insert it at the
+                new index, and update state.
+              </li>
+              <li>
+                <strong>DragEnd:</strong> clear both refs and the visual hover
+                state.
+              </li>
+            </ol>
+            <div class="alert alert-warning mb-0">
+              <strong>Important:</strong> React state is used for the actual
+              list because the UI must re-render when the list order changes. We
+              never mutate the original constant directly.
+            </div>
+          </div>
+        </section>
+
+        <section id="flow" class="card">
+          <div class="card-header bg-dark text-white">
+            4. Visual Explanation
+          </div>
+          <div class="card-body">
+            <div class="flow mb-4">
+              <div class="flow-box">
+                <strong>DragStart</strong><br /><span class="small-note"
+                  >save index</span
+                >
+              </div>
+              <div class="arrow">→</div>
+              <div class="flow-box">
+                <strong>DragOver</strong><br /><span class="small-note"
+                  >find position</span
+                >
+              </div>
+              <div class="arrow">→</div>
+              <div class="flow-box">
+                <strong>Reorder</strong><br /><span class="small-note"
+                  >remove + insert</span
+                >
+              </div>
+              <div class="arrow">→</div>
+              <div class="flow-box">
+                <strong>DragEnd</strong><br /><span class="small-note"
+                  >clear refs</span
+                >
+              </div>
+            </div>
+            <h6>Example</h6>
+            <pre><code>Before:
+[ Product 1, Product 2, Product 3, Product 4, Product 5 ]
+                         ↑
+                    dragging
+
+Move Product 3 over Product 5:
+
+1. draggedIndex = 2
+2. hoverIndex   = 4
+3. remove Product 3
+4. insert Product 3 at the new position
+
+After:
+[ Product 1, Product 2, Product 4, Product 5, Product 3 ]</code></pre>
+          </div>
+        </section>
+
+        <section id="dragover" class="card">
+          <div class="card-header bg-warning text-dark">
+            5. Why DragOver for Position, Not Drop?
+          </div>
+          <div class="card-body">
+            <p>
+              <strong
+                >DragOver tells us where the dragged item currently is.</strong
+              >
+              It fires continously while the user moves the dragged item across
+              possible targets.
+            </p>
+            <p>
+              That makes it useful for a live reorder UI: as the pointer enters
+              another item's area, we know the current target index and can move
+              the item there.
+            </p>
+            <p>
+              <strong>Drop is different:</strong>
+              The <code>drop</code> event fires when the user releases the mouse
+              button and drops the dragged element at a valid target position.
+            </p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="alert alert-primary h-100 mb-0">
+                  <strong>DragOver</strong><br />
+                  “Where is the user dragging right now?”<br />
+                  Good for live positioning / preview.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="alert alert-secondary h-100 mb-0">
+                  <strong>Drop</strong><br />
+                  “Where did the user finally release?”<br />
+                  Good for final commit.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="alert alert-danger h-100 mb-0">
+                  <strong>onDragStart</strong><br />
+                  "Which element did the user start dragging?"
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="alert alert-success h-100 mb-0">
+                  <strong>onDragEnd</strong><br />
+                  "The dragging operation is finished — clean up the drag
+                  state."
+                </div>
+              </div>
+            </div>
+            <p class="small-note mt-3 mb-0">
+              Interview note: There is no universal rule that says reordering
+              must happen in dragOver. A drop-based implementation is also
+              valid. In this implementation, dragOver is intentionally used
+              because we want the list position to update while dragging.
+            </p>
+          </div>
+        </section>
+
+        <section id="code" class="card">
+          <div class="card-header bg-primary text-white">
+            6. Corrected Full Code
+          </div>
+          <div class="card-body">
+            <p>
+              This version keeps your original <code>useRef</code> idea, but
+              fixes the important issues: list is state, refs use
+              <code>.current</code>, the original array is not mutated, and
+              downward movement is handled correctly.
+            </p>
+            <pre><code>import React, { useRef, useState } from "react";
+
+const DRAGDROPLIST = Array.from({ length: 20 }, (_, i) => ({
+  id: i + 1,
+  label: "Product " + (i + 1),
+}));
+
+
+const styles = {
+  itemStyles: {
+    border: "1px solid #d2d2d2",
+    background: "#f2f3f4",
+    fontSize: "22px",
+    padding: "6px",
+    margin: "4px",
+  },
+};
+
+const DragAndDrop = () =&gt; {
+  // List must be state because React needs to re-render after reordering.
+  const [list, setList] = useState(DRAGDROPLIST);
+
+  // Used only for the visual hover indicator.
+  const [dragOnHoverIndex, setDragOnHoverIndex] = useState(null);
+
+  // Store temporary drag information without causing a render.
+  const dragItemIndexRef = useRef(null);
+  const dragOnHoverIndexRef = useRef(null);
+
+  const handleDragStart = (index) =&gt; {
+    // Remember which item the user started dragging.
+    dragItemIndexRef.current = index;
+
+    // Reset the hover target for this drag operation.
+    dragOnHoverIndexRef.current = null;
+  };
+
+  const handleDragOver = (event, index) =&gt; {
+    // Required so this element can act as a drop target.
+    event.preventDefault();
+
+    const draggedIndex = dragItemIndexRef.current;
+    const previousHoverIndex = dragOnHoverIndexRef.current;
+
+    // Nothing is being dragged.
+    if (draggedIndex === null) {
+      return;
+    }
+
+    // Do not move an item over itself.
+    if (draggedIndex === index) {
+      return;
+    }
+
+    // DragOver can fire many times.
+    // Do not reorder again if the target has not changed.
+    if (previousHoverIndex === index) {
+      return;
+    }
+
+    dragOnHoverIndexRef.current = index;
+    setDragOnHoverIndex(index);
+
+    setList((previousList) =&gt; {
+      const newList = [...previousList];
+
+      // Remove the dragged item.
+      const [draggedItem] = newList.splice(draggedIndex, 1);
+
+      // Insert the dragged item at the new position.
+      newList.splice(index, 0, draggedItem);
+
+      // The array is returned to React as new state.
+      return newList;
+    });
+
+    dragItemIndexRef.current = index;
+  };
+
+  const handleDragEnd = () =&gt; {
+    // Clear temporary drag information.
+    dragItemIndexRef.current = null;
+    dragOnHoverIndexRef.current = null;
+
+    // Remove the hover highlight.
+    setDragOnHoverIndex(null);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;DragAndDrop&lt;/h1&gt;
+
+      &lt;div
+        style={{
+          margin: "5px",
+          width: "40vw",
+          border: "1px solid #d2d2d2",
+        }}
+        onDragOver={(event) =&gt; event.preventDefault()}
+      &gt;
+        {list.map((item, index) =&gt; (
+          &lt;p
+            key={item.id}
+            draggable
+            onDragStart={() =&gt; handleDragStart(index)}
+            onDragOver={(event) =&gt; handleDragOver(event, index)}
+            onDragEnd={handleDragEnd}
+            style={{
+              ...styles.itemStyles,
+              backgroundColor:
+                dragOnHoverIndex === index
+                  ? "red"
+                  : "#f2f3f4",
+            }}
+          &gt;
+            {item.label}
+          &lt;/p&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default DragAndDrop;</code></pre>
+
+            <div class="alert alert-danger mt-3">
+              <strong>Important correction from your code:</strong>
+              <ul class="mb-0">
+                <li>
+                  <code>DRAGDROPLIST.splice(...)</code> was directly mutating a
+                  constant array.
+                </li>
+                <li>
+                  <code>dragItemIndexRef</code> must be read with
+                  <code>dragItemIndexRef.current</code>.
+                </li>
+                <li>
+                  <code>onDragOver</code> can fire repeatedly, so we compare the
+                  previous hover target.
+                </li>
+                <li>
+                  When moving downward, removing the dragged item changes the
+                  target index, so we calculate <code>newIndex</code>.
+                </li>
+                <li>
+                  The parent does not need
+                  <code>onDrop={(e) =&gt; e.preventDefault()}</code> for this
+                  live-reorder approach.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="mistakes" class="card">
+          <div class="card-header bg-danger text-white">
+            7. Common Developer Mistakes
+          </div>
+          <div class="card-body">
+            <div class="mistake">
+              <strong>1. Mutating the original array</strong><br />Bad:
+              <code>DRAGDROPLIST.splice(...)</code>. React state should be
+              updated immutably.
+            </div>
+            <div class="mistake">
+              <strong>2. Forgetting .current</strong><br />Bad:
+              <code>splice(dragItemIndexRef, 1)</code>. Correct:
+              <code>splice(dragItemIndexRef.current, 1)</code>.
+            </div>
+            <div class="mistake">
+              <strong>3. Using array index as the React key</strong><br />Prefer
+              the stable item ID: <code>key={item.id}</code>.
+            </div>
+            <div class="mistake">
+              <strong>4. Reordering on every dragOver event</strong><br /><code
+                >dragOver</code
+              >
+              can fire many times. Track the last target and skip duplicate
+              work.
+            </div>
+            <div class="mistake">
+              <strong>5. Forgetting event.preventDefault()</strong><br />Without
+              it, the browser may not allow the element to behave as a drop
+              target.
+            </div>
+            <div class="mistake">
+              <strong>6. Not updating the dragged index</strong><br />After
+              moving the item, its index may have changed. Keep the ref
+              synchronized.
+            </div>
+            <div class="mistake">
+              <strong>7. Ignoring the downward-index shift</strong><br />If the
+              dragged item is before the target, removing it shifts later
+              indexes by one.
+            </div>
+            <div class="mistake">
+              <strong>8. Putting everything in state</strong><br />Temporary
+              drag metadata can live in refs. Use state where the UI actually
+              needs a render.
+            </div>
+          </div>
+        </section>
+
+        <section id="interviewer" class="card">
+          <div class="card-header bg-success text-white">
+            8. How I Would Explain This to the Interviewer
+          </div>
+          <div class="card-body">
+            <div class="interviewer">
+              <p class="mb-2"><strong>Start with the requirement:</strong></p>
+              <p>
+                “I need to reorder items in a list using the browser's native
+                drag-and-drop events.”
+              </p>
+
+              <p class="mb-2"><strong>Then explain the design:</strong></p>
+              <p>
+                “I am using React state for the list because changing the order
+                must update the UI. For temporary drag information, I use useRef
+                so I don't trigger a component render every time that
+                information changes.”
+              </p>
+
+              <p class="mb-2"><strong>Explain the two refs:</strong></p>
+              <p>
+                “The first ref stores the index of the item being dragged. The
+                second stores the current hover target.”
+              </p>
+
+              <p class="mb-2"><strong>Explain dragOver:</strong></p>
+              <p>
+                “I use dragOver to know the current position while the user is
+                dragging. I call preventDefault because the browser needs it to
+                allow a drop target. When the target changes, I remove the item
+                from its old position and insert it at the new position.”
+              </p>
+
+              <p class="mb-2"><strong>Explain performance:</strong></p>
+              <p>
+                “Because dragOver can fire frequently, I keep the indexes in
+                refs and skip work when the hover target has not changed. Only
+                the visual hover state and the actual list state cause React
+                renders.”
+              </p>
+
+              <p class="mb-0"><strong>Finish with edge cases:</strong></p>
+              <p>
+                “I also handle dragging over the same item, clearing refs on
+                dragEnd, stable React keys, immutable state updates, and the
+                index shift that happens when moving an item downward.”
+              </p>
+            </div>
+
+            <div class="alert alert-primary mt-4 mb-0">
+              <strong>Interview shortcut:</strong>
+              Remember <strong>“Start → Track → Reorder → Cleanup”</strong>.
+              <br />
+              Start = dragged index → Track = hover index → Reorder = remove +
+              insert → Cleanup = reset refs.
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // Simple demo for visual understanding.
+      const demo = document.createElement("div");
+      demo.className = "container-fluid px-4 pb-5";
+    </script>
+  </body>
+</html>
