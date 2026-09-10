@@ -835,7 +835,6 @@ Tabs
 Accordion
 Modal
 Dropdown
-Pagination
 Form validation
 Stopwatch
 Countdown timer
@@ -843,12 +842,13 @@ Password strength indicator
 
 # Intermediate → Advanced
 Debounced search(3) - completed
-Autocomplete
+Autocomplete- completed
 Infinite scrolling - completed
-lazy loading
-pagaination
-Data table
+lazy loading- completed
+pagaination- completed
+Virtualized list- completed
 Sort/filter/pagination table
+Data table
 Shopping cart
 Multi-step form
 File upload
@@ -857,7 +857,6 @@ Optimistic UI
 Undo/redo
 Nested comments
 Tree view
-Virtualized list
 Custom useFetch
 Custom useDebounce
 Custom usePrevious
