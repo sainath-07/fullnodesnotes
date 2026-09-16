@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontend + Backend Pagination with DummyJSON</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth} body{background:#f5f7fb;color:#212529}
+.sticky{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(8px)}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+section{scroll-margin-top:85px}.card{border:0;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.08);overflow:hidden}
+.lh{background:#0d6efd;color:#fff}.rh{background:#198754;color:#fff}
+.code{background:#111827;color:#e5e7eb;border-radius:10px;padding:18px;overflow:auto;font-size:.86rem}
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.box{background:#e7f1ff;border:1px solid #b6d4fe;border-radius:10px;padding:12px 15px;text-align:center;font-weight:600}
+.arrow{font-size:22px;color:#0d6efd;font-weight:700}
+.formula{font-family:monospace;background:#eef2ff;padding:8px 12px;border-radius:7px}
+.mistake{border-left:4px solid #dc3545}.tip{border-left:4px solid #198754}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg border-bottom shadow-sm sticky">
+<div class="container-fluid">
+<a class="navbar-brand fw-bold" href="#top">Pagination Notes</a>
+<div class="d-flex flex-wrap gap-2">
+<a class="btn btn-sm btn-outline-primary" href="#what">What</a>
+<a class="btn btn-sm btn-outline-primary" href="#why">Why</a>
+<a class="btn btn-sm btn-outline-primary" href="#how">How</a>
+<a class="btn btn-sm btn-outline-primary" href="#api">DummyJSON API</a>
+<a class="btn btn-sm btn-outline-primary" href="#code">Full Code</a>
+<a class="btn btn-sm btn-outline-primary" href="#mistakes">Mistakes</a>
+<a class="btn btn-sm btn-outline-primary" href="#interview">Interviewer</a>
+</div>
+</div>
+</nav>
+
+<header id="top" class="hero py-5">
+<div class="container-fluid">
+<h1 class="display-5 fw-bold">Pagination — Frontend + Backend</h1>
+<p class="lead mb-0">Machine Coding Round • React + DummyJSON server-side pagination</p>
+</div>
+</header>
+
+<div class="container-fluid py-4">
+<div class="row g-4">
+
+<!-- LEFT -->
+<div class="col-lg-5">
+
+<section id="what" class="card mb-4">
+<div class="card-header lh fw-bold">1. What is Pagination?</div>
+<div class="card-body">
+<h5>Question</h5><p>What is pagination?</p>
+<h5>Answer</h5>
+<p>Pagination means dividing a large collection of records into smaller pages. Instead of showing every record at once, we show one page at a time.</p>
+<div class="alert alert-primary"><strong>Two common approaches:</strong><br>
+<strong>Frontend pagination:</strong> the browser already has all records and uses <code>slice()</code> to display one page.<br>
+<strong>Backend pagination:</strong> the browser asks the server for only the records needed for the selected page.</div>
+<p class="mb-0">For this machine-coding example, we will use <strong>DummyJSON</strong> so the server performs the pagination.</p>
+</div>
+</section>
+
+<section id="why" class="card mb-4">
+<div class="card-header lh fw-bold">2. Why Backend Pagination?</div>
+<div class="card-body">
+<h5>Question</h5><p>Why should pagination happen on the server?</p>
+<ul>
+<li>We do not download the complete dataset.</li>
+<li>Less data travels over the network.</li>
+<li>The browser stores fewer records.</li>
+<li>Large database tables are easier to work with.</li>
+<li>The API can return exactly the requested page.</li>
+</ul>
+<div class="alert alert-warning"><strong>Key difference:</strong> With frontend pagination, all data may already be downloaded. With backend pagination, the server sends only the requested portion.</div>
+</div>
+</section>
+
+<section id="how" class="card mb-4">
+<div class="card-header lh fw-bold">3. How Does Server-Side Pagination Work?</div>
+<div class="card-body">
+<h5>Question</h5><p>How does the frontend request a specific page?</p>
+<p>The frontend sends pagination information to the API, commonly using <code>limit</code> and <code>skip</code>.</p>
+<p><span class="formula">skip = (page - 1) × limit</span></p>
+<p>Example: page 3 with 10 items per page:</p>
+<p><span class="formula">skip = (3 - 1) × 10 = 20</span></p>
+<div class="alert alert-success mb-0">The server returns records starting from item 21, with at most 10 records.</div>
+</div>
+</section>
+
+<section id="api" class="card mb-4">
+<div class="card-header lh fw-bold">4. DummyJSON API</div>
+<div class="card-body">
+<h5>Question</h5><p>What API are we using?</p>
+<p>We use the DummyJSON products endpoint:</p>
+<pre class="code">https://dummyjson.com/products?limit=10&skip=0</pre>
+<p>For page 2 with 10 items:</p>
+<pre class="code">https://dummyjson.com/products?limit=10&skip=10</pre>
+<p>Important response fields:</p>
+<ul>
+<li><code>products</code> — records for the current page</li>
+<li><code>total</code> — total number of records</li>
+<li><code>skip</code> — number of records skipped</li>
+<li><code>limit</code> — number of records requested</li>
+</ul>
+<div class="alert alert-info mb-0"><strong>Why total matters:</strong> The frontend uses <code>total</code> to calculate how many page buttons are required.</div>
+</div>
+</section>
+
+<section id="code" class="card mb-4">
+<div class="card-header lh fw-bold">5. Full React Code — Machine Coding Answer</div>
+<div class="card-body">
+<pre class="code"><code>import React, { useEffect, useState } from "react";
+
+const API_URL = "https://dummyjson.com/products";
+
+function ProductPagination() {
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const totalPages = Math.ceil(total / limit);
+
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const skip = (currentPage - 1) * limit;
+
+        const response = await fetch(
+          `${API_URL}?limit=${limit}&skip=${skip}`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const result = await response.json();
+
+        setProducts(result.products);
+        setTotal(result.total);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchProducts();
+
+    return () =&gt; controller.abort();
+  }, [currentPage, limit]);
+
+  const goToPage = (page) =&gt; {
+    if (page &lt; 1 || page &gt; totalPages) return;
+    setCurrentPage(page);
+  };
+
+  const handleLimitChange = (event) =&gt; {
+    setLimit(Number(event.target.value));
+    setCurrentPage(1);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Products&lt;/h2&gt;
+
+      &lt;label&gt;Items per page: &lt;/label&gt;
+
+      &lt;select
+        value={limit}
+        onChange={handleLimitChange}
+      &gt;
+        &lt;option value={5}&gt;5&lt;/option&gt;
+        &lt;option value={10}&gt;10&lt;/option&gt;
+        &lt;option value={20}&gt;20&lt;/option&gt;
+      &lt;/select&gt;
+
+      {loading &amp;&amp; &lt;p&gt;Loading...&lt;/p&gt;}
+      {error &amp;&amp; &lt;p&gt;{error}&lt;/p&gt;}
+
+      &lt;ul&gt;
+        {products.map((product) =&gt; (
+          &lt;li key={product.id}&gt;
+            {product.title}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+
+      &lt;button
+        disabled={currentPage === 1 || loading}
+        onClick={() =&gt; goToPage(currentPage - 1)}
+      &gt;
+        Previous
+      &lt;/button&gt;
+
+      {Array.from(
+        { length: totalPages },
+        (_, index) =&gt; index + 1
+      ).map((page) =&gt; (
+        &lt;button
+          key={page}
+          disabled={loading}
+          onClick={() =&gt; goToPage(page)}
+          aria-current={
+            currentPage === page ? "page" : undefined
+          }
+        &gt;
+          {page}
+        &lt;/button&gt;
+      ))}
+
+      &lt;button
+        disabled={currentPage === totalPages || loading}
+        onClick={() =&gt; goToPage(currentPage + 1)}
+      &gt;
+        Next
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default ProductPagination;</code></pre>
+<div class="alert alert-success mt-3 mb-0"><strong>Core logic:</strong> page changes → <code>useEffect</code> runs → calculate <code>skip</code> → call API → receive current page → update products and total → render.</div>
+</div>
+</section>
+
+<section id="mistakes" class="card mb-4">
+<div class="card-header lh fw-bold">6. Common Developer Mistakes</div>
+<div class="card-body">
+<div class="alert alert-danger mistake"><strong>1. Wrong skip calculation:</strong> Use <code>(currentPage - 1) * limit</code>. Do not use <code>currentPage * limit</code>.</div>
+<div class="alert alert-danger mistake"><strong>2. Forgetting total:</strong> The API's <code>total</code> is needed to calculate <code>totalPages</code>.</div>
+<div class="alert alert-danger mistake"><strong>3. Fetching only once:</strong> The API request must depend on <code>currentPage</code> and <code>limit</code>.</div>
+<div class="alert alert-danger mistake"><strong>4. Not resetting page-size:</strong> When limit changes, reset to page 1.</div>
+<div class="alert alert-danger mistake"><strong>5. Not handling loading:</strong> Rapid clicks can create multiple requests and poor UI feedback.</div>
+<div class="alert alert-danger mistake"><strong>6. Ignoring race conditions:</strong> A slower old response can overwrite a newer response. Abort the previous request or otherwise guard against stale responses.</div>
+<div class="alert alert-danger mistake"><strong>7. No error handling:</strong> Network/API failures should show a useful message.</div>
+<div class="alert alert-danger mistake"><strong>8. Rendering every page button:</strong> Thousands of pages can create a huge pagination control. Use condensed pagination for large page counts.</div>
+<div class="alert alert-danger mistake"><strong>9. Unstable React keys:</strong> Use a unique product ID such as <code>product.id</code>.</div>
+<div class="alert alert-danger mistake mb-0"><strong>10. Mixing frontend and backend pagination:</strong> Do not download all records and call it server-side pagination. The API request itself should contain the page range.</div>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header lh fw-bold">7. Interview Questions</div>
+<div class="card-body">
+<ol>
+<li>What is pagination?</li>
+<li>What is the difference between frontend and backend pagination?</li>
+<li>Why is backend pagination better for large datasets?</li>
+<li>What are <code>limit</code> and <code>skip</code>?</li>
+<li>How do you calculate skip?</li>
+<li>How do you calculate total pages?</li>
+<li>Why do you need the API's total count?</li>
+<li>What happens when the page size changes?</li>
+<li>How do you handle loading, errors and race conditions?</li>
+<li>How would you implement pagination with search and sorting?</li>
+<li>How would you handle 10,000 page buttons?</li>
+</ol>
+</div>
+</section>
+
+</div>
+
+<!-- RIGHT -->
+<div class="col-lg-7">
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">Selected Answer — Simple Architecture</div>
+<div class="card-body">
+<div class="flow my-3">
+<div class="box">User clicks<br>Page 3</div><div class="arrow">→</div>
+<div class="box">React calculates<br>skip = 20</div><div class="arrow">→</div>
+<div class="box">API Request<br>limit=10&skip=20</div><div class="arrow">→</div>
+<div class="box">Server returns<br>10 products</div><div class="arrow">→</div>
+<div class="box">React renders<br>products</div>
+</div>
+<div class="alert alert-success mb-0"><strong>Main idea:</strong> The frontend does not ask for every product. It asks the backend for exactly the records needed for the selected page.</div>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">Visual Explanation — Simple Steps</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 1</strong><br>User opens the product page.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 2</strong><br>React starts with page 1 and limit 10.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 3</strong><br>React calculates <code>skip = 0</code>.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 4</strong><br>API returns 10 products plus <code>total</code>.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 5</strong><br>User clicks page 2.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 6</strong><br>React calculates <code>skip = 10</code>.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 7</strong><br>Server returns only page 2 data.</div></div>
+<div class="col-md-6"><div class="p-3 bg-light rounded"><strong>Step 8</strong><br>React replaces the displayed products.</div></div>
+</div>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">Page Calculation Example</div>
+<div class="card-body">
+<p>Assume:</p>
+<ul>
+<li>Total products = 194</li>
+<li>Items per page = 10</li>
+<li>Current page = 4</li>
+</ul>
+<p><span class="formula">totalPages = Math.ceil(194 / 10) = 20</span></p>
+<p><span class="formula">skip = (4 - 1) × 10 = 30</span></p>
+<p>So the request becomes:</p>
+<pre class="code">GET /products?limit=10&skip=30</pre>
+<div class="alert alert-info mb-0">The server returns up to 10 products starting after the first 30 products.</div>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">Request → Response Data Flow</div>
+<div class="card-body">
+<pre class="code">Frontend
+   |
+   | page = 3, limit = 10
+   v
+skip = (3 - 1) * 10
+skip = 20
+   |
+   v
+GET /products?limit=10&skip=20
+   |
+   v
+DummyJSON Server
+   |
+   | products: [10 records]
+   | total: 194
+   | skip: 20
+   | limit: 10
+   v
+React State
+   |
+   +--> products
+   +--> total
+   |
+   v
+UI renders current page</pre>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">Frontend vs Backend Pagination</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead><tr><th>Point</th><th>Frontend</th><th>Backend</th></tr></thead>
+<tbody>
+<tr><td>Data download</td><td>Usually all data</td><td>Only requested page</td></tr>
+<tr><td>Network usage</td><td>Higher for large data</td><td>Lower</td></tr>
+<tr><td>Browser memory</td><td>Can be high</td><td>Lower</td></tr>
+<tr><td>Filtering</td><td>Browser</td><td>Server/database</td></tr>
+<tr><td>Best for</td><td>Small/medium datasets</td><td>Large datasets</td></tr>
+<tr><td>Core idea</td><td><code>data.slice()</code></td><td><code>limit + skip</code> / API query</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">Loading and Race-Condition Explanation</div>
+<div class="card-body">
+<p>Suppose the user quickly clicks page 2 and page 3.</p>
+<div class="flow mb-3">
+<div class="box">Request A<br>Page 2</div><div class="arrow">→</div>
+<div class="box">Request B<br>Page 3</div><div class="arrow">→</div>
+<div class="box">B finishes first</div><div class="arrow">→</div>
+<div class="box">A finishes later</div>
+</div>
+<p>If we do not protect against stale responses, page 2 data could overwrite page 3 data.</p>
+<div class="alert alert-success"><strong>Solution used in our code:</strong> <code>AbortController</code> cancels the previous fetch when the effect is cleaned up.</div>
+</div>
+</section>
+
+<section class="card mb-4" id="interview">
+<div class="card-header rh fw-bold">How I Would Explain My Implementation to the Interviewer</div>
+<div class="card-body">
+<div class="alert alert-primary">
+<p class="mb-0"><strong>Interviewer-ready answer:</strong></p>
+<p class="mt-2 mb-0">“I am implementing server-side pagination because the dataset can be large, so I do not want to download all records to the browser. I maintain the current page and page size in React state. Whenever either value changes, I calculate the skip value using <code>(currentPage - 1) * limit</code>. I then call the DummyJSON products API with <code>limit</code> and <code>skip</code>. The API returns the current page of products along with the total number of products. I store the products and total in state. The total lets me calculate the number of pages using <code>Math.ceil(total / limit)</code>. I also handle loading and errors, disable navigation while loading, reset to page 1 when the page size changes, use stable product IDs as React keys, and abort stale requests to avoid race conditions.”</p>
+</div>
+<h5>Then explain the implementation in this order:</h5>
+<ol>
+<li><strong>State:</strong> products, currentPage, limit, total, loading, error.</li>
+<li><strong>Derived value:</strong> totalPages.</li>
+<li><strong>Request:</strong> calculate skip and call API.</li>
+<li><strong>Response:</strong> update products and total.</li>
+<li><strong>Navigation:</strong> change currentPage.</li>
+<li><strong>Edge cases:</strong> loading, errors, invalid pages, page-size changes, stale requests.</li>
+</ol>
+<div class="alert alert-success mb-0"><strong>Interview tip:</strong> First explain the API contract and data flow. Then write the smallest working pagination. Finally add production concerns such as cancellation, error handling and large page-button handling.</div>
+</div>
+</section>
+
+<section class="card mb-4">
+<div class="card-header rh fw-bold">If Interviewer Adds Search + Sort</div>
+<div class="card-body">
+<div class="flow mb-3">
+<div class="box">User Input</div><div class="arrow">→</div>
+<div class="box">Search / Filters</div><div class="arrow">→</div>
+<div class="box">Sort</div><div class="arrow">→</div>
+<div class="box">Pagination Params</div><div class="arrow">→</div>
+<div class="box">Server</div>
+</div>
+<p>For true server-side pagination, search and sorting should also be represented in the API request when the backend supports them.</p>
+<div class="alert alert-warning mb-0">When search/filter changes, reset the page to 1. Otherwise the user might remain on a page that no longer exists for the filtered result set.</div>
+</div>
+</section>
+
+<section class="card">
+<div class="card-header rh fw-bold">Quick Revision</div>
+<div class="card-body">
+<div class="row g-2">
+<div class="col-md-6"><div class="alert alert-success mb-0"><strong>Page:</strong> current UI page</div></div>
+<div class="col-md-6"><div class="alert alert-success mb-0"><strong>Limit:</strong> records requested</div></div>
+<div class="col-md-6"><div class="alert alert-success mb-0"><strong>Skip:</strong> <code>(page - 1) × limit</code></div></div>
+<div class="col-md-6"><div class="alert alert-success mb-0"><strong>Total pages:</strong> <code>ceil(total / limit)</code></div></div>
+</div>
+<p class="mt-3 mb-0"><strong>Memory trick:</strong> <em>Page → Skip → API → Products + Total → Render.</em></p>
+</div>
+</section>
+
+</div>
+</div>
+</div>
+
+<footer class="text-center text-muted py-4">Frontend + Backend Pagination • React • DummyJSON • Machine Coding Round</footer>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React Machine Coding — Throttling</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#1f2937}.sticky-nav{position:sticky;top:0;z-index:1030}
+.sidebar{position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto;background:#111827}
+.sidebar .nav-link{color:#cbd5e1;border-radius:8px;margin:3px 0}.sidebar .nav-link:hover,.sidebar .nav-link.active{background:#2563eb;color:white}
+.content{max-width:1100px}.section-card{border:0;box-shadow:0 5px 18px rgba(15,23,42,.08);border-radius:14px}
+.section-card .card-header{border:0;font-weight:700}.code{background:#0b1220;color:#dbeafe;border-radius:10px;padding:18px;overflow:auto;font-size:13px;line-height:1.55}
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}.flow-box{min-width:150px;padding:14px;border-radius:12px;text-align:center;background:#eff6ff;border:2px solid #93c5fd;font-weight:600}.arrow{font-size:22px;color:#64748b}
+.mistake{border-left:5px solid #dc3545;background:#fff5f5}.tip{border-left:5px solid #0d6efd;background:#eef6ff}.interview{border-left:5px solid #198754;background:#effcf6}
+.demo{background:linear-gradient(135deg,#eff6ff,#f8fafc);border:1px solid #dbeafe}pre{margin:0}
+@media(max-width:991px){.sidebar{position:relative;top:0;height:auto}}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow-sm"><div class="container-fluid">
+<span class="navbar-brand fw-bold">⚛️ React Machine Coding — Throttling</span><span class="badge text-bg-primary">Interview Ready</span>
+</div></nav>
+
+<div class="container-fluid"><div class="row">
+<aside class="col-lg-3 col-xl-2 sidebar p-3">
+<div class="text-uppercase small text-secondary fw-bold mb-2">Topics</div>
+<nav class="nav flex-column">
+<a class="nav-link active" href="#what">What is Throttling?</a>
+<a class="nav-link" href="#why">Why do we need it?</a>
+<a class="nav-link" href="#how">How it works</a>
+<a class="nav-link" href="#code">Full Code</a>
+<a class="nav-link" href="#button">Button Click</a>
+<a class="nav-link" href="#scroll">Scrolling</a>
+<a class="nav-link" href="#mouse">Mouse Move</a>
+<a class="nav-link" href="#mistakes">Common Mistakes</a>
+<a class="nav-link" href="#interview">How I explain it</a>
+<a class="nav-link" href="#cheatsheet">Interview Cheat Sheet</a>
+</nav></aside>
+
+<main class="col-lg-9 col-xl-10 p-3 p-md-4"><div class="content mx-auto">
+<div class="alert alert-primary shadow-sm"><strong>Machine coding goal:</strong> Build a reusable throttle utility and use it with <strong>button click, scroll, and mouse move</strong> events in React.</div>
+
+<section id="what" class="card section-card mb-4"><div class="card-header bg-primary text-white">1. What is Throttling?</div><div class="card-body">
+<p><strong>Throttling means limiting how often a function is allowed to run.</strong></p>
+<p>If an event fires 100 times in one second, we may not want our expensive function to run 100 times. With throttling, we can say: <em>“Run it at most once every X milliseconds.”</em></p>
+<div class="demo rounded p-3"><div class="row text-center g-3 align-items-center">
+<div class="col-md-5"><div class="p-3 bg-white rounded shadow-sm">⚡ Event fires repeatedly<br><small>click / scroll / mousemove</small></div></div>
+<div class="col-md-2 fs-2">→</div><div class="col-md-5"><div class="p-3 bg-white rounded shadow-sm">🛡️ Throttle<br><strong>Only allow limited calls</strong></div></div>
+</div></div></div></section>
+
+<section id="why" class="card section-card mb-4"><div class="card-header bg-success text-white">2. Why do we need Throttling?</div><div class="card-body">
+<div class="row g-3">
+<div class="col-md-4"><div class="alert alert-warning h-100"><strong>Problem</strong><br>High-frequency events can call functions many times.</div></div>
+<div class="col-md-4"><div class="alert alert-danger h-100"><strong>Impact</strong><br>More state updates, calculations, API calls, and rendering work.</div></div>
+<div class="col-md-4"><div class="alert alert-success h-100"><strong>Solution</strong><br>Throttle controls the execution frequency.</div></div>
+</div>
+<div class="tip p-3 rounded"><strong>Simple interview line:</strong> “I use throttling when an event happens continuously but I only need to process it periodically.”</div>
+</div></section>
+
+<section id="how" class="card section-card mb-4"><div class="card-header bg-info">3. How Throttling works — simple steps</div><div class="card-body">
+<div class="flow">
+<div class="flow-box">1️⃣ Event happens</div><div class="arrow">→</div><div class="flow-box">2️⃣ Get current time</div><div class="arrow">→</div>
+<div class="flow-box">3️⃣ Compare with last run</div><div class="arrow">→</div><div class="flow-box">4️⃣ Enough time?</div><div class="arrow">→</div><div class="flow-box">5️⃣ Run + update last time</div>
+</div><hr>
+<p><strong>Core condition:</strong></p><div class="code"><code>currentTime - lastTime &gt; limit</code></div>
+<p class="mt-3">Example: limit = <strong>300ms</strong>.</p>
+<ul><li>0ms → run.</li><li>100ms → ignore.</li><li>200ms → ignore.</li><li>350ms → run.</li></ul>
+<div class="alert alert-secondary mb-0"><strong>Important:</strong> Your implementation is a simple leading-edge throttle: it runs when the time window is available and ignores calls during the window. It does not schedule a trailing call.</div>
+</div></section>
+
+<section id="code" class="card section-card mb-4"><div class="card-header bg-dark text-white">4. Full React Code — your implementation</div><div class="card-body">
+<pre class="code"><code>import React, { useRef, useState } from "react";
+
+const productList = Array.from({ length: 100 }, (_, i) => ({
+  id: i + 1,
+  label: "Product: " + (i + 1),
+}));
+
+const createThrottle = (fn, limit) => {
+  let last = 0;
+  return (...args) => {
+    let start = Date.now();
+
+    if (start - last > limit) {
+      fn(...args);
+      last = start;
+    }
+  };
+};
+
+const Throttling = () => {
+  const [mouseMoveCount, setMouseMoveCount] = useState(0);
+  const [throttleMouseMoveCount, setThrottleMouseMoveCount] = useState(0);
+  const [scrolldowncount, setscrolldowncount] = useState(0);
+  const [throttlescrolldowncount, setthrottlescrolldowncount] = useState(0);
+  const [buttonClickCount, setbuttonClickcount] = useState(0);
+  const [throttlebuttonClickcount, setthrottlebuttonClickcount] = useState(0);
+
+  const throttleMouseHover = useRef(
+    createThrottle(() => {
+      setThrottleMouseMoveCount(prev => prev + 1);
+    }, 200)
+  ).current;
+
+  const throttlescrolldown = useRef(
+    createThrottle(() => {
+      setthrottlescrolldowncount(prev => prev + 1);
+    }, 300)
+  ).current;
+
+  const throttleButtonClick = useRef(
+    createThrottle(() => {
+      setthrottlebuttonClickcount(prev => prev + 1);
+    }, 400)
+  ).current;
+
+  const handleMouseHover = () => {
+    setMouseMoveCount(prev => prev + 1);
+    throttleMouseHover();
+  };
+
+  const handleScroll = () => {
+    setscrolldowncount(prev => prev + 1);
+    throttlescrolldown();
+  };
+
+  const handleButtonClick = () => {
+    setbuttonClickcount(prev => prev + 1);
+    throttleButtonClick();
+  };
+
+  return (
+    <div>
+      {/* Button container -> onClick={handleButtonClick} */}
+      {/* Scroll container -> onScroll={handleScroll} */}
+      {/* Mouse container -> onMouseMove={handleMouseHover} */}
+    </div>
+  );
+};
+
+export default Throttling;</code></pre>
+<div class="alert alert-warning mt-3 mb-0"><strong>Interview note:</strong> The key machine-coding part is <code>createThrottle</code>. The three handlers prove the same reusable utility works for different event types.</div>
+</div></section>
+
+<section id="button" class="card section-card mb-4"><div class="card-header bg-warning">5. Button Click — 400ms throttle</div><div class="card-body">
+<p>Normal count increases for every click. Throttled count increases only when at least 400ms has passed since the previous allowed execution.</p>
+<div class="flow"><div class="flow-box">👆 Click</div><div class="arrow">→</div><div class="flow-box">handleButtonClick()</div><div class="arrow">→</div><div class="flow-box">throttleButtonClick()</div><div class="arrow">→</div><div class="flow-box">400ms check</div><div class="arrow">→</div><div class="flow-box">✅ execute / ❌ ignore</div></div>
+</div></section>
+
+<section id="scroll" class="card section-card mb-4"><div class="card-header bg-primary text-white">6. Scroll — 300ms throttle</div><div class="card-body">
+<p>Scrolling can generate many events quickly. The normal counter shows event frequency, while the throttled counter shows controlled execution.</p>
+<div class="row g-3"><div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Raw:</strong> every scroll event calls <code>handleScroll</code>.</div></div>
+<div class="col-md-6"><div class="p-3 border rounded bg-light"><strong>Throttled:</strong> callback is allowed only after the 300ms window.</div></div></div>
+<div class="alert alert-info mt-3 mb-0"><strong>Use cases:</strong> scroll position tracking, sticky UI calculations, progress indicators, analytics, and other repeated work.</div>
+</div></section>
+
+<section id="mouse" class="card section-card mb-4"><div class="card-header bg-secondary text-white">7. Mouse Move — 200ms throttle</div><div class="card-body">
+<p><code>mousemove</code> can fire very frequently. Your implementation keeps the raw count and throttled count separately so the difference is easy to demonstrate.</p>
+<div class="flow"><div class="flow-box">🖱️ Mouse moves</div><div class="arrow">→</div><div class="flow-box">handleMouseHover()</div><div class="arrow">→</div><div class="flow-box">Throttle: 200ms</div><div class="arrow">→</div><div class="flow-box">Controlled updates</div></div>
+</div></section>
+
+<section id="mistakes" class="card section-card mb-4"><div class="card-header bg-danger text-white">8. Common Developer Mistakes</div><div class="card-body">
+<div class="mistake p-3 rounded mb-3"><strong>❌ Creating throttle on every render</strong><br>If <code>createThrottle()</code> runs during every render, the private <code>last</code> value can reset. Use <code>useRef</code> to preserve the same throttled function.</div>
+<div class="mistake p-3 rounded mb-3"><strong>❌ Using state for <code>last</code></strong><br>State is UI data and causes re-renders. The timing value can stay inside the closure.</div>
+<div class="mistake p-3 rounded mb-3"><strong>❌ Forgetting the closure</strong><br><code>last</code> must remain accessible to the returned function so it can remember the previous execution time.</div>
+<div class="mistake p-3 rounded mb-3"><strong>❌ Confusing throttle with debounce</strong><br>Throttle runs periodically while events continue. Debounce waits until events stop for the specified period.</div>
+<div class="mistake p-3 rounded"><strong>❌ Assuming trailing execution</strong><br>This implementation does not schedule a final call. Calls ignored during the limit are dropped.</div>
+</div></section>
+
+<section id="interview" class="card section-card mb-4"><div class="card-header bg-success text-white">9. How I would explain this to the interviewer</div><div class="card-body">
+<div class="interview p-4 rounded"><h5>🎤 My explanation</h5>
+<p>“First, I create a reusable <code>createThrottle</code> function. It accepts a callback and a time limit.”</p>
+<p>“Inside it, I keep a <code>last</code> timestamp in a closure. Every time the returned function is called, I get the current time using <code>Date.now()</code>.”</p>
+<p>“Then I compare <code>currentTime - last</code> with the limit. If enough time has passed, I execute the callback and update <code>last</code>. Otherwise, I ignore the call.”</p>
+<p>“In React, I use <code>useRef</code> so the throttled function instance and its closure survive re-renders. I can reuse the same utility for button click, scrolling, and mouse movement.”</p>
+<p class="mb-0">“This is a leading-edge throttle. It executes when allowed and drops calls during the waiting window. If the requirement needs a trailing call, I would extend it with a timer.”</p>
+</div></div></section>
+
+<section id="cheatsheet" class="card section-card mb-5"><div class="card-header bg-dark text-white">10. Interview Cheat Sheet</div><div class="card-body">
+<table class="table table-bordered align-middle"><thead class="table-light"><tr><th>Question</th><th>Short Answer</th></tr></thead><tbody>
+<tr><td>What is throttle?</td><td>Limits how often a function can execute.</td></tr>
+<tr><td>Why use it?</td><td>To reduce repeated expensive work from high-frequency events.</td></tr>
+<tr><td>Where?</td><td>Scroll, mousemove, resize, repeated user actions, analytics, etc.</td></tr>
+<tr><td>Core idea?</td><td>Compare current time with the previous allowed execution time.</td></tr>
+<tr><td>Why closure?</td><td>To remember the previous execution timestamp.</td></tr>
+<tr><td>Why useRef in React?</td><td>To preserve the same throttled function across renders without causing re-renders.</td></tr>
+<tr><td>Throttle vs debounce?</td><td>Throttle runs periodically; debounce waits until activity stops.</td></tr>
+<tr><td>Your implementation type?</td><td>Leading-edge throttle without trailing execution.</td></tr>
+</tbody></table>
+<div class="alert alert-success mb-0"><strong>Machine coding strategy:</strong> Start with utility → explain closure → add one event → show counters → reuse utility → discuss edge cases.</div>
+</div></section>
+
+</div></main></div></div>
+</body></html>

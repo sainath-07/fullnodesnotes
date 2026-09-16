@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React Virtualisation - Code Review</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth} body{background:#f5f7fb;color:#20242a;line-height:1.7}
+section{scroll-margin-top:75px}.navbar{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#111827,#6f42c1)}
+.card{border:0;border-radius:16px;overflow:hidden}.shadow-soft{box-shadow:0 .5rem 1.5rem rgba(0,0,0,.08)}
+pre{background:#17202a;color:#f8f9fa;border-radius:12px;padding:18px;overflow:auto;font-size:.88rem}
+pre code{color:#f8f9fa} code{color:#b4236e}.flow{background:#fff;border:2px dashed #ced4da;border-radius:14px;padding:20px}
+.flow-box{padding:13px;border:1px solid #dee2e6;border-radius:10px;background:#f8f9fa;text-align:center;font-weight:600}
+.arrow{text-align:center;font-size:24px;color:#6c757d}.tip{border-left:5px solid #198754}
+.note{border-left:5px solid #0dcaf0}.warn{border-left:5px solid #ffc107}
+.badge-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+<div class="container">
+<a class="navbar-brand fw-bold" href="#top">React Virtualisation</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+<div class="collapse navbar-collapse" id="nav"><ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link" href="#concept">Concept</a></li>
+<li class="nav-item"><a class="nav-link" href="#review">Review</a></li>
+<li class="nav-item"><a class="nav-link" href="#math">Calculation</a></li>
+<li class="nav-item"><a class="nav-link" href="#code">Improved Code</a></li>
+<li class="nav-item"><a class="nav-link" href="#changes">Changes</a></li>
+<li class="nav-item"><a class="nav-link" href="#interview">Interview</a></li>
+</ul></div></div>
+</nav>
+
+<header id="top" class="hero text-white py-5">
+<div class="container">
+<span class="badge bg-light text-primary mb-3 badge-label">React.js • Performance</span>
+<h1 class="display-5 fw-bold">React Virtualisation — Code Review & Improved Version</h1>
+<p class="lead mb-0">A simple review of your implementation, with corrections, explanations and a cleaner version.</p>
+</div></header>
+
+<main class="container py-5">
+
+<div class="alert alert-success shadow-soft">
+<strong>Overall review:</strong> Your core virtualisation logic is correct. You correctly track scrolling,
+calculate the visible range, use overscan, create the full scroll height, and absolutely position only the
+items that should be rendered. The main improvements are naming, stable keys, layout, comments and clearer structure.
+</div>
+
+<section id="concept" class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-primary text-white py-3"><h2 class="h4 mb-0">1. What Your Virtualisation Is Doing</h2></div>
+<div class="card-body p-4">
+<p>Virtualisation means we <strong>do not render every item</strong> in a large list. If there are 10,000 products,
+the user may see only 10–20 at a time. We render the visible products plus a few extra products called <strong>overscan</strong>.</p>
+<div class="flow">
+<div class="flow-box">All products<br>10,000 items</div><div class="arrow">↓</div>
+<div class="flow-box">User scrolls<br><code>scrollTop</code> changes</div><div class="arrow">↓</div>
+<div class="flow-box">Calculate visible indexes</div><div class="arrow">↓</div>
+<div class="flow-box">Render visible items + overscan</div>
+</div>
+<div class="alert alert-info note mt-4 mb-0"><strong>Key idea:</strong> The browser still gets a large inner scroll area,
+but React creates DOM elements only for the small portion currently needed.</div>
+</div></div>
+</section>
+
+<section id="review" class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-success text-white py-3"><h2 class="h4 mb-0">2. Review of Your Original Code</h2></div>
+<div class="card-body p-4">
+<div class="table-responsive"><table class="table table-bordered table-striped align-middle">
+<thead class="table-dark"><tr><th>Part</th><th>Review</th><th>Why / Improvement</th></tr></thead>
+<tbody>
+<tr><td><code>useState</code></td><td>✅ Correct</td><td>Stores the current vertical scroll position.</td></tr>
+<tr><td>Visible index</td><td>✅ Correct</td><td><code>Math.floor(scrollTop / itemHeight)</code> works for fixed-height rows.</td></tr>
+<tr><td>Overscan</td><td>✅ Good</td><td>Extra rows make fast scrolling smoother.</td></tr>
+<tr><td>Full inner height</td><td>✅ Correct</td><td>Makes the scrollbar represent the complete list.</td></tr>
+<tr><td>Absolute positioning</td><td>✅ Correct</td><td>Places each rendered row at its real position.</td></tr>
+<tr><td><code>useMemo</code></td><td>⚠️ Optional</td><td><code>slice()</code> is cheap for this example. It is not required.</td></tr>
+<tr><td>React key</td><td>⚠️ Improve</td><td>Use <code>product.id</code> instead of <code>product.label</code>.</td></tr>
+<tr><td><code>margin: 12px</code></td><td>⚠️ Improve</td><td>Margin can make fixed-height positioning confusing. Prefer padding.</td></tr>
+<tr><td><code>&lt;p&gt;</code> row</td><td>⚠️ Improve</td><td>A <code>div</code> is clearer for a visual list row.</td></tr>
+<tr><td>Inline styling</td><td>Works</td><td>Fine for learning; CSS classes are easier to maintain in larger apps.</td></tr>
+</tbody></table></div>
+<div class="alert alert-warning warn mt-4 mb-0"><strong>Most important limitation:</strong>
+This algorithm assumes every row has the same fixed height. If rows have different heights, this simple
+<code>index × ITEM_HEIGHT</code> calculation is no longer accurate.</div>
+</div></div>
+</section>
+
+<section id="math" class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-info text-dark py-3"><h2 class="h4 mb-0">3. How the Calculation Works</h2></div>
+<div class="card-body p-4">
+<h5>Step 1 — Find the first visible index</h5>
+<pre><code>const firstVisibleIndex = Math.floor(
+  scrollTop / ITEM_HEIGHT
+);</code></pre>
+<p>If <code>scrollTop = 200</code> and each row is <code>50px</code>:</p>
+<pre><code>200 / 50 = 4
+firstVisibleIndex = 4</code></pre>
+
+<h5>Step 2 — Find how many rows fit</h5>
+<pre><code>const visibleItemCount = Math.ceil(
+  CONTAINER_HEIGHT / ITEM_HEIGHT
+);</code></pre>
+<pre><code>500 / 50 = 10 rows</code></pre>
+
+<h5>Step 3 — Add overscan</h5>
+<pre><code>const startIndex = Math.max(
+  0,
+  firstVisibleIndex - OVERSCAN
+);
+
+const endIndex = Math.min(
+  PRODUCTS.length,
+  firstVisibleIndex + visibleItemCount + OVERSCAN
+);</code></pre>
+<p>For index 20, 10 visible rows and overscan 5:</p>
+<pre><code>startIndex = 15
+endIndex   = 35</code></pre>
+<div class="alert alert-success tip"><strong>Why overscan?</strong>
+We render a few rows outside the viewport so a fast scroll does not immediately expose an empty area.</div>
+
+<h5 class="mt-4">Step 4 — Create the full virtual height</h5>
+<pre><code>const totalHeight = PRODUCTS.length * ITEM_HEIGHT;</code></pre>
+<p>For 100 products × 50px = <strong>5000px</strong>. This creates the space for the full virtual list without creating 100 DOM rows.</p>
+</div></div>
+</section>
+
+<section id="code" class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-dark text-white py-3"><h2 class="h4 mb-0">4. Improved Version of Your Code</h2></div>
+<div class="card-body p-4">
+<div class="alert alert-primary">This version keeps your manual approach because it is useful for learning how virtualisation works internally.</div>
+<pre><code>import React, { useMemo, useState } from "react";
+
+const PRODUCTS = Array.from({ length: 100 }, (_, index) =&gt; ({
+  id: index + 1,
+  label: `Product ${index + 1}`,
+}));
+
+// The visible scrolling area.
+const CONTAINER_HEIGHT = 500;
+
+// IMPORTANT: This algorithm assumes every item has the same height.
+const ITEM_HEIGHT = 50;
+
+// Render a few extra items above and below the viewport.
+// This improves the visual experience during fast scrolling.
+const OVERSCAN = 5;
+
+const Virtualisation = () =&gt; {
+  const [scrollTop, setScrollTop] = useState(0);
+
+  // Convert the scroll position in pixels into an item index.
+  // Example: 200px / 50px = index 4.
+  const firstVisibleIndex = Math.floor(
+    scrollTop / ITEM_HEIGHT
+  );
+
+  // How many complete rows can fit in the viewport?
+  const visibleItemCount = Math.ceil(
+    CONTAINER_HEIGHT / ITEM_HEIGHT
+  );
+
+  // Start before the viewport by OVERSCAN rows.
+  // Math.max prevents a negative start index.
+  const startIndex = Math.max(
+    0,
+    firstVisibleIndex - OVERSCAN
+  );
+
+  // Stop after the viewport by OVERSCAN rows.
+  // Math.min prevents going beyond the array length.
+  const endIndex = Math.min(
+    PRODUCTS.length,
+    firstVisibleIndex + visibleItemCount + OVERSCAN
+  );
+
+  // Only this small section is rendered.
+  // useMemo is optional here because slice() is inexpensive,
+  // but it is kept to make the virtual window explicit.
+  const visibleProducts = useMemo(() =&gt; {
+    return PRODUCTS.slice(startIndex, endIndex);
+  }, [startIndex, endIndex]);
+
+  // Reserve space for the complete list.
+  // We reserve the space; we do NOT render every product.
+  const totalHeight = PRODUCTS.length * ITEM_HEIGHT;
+
+  return (
+    &lt;div
+      style={{
+        width: "min(100%, 500px)",
+        height: CONTAINER_HEIGHT,
+        overflowY: "auto",
+        border: "1px solid #0c7ae8",
+        borderRadius: "12px",
+        background: "#f8fafc",
+      }}
+      onScroll={(event) =&gt; {
+        // scrollTop tells us how far the user has scrolled.
+        setScrollTop(event.currentTarget.scrollTop);
+      }}
+    &gt;
+      {/*
+        This element creates the complete virtual scroll space.
+
+        Example:
+        100 products × 50px = 5000px.
+
+        The browser gets a scrollbar for this full height,
+        even though only a small number of rows are rendered.
+      */}
+      &lt;div
+        style={{
+          height: totalHeight,
+          position: "relative",
+        }}
+      &gt;
+        {visibleProducts.map((product, index) =&gt; {
+          // index is the index inside the sliced array.
+          // actualIndex is the index inside the original array.
+          //
+          // Example:
+          // startIndex = 15
+          // index = 0
+          // actualIndex = 15
+          const actualIndex = startIndex + index;
+
+          return (
+            &lt;div
+              key={product.id}
+              style={{
+                position: "absolute",
+
+                // Put this row at its real position
+                // inside the complete virtual list.
+                top: actualIndex * ITEM_HEIGHT,
+
+                left: 0,
+                right: 0,
+                height: ITEM_HEIGHT,
+
+                boxSizing: "border-box",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 14px",
+
+                background: "#dad6aa",
+                border: "1px solid #c2a8a8",
+                borderRadius: "8px",
+                fontSize: "18px",
+                fontWeight: "700",
+              }}
+            &gt;
+              {product.label}
+            &lt;/div&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Virtualisation;</code></pre>
+<div class="alert alert-success tip"><strong>Why this version is better:</strong>
+The algorithm is still yours. The names are clearer, the key uses the stable ID, margin is removed from the
+virtual coordinate system, and comments explain both <em>what</em> each part does and <em>why</em> it exists.</div>
+</div></div>
+</section>
+
+<section id="changes" class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-warning py-3"><h2 class="h4 mb-0">5. Changes Made and Why</h2></div>
+<div class="card-body p-4">
+<h5>1. <code>product.label</code> → <code>product.id</code></h5>
+<pre><code>// Before
+key={product.label}
+
+// Better
+key={product.id}</code></pre>
+<p>A product ID is a stable unique identifier. The label is display text and may change.</p>
+
+<h5 class="mt-4">2. Better variable names</h5>
+<pre><code>firstIndexValue  → firstVisibleIndex
+visibleListCount → visibleItemCount
+start            → startIndex
+end              → endIndex
+getProductList   → visibleProducts
+ITEMS_HEIGHT     → ITEM_HEIGHT</code></pre>
+<p>Good names make the algorithm easier to understand without reading every line.</p>
+
+<h5 class="mt-4">3. Removed the inner margin</h5>
+<p>Your original code has <code>margin: "12px"</code>. The calculation says a row is positioned every 50px.
+Extra spacing can make the visual layout disagree with the mathematical position. The improved version uses a simpler coordinate system.</p>
+
+<h5 class="mt-4">4. Changed <code>&lt;p&gt;</code> to <code>&lt;div&gt;</code></h5>
+<p>The row is a visual container, so <code>div</code> is a clearer choice. If this represents an actual semantic list,
+you can also use <code>ul</code> and <code>li</code> with suitable styling.</p>
+
+<h5 class="mt-4">5. Changed <code>overflowY: "scroll"</code> to <code>"auto"</code></h5>
+<p><code>auto</code> allows the browser to show the scrollbar when it is needed. This is mostly a UI improvement; your original approach also works.</p>
+
+<h5 class="mt-4">6. Removed development logging</h5>
+<p>Your <code>console.log()</code> is useful while learning. However, scroll events can happen many times, so it should normally be removed after debugging.</p>
+
+<div class="alert alert-info note mt-4 mb-0"><strong>One thing I did not change:</strong>
+I kept <code>useMemo</code>. It is not required for this small <code>slice()</code>, but keeping it is reasonable
+while learning. Later, learn when memoisation actually helps instead of using it automatically.</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-secondary text-white py-3"><h2 class="h4 mb-0">6. Virtualisation Flow</h2></div>
+<div class="card-body p-4">
+<div class="flow">
+<div class="flow-box">User scrolls</div><div class="arrow">↓</div>
+<div class="flow-box"><code>scrollTop</code> changes</div><div class="arrow">↓</div>
+<div class="flow-box"><code>firstVisibleIndex = floor(scrollTop / ITEM_HEIGHT)</code></div><div class="arrow">↓</div>
+<div class="row g-3"><div class="col-md-6"><div class="flow-box"><code>startIndex</code><br>visible start − overscan</div></div>
+<div class="col-md-6"><div class="flow-box"><code>endIndex</code><br>visible end + overscan</div></div></div>
+<div class="arrow">↓</div><div class="flow-box"><code>PRODUCTS.slice(startIndex, endIndex)</code></div>
+<div class="arrow">↓</div><div class="flow-box">Render only a small number of DOM rows</div>
+<div class="arrow">↓</div><div class="flow-box"><code>top = actualIndex × ITEM_HEIGHT</code></div>
+</div>
+</div></div>
+</section>
+
+<section id="interview" class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-danger text-white py-3"><h2 class="h4 mb-0">7. Interview Tips</h2></div>
+<div class="card-body p-4">
+<div class="alert alert-primary"><strong>Q: What problem does virtualisation solve?</strong><br>
+It reduces the number of DOM elements created for a large list. This can improve rendering and scrolling performance.</div>
+<div class="alert alert-success"><strong>Q: Why create a large inner container?</strong><br>
+It preserves the scrollbar and total scrollable space for the complete list while only a small window is rendered.</div>
+<div class="alert alert-info"><strong>Q: Why use absolute positioning?</strong><br>
+Because every rendered item must appear at its correct location in the full virtual list.</div>
+<div class="alert alert-warning"><strong>Q: Why is fixed height important?</strong><br>
+Because the simple formula <code>index × ITEM_HEIGHT</code> assumes every row has the same height.</div>
+<div class="alert alert-secondary"><strong>Q: What is overscan?</strong><br>
+Rendering a few items outside the viewport so scrolling feels smoother.</div>
+<div class="alert alert-dark"><strong>Q: Why use <code>product.id</code> as the key?</strong><br>
+It is a stable unique identifier and is better suited for React's list reconciliation than display text.</div>
+<div class="alert alert-success tip mb-0"><strong>Interview-ready explanation:</strong>
+“Virtualisation renders only the items needed for the current viewport, plus a small buffer, while a large
+inner container preserves the full scrollable height.”</div>
+</div></div>
+</section>
+
+<section class="mb-5">
+<div class="card shadow-soft"><div class="card-header bg-dark text-white py-3"><h2 class="h4 mb-0">8. Final Assessment</h2></div>
+<div class="card-body p-4">
+<p>Your implementation is <strong>good for learning manual virtualisation</strong>. You have understood the important algorithm.</p>
+<ul class="list-group mb-4">
+<li class="list-group-item">✅ Track <code>scrollTop</code></li>
+<li class="list-group-item">✅ Calculate the first visible index</li>
+<li class="list-group-item">✅ Calculate the visible count</li>
+<li class="list-group-item">✅ Add overscan</li>
+<li class="list-group-item">✅ Slice the required data</li>
+<li class="list-group-item">✅ Create the full virtual height</li>
+<li class="list-group-item">✅ Position rows using their actual index</li>
+</ul>
+<div class="alert alert-primary"><strong>Next step:</strong> After you are comfortable with this version,
+learn how production virtualisation handles variable row heights, window resizing, dynamic content, accessibility,
+and very large datasets.</div>
+<div class="alert alert-warning warn mb-0"><strong>Important:</strong> Do not just memorise the code.
+Be able to explain why <code>scrollTop</code>, <code>startIndex</code>, <code>endIndex</code>,
+<code>OVERSCAN</code>, <code>totalHeight</code>, and <code>actualIndex</code> are needed. That is the real understanding of virtualisation.</div>
+</div></div>
+</section>
+
+</main>
+<footer class="bg-dark text-white py-4"><div class="container text-center">
+<small>React Virtualisation • Code Review • Manual Fixed-Height Virtualisation</small>
+</div></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

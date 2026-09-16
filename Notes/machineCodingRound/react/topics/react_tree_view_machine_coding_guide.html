@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tree View with React - Machine Coding Round Guide</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:#f4f6f9;color:#212529;line-height:1.7}
+.sticky-nav{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.main-card{border:0;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.08);overflow:hidden}
+.sidebar{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+.sidebar .list-group-item{border:0;padding:13px 16px}
+.sidebar .list-group-item:hover{background:#e9f1ff;color:#0d6efd}
+.answer-section{scroll-margin-top:90px;margin-bottom:30px}
+.section-head{color:#fff;padding:14px 20px;font-weight:700}
+.blue{background:#2563eb}.green{background:#198754}.orange{background:#fd7e14}
+.purple{background:#6f42c1}.dark{background:#212529}.red{background:#dc3545}.cyan{background:#0dcaf0;color:#052c35}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:12px;overflow-x:auto;font-size:.84rem}
+code{color:#d63384}pre code{color:inherit}
+.step{border:2px solid #dee2e6;border-radius:12px;padding:16px;text-align:center;height:100%;background:#fff}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:2rem;color:#2563eb}
+.interview{border-left:5px solid #0d6efd;background:#eef5ff}
+.mistake{border-left:5px solid #dc3545;background:#fff1f2}
+.success{border-left:5px solid #198754;background:#effcf6}
+.tip{border-left:5px solid #fd7e14;background:#fff8ef}
+.info{border-left:5px solid #0dcaf0;background:#effcff}
+.tree{font-family:monospace;background:#f8f9fa;border-radius:12px;padding:20px;font-size:1rem;line-height:1.9}
+.folder{font-weight:700;color:#0d6efd}
+.file{color:#198754}
+.node{border:1px solid #dee2e6;border-radius:10px;padding:10px 14px;background:#fff;margin:7px 0}
+.node.child{margin-left:35px}
+.node.child2{margin-left:70px}
+.node.child3{margin-left:105px}
+.badge-pill{border-radius:30px}
+@media(max-width:991px){.sidebar{position:static;max-height:none;margin-bottom:20px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow">
+<div class="container-fluid px-4">
+<a class="navbar-brand fw-bold" href="#top">Tree View</a>
+<span class="navbar-text text-white-50">React Machine Coding Round</span>
+</div>
+</nav>
+
+<header id="top" class="hero py-5">
+<div class="container">
+<div class="text-white-50 text-uppercase small fw-bold">React.js • Frontend Machine Coding</div>
+<h1 class="display-5 fw-bold">Tree View with React</h1>
+<p class="lead mb-0">Build a reusable hierarchical UI for folders, files, categories, menus, comments and other parent-child data.</p>
+</div>
+</header>
+
+<main class="container-fluid px-4 py-4">
+<div class="row g-4">
+
+<!-- LEFT -->
+<aside class="col-lg-3">
+<div class="card main-card sidebar">
+<div class="card-header bg-dark text-white fw-bold">Topics</div>
+<div class="list-group list-group-flush">
+<a class="list-group-item" href="#what">1. What is Tree View?</a>
+<a class="list-group-item" href="#problem">2. What Problem Does It Resolve?</a>
+<a class="list-group-item" href="#why">3. Why Use Tree View?</a>
+<a class="list-group-item" href="#how">4. How Does It Work?</a>
+<a class="list-group-item" href="#data">5. Data Structure</a>
+<a class="list-group-item" href="#visual">6. Visual Explanation</a>
+<a class="list-group-item" href="#requirements">7. Machine Coding Requirements</a>
+<a class="list-group-item" href="#fullcode">8. Full Code</a>
+<a class="list-group-item" href="#recursion">9. Why Recursion?</a>
+<a class="list-group-item" href="#state">10. State Management</a>
+<a class="list-group-item" href="#mistakes">11. Common Developer Mistakes</a>
+<a class="list-group-item" href="#interviewer">12. Explain to Interviewer</a>
+<a class="list-group-item" href="#followups">13. Follow-up Questions</a>
+<a class="list-group-item" href="#recap">14. Quick Recap</a>
+</div>
+</div>
+</aside>
+
+<!-- RIGHT -->
+<section class="col-lg-9">
+
+<section id="what" class="card main-card answer-section">
+<div class="section-head blue">1. What is a Tree View?</div>
+<div class="card-body p-4">
+<p><strong>Definition:</strong> A Tree View is a UI component that displays hierarchical data using parent-child relationships. A parent node can contain one or more child nodes.</p>
+<div class="alert alert-primary">
+<strong>Layman example:</strong> Think about folders on your computer. A main folder can contain subfolders, and those subfolders can contain more folders and files. The UI displays this relationship like a tree.
+</div>
+
+<div class="tree">
+<span class="folder">📁 src</span><br>
+├── <span class="folder">📁 components</span><br>
+│&nbsp;&nbsp;&nbsp;├── <span class="file">📄 Header.jsx</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="file">📄 Button.jsx</span><br>
+├── <span class="folder">📁 pages</span><br>
+│&nbsp;&nbsp;&nbsp;└── <span class="file">📄 Home.jsx</span><br>
+└── <span class="file">📄 App.jsx</span>
+</div>
+
+<p class="mt-3 mb-0">The important idea is that the data is hierarchical and the UI should represent the same hierarchy.</p>
+</div>
+</section>
+
+<section id="problem" class="card main-card answer-section">
+<div class="section-head green">2. What Problem Does Tree View Resolve?</div>
+<div class="card-body p-4">
+<p>A normal list is useful when every item has the same level. But it becomes difficult to understand relationships when data has multiple levels.</p>
+<div class="row g-3">
+<div class="col-md-6">
+<div class="step"><strong>Flat List</strong><br><small>Folder and files appear at the same level. Parent-child relationships are difficult to see.</small></div>
+</div>
+<div class="col-md-6">
+<div class="step"><strong>Tree View</strong><br><small>Children are displayed under their parent and can be expanded or collapsed.</small></div>
+</div>
+</div>
+<div class="alert alert-success mt-4">
+<strong>Problem solved:</strong> Tree View makes hierarchical data easier to understand, navigate and manage.
+</div>
+</div>
+</section>
+
+<section id="why" class="card main-card answer-section">
+<div class="section-head purple">3. Why Use Tree View?</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-4"><div class="step"><h5>📁 File Explorer</h5><p class="mb-0">Display folders and files.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>💬 Comments</h5><p class="mb-0">Display nested replies.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🗂 Categories</h5><p class="mb-0">Display parent and child categories.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🧭 Menus</h5><p class="mb-0">Display nested navigation items.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🏢 Organization</h5><p class="mb-0">Display departments and teams.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>⚙️ Permissions</h5><p class="mb-0">Display nested permission groups.</p></div></div>
+</div>
+</div>
+</section>
+
+<section id="how" class="card main-card answer-section">
+<div class="section-head orange">4. How Does Tree View Work?</div>
+<div class="card-body p-4">
+<ol>
+<li>Receive hierarchical data from state or an API.</li>
+<li>Render the root nodes.</li>
+<li>Check whether each node has children.</li>
+<li>Display an expand/collapse button when children exist.</li>
+<li>When expanded, recursively render the children.</li>
+<li>When collapsed, hide the children.</li>
+<li>Maintain expanded node IDs in React state.</li>
+</ol>
+
+<div class="alert alert-info">
+<strong>Core idea:</strong> The component renders one node. If that node has children and is expanded, the same component renders its children.
+</div>
+
+<h5 class="mt-4">Simple flow</h5>
+<div class="row g-2 align-items-stretch">
+<div class="col-md-2"><div class="step"><strong>1</strong><br>Read node</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>2</strong><br>Show label</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>3</strong><br>Has children?</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>4</strong><br>Render children</div></div>
+</div>
+</div>
+</section>
+
+<section id="data" class="card main-card answer-section">
+<div class="section-head cyan">5. Tree View Data Structure</div>
+<div class="card-body p-4">
+<p>A simple node can contain an ID, label, type and a <code>children</code> array.</p>
+<pre><code>const treeData = [
+  {
+    id: 1,
+    name: "src",
+    type: "folder",
+    children: [
+      {
+        id: 2,
+        name: "components",
+        type: "folder",
+        children: [
+          {
+            id: 3,
+            name: "Header.jsx",
+            type: "file",
+            children: []
+          }
+        ]
+      },
+      {
+        id: 4,
+        name: "App.jsx",
+        type: "file",
+        children: []
+      }
+    ]
+  }
+];</code></pre>
+
+<div class="row g-3 mt-3">
+<div class="col-md-3"><div class="step"><strong>id</strong><br>Unique node identifier.</div></div>
+<div class="col-md-3"><div class="step"><strong>name</strong><br>Text shown to the user.</div></div>
+<div class="col-md-3"><div class="step"><strong>type</strong><br>Folder, file, category, etc.</div></div>
+<div class="col-md-3"><div class="step"><strong>children</strong><br>Child nodes.</div></div>
+</div>
+
+<div class="alert alert-warning mt-4 mb-0">
+<strong>Interview point:</strong> The field names can change, but the parent → children relationship is the key requirement.
+</div>
+</div>
+</section>
+
+<section id="visual" class="card main-card answer-section">
+<div class="section-head blue">6. Visual Explanation — How It Works</div>
+<div class="card-body p-4">
+
+<h5>Step 1 — Initial Tree</h5>
+<div class="tree">
+📁 src<br>
+├── 📁 components<br>
+│&nbsp;&nbsp;&nbsp;├── 📄 Header.jsx<br>
+│&nbsp;&nbsp;&nbsp;└── 📄 Button.jsx<br>
+└── 📄 App.jsx
+</div>
+
+<h5 class="mt-4">Step 2 — User clicks the folder</h5>
+<div class="row g-3">
+<div class="col-md-5"><div class="step"><strong>Before</strong><br>📁 components ▶<br><small>Children hidden</small></div></div>
+<div class="col-md-2 arrow">→</div>
+<div class="col-md-5"><div class="step"><strong>After</strong><br>📁 components ▼<br>↳ Header.jsx<br>↳ Button.jsx</div></div>
+</div>
+
+<h5 class="mt-4">Step 3 — React state changes</h5>
+<pre><code>expandedIds = [1, 2];
+
+// 1 = src is open
+// 2 = components is open</code></pre>
+
+<h5 class="mt-4">Step 4 — Component recursively renders children</h5>
+<div class="tree">
+TreeNode(src)<br>
+&nbsp;&nbsp;└── TreeNode(components)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── TreeNode(Header.jsx)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── TreeNode(Button.jsx)
+</div>
+
+<div class="alert alert-primary mt-4 mb-0">
+<strong>Memory formula:</strong> <code>Tree Data → TreeNode → Expand/Collapse State → Recursive Children Rendering</code>
+</div>
+</div>
+</section>
+
+<section id="requirements" class="card main-card answer-section">
+<div class="section-head green">7. Machine Coding Requirements</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Basic Requirements</h5>
+<ul class="mb-0">
+<li>Display hierarchical data.</li>
+<li>Render folders and files.</li>
+<li>Expand and collapse folders.</li>
+<li>Support multiple nesting levels.</li>
+<li>Use stable unique keys.</li>
+</ul>
+</div></div>
+</div>
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Interview-Ready Improvements</h5>
+<ul class="mb-0">
+<li>Expand all / collapse all.</li>
+<li>Add new file/folder.</li>
+<li>Rename node.</li>
+<li>Delete node.</li>
+<li>Search/filter nodes.</li>
+<li>Lazy-load children from API.</li>
+</ul>
+</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="card main-card answer-section">
+<div class="section-head dark">8. Full React Code</div>
+<div class="card-body p-4">
+
+<h5>App.jsx</h5>
+<pre><code>import { useState } from "react";
+import TreeNode from "./TreeNode";
+
+const treeData = [
+  {
+    id: 1,
+    name: "src",
+    type: "folder",
+    children: [
+      {
+        id: 2,
+        name: "components",
+        type: "folder",
+        children: [
+          {
+            id: 3,
+            name: "Header.jsx",
+            type: "file",
+            children: []
+          },
+          {
+            id: 4,
+            name: "Button.jsx",
+            type: "file",
+            children: []
+          }
+        ]
+      },
+      {
+        id: 5,
+        name: "pages",
+        type: "folder",
+        children: [
+          {
+            id: 6,
+            name: "Home.jsx",
+            type: "file",
+            children: []
+          }
+        ]
+      },
+      {
+        id: 7,
+        name: "App.jsx",
+        type: "file",
+        children: []
+      }
+    ]
+  }
+];
+
+function App() {
+  const [expandedIds, setExpandedIds] = useState(new Set());
+
+  const toggleNode = (id) =&gt; {
+    setExpandedIds((previous) =&gt; {
+      const next = new Set(previous);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;React Tree View&lt;/h1&gt;
+
+      {treeData.map((node) =&gt; (
+        &lt;TreeNode
+          key={node.id}
+          node={node}
+          expandedIds={expandedIds}
+          onToggle={toggleNode}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+
+<h5 class="mt-4">TreeNode.jsx</h5>
+<pre><code>function TreeNode({ node, expandedIds, onToggle }) {
+  const hasChildren = node.children?.length &gt; 0;
+  const isExpanded = expandedIds.has(node.id);
+
+  const handleToggle = () =&gt; {
+    if (hasChildren) {
+      onToggle(node.id);
+    }
+  };
+
+  return (
+    &lt;div style={{ marginLeft: "20px" }}&gt;
+
+      &lt;div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "8px"
+        }}
+      &gt;
+
+        {hasChildren ? (
+          &lt;button onClick={handleToggle}&gt;
+            {isExpanded ? "▼" : "▶"}
+          &lt;/button&gt;
+        ) : (
+          &lt;span style={{ width: "32px" }} /&gt;
+        )}
+
+        &lt;span&gt;
+          {node.type === "folder" ? "📁" : "📄"}
+        &lt;/span&gt;
+
+        &lt;span&gt;{node.name}&lt;/span&gt;
+      &lt;/div&gt;
+
+      {hasChildren &amp;&amp; isExpanded &amp;&amp; (
+        &lt;div&gt;
+          {node.children.map((child) =&gt; (
+            &lt;TreeNode
+              key={child.id}
+              node={child}
+              expandedIds={expandedIds}
+              onToggle={onToggle}
+            /&gt;
+          ))}
+        &lt;/div&gt;
+      )}
+
+    &lt;/div&gt;
+  );
+}
+
+export default TreeNode;</code></pre>
+
+<div class="success p-3 mt-4">
+<strong>Key implementation concepts:</strong>
+<span class="badge text-bg-primary ms-1">recursive component</span>
+<span class="badge text-bg-primary">tree traversal</span>
+<span class="badge text-bg-primary">Set for expanded IDs</span>
+<span class="badge text-bg-primary">immutable state</span>
+<span class="badge text-bg-primary">stable keys</span>
+</div>
+
+<h5 class="mt-4">Why use a Set for expandedIds?</h5>
+<p>A <code>Set</code> makes it simple to check whether a node is currently expanded.</p>
+<pre><code>expandedIds.has(node.id)   // check
+expandedIds.add(node.id)   // expand
+expandedIds.delete(node.id) // collapse</code></pre>
+</div>
+</section>
+
+<section id="recursion" class="card main-card answer-section">
+<div class="section-head orange">9. Why Recursion?</div>
+<div class="card-body p-4">
+<p>Tree data can have any number of levels. Recursion lets the same <code>TreeNode</code> component render every level.</p>
+
+<div class="row g-3">
+<div class="col-md-6">
+<div class="step">
+<h5>Without Recursion</h5>
+<p>You may write separate logic for Level 1, Level 2, Level 3, etc.</p>
+<p class="mb-0">This becomes repetitive and does not handle unknown depth well.</p>
+</div>
+</div>
+<div class="col-md-6">
+<div class="step">
+<h5>With Recursion</h5>
+<p>The component renders itself for each child.</p>
+<p class="mb-0">The same code works for any supported tree depth.</p>
+</div>
+</div>
+</div>
+
+<h5 class="mt-4">Recursive flow</h5>
+<pre><code>TreeNode
+   ↓
+Render current node
+   ↓
+Has children?
+   ↓ yes
+Is expanded?
+   ↓ yes
+children.map(...)
+   ↓
+TreeNode(child)
+   ↓
+Repeat</code></pre>
+
+<div class="alert alert-info mb-0">
+<strong>Interview line:</strong> “I use recursion because the UI structure mirrors the recursive nature of the tree data.”
+</div>
+</div>
+</section>
+
+<section id="state" class="card main-card answer-section">
+<div class="section-head cyan">10. State Management</div>
+<div class="card-body p-4">
+<p>The tree data and UI state are two different things.</p>
+<div class="row g-3">
+<div class="col-md-6">
+<div class="step">
+<h5>Tree Data</h5>
+<p>Represents what nodes exist.</p>
+<code>treeData</code>
+</div>
+</div>
+<div class="col-md-6">
+<div class="step">
+<h5>UI State</h5>
+<p>Represents which nodes are currently expanded.</p>
+<code>expandedIds</code>
+</div>
+</div>
+</div>
+
+<div class="alert alert-warning mt-4">
+<strong>Good design:</strong> Keep the main tree state in the parent component and pass only the data and actions required by the recursive child component.
+</div>
+
+<h5 class="mt-4">Expand / Collapse logic</h5>
+<pre><code>if (expandedIds.has(id)) {
+    // node is open → close it
+    next.delete(id);
+} else {
+    // node is closed → open it
+    next.add(id);
+}</code></pre>
+</div>
+</section>
+
+<section id="mistakes" class="card main-card answer-section">
+<div class="section-head red">11. Common Developer Mistakes</div>
+<div class="card-body p-4">
+<div class="alert mistake"><strong>1. Using array index as the key</strong><br>Use a stable unique ID such as <code>node.id</code>. Index keys can cause incorrect rendering when tree items change.</div>
+<div class="alert mistake"><strong>2. Hard-coding nesting levels</strong><br>Do not create separate components for Level 1, Level 2 and Level 3. Use recursion.</div>
+<div class="alert mistake"><strong>3. Mutating the Set directly</strong><br>Avoid changing the existing state object and returning it. Create a new <code>Set</code> so React receives a new reference.</div>
+<div class="alert mistake"><strong>4. Mutating tree data directly</strong><br>Avoid direct operations such as <code>node.children.push()</code> when tree data is React state. Use immutable updates.</div>
+<div class="alert mistake"><strong>5. Forgetting the leaf-node case</strong><br>Files or nodes without children should not display an expand/collapse button.</div>
+<div class="alert mistake"><strong>6. Expanding every node unintentionally</strong><br>Decide whether the initial UI should be collapsed, partially expanded or fully expanded.</div>
+<div class="alert mistake"><strong>7. Rendering huge trees without optimization</strong><br>Thousands of nodes can make rendering expensive. Consider lazy loading, virtualization or pagination depending on the use case.</div>
+<div class="alert mistake"><strong>8. Mixing data logic and UI logic everywhere</strong><br>Keep tree operations and rendering responsibilities organized so the component remains maintainable.</div>
+</div>
+</section>
+
+<section id="interviewer" class="card main-card answer-section">
+<div class="section-head purple">12. How I Would Explain My Implementation to the Interviewer</div>
+<div class="card-body p-4">
+<div class="alert interview">
+<strong>Interview explanation:</strong>
+<p class="mt-2 mb-0">“I implemented the Tree View using a hierarchical tree data structure. Each node contains an ID, name, type and a children array. I created a reusable TreeNode component that renders one node. If the node has children and it is expanded, TreeNode recursively renders each child. I maintain a Set of expanded node IDs in the parent component, which allows me to control the expand and collapse state without changing the actual tree data.”</p>
+</div>
+
+<h5 class="mt-4">Explain it in this order</h5>
+<ol>
+<li><strong>Data structure:</strong> “The data follows a parent-child tree structure.”</li>
+<li><strong>Component:</strong> “TreeNode handles one node.”</li>
+<li><strong>Recursion:</strong> “TreeNode renders itself for child nodes.”</li>
+<li><strong>Expand state:</strong> “I keep expanded IDs in a Set.”</li>
+<li><strong>Toggle:</strong> “Clicking a folder adds or removes its ID from the Set.”</li>
+<li><strong>Conditional rendering:</strong> “Children are rendered only when the node is expanded.”</li>
+<li><strong>Leaf handling:</strong> “Nodes without children do not show an expand button.”</li>
+<li><strong>Scalability:</strong> “For large trees, I would consider lazy loading or virtualization.”</li>
+</ol>
+
+<div class="alert alert-success mb-0">
+<strong>Strong interview line:</strong> “The key challenge is making the component work for an unknown number of nesting levels while keeping expansion state separate from the tree data.”
+</div>
+</div>
+</section>
+
+<section id="followups" class="card main-card answer-section">
+<div class="section-head blue">13. Common Follow-Up Questions</div>
+<div class="card-body p-4">
+<div class="accordion" id="questions">
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">Why is recursion suitable for a Tree View?</button></h2>
+<div id="q1" class="accordion-collapse collapse show"><div class="accordion-body">A tree contains nodes that can contain more nodes of the same structure. Recursion lets the same component render every level.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">Why use Set instead of an array for expanded IDs?</button></h2>
+<div id="q2" class="accordion-collapse collapse"><div class="accordion-body">A Set is convenient for membership checks and add/delete operations. It also clearly represents a collection of unique expanded node IDs.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">How would you add a new file?</button></h2>
+<div id="q3" class="accordion-collapse collapse"><div class="accordion-body">Find the target parent node recursively, create a new node with a unique ID, and immutably add it to that parent's children array.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">How would you delete a node?</button></h2>
+<div id="q4" class="accordion-collapse collapse"><div class="accordion-body">Recursively traverse the tree and filter the target node from each children array. If deleting a folder, decide whether its descendants should also be removed.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">How would you implement Expand All?</button></h2>
+<div id="q5" class="accordion-collapse collapse"><div class="accordion-body">Traverse the tree, collect the IDs of nodes that have children, and put those IDs into the expanded Set.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">How would you handle a very large file tree?</button></h2>
+<div id="q6" class="accordion-collapse collapse"><div class="accordion-body">Load children on demand, avoid rendering collapsed descendants, consider virtualization for large visible lists, and fetch data incrementally when appropriate.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="recap" class="card main-card answer-section">
+<div class="section-head dark">14. Quick Recap</div>
+<div class="card-body p-4">
+<table class="table table-bordered align-middle">
+<tbody>
+<tr><th>Tree View</th><td>UI for displaying hierarchical parent-child data.</td></tr>
+<tr><th>Data</th><td>Each node can contain a <code>children</code> array.</td></tr>
+<tr><th>TreeNode</th><td>Reusable component that renders one node.</td></tr>
+<tr><th>Recursion</th><td>Allows the same component to render unlimited supported levels.</td></tr>
+<tr><th>Expanded state</th><td>A Set of node IDs tracks open folders/nodes.</td></tr>
+<tr><th>Leaf node</th><td>A node with no children.</td></tr>
+<tr><th>Performance</th><td>Large trees may need lazy loading or virtualization.</td></tr>
+</tbody>
+</table>
+
+<div class="alert alert-primary mb-0">
+<strong>Final memory formula:</strong><br>
+<code>Tree Data → TreeNode → Check Children → Expand State → Recursive Render</code>
+</div>
+</div>
+</section>
+
+</section>
+</div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+<small>Tree View with React • Machine Coding Round Documentation • Bootstrap 5</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

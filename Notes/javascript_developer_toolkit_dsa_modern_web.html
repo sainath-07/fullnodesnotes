@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript Developer Toolkit — DSA & Modern Web Development</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#212529}
+.sticky-nav{position:sticky;top:0;z-index:1030;background:rgba(255,255,255,.96);border-bottom:1px solid #dee2e6}
+section{scroll-margin-top:78px}
+.doc-card{border:0;box-shadow:0 .35rem 1rem rgba(0,0,0,.08);margin-bottom:1.5rem}
+.card-header{font-weight:700}
+.code{background:#111827;color:#e5e7eb;border-radius:.5rem;padding:1rem;overflow:auto;font-family:Consolas,monospace;font-size:.9rem}
+.diagram{background:#f8f9fa;border:1px dashed #adb5bd;border-radius:.5rem;padding:1rem;font-family:monospace;white-space:pre-wrap}
+.tip{border-left:4px solid #0d6efd}
+.badge-soft{background:#eef2ff;color:#3730a3}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-nav">
+<div class="container">
+<a class="navbar-brand fw-bold" href="#top">⚡ JavaScript Developer Toolkit</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+<div class="collapse navbar-collapse" id="nav">
+<ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link" href="#swap">Swap</a></li>
+<li class="nav-item"><a class="nav-link" href="#arrays">Arrays</a></li>
+<li class="nav-item"><a class="nav-link" href="#objects">Objects</a></li>
+<li class="nav-item"><a class="nav-link" href="#maps">Map/Set</a></li>
+<li class="nav-item"><a class="nav-link" href="#strings">Strings</a></li>
+<li class="nav-item"><a class="nav-link" href="#modern">Modern JS</a></li>
+<li class="nav-item"><a class="nav-link" href="#dsa">DSA</a></li>
+<li class="nav-item"><a class="nav-link" href="#product">Products</a></li>
+</ul>
+</div>
+</div>
+</nav>
+
+<main id="top" class="container py-4">
+
+<section>
+<div class="card doc-card">
+<div class="card-header bg-primary text-white">1. What This Guide Is About</div>
+<div class="card-body">
+<h4>Small JavaScript techniques that create big advantages</h4>
+<p>When learning DSA or building software, you often discover that the hard part is not the algorithm itself. Knowing the language well can make the algorithm much shorter and easier to express.</p>
+<div class="alert alert-info"><strong>Example:</strong> Instead of creating a temporary variable for swapping two array elements, JavaScript supports destructuring assignment.</div>
+<pre class="code">let temp = nums[i];
+nums[i] = nums[maxIndex];
+nums[maxIndex] = temp;
+
+// Modern JavaScript
+[nums[i], nums[maxIndex]] = [nums[maxIndex], nums[i]];</pre>
+<div class="diagram">DSA idea
+   ↓
+Algorithm
+   ↓
+JavaScript language feature
+   ↓
+Shorter + clearer implementation
+
+Example:
+"swap two values"
+        ↓
+destructuring assignment
+        ↓
+[a, b] = [b, a]</div>
+<p class="mb-0"><strong>Goal:</strong> Don't memorize tricks blindly. Learn what problem each feature solves and when it is appropriate.</p>
+</div>
+</div>
+</section>
+
+<section id="swap">
+<div class="card doc-card">
+<div class="card-header bg-success text-white">2. Swapping & Multiple Assignment</div>
+<div class="card-body">
+<h5>2.1 Swap two variables</h5>
+<pre class="code">let a = 10;
+let b = 20;
+
+[a, b] = [b, a];
+
+console.log(a); // 20
+console.log(b); // 10</pre>
+<p><strong>Why useful?</strong> Selection sort, two pointers, reversing arrays, partitioning, matrix problems.</p>
+
+<h5>2.2 Swap array elements</h5>
+<pre class="code">[nums[i], nums[j]] = [nums[j], nums[i]];</pre>
+
+<h5>2.3 Rotate variables</h5>
+<pre class="code">let a = 1, b = 2, c = 3;
+
+[a, b, c] = [b, c, a];
+
+// a=2, b=3, c=1</pre>
+
+<div class="alert alert-warning"><strong>Remember:</strong> Destructuring is elegant, but don't use clever syntax if it makes the code harder for your team to understand.</div>
+</div>
+</div>
+</section>
+
+<section id="arrays">
+<div class="card doc-card">
+<div class="card-header bg-info text-dark">3. Array Techniques You Should Know</div>
+<div class="card-body">
+
+<h5>3.1 Destructuring an array</h5>
+<pre class="code">const nums = [10, 20, 30];
+
+const [first, second, third] = nums;</pre>
+
+<h5>3.2 Ignore values</h5>
+<pre class="code">const [first, , third] = [10, 20, 30];</pre>
+
+<h5>3.3 Rest operator</h5>
+<pre class="code">const [first, ...remaining] = [10, 20, 30, 40];
+
+// first = 10
+// remaining = [20, 30, 40]</pre>
+
+<h5>3.4 Spread operator</h5>
+<pre class="code">const a = [1, 2];
+const b = [3, 4];
+
+const result = [...a, ...b];
+// [1, 2, 3, 4]</pre>
+
+<h5>3.5 Remove without mutating the original</h5>
+<pre class="code">const nums = [10, 20, 30, 40];
+
+const result = nums.filter(x => x !== 30);</pre>
+
+<h5>3.6 Get last element</h5>
+<pre class="code">const last = nums.at(-1);</pre>
+<p>Useful when the index is relative to the end.</p>
+
+<h5>3.7 Get first/last without manual indexes</h5>
+<pre class="code">const first = nums.at(0);
+const last = nums.at(-1);</pre>
+
+<h5>3.8 Fill an array</h5>
+<pre class="code">const zeros = new Array(5).fill(0);
+// [0, 0, 0, 0, 0]</pre>
+
+<h5>3.9 Create a sequence</h5>
+<pre class="code">const nums = Array.from({ length: 5 }, (_, i) => i);
+// [0, 1, 2, 3, 4]</pre>
+
+<h5>3.10 Convert iterable values to arrays</h5>
+<pre class="code">const chars = Array.from("hello");
+// ["h", "e", "l", "l", "o"]</pre>
+
+<h5>3.11 Flatten nested arrays</h5>
+<pre class="code">const nums = [1, [2, 3], [4, [5]]];
+
+nums.flat();
+// [1, 2, 3, 4, [5]]
+
+nums.flat(Infinity);
+// [1, 2, 3, 4, 5]</pre>
+
+<h5>3.12 Find an object</h5>
+<pre class="code">const users = [
+  { id: 1, name: "A" },
+  { id: 2, name: "B" }
+];
+
+const user = users.find(user => user.id === 2);</pre>
+
+<h5>3.13 Check whether an item exists</h5>
+<pre class="code">nums.includes(10);</pre>
+
+<h5>3.14 Check a condition across an array</h5>
+<pre class="code">nums.some(x => x > 100);
+nums.every(x => x >= 0);</pre>
+
+<div class="alert alert-success"><strong>DSA connection:</strong> <code>at()</code>, <code>includes()</code>, <code>find()</code>, <code>some()</code>, <code>every()</code>, <code>flat()</code>, <code>Array.from()</code>, spread and destructuring appear frequently in clean implementations.</div>
+</div>
+</div>
+</section>
+
+<section id="objects">
+<div class="card doc-card">
+<div class="card-header bg-warning text-dark">4. Object Techniques</div>
+<div class="card-body">
+
+<h5>4.1 Object destructuring</h5>
+<pre class="code">const user = {
+  name: "Sainath",
+  age: 30
+};
+
+const { name, age } = user;</pre>
+
+<h5>4.2 Rename while destructuring</h5>
+<pre class="code">const { name: userName } = user;</pre>
+
+<h5>4.3 Default values</h5>
+<pre class="code">const { role = "user" } = user;</pre>
+
+<h5>4.4 Dynamic property names</h5>
+<pre class="code">const key = "score";
+
+const obj = {
+  [key]: 100
+};</pre>
+
+<h5>4.5 Object.entries()</h5>
+<pre class="code">const user = { name: "A", age: 30 };
+
+for (const [key, value] of Object.entries(user)) {
+  console.log(key, value);
+}</pre>
+
+<h5>4.6 Object.keys() and Object.values()</h5>
+<pre class="code">Object.keys(user);
+Object.values(user);</pre>
+
+<h5>4.7 Create an object from entries</h5>
+<pre class="code">const entries = [
+  ["name", "A"],
+  ["age", 30]
+];
+
+const user = Object.fromEntries(entries);</pre>
+
+<h5>4.8 Merge objects</h5>
+<pre class="code">const result = {
+  ...defaults,
+  ...userSettings
+};</pre>
+
+<div class="alert alert-info"><strong>Real product use:</strong> Object spread is common when creating updated React state, configuration objects, API payloads and immutable transformations.</div>
+</div>
+</div>
+</section>
+
+<section id="maps">
+<div class="card doc-card">
+<div class="card-header bg-danger text-white">5. Map & Set — Extremely Useful for DSA</div>
+<div class="card-body">
+
+<h5>5.1 Set — remove duplicates</h5>
+<pre class="code">const nums = [1, 2, 2, 3, 3, 4];
+
+const unique = [...new Set(nums)];
+// [1, 2, 3, 4]</pre>
+
+<h5>5.2 Set — fast membership checking</h5>
+<pre class="code">const seen = new Set();
+
+seen.add(10);
+seen.has(10); // true
+seen.delete(10);</pre>
+
+<p>Average lookup is generally <strong>O(1)</strong>.</p>
+
+<h5>5.3 Map — key/value storage</h5>
+<pre class="code">const map = new Map();
+
+map.set("apple", 10);
+map.set("banana", 20);
+
+map.get("apple");
+map.has("banana");</pre>
+
+<h5>5.4 Frequency counter</h5>
+<pre class="code">const freq = new Map();
+
+for (const num of nums) {
+  freq.set(num, (freq.get(num) ?? 0) + 1);
+}</pre>
+
+<h5>5.5 Two Sum pattern</h5>
+<pre class="code">const seen = new Map();
+
+for (let i = 0; i < nums.length; i++) {
+  const needed = target - nums[i];
+
+  if (seen.has(needed)) {
+    return [seen.get(needed), i];
+  }
+
+  seen.set(nums[i], i);
+}</pre>
+
+<div class="diagram">Array search:
+[5, 9, 2, 7, 4]
+       ↓
+find 7?
+       ↓
+scan → scan → scan
+O(n)
+
+Set / Map:
+value → lookup
+  7   →  true
+approximately O(1) average lookup</div>
+
+<div class="alert alert-success"><strong>Interview rule:</strong> If you repeatedly ask “Have I seen this before?”, immediately consider <code>Set</code> or <code>Map</code>.</div>
+</div>
+</div>
+</section>
+
+<section id="strings">
+<div class="card doc-card">
+<div class="card-header bg-primary text-white">6. String Techniques</div>
+<div class="card-body">
+
+<h5>6.1 Convert string to characters</h5>
+<pre class="code">const chars = [..."hello"];</pre>
+
+<h5>6.2 Reverse a simple string</h5>
+<pre class="code">const reversed = [...str].reverse().join("");</pre>
+
+<div class="alert alert-warning">For Unicode text such as some emoji sequences, simple character reversal can be more complicated than this. Use this technique mainly for normal interview-style strings.</div>
+
+<h5>6.3 Check palindrome</h5>
+<pre class="code">const reversed = [...str].reverse().join("");
+
+if (str === reversed) {
+  // palindrome
+}</pre>
+
+<h5>6.4 Split into words</h5>
+<pre class="code">const words = sentence.trim().split(/\s+/);</pre>
+
+<h5>6.5 String search</h5>
+<pre class="code">str.includes("cat");
+str.startsWith("Hello");
+str.endsWith("!");</pre>
+
+<h5>6.6 Character code</h5>
+<pre class="code">"A".charCodeAt(0); // 65
+
+String.fromCharCode(65); // "A"</pre>
+
+<h5>6.7 Repeat</h5>
+<pre class="code">"*".repeat(5);
+// *****</pre>
+
+<p>Useful for pattern-printing questions.</p>
+</div>
+</div>
+</section>
+
+<section id="modern">
+<div class="card doc-card">
+<div class="card-header bg-success text-white">7. Modern JavaScript Features Worth Knowing</div>
+<div class="card-body">
+
+<h5>7.1 Optional chaining</h5>
+<pre class="code">const city = user?.address?.city;</pre>
+<p>Instead of manually checking every level.</p>
+
+<h5>7.2 Nullish coalescing</h5>
+<pre class="code">const count = value ?? 0;</pre>
+<p>Uses <code>0</code> only when the value is <code>null</code> or <code>undefined</code>.</p>
+
+<h5>7.3 Difference: || vs ??</h5>
+<pre class="code">0 || 10   // 10
+0 ?? 10   // 0
+
+"" || "x" // "x"
+"" ?? "x" // ""</pre>
+
+<div class="alert alert-info"><strong>Remember:</strong> Use <code>??</code> when you specifically mean “missing value”. Use <code>||</code> when you mean “falsy value”.</div>
+
+<h5>7.4 Logical assignment</h5>
+<pre class="code">value ||= 10; // assign if falsy
+value ??= 10; // assign if null/undefined
+value &&= 10; // assign if truthy</pre>
+
+<h5>7.5 Default function parameters</h5>
+<pre class="code">function greet(name = "Guest") {
+  return `Hello ${name}`;
+}</pre>
+
+<h5>7.6 Rest parameters</h5>
+<pre class="code">function sum(...nums) {
+  return nums.reduce((total, n) => total + n, 0);
+}</pre>
+
+<h5>7.7 Null-safe method call</h5>
+<pre class="code">const result = value?.toString();</pre>
+
+<h5>7.8 Structured cloning</h5>
+<pre class="code">const copy = structuredClone(original);</pre>
+<p>Useful for deep-copying many structured data types. It is different from shallow spread copying.</p>
+
+<div class="alert alert-warning"><strong>Important:</strong> <code>{...obj}</code> and <code>[...arr]</code> create shallow copies. Nested objects/arrays remain shared.</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card doc-card">
+<div class="card-header bg-info text-dark">8. Callback Methods — Know What Each One Means</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Method</th><th>Think of it as</th><th>Returns</th></tr></thead>
+<tbody>
+<tr><td><code>map()</code></td><td>Transform every item</td><td>New array</td></tr>
+<tr><td><code>filter()</code></td><td>Keep matching items</td><td>New array</td></tr>
+<tr><td><code>find()</code></td><td>Find first matching item</td><td>Item / undefined</td></tr>
+<tr><td><code>findIndex()</code></td><td>Find first matching index</td><td>Index / -1</td></tr>
+<tr><td><code>some()</code></td><td>Does at least one match?</td><td>Boolean</td></tr>
+<tr><td><code>every()</code></td><td>Do all match?</td><td>Boolean</td></tr>
+<tr><td><code>reduce()</code></td><td>Build one result from many</td><td>Any value</td></tr>
+<tr><td><code>forEach()</code></td><td>Run something for each item</td><td>undefined</td></tr>
+</tbody>
+</table>
+
+<pre class="code">const nums = [1, 2, 3, 4];
+
+nums.map(x => x * 2);       // [2,4,6,8]
+nums.filter(x => x % 2);    // [1,3]
+nums.find(x => x > 2);      // 3
+nums.some(x => x > 3);      // true
+nums.every(x => x > 0);     // true
+nums.reduce((a,x) => a+x,0);// 10</pre>
+</div>
+</div>
+</section>
+
+<section id="dsa">
+<div class="card doc-card">
+<div class="card-header bg-dark text-white">9. DSA Patterns + JavaScript Tools</div>
+<div class="card-body">
+<table class="table table-striped table-bordered align-middle">
+<thead><tr><th>DSA problem pattern</th><th>JavaScript tool to consider</th><th>Typical idea</th></tr></thead>
+<tbody>
+<tr><td>Frequency counting</td><td>Map / object</td><td>Count occurrences</td></tr>
+<tr><td>Duplicate detection</td><td>Set</td><td>Have I seen this?</td></tr>
+<tr><td>Two Sum</td><td>Map</td><td>Store value → index</td></tr>
+<tr><td>Two pointers</td><td>Destructuring swap</td><td>Move left/right indexes</td></tr>
+<tr><td>Sliding window</td><td>Set / Map</td><td>Track current window</td></tr>
+<tr><td>Stack</td><td>Array <code>push/pop</code></td><td>Last in, first out</td></tr>
+<tr><td>Queue</td><td>Index pointer</td><td>Avoid repeated <code>shift()</code> for large queues</td></tr>
+<tr><td>Heap</td><td>Custom heap class</td><td>Priority operations</td></tr>
+<tr><td>Graph BFS</td><td>Array + head index</td><td>Efficient queue behavior</td></tr>
+<tr><td>Sorting</td><td><code>sort()</code> with comparator</td><td>Numeric/custom ordering</td></tr>
+<tr><td>Maximum subarray</td><td>Simple variables</td><td>Kadane: start or continue</td></tr>
+<tr><td>Backtracking</td><td>Spread / slice</td><td>Create next candidate state</td></tr>
+</tbody>
+</table>
+
+<h5>9.1 Numeric sort — common JavaScript trap</h5>
+<pre class="code">[10, 2, 5].sort();
+// [10, 2, 5]  ← lexicographic/string-like ordering
+
+[10, 2, 5].sort((a, b) => a - b);
+// [2, 5, 10]</pre>
+
+<h5>9.2 Descending</h5>
+<pre class="code">nums.sort((a, b) => b - a);</pre>
+
+<h5>9.3 Stack with an array</h5>
+<pre class="code">const stack = [];
+
+stack.push(10);
+stack.push(20);
+
+const top = stack.pop();</pre>
+
+<h5>9.4 Queue without shift()</h5>
+<pre class="code">const queue = [10, 20, 30];
+let head = 0;
+
+while (head < queue.length) {
+  const value = queue[head++];
+  console.log(value);
+}</pre>
+<div class="alert alert-warning"><strong>Why?</strong> Repeatedly removing the first element with <code>shift()</code> can cause unnecessary work for large arrays. A head index is a common interview-friendly queue technique.</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card doc-card">
+<div class="card-header bg-secondary text-white">10. Math & Bitwise Tricks — Useful, But Don't Overuse Them</div>
+<div class="card-body">
+
+<h5>10.1 Check even / odd</h5>
+<pre class="code">if (n % 2 === 0) {
+  // even
+}</pre>
+
+<h5>10.2 Power of two</h5>
+<pre class="code">n > 0 && (n & (n - 1)) === 0</pre>
+<p>This works because powers of two have exactly one set bit in binary.</p>
+
+<h5>10.3 XOR for toggling bits</h5>
+<pre class="code">let mask = 0;
+
+mask ^= 1; // toggle lowest bit</pre>
+
+<h5>10.4 XOR swap — know it, but don't prefer it</h5>
+<pre class="code">a ^= b;
+b ^= a;
+a ^= b;</pre>
+<div class="alert alert-danger"><strong>Interview note:</strong> JavaScript destructuring is much clearer. Know XOR swap as a concept, not as your normal production technique.</div>
+
+<h5>10.5 Integer truncation — don't use bitwise tricks casually</h5>
+<pre class="code">Math.floor(5.9); // 5</pre>
+<p>Modern JavaScript code should generally prefer readable numeric APIs instead of old bitwise truncation tricks.</p>
+</div>
+</div>
+</section>
+
+<section id="product">
+<div class="card doc-card">
+<div class="card-header bg-primary text-white">11. Techniques That Matter in Real Software Products</div>
+<div class="card-body">
+<div class="row g-3">
+<div class="col-md-6"><div class="card h-100"><div class="card-body">
+<h5>Immutable updates</h5>
+<pre class="code">const updated = {
+  ...user,
+  name: "New Name"
+};</pre>
+<p>Common in state management and predictable UI updates.</p>
+</div></div></div>
+
+<div class="col-md-6"><div class="card h-100"><div class="card-body">
+<h5>Optional API data</h5>
+<pre class="code">const name =
+  response?.data?.user?.name ?? "Unknown";</pre>
+<p>Useful when API responses can have missing fields.</p>
+</div></div></div>
+
+<div class="col-md-6"><div class="card h-100"><div class="card-body">
+<h5>Configuration merging</h5>
+<pre class="code">const config = {
+  ...defaultConfig,
+  ...userConfig
+};</pre>
+<p>Useful for defaults and overrides.</p>
+</div></div></div>
+
+<div class="col-md-6"><div class="card h-100"><div class="card-body">
+<h5>Transform API data</h5>
+<pre class="code">const cards = users.map(user => ({
+  id: user.id,
+  title: user.name
+}));</pre>
+<p>Convert backend data into UI-friendly structures.</p>
+</div></div></div>
+
+<div class="col-md-6"><div class="card h-100"><div class="card-body">
+<h5>Fast lookup cache</h5>
+<pre class="code">const cache = new Map();
+
+cache.set(id, data);
+const result = cache.get(id);</pre>
+<p>Useful for caching and avoiding repeated work.</p>
+</div></div></div>
+
+<div class="col-md-6"><div class="card h-100"><div class="card-body">
+<h5>Deduplicate IDs</h5>
+<pre class="code">const uniqueIds = [...new Set(ids)];</pre>
+<p>Useful when processing events, API data, tags or selections.</p>
+</div></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card doc-card">
+<div class="card-header bg-success text-white">12. Things Developers Often Learn Too Late</div>
+<div class="card-body">
+<ol>
+<li><strong>Know the data structure before coding.</strong> Many slow solutions become fast by changing Array → Set/Map.</li>
+<li><strong>Understand mutation.</strong> <code>sort()</code>, <code>reverse()</code>, <code>push()</code>, <code>pop()</code>, <code>splice()</code> mutate the array.</li>
+<li><strong>Understand shallow vs deep copy.</strong> Spread syntax does not deeply clone nested objects.</li>
+<li><strong>Don't use <code>shift()</code> repeatedly for large queues.</strong> Use a head pointer.</li>
+<li><strong>Don't assume <code>sort()</code> is numeric.</strong> Supply a comparator.</li>
+<li><strong>Know Big-O of your operations.</strong> Short code can still be slow code.</li>
+<li><strong>Use Map/Set intentionally.</strong> They can turn repeated searches into much faster lookups.</li>
+<li><strong>Readable code beats clever code.</strong> A one-line trick is not automatically better.</li>
+<li><strong>Learn the language and DSA together.</strong> Algorithmic thinking tells you what to do; language knowledge tells you how to express it efficiently.</li>
+</ol>
+<div class="tip bg-light p-3">
+<strong>Best mindset:</strong> When you learn a new JavaScript feature, ask: <em>“What problem does this remove?”</em> That is much more useful than memorizing syntax.
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card doc-card">
+<div class="card-header bg-warning text-dark">13. Your Quick Revision Checklist</div>
+<div class="card-body">
+<div class="row">
+<div class="col-md-6">
+<ul>
+<li>Destructuring</li>
+<li>Swap without temp variable</li>
+<li>Rest / spread</li>
+<li>Array.at()</li>
+<li>Array.from()</li>
+<li>Set</li>
+<li>Map</li>
+<li>Object.entries()</li>
+<li>Object.fromEntries()</li>
+<li>find / findIndex</li>
+</ul>
+</div>
+<div class="col-md-6">
+<ul>
+<li>some / every</li>
+<li>reduce</li>
+<li>flat</li>
+<li>Optional chaining</li>
+<li>Nullish coalescing</li>
+<li>Logical assignment</li>
+<li>structuredClone</li>
+<li>Numeric sort comparator</li>
+<li>Queue with head index</li>
+<li>Shallow vs deep copy</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="card doc-card">
+<div class="card-header bg-dark text-white">14. Final Mental Model</div>
+<div class="card-body">
+<div class="diagram">When solving a DSA problem:
+
+1. Understand the problem
+        ↓
+2. Pick the right data structure
+        ↓
+3. Think about time + space complexity
+        ↓
+4. Look for a known pattern
+        ↓
+5. Use JavaScript features to express the solution cleanly
+
+Examples:
+
+"Need to swap?"
+        → destructuring
+
+"Have I seen this?"
+        → Set
+
+"Need value → index?"
+        → Map
+
+"Need to transform?"
+        → map()
+
+"Need to keep matching values?"
+        → filter()
+
+"Need one final result?"
+        → reduce()
+
+"Need optional nested data?"
+        → ?.
+
+"Need a default only for null/undefined?"
+        → ??
+
+"Need queue?"
+        → array + head index
+
+"Need numeric sort?"
+        → sort((a,b) => a-b)</div>
+
+<div class="alert alert-primary mt-3 mb-0">
+<strong>The bigger goal:</strong> Become the developer who can look at a problem and quickly recognize both the <em>algorithmic pattern</em> and the <em>language tool</em> that fits it.
+</div>
+</div>
+</div>
+</section>
+
+<footer class="text-center text-muted py-4">
+JavaScript Developer Toolkit • DSA • Modern JavaScript • Software Product Development
+</footer>
+
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

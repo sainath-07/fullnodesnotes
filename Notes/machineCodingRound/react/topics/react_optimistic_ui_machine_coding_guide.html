@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimistic UI with React - Machine Coding Guide</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{background:#f4f6f9;color:#212529;line-height:1.7}
+.sticky-nav{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.main-card{border:0;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.08);overflow:hidden}
+.sidebar{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+.sidebar .list-group-item{border:0;padding:13px 16px;cursor:pointer}
+.sidebar .list-group-item:hover{background:#e9f1ff;color:#0d6efd}
+.answer-section{scroll-margin-top:90px;margin-bottom:30px}
+.section-head{color:#fff;padding:14px 20px;font-weight:700}
+.blue{background:#2563eb}.green{background:#198754}.orange{background:#fd7e14}
+.purple{background:#6f42c1}.dark{background:#212529}.red{background:#dc3545}.cyan{background:#0dcaf0;color:#052c35}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:12px;overflow-x:auto;font-size:.88rem}
+code{color:#d63384}pre code{color:inherit}
+.step{border:2px solid #dee2e6;border-radius:12px;padding:16px;text-align:center;height:100%;background:#fff}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:2rem;color:#2563eb}
+.interview{border-left:5px solid #0d6efd;background:#eef5ff}
+.mistake{border-left:5px solid #dc3545;background:#fff1f2}
+.success{border-left:5px solid #198754;background:#effcf6}
+.tip{border-left:5px solid #fd7e14;background:#fff8ef}
+.info{border-left:5px solid #0dcaf0;background:#effcff}
+.small-label{text-transform:uppercase;letter-spacing:1px;font-size:.75rem;color:#6c757d;font-weight:700}
+.flow-api{border:2px dashed #adb5bd;border-radius:14px;padding:20px;background:#fff}
+.badge-pill{border-radius:30px}
+@media(max-width:991px){.sidebar{position:static;max-height:none;margin-bottom:20px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow">
+<div class="container-fluid px-4">
+<a class="navbar-brand fw-bold" href="#top">Optimistic UI</a>
+<span class="navbar-text text-white-50">React Machine Coding Round</span>
+</div>
+</nav>
+
+<header id="top" class="hero py-5">
+<div class="container">
+<div class="small-label text-white-50">React.js • Frontend Machine Coding</div>
+<h1 class="display-5 fw-bold">Optimistic UI with React</h1>
+<p class="lead mb-0">A practical guide to making the UI feel instant while the API request is still running.</p>
+</div>
+</header>
+
+<main class="container-fluid px-4 py-4">
+<div class="row g-4">
+
+<!-- LEFT SIDE -->
+<aside class="col-lg-3">
+<div class="card main-card sidebar">
+<div class="card-header bg-dark text-white fw-bold">Topics</div>
+<div class="list-group list-group-flush">
+<a class="list-group-item" href="#what">1. What is Optimistic UI?</a>
+<a class="list-group-item" href="#problem">2. What Problem Does It Resolve?</a>
+<a class="list-group-item" href="#why">3. Why Use It?</a>
+<a class="list-group-item" href="#how">4. How Does It Work?</a>
+<a class="list-group-item" href="#visual">5. Visual Explanation</a>
+<a class="list-group-item" href="#scenario">6. Real Example</a>
+<a class="list-group-item" href="#fullcode">7. Full Code</a>
+<a class="list-group-item" href="#failure">8. API Failure & Rollback</a>
+<a class="list-group-item" href="#mistakes">9. Common Mistakes</a>
+<a class="list-group-item" href="#interviewer">10. Explain to Interviewer</a>
+<a class="list-group-item" href="#followups">11. Follow-up Questions</a>
+<a class="list-group-item" href="#recap">12. Quick Recap</a>
+</div>
+</div>
+</aside>
+
+<!-- RIGHT SIDE -->
+<section class="col-lg-9">
+
+<section id="what" class="card main-card answer-section">
+<div class="section-head blue">1. What is Optimistic UI?</div>
+<div class="card-body p-4">
+<p><strong>Definition:</strong> Optimistic UI is a UI pattern where the application updates the screen immediately, assuming that the server request will succeed. The API request runs in the background.</p>
+<div class="alert alert-primary">
+<strong>Layman example:</strong> Imagine pressing a “Like” button. Instead of waiting for the server to say “Like successful,” the heart changes immediately. The application then sends the request to the server. If the server fails, the UI can roll the change back.
+</div>
+<div class="row g-3 mt-3">
+<div class="col-md-3"><div class="step"><strong>User Action</strong><br>Click Like</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>Instant UI</strong><br>Like count changes</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>API</strong><br>Request runs</div></div>
+</div>
+</div>
+</section>
+
+<section id="problem" class="card main-card answer-section">
+<div class="section-head green">2. What Problem Does Optimistic UI Resolve?</div>
+<div class="card-body p-4">
+<p>Without Optimistic UI, the user may have to wait for a network request before seeing the result of an action.</p>
+<table class="table table-bordered align-middle">
+<thead class="table-dark"><tr><th>Normal UI</th><th>Optimistic UI</th></tr></thead>
+<tbody>
+<tr><td>User clicks Like → API request → wait → UI updates</td><td>User clicks Like → UI updates → API request runs</td></tr>
+<tr><td>Feels slower when network latency is high.</td><td>Feels much more responsive.</td></tr>
+<tr><td>User waits for confirmation before visual feedback.</td><td>User receives immediate visual feedback.</td></tr>
+</tbody>
+</table>
+<div class="alert alert-success mb-0"><strong>Problem solved:</strong> It reduces the perceived waiting time for actions that are expected to succeed most of the time.</div>
+</div>
+</section>
+
+<section id="why" class="card main-card answer-section">
+<div class="section-head purple">3. Why Do We Use Optimistic UI?</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-6"><div class="step"><h5>⚡ Faster Feeling</h5><p class="mb-0">The interface responds immediately to the user's action.</p></div></div>
+<div class="col-md-6"><div class="step"><h5>😊 Better UX</h5><p class="mb-0">The application feels more responsive on slower networks.</p></div></div>
+<div class="col-md-6"><div class="step"><h5>❤️ Likes</h5><p class="mb-0">Like/unlike actions are common optimistic UI candidates.</p></div></div>
+<div class="col-md-6"><div class="step"><h5>🛒 Cart</h5><p class="mb-0">A cart quantity can update immediately while the server is being updated.</p></div></div>
+</div>
+<div class="tip p-3 mt-4"><strong>Good use case:</strong> Actions where failure is relatively uncommon and the UI can safely undo or reconcile the temporary change.</div>
+</div>
+</section>
+
+<section id="how" class="card main-card answer-section">
+<div class="section-head orange">4. How Does Optimistic UI Work?</div>
+<div class="card-body p-4">
+<ol>
+<li>User performs an action.</li>
+<li>React immediately updates the local UI state.</li>
+<li>React sends the API request in the background.</li>
+<li>If the API succeeds, keep the optimistic state.</li>
+<li>If the API fails, restore the previous state or refetch the authoritative server state.</li>
+</ol>
+<div class="alert alert-info">
+<strong>Core idea:</strong> The UI does not wait for the API before showing the expected result.
+</div>
+<div class="flow-api">
+<div class="row g-3 align-items-center">
+<div class="col-md-3"><div class="step"><strong>Previous State</strong><br>Liked: false<br>Count: 10</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>Optimistic State</strong><br>Liked: true<br>Count: 11</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>Server Result</strong><br>Success or Failure</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="visual" class="card main-card answer-section">
+<div class="section-head blue">5. Visual Explanation — Step by Step</div>
+<div class="card-body p-4">
+<div class="row g-2 align-items-stretch">
+<div class="col-md-2"><div class="step"><strong>1</strong><br>User clicks Like</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>2</strong><br>Save previous state</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>3</strong><br>Update UI immediately</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>4</strong><br>Send API request</div></div>
+</div>
+<div class="text-center fs-2 my-2">↓</div>
+<div class="row justify-content-center g-2">
+<div class="col-md-4"><div class="step"><strong>API Success</strong><br>Keep the optimistic UI.</div></div>
+<div class="col-md-1 arrow">↔</div>
+<div class="col-md-4"><div class="step"><strong>API Failure</strong><br>Rollback or refetch server state.</div></div>
+</div>
+<div class="alert alert-primary mt-4 mb-0"><strong>Memory formula:</strong> <code>Save Old State → Update UI → API → Success: Keep → Failure: Rollback</code></div>
+</div>
+</section>
+
+<section id="scenario" class="card main-card answer-section">
+<div class="section-head cyan">6. Real Machine-Coding Example — Like Button</div>
+<div class="card-body p-4">
+<p>We will build a small Like button. The UI changes immediately. A fake API simulates server delay and can randomly fail so we can demonstrate rollback.</p>
+<div class="row g-4">
+<div class="col-md-6">
+<h5>Initial state</h5>
+<div class="step">
+<div class="fs-1">♡</div>
+<p class="mb-0">10 likes</p>
+</div>
+</div>
+<div class="col-md-6">
+<h5>After click — optimistic state</h5>
+<div class="step">
+<div class="fs-1">♥</div>
+<p class="mb-0">11 likes</p>
+<small>API is still running</small>
+</div>
+</div>
+</div>
+<div class="alert alert-warning mt-4 mb-0"><strong>If API fails:</strong> change the UI back to 10 likes and show an error message. This is the rollback part of Optimistic UI.</div>
+</div>
+</section>
+
+<section id="fullcode" class="card main-card answer-section">
+<div class="section-head dark">7. Full React Code</div>
+<div class="card-body p-4">
+<h5>LikeButton.jsx</h5>
+<pre><code>import { useState } from "react";
+
+// Fake API for machine-coding demonstration
+const likePostApi = () =&gt; {
+  return new Promise((resolve, reject) =&gt; {
+    setTimeout(() =&gt; {
+      // Simulate 80% success and 20% failure
+      if (Math.random() &lt; 0.8) {
+        resolve({ success: true });
+      } else {
+        reject(new Error("Server failed to update like"));
+      }
+    }, 1200);
+  });
+};
+
+function LikeButton() {
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(10);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLike = async () =&gt; {
+    // Prevent duplicate requests while one is running
+    if (loading) return;
+
+    // Save previous state for rollback
+    const previousLiked = liked;
+    const previousLikeCount = likeCount;
+
+    // Optimistic update
+    const nextLiked = !liked;
+
+    setLiked(nextLiked);
+    setLikeCount((count) =&gt;
+      nextLiked ? count + 1 : count - 1
+    );
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await likePostApi();
+
+      // API succeeded.
+      // Keep the optimistic state.
+    } catch (err) {
+      // API failed: rollback to previous state
+      setLiked(previousLiked);
+      setLikeCount(previousLikeCount);
+      setError("Could not update like. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;button
+        onClick={handleLike}
+        disabled={loading}
+        style={{
+          fontSize: "32px",
+          border: "none",
+          background: "transparent",
+          cursor: loading ? "not-allowed" : "pointer"
+        }}
+        aria-label={liked ? "Unlike post" : "Like post"}
+      &gt;
+        {liked ? "♥" : "♡"}
+      &lt;/button&gt;
+
+      &lt;span&gt; {likeCount} likes&lt;/span&gt;
+
+      {loading &amp;&amp; (
+        &lt;p&gt;Saving...&lt;/p&gt;
+      )}
+
+      {error &amp;&amp; (
+        &lt;p style={{ color: "red" }}&gt;
+          {error}
+        &lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default LikeButton;</code></pre>
+
+<div class="success p-3 mt-4">
+<strong>Important pieces:</strong>
+<span class="badge text-bg-primary ms-1">previous state</span>
+<span class="badge text-bg-primary">optimistic update</span>
+<span class="badge text-bg-primary">API request</span>
+<span class="badge text-bg-primary">rollback</span>
+<span class="badge text-bg-primary">loading</span>
+<span class="badge text-bg-primary">error handling</span>
+</div>
+</div>
+</section>
+
+<section id="failure" class="card main-card answer-section">
+<div class="section-head red">8. API Failure & Rollback</div>
+<div class="card-body p-4">
+<p>Rollback is one of the most important parts of a basic Optimistic UI implementation.</p>
+<div class="row g-3">
+<div class="col-md-4"><div class="step"><strong>Before click</strong><br>liked = false<br>count = 10</div></div>
+<div class="col-md-4"><div class="step"><strong>Optimistic update</strong><br>liked = true<br>count = 11</div></div>
+<div class="col-md-4"><div class="step"><strong>API fails</strong><br>restore false / 10</div></div>
+</div>
+<div class="alert alert-danger mt-4">
+<strong>Why rollback?</strong> The optimistic state was only an assumption. The server is the source of truth, so the UI must be corrected when the operation fails.
+</div>
+<h5 class="mt-4">Two common recovery strategies</h5>
+<ul>
+<li><strong>Rollback:</strong> restore the exact previous local state.</li>
+<li><strong>Refetch:</strong> request the latest server state and replace local state with the authoritative result.</li>
+</ul>
+<div class="alert alert-info mb-0"><strong>Interview tip:</strong> Mention that refetching can be useful when several pieces of data may have changed and calculating a perfect rollback locally is difficult.</div>
+</div>
+</section>
+
+<section id="mistakes" class="card main-card answer-section">
+<div class="section-head red">9. Common Developer Mistakes</div>
+<div class="card-body p-4">
+<div class="alert mistake"><strong>1. Updating UI but not handling API failure</strong><br>An optimistic update without rollback or reconciliation can leave the UI inconsistent with the server.</div>
+<div class="alert mistake"><strong>2. Not saving the previous state</strong><br>If rollback is required, keep the previous values before applying the optimistic change.</div>
+<div class="alert mistake"><strong>3. Allowing duplicate clicks</strong><br>Multiple requests can create race conditions or duplicate operations. Disable the action or otherwise manage concurrent requests when appropriate.</div>
+<div class="alert mistake"><strong>4. Assuming every operation should be optimistic</strong><br>Actions with high consequences or complicated server-side rules may need confirmation before updating the UI.</div>
+<div class="alert mistake"><strong>5. Ignoring race conditions</strong><br>When multiple requests can be in flight, an older response can arrive after a newer response. Design the state update strategy accordingly.</div>
+<div class="alert mistake"><strong>6. Treating frontend validation as security</strong><br>The backend remains authoritative. Client-side behavior should not be trusted for authorization or data integrity.</div>
+<div class="alert mistake"><strong>7. Forgetting loading/error feedback</strong><br>The UI should communicate that the server operation is still being synchronized or that the optimistic update was rolled back.</div>
+</div>
+</section>
+
+<section id="interviewer" class="card main-card answer-section">
+<div class="section-head purple">10. How I Would Explain My Implementation to the Interviewer</div>
+<div class="card-body p-4">
+<div class="alert interview">
+<strong>Interview explanation:</strong>
+<p class="mt-2 mb-0">“I implemented Optimistic UI for a Like button. When the user clicks the button, I first capture the previous state. Then I immediately update the local React state so the UI responds without waiting for the network. At the same time, I send the API request. If the request succeeds, I keep the optimistic state. If it fails, I restore the previous state and show an error. I also prevent duplicate requests while the current request is running. This makes the interface feel faster while still keeping the UI consistent with the server.”</p>
+</div>
+
+<h5 class="mt-4">Explain the code in this order</h5>
+<ol>
+<li><strong>State:</strong> “I have liked, likeCount, loading and error state.”</li>
+<li><strong>Previous state:</strong> “I save the old values because I may need to rollback.”</li>
+<li><strong>Optimistic update:</strong> “I update the UI immediately.”</li>
+<li><strong>API:</strong> “I send the request after updating the UI.”</li>
+<li><strong>Success:</strong> “If the API succeeds, I keep the state.”</li>
+<li><strong>Failure:</strong> “If it fails, I restore the previous state.”</li>
+<li><strong>UX:</strong> “I disable duplicate clicks and show loading/error feedback.”</li>
+</ol>
+
+<div class="alert alert-success mb-0">
+<strong>Strong interview line:</strong> “Optimistic UI is not simply updating the UI before the API. The important part is having a recovery strategy when the server rejects the optimistic assumption.”
+</div>
+</div>
+</section>
+
+<section id="followups" class="card main-card answer-section">
+<div class="section-head orange">11. Common Follow-Up Questions</div>
+<div class="card-body p-4">
+<div class="accordion" id="questions">
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">When should we use Optimistic UI?</button></h2>
+<div id="q1" class="accordion-collapse collapse show"><div class="accordion-body">It is useful for actions that are expected to succeed and where immediate feedback improves the experience, such as likes, toggles or some cart updates.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">What happens if the API fails?</button></h2>
+<div id="q2" class="accordion-collapse collapse"><div class="accordion-body">Rollback the optimistic change or refetch the authoritative server state, then communicate the failure to the user.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">Why save the previous state?</button></h2>
+<div id="q3" class="accordion-collapse collapse"><div class="accordion-body">Because the previous state is needed if the server rejects the operation and the UI must be restored.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">Can Optimistic UI cause inconsistent data?</button></h2>
+<div id="q4" class="accordion-collapse collapse"><div class="accordion-body">Yes, if failures, concurrent requests, race conditions or server-side rules are not handled correctly. The implementation must reconcile the UI with the server.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">Is Optimistic UI the same as caching?</button></h2>
+<div id="q5" class="accordion-collapse collapse"><div class="accordion-body">No. Optimistic UI is about updating the interface before server confirmation. Caching is about storing data so it can be reused without always fetching it again.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="recap" class="card main-card answer-section">
+<div class="section-head dark">12. Quick Recap</div>
+<div class="card-body p-4">
+<table class="table table-bordered align-middle">
+<tbody>
+<tr><th>Optimistic UI</th><td>Update the UI immediately before server confirmation.</td></tr>
+<tr><th>Previous state</th><td>State captured before the optimistic change for possible rollback.</td></tr>
+<tr><th>API request</th><td>Runs after or alongside the immediate UI update.</td></tr>
+<tr><th>Success</th><td>Keep the optimistic result or reconcile with the response.</td></tr>
+<tr><th>Failure</th><td>Rollback or refetch the authoritative server state.</td></tr>
+<tr><th>Important UX</th><td>Loading, error and duplicate-request handling.</td></tr>
+</tbody>
+</table>
+<div class="alert alert-primary mb-0">
+<strong>Final memory formula:</strong><br>
+<code>Capture Old State → Update UI → Send API → Success: Keep → Failure: Rollback/Refetch</code>
+</div>
+</div>
+</section>
+
+</section>
+</div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+<small>Optimistic UI with React • Machine Coding Round Documentation • Bootstrap 5</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -848,17 +848,17 @@ lazy loading- completed
 pagaination- completed
 Virtualized list- completed
 Sort/filter/pagination table
-Data table
-Shopping cart
-Multi-step form
+Data table- completed
+Multi-step form- completed
+Drag and drop- completed
 File upload
-Drag and drop
 Optimistic UI
 Undo/redo
-Nested comments
 Tree view
 Custom useFetch
+Nested comments
 Custom useDebounce
+Shopping cart
 Custom usePrevious
 Custom useLocalStorage
 

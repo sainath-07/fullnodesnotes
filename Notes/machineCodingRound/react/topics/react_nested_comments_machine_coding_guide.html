@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nested Comments with React - Machine Coding Round Guide</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:#f4f6f9;color:#212529;line-height:1.7}
+.sticky-nav{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.main-card{border:0;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.08);overflow:hidden}
+.sidebar{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+.sidebar .list-group-item{border:0;padding:13px 16px}
+.sidebar .list-group-item:hover{background:#e9f1ff;color:#0d6efd}
+.answer-section{scroll-margin-top:90px;margin-bottom:30px}
+.section-head{color:#fff;padding:14px 20px;font-weight:700}
+.blue{background:#2563eb}.green{background:#198754}.orange{background:#fd7e14}
+.purple{background:#6f42c1}.dark{background:#212529}.red{background:#dc3545}.cyan{background:#0dcaf0;color:#052c35}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:12px;overflow-x:auto;font-size:.84rem}
+code{color:#d63384}pre code{color:inherit}
+.step{border:2px solid #dee2e6;border-radius:12px;padding:16px;text-align:center;height:100%;background:#fff}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:2rem;color:#2563eb}
+.interview{border-left:5px solid #0d6efd;background:#eef5ff}
+.mistake{border-left:5px solid #dc3545;background:#fff1f2}
+.success{border-left:5px solid #198754;background:#effcf6}
+.tip{border-left:5px solid #fd7e14;background:#fff8ef}
+.info{border-left:5px solid #0dcaf0;background:#effcff}
+.small-label{text-transform:uppercase;letter-spacing:1px;font-size:.75rem;color:#6c757d;font-weight:700}
+.comment-box{border-left:4px solid #6c757d;background:#fff;border-radius:10px;padding:12px 16px;margin-top:10px}
+.reply{margin-left:30px;border-left:3px solid #0d6efd;padding-left:16px}
+.reply2{margin-left:30px;border-left:3px solid #198754;padding-left:16px}
+.tree{font-family:monospace;background:#f8f9fa;border-radius:12px;padding:20px;font-size:1rem}
+.badge-pill{border-radius:30px}
+@media(max-width:991px){.sidebar{position:static;max-height:none;margin-bottom:20px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow">
+<div class="container-fluid px-4">
+<a class="navbar-brand fw-bold" href="#top">Nested Comments</a>
+<span class="navbar-text text-white-50">React Machine Coding Round</span>
+</div>
+</nav>
+
+<header id="top" class="hero py-5">
+<div class="container">
+<div class="small-label text-white-50">React.js • Frontend Machine Coding</div>
+<h1 class="display-5 fw-bold">Nested Comments with React</h1>
+<p class="lead mb-0">Build a comment system where users can reply to comments at multiple levels.</p>
+</div>
+</header>
+
+<main class="container-fluid px-4 py-4">
+<div class="row g-4">
+
+<!-- LEFT SIDE -->
+<aside class="col-lg-3">
+<div class="card main-card sidebar">
+<div class="card-header bg-dark text-white fw-bold">Topics</div>
+<div class="list-group list-group-flush">
+<a class="list-group-item" href="#what">1. What are Nested Comments?</a>
+<a class="list-group-item" href="#problem">2. What Problem Does It Resolve?</a>
+<a class="list-group-item" href="#why">3. Why Use Nested Comments?</a>
+<a class="list-group-item" href="#how">4. How Does It Work?</a>
+<a class="list-group-item" href="#data">5. Data Structure</a>
+<a class="list-group-item" href="#visual">6. Visual Explanation</a>
+<a class="list-group-item" href="#requirements">7. Machine Coding Requirements</a>
+<a class="list-group-item" href="#fullcode">8. Full Code</a>
+<a class="list-group-item" href="#recursion">9. Why Recursion?</a>
+<a class="list-group-item" href="#mistakes">10. Common Developer Mistakes</a>
+<a class="list-group-item" href="#interviewer">11. Explain to Interviewer</a>
+<a class="list-group-item" href="#followups">12. Follow-up Questions</a>
+<a class="list-group-item" href="#recap">13. Quick Recap</a>
+</div>
+</div>
+</aside>
+
+<!-- RIGHT SIDE -->
+<section class="col-lg-9">
+
+<section id="what" class="card main-card answer-section">
+<div class="section-head blue">1. What are Nested Comments?</div>
+<div class="card-body p-4">
+<p><strong>Definition:</strong> Nested comments are comments that can contain replies, and those replies can contain more replies. This creates a tree-like structure.</p>
+<div class="alert alert-primary">
+<strong>Layman example:</strong> Think about a conversation. Person A asks a question. Person B replies to A. Person C replies specifically to B. Person D can reply to C. Each reply stays connected to the comment it belongs to.
+</div>
+
+<div class="tree">
+Comment A<br>
+├── Reply A1<br>
+│&nbsp;&nbsp; ├── Reply A1.1<br>
+│&nbsp;&nbsp; └── Reply A1.2<br>
+└── Reply A2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── Reply A2.1
+</div>
+
+<p class="mt-3 mb-0">The important idea is that each comment can have a <code>replies</code> array containing child comments.</p>
+</div>
+</section>
+
+<section id="problem" class="card main-card answer-section">
+<div class="section-head green">2. What Problem Does It Resolve?</div>
+<div class="card-body p-4">
+<p>A flat list works for simple comments, but it becomes difficult to represent conversations where users reply to specific comments.</p>
+<div class="row g-3">
+<div class="col-md-6"><div class="step"><strong>Flat Comments</strong><br><small>All comments appear at the same level, so conversation relationships are unclear.</small></div></div>
+<div class="col-md-6"><div class="step"><strong>Nested Comments</strong><br><small>Replies are visually grouped under their parent comment.</small></div></div>
+</div>
+<div class="alert alert-success mt-4">
+<strong>Problem solved:</strong> It represents threaded conversations and makes it clear which comment a user is replying to.
+</div>
+</div>
+</section>
+
+<section id="why" class="card main-card answer-section">
+<div class="section-head purple">3. Why Use Nested Comments?</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-4"><div class="step"><h5>💬 Discussions</h5><p class="mb-0">Useful for conversations with multiple replies.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🧵 Threads</h5><p class="mb-0">Keeps replies connected to the correct parent.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🌳 Tree Data</h5><p class="mb-0">Maps naturally to parent-child data.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>📰 News Sites</h5><p class="mb-0">Users can reply to individual comments.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>📱 Social Apps</h5><p class="mb-0">Supports threaded replies.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🔧 Machine Coding</h5><p class="mb-0">Tests recursion, state updates and component design.</p></div></div>
+</div>
+</div>
+</section>
+
+<section id="how" class="card main-card answer-section">
+<div class="section-head orange">4. How Does Nested Comments Work?</div>
+<div class="card-body p-4">
+<ol>
+<li>Store comments in a hierarchical structure.</li>
+<li>Each comment has its own unique <code>id</code>.</li>
+<li>A comment can contain a <code>replies</code> array.</li>
+<li>Render each comment.</li>
+<li>If the comment has replies, render those replies inside the current comment.</li>
+<li>Use a recursive component so the same rendering logic works at every depth.</li>
+<li>When the user adds a reply, find the parent comment and add the new comment to its <code>replies</code>.</li>
+</ol>
+
+<div class="alert alert-info">
+<strong>Core idea:</strong> The UI is recursive because the data itself is recursive: <code>comment → replies → replies → replies...</code>
+</div>
+</div>
+</section>
+
+<section id="data" class="card main-card answer-section">
+<div class="section-head cyan">5. Data Structure</div>
+<div class="card-body p-4">
+<p>A nested comment object can look like this:</p>
+<pre><code>{
+  id: 1,
+  author: "Rahul",
+  text: "What do you think about React?",
+  replies: [
+    {
+      id: 2,
+      author: "Priya",
+      text: "I like React.",
+      replies: [
+        {
+          id: 3,
+          author: "Amit",
+          text: "Same here!",
+          replies: []
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+<div class="row g-3 mt-3">
+<div class="col-md-4"><div class="step"><strong>id</strong><br>Uniquely identifies a comment.</div></div>
+<div class="col-md-4"><div class="step"><strong>author</strong><br>Identifies who posted it.</div></div>
+<div class="col-md-4"><div class="step"><strong>replies</strong><br>Contains child comments.</div></div>
+</div>
+
+<div class="alert alert-warning mt-4 mb-0"><strong>Interview point:</strong> The exact field names can vary. The important relationship is parent comment → child replies.</div>
+</div>
+</section>
+
+<section id="visual" class="card main-card answer-section">
+<div class="section-head blue">6. Visual Explanation — Simple Steps</div>
+<div class="card-body p-4">
+
+<div class="row g-2 align-items-stretch">
+<div class="col-md-2"><div class="step"><strong>1</strong><br>User sees comment</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>2</strong><br>Clicks Reply</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>3</strong><br>Enter reply</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>4</strong><br>Find parent</div></div>
+</div>
+<div class="text-center fs-2 my-2">↓</div>
+<div class="row justify-content-center g-2">
+<div class="col-md-4"><div class="step"><strong>5. Update Tree</strong><br>Add reply inside parent's <code>replies</code>.</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-4"><div class="step"><strong>6. React Re-renders</strong><br>New reply appears at the correct level.</div></div>
+</div>
+
+<h5 class="mt-4">Rendering flow</h5>
+<div class="tree">
+Comment<br>
+&nbsp;└── CommentItem<br>
+&nbsp;&nbsp;&nbsp;&nbsp;├── Comment content<br>
+&nbsp;&nbsp;&nbsp;&nbsp;└── replies.map()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── CommentItem<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── replies.map()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── CommentItem
+</div>
+</div>
+</section>
+
+<section id="requirements" class="card main-card answer-section">
+<div class="section-head green">7. Machine Coding Requirements</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Basic Requirements</h5>
+<ul class="mb-0">
+<li>Display comments.</li>
+<li>Show nested replies.</li>
+<li>Add a reply.</li>
+<li>Support multiple nesting levels.</li>
+<li>Use unique keys.</li>
+</ul>
+</div></div>
+</div>
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Interview-Ready Improvements</h5>
+<ul class="mb-0">
+<li>Reply input per comment.</li>
+<li>Cancel reply.</li>
+<li>Prevent empty comments.</li>
+<li>Delete comments recursively.</li>
+<li>Loading/error states for APIs.</li>
+<li>Accessibility and keyboard support.</li>
+</ul>
+</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="card main-card answer-section">
+<div class="section-head dark">8. Full React Code</div>
+<div class="card-body p-4">
+
+<h5>App.jsx</h5>
+<pre><code>import { useState } from "react";
+import CommentItem from "./CommentItem";
+
+const initialComments = [
+  {
+    id: 1,
+    author: "Rahul",
+    text: "What do you think about React?",
+    replies: [
+      {
+        id: 2,
+        author: "Priya",
+        text: "I really like React.",
+        replies: [
+          {
+            id: 3,
+            author: "Amit",
+            text: "Same here!",
+            replies: []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 4,
+    author: "Neha",
+    text: "Which React feature do you use most?",
+    replies: []
+  }
+];
+
+function App() {
+  const [comments, setComments] = useState(initialComments);
+  const [nextId, setNextId] = useState(5);
+
+  const addReply = (parentId, text) =&gt; {
+    const newReply = {
+      id: nextId,
+      author: "You",
+      text,
+      replies: []
+    };
+
+    setComments((currentComments) =&gt;
+      addReplyToTree(currentComments, parentId, newReply)
+    );
+
+    setNextId((id) =&gt; id + 1);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Nested Comments&lt;/h1&gt;
+
+      {comments.map((comment) =&gt; (
+        &lt;CommentItem
+          key={comment.id}
+          comment={comment}
+          onReply={addReply}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+// Recursively find the parent and add the reply.
+function addReplyToTree(comments, parentId, newReply) {
+  return comments.map((comment) =&gt; {
+    if (comment.id === parentId) {
+      return {
+        ...comment,
+        replies: [...comment.replies, newReply]
+      };
+    }
+
+    if (comment.replies.length &gt; 0) {
+      return {
+        ...comment,
+        replies: addReplyToTree(
+          comment.replies,
+          parentId,
+          newReply
+        )
+      };
+    }
+
+    return comment;
+  });
+}
+
+export default App;</code></pre>
+
+<h5 class="mt-4">CommentItem.jsx</h5>
+<pre><code>import { useState } from "react";
+
+function CommentItem({ comment, onReply }) {
+  const [showReplyBox, setShowReplyBox] = useState(false);
+  const [replyText, setReplyText] = useState("");
+
+  const handleSubmit = () =&gt; {
+    const text = replyText.trim();
+
+    if (!text) return;
+
+    onReply(comment.id, text);
+
+    setReplyText("");
+    setShowReplyBox(false);
+  };
+
+  return (
+    &lt;div
+      style={{
+        marginLeft: "20px",
+        marginTop: "16px",
+        padding: "12px",
+        borderLeft: "3px solid #ddd"
+      }}
+    &gt;
+      &lt;strong&gt;{comment.author}&lt;/strong&gt;
+
+      &lt;p&gt;{comment.text}&lt;/p&gt;
+
+      &lt;button
+        onClick={() =&gt; setShowReplyBox((value) =&gt; !value)}
+      &gt;
+        {showReplyBox ? "Cancel" : "Reply"}
+      &lt;/button&gt;
+
+      {showReplyBox &amp;&amp; (
+        &lt;div style={{ marginTop: "10px" }}&gt;
+          &lt;input
+            value={replyText}
+            onChange={(event) =&gt;
+              setReplyText(event.target.value)
+            }
+            placeholder="Write a reply..."
+          /&gt;
+
+          &lt;button onClick={handleSubmit}&gt;
+            Add Reply
+          &lt;/button&gt;
+        &lt;/div&gt;
+      )}
+
+      &lt;div&gt;
+        {comment.replies.map((reply) =&gt; (
+          &lt;CommentItem
+            key={reply.id}
+            comment={reply}
+            onReply={onReply}
+          /&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default CommentItem;</code></pre>
+
+<div class="success p-3 mt-4">
+<strong>Key implementation ideas:</strong>
+<span class="badge text-bg-primary ms-1">recursive component</span>
+<span class="badge text-bg-primary">tree traversal</span>
+<span class="badge text-bg-primary">immutable update</span>
+<span class="badge text-bg-primary">unique IDs</span>
+<span class="badge text-bg-primary">parentId</span>
+</div>
+
+<div class="alert alert-primary mt-4 mb-0">
+<strong>Important:</strong> The code uses <code>addReplyToTree()</code> to recursively search the comment tree and create new objects instead of directly mutating the existing state.
+</div>
+</div>
+</section>
+
+<section id="recursion" class="card main-card answer-section">
+<div class="section-head orange">9. Why Recursion?</div>
+<div class="card-body p-4">
+<p>We use recursion because every comment has the same structure: it contains comment data and potentially another array of comments.</p>
+
+<div class="row g-3">
+<div class="col-md-6">
+<div class="step">
+<h5>CommentItem</h5>
+<p>Displays one comment.</p>
+<p class="mb-0">If replies exist, it renders another <code>CommentItem</code> for each reply.</p>
+</div>
+</div>
+<div class="col-md-6">
+<div class="step">
+<h5>Same component at every level</h5>
+<p>Level 1, level 2 and level 3 all use the same component.</p>
+<p class="mb-0">This avoids writing separate code for each nesting level.</p>
+</div>
+</div>
+</div>
+
+<h5 class="mt-4">Simple recursion idea</h5>
+<pre><code>CommentItem
+   ↓
+render comment
+   ↓
+does it have replies?
+   ↓ yes
+map replies
+   ↓
+render CommentItem again
+   ↓
+repeat until replies = []</code></pre>
+
+<div class="alert alert-info mb-0"><strong>Interview line:</strong> “I use recursion because the comment data is a tree and each node has the same structure as its children.”</div>
+</div>
+</section>
+
+<section id="mistakes" class="card main-card answer-section">
+<div class="section-head red">10. Common Developer Mistakes</div>
+<div class="card-body p-4">
+<div class="alert mistake"><strong>1. Using array index as the key</strong><br>Use a stable unique comment ID instead of <code>key={index}</code>, especially when comments can be inserted or deleted.</div>
+<div class="alert mistake"><strong>2. Mutating nested state directly</strong><br>Avoid changing <code>comment.replies.push()</code> directly. Create new arrays and objects so React can correctly detect the update.</div>
+<div class="alert mistake"><strong>3. Supporting only one nesting level</strong><br>Hard-coding “comment → reply” does not solve the general nested-comments problem. Use recursion.</div>
+<div class="alert mistake"><strong>4. Updating the wrong parent</strong><br>Use a unique <code>parentId</code> and recursively search the tree to find the correct parent.</div>
+<div class="alert mistake"><strong>5. Allowing empty replies</strong><br>Trim the input and validate it before adding a new comment.</div>
+<div class="alert mistake"><strong>6. Putting all state inside one huge component</strong><br>Separate the recursive comment item from the parent state management to keep the code easier to understand.</div>
+<div class="alert mistake"><strong>7. Forgetting API states</strong><br>For a real application, handle loading, success, failure and retry when creating replies through an API.</div>
+<div class="alert mistake"><strong>8. Ignoring very deep trees</strong><br>Extremely deep recursive structures can become expensive. Real applications may limit nesting depth or use alternative rendering strategies.</div>
+</div>
+</section>
+
+<section id="interviewer" class="card main-card answer-section">
+<div class="section-head purple">11. How I Would Explain My Implementation to the Interviewer</div>
+<div class="card-body p-4">
+<div class="alert interview">
+<strong>Interview explanation:</strong>
+<p class="mt-2 mb-0">“I implemented nested comments using a tree data structure. Each comment has an id, author, text and a replies array. I created a reusable CommentItem component that renders a comment and recursively renders its replies. For adding a reply, I pass the parent comment ID to the parent state handler. The handler recursively traverses the tree, finds the matching parent and immutably adds the new reply to its replies array. This approach supports any number of nesting levels instead of hard-coding a fixed number of levels.”</p>
+</div>
+
+<h5 class="mt-4">Explain the implementation in this order</h5>
+<ol>
+<li><strong>Data structure:</strong> “Comments form a tree because each comment can have children.”</li>
+<li><strong>Component:</strong> “CommentItem is responsible for rendering one comment.”</li>
+<li><strong>Recursion:</strong> “CommentItem renders itself for every child reply.”</li>
+<li><strong>Add reply:</strong> “The parent ID tells me where the new reply belongs.”</li>
+<li><strong>Tree traversal:</strong> “I recursively search until I find that parent.”</li>
+<li><strong>Immutable update:</strong> “I create new objects and arrays instead of mutating state.”</li>
+<li><strong>Validation:</strong> “I prevent empty replies.”</li>
+<li><strong>Scalability:</strong> “For production, I would also handle API states, pagination or lazy loading for large comment trees.”</li>
+</ol>
+
+<div class="alert alert-success mb-0">
+<strong>Strong interview line:</strong> “The key challenge is not rendering a comment; it is correctly traversing and updating a recursive tree without mutating React state.”
+</div>
+</div>
+</section>
+
+<section id="followups" class="card main-card answer-section">
+<div class="section-head blue">12. Common Follow-Up Questions</div>
+<div class="card-body p-4">
+<div class="accordion" id="questions">
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">Why use recursion instead of nested map calls?</button></h2>
+<div id="q1" class="accordion-collapse collapse show"><div class="accordion-body">Recursion handles an arbitrary number of nesting levels. Hard-coding multiple map levels becomes repetitive and limits the depth.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">How do you find a comment by ID?</button></h2>
+<div id="q2" class="accordion-collapse collapse"><div class="accordion-body">Traverse the current array. If the ID matches, use that comment. Otherwise recursively search its replies.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">How do you delete a nested comment?</button></h2>
+<div id="q3" class="accordion-collapse collapse"><div class="accordion-body">Recursively map the tree and filter out the target ID at each level. The resulting tree is returned as a new immutable structure.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">What is the time complexity of finding a comment?</button></h2>
+<div id="q4" class="accordion-collapse collapse"><div class="accordion-body">In the worst case, O(n), because we may need to visit every comment in the tree.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">How would you handle thousands of comments?</button></h2>
+<div id="q5" class="accordion-collapse collapse"><div class="accordion-body">Use pagination or lazy loading, avoid rendering huge trees at once, consider virtualization where appropriate, and keep server/API data normalized if the application becomes complex.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">Should comments always be nested forever?</button></h2>
+<div id="q6" class="accordion-collapse collapse"><div class="accordion-body">Not necessarily. A product can limit nesting depth for readability and performance. The requirement depends on the application's UX and backend design.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="recap" class="card main-card answer-section">
+<div class="section-head dark">13. Quick Recap</div>
+<div class="card-body p-4">
+<table class="table table-bordered align-middle">
+<tbody>
+<tr><th>Data structure</th><td>Tree / parent-child structure.</td></tr>
+<tr><th>Comment</th><td>Contains its own data and a <code>replies</code> array.</td></tr>
+<tr><th>Rendering</th><td>Recursive <code>CommentItem</code> component.</td></tr>
+<tr><th>Add reply</th><td>Find parent by ID and add a child immutably.</td></tr>
+<tr><th>Key</th><td>Use a stable unique comment ID.</td></tr>
+<tr><th>Search complexity</th><td>Worst case O(n).</td></tr>
+<tr><th>Important concern</th><td>Large/deep trees may need pagination, lazy loading or optimized rendering.</td></tr>
+</tbody>
+</table>
+
+<div class="alert alert-primary mb-0">
+<strong>Final memory formula:</strong><br>
+<code>Tree Data → Recursive Component → Find Parent → Immutable Update → React Re-renders</code>
+</div>
+</div>
+</section>
+
+</section>
+</div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+<small>Nested Comments with React • Machine Coding Round Documentation • Bootstrap 5</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

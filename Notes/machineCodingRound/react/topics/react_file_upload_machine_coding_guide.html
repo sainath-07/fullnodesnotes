@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>React File Upload - Machine Coding Round Guide</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html { scroll-behavior:smooth; }
+    body { background:#f4f6f9; color:#212529; }
+    .sticky-nav { position:sticky; top:0; z-index:1030; }
+    .hero { background:linear-gradient(135deg,#172554,#2563eb); color:white; }
+    .main-card { border:0; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,.08); overflow:hidden; }
+    .sidebar { position:sticky; top:75px; max-height:calc(100vh - 95px); overflow:auto; }
+    .sidebar .list-group-item { border:0; padding:13px 16px; cursor:pointer; }
+    .sidebar .list-group-item:hover { background:#e9f1ff; color:#0d6efd; }
+    .answer-section { scroll-margin-top:90px; margin-bottom:32px; }
+    .section-head { color:#fff; padding:14px 20px; font-weight:700; }
+    .blue { background:#2563eb; } .green { background:#198754; }
+    .orange { background:#fd7e14; } .purple { background:#6f42c1; }
+    .dark { background:#212529; } .red { background:#dc3545; }
+    pre { background:#111827; color:#e5e7eb; padding:18px; border-radius:12px; overflow-x:auto; font-size:.88rem; }
+    code { color:#d63384; } pre code { color:inherit; }
+    .step { border:2px solid #dee2e6; border-radius:12px; padding:16px; text-align:center; height:100%; background:#fff; }
+    .arrow { display:flex; align-items:center; justify-content:center; font-size:2rem; color:#2563eb; }
+    .interview { border-left:5px solid #0d6efd; background:#eef5ff; }
+    .mistake { border-left:5px solid #dc3545; background:#fff1f2; }
+    .success { border-left:5px solid #198754; background:#effcf6; }
+    .tip { border-left:5px solid #fd7e14; background:#fff8ef; }
+    .badge-pill { border-radius:30px; }
+    .small-label { text-transform:uppercase; letter-spacing:1px; font-size:.75rem; color:#6c757d; font-weight:700; }
+    @media(max-width:991px) {
+      .sidebar { position:static; max-height:none; margin-bottom:20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="#">React File Upload</a>
+    <span class="navbar-text text-white-50">Machine Coding Round</span>
+  </div>
+</nav>
+
+<header class="hero py-5">
+  <div class="container">
+    <div class="small-label text-white-50">React.js • Frontend Machine Coding</div>
+    <h1 class="display-5 fw-bold">File Upload with React</h1>
+    <p class="lead mb-0">A practical interview guide with a two-column implementation approach, complete code, visual flow, mistakes and an interviewer explanation.</p>
+  </div>
+</header>
+
+<main class="container-fluid px-4 py-4">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="card main-card sidebar">
+        <div class="card-header bg-dark text-white fw-bold">Topics</div>
+        <div class="list-group list-group-flush">
+          <a class="list-group-item" href="#what">1. What is File Upload?</a>
+          <a class="list-group-item" href="#problem">2. What Problem Does It Resolve?</a>
+          <a class="list-group-item" href="#why">3. Why Do We Need It?</a>
+          <a class="list-group-item" href="#how">4. How Does It Work?</a>
+          <a class="list-group-item" href="#visual">5. Visual Explanation</a>
+          <a class="list-group-item" href="#requirements">6. Requirements</a>
+          <a class="list-group-item" href="#fullcode">7. Full Code</a>
+          <a class="list-group-item" href="#validation">8. File Validation</a>
+          <a class="list-group-item" href="#mistakes">9. Common Mistakes</a>
+          <a class="list-group-item" href="#interviewer">10. Explain to Interviewer</a>
+          <a class="list-group-item" href="#followups">11. Follow-up Questions</a>
+          <a class="list-group-item" href="#recap">12. Quick Recap</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section class="col-lg-9">
+
+      <div id="what" class="card main-card answer-section">
+        <div class="section-head blue">1. What is File Upload in React?</div>
+        <div class="card-body p-4">
+          <p><strong>Definition:</strong> File upload is the process of selecting a file from the user's device and sending that file from the React application to a backend server or storage service.</p>
+          <div class="alert alert-primary">
+            <strong>Layman example:</strong> Think about uploading a resume to a job website. You click <strong>Choose File</strong>, select your resume, and click <strong>Upload</strong>. React handles the browser-side interaction and sends the selected file to the backend.
+          </div>
+          <p>React itself does not permanently store the uploaded file. React normally collects the file and sends it to an API. The backend or cloud storage is responsible for storing it.</p>
+          <div class="mt-3">
+            <span class="badge text-bg-primary badge-pill">input type="file"</span>
+            <span class="badge text-bg-success badge-pill">File API</span>
+            <span class="badge text-bg-warning badge-pill">FormData</span>
+            <span class="badge text-bg-dark badge-pill">POST API</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="problem" class="card main-card answer-section">
+        <div class="section-head green">2. What Problem Does File Upload Resolve?</div>
+        <div class="card-body p-4">
+          <p>Many applications need users to send files to the application instead of entering only text.</p>
+          <div class="row g-3">
+            <div class="col-md-4"><div class="step"><strong>Profile Photo</strong><br><small>User uploads a profile image.</small></div></div>
+            <div class="col-md-4"><div class="step"><strong>Resume</strong><br><small>Candidate uploads a PDF resume.</small></div></div>
+            <div class="col-md-4"><div class="step"><strong>Documents</strong><br><small>User uploads invoices or reports.</small></div></div>
+            <div class="col-md-4"><div class="step"><strong>Product Images</strong><br><small>Seller uploads product photos.</small></div></div>
+            <div class="col-md-4"><div class="step"><strong>Chat Attachments</strong><br><small>User sends images or files.</small></div></div>
+            <div class="col-md-4"><div class="step"><strong>Support Tickets</strong><br><small>Customer attaches evidence.</small></div></div>
+          </div>
+          <div class="alert alert-success mt-4 mb-0"><strong>Problem solved:</strong> It gives the application a controlled way to receive files from the user's device and pass them to the backend/storage layer.</div>
+        </div>
+      </div>
+
+      <div id="why" class="card main-card answer-section">
+        <div class="section-head purple">3. Why Do We Need File Upload?</div>
+        <div class="card-body p-4">
+          <ul>
+            <li>To allow users to upload images, PDFs, videos or documents.</li>
+            <li>To collect files as part of forms and workflows.</li>
+            <li>To send files to a backend API.</li>
+            <li>To validate file type and file size before upload.</li>
+            <li>To show selected-file information and upload status.</li>
+          </ul>
+          <div class="tip p-3 mt-3">
+            <strong>Machine-coding expectation:</strong> Do not stop at a file input. Show that you understand file selection, state management, validation, <code>FormData</code>, API submission, loading state and error handling.
+          </div>
+        </div>
+      </div>
+
+      <div id="how" class="card main-card answer-section">
+        <div class="section-head orange">4. How Does File Upload Work?</div>
+        <div class="card-body p-4">
+          <ol class="mb-4">
+            <li>User selects a file using <code>&lt;input type="file"&gt;</code>.</li>
+            <li>Browser gives React a <code>File</code> object through the input's <code>change</code> event.</li>
+            <li>React stores the selected file in state.</li>
+            <li>Application validates file type and size.</li>
+            <li>On submit, the file is added to a <code>FormData</code> object.</li>
+            <li>The frontend sends <code>FormData</code> to the backend using <code>fetch</code> or Axios.</li>
+            <li>Backend receives the multipart request and stores/processes the file.</li>
+          </ol>
+          <div class="alert alert-info"><strong>Important:</strong> For a normal multipart upload, do not manually set <code>Content-Type: multipart/form-data</code> when using browser <code>fetch</code> with <code>FormData</code>. The browser adds the required boundary automatically.</div>
+        </div>
+      </div>
+
+      <div id="visual" class="card main-card answer-section">
+        <div class="section-head blue">5. Visual Explanation — File Upload Flow</div>
+        <div class="card-body p-4">
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md-2"><div class="step"><strong>1</strong><br>User selects file</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="step"><strong>2</strong><br>React gets File object</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="step"><strong>3</strong><br>Validate</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="step"><strong>4</strong><br>Create FormData</div></div>
+          </div>
+          <div class="text-center fs-2 my-2">↓</div>
+          <div class="row justify-content-center g-2">
+            <div class="col-md-3"><div class="step"><strong>5</strong><br>POST to API</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="step"><strong>6</strong><br>Backend receives file</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="step"><strong>7</strong><br>Storage / response</div></div>
+          </div>
+          <div class="alert alert-primary mt-4 mb-0">
+            <strong>Memory trick:</strong> <code>Select → Validate → FormData → POST → Store → Response</code>
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card main-card answer-section">
+        <div class="section-head green">6. Machine Coding Requirements</div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card h-100 border">
+                <div class="card-body">
+                  <h5>Basic</h5>
+                  <ul class="mb-0">
+                    <li>Select one file.</li>
+                    <li>Show selected filename.</li>
+                    <li>Upload using a button.</li>
+                    <li>Send using <code>FormData</code>.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 border">
+                <div class="card-body">
+                  <h5>Good Interview Version</h5>
+                  <ul class="mb-0">
+                    <li>File type validation.</li>
+                    <li>File size validation.</li>
+                    <li>Loading state.</li>
+                    <li>Error and success messages.</li>
+                    <li>Reset after successful upload.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fullcode" class="card main-card answer-section">
+        <div class="section-head dark">7. Full React Code</div>
+        <div class="card-body p-4">
+          <p>This example uses a functional component and <code>fetch</code>. Assume the backend exposes <code>POST /api/upload</code>.</p>
+
+          <h5>FileUpload.jsx</h5>
+          <pre><code>import { useRef, useState } from "react";
+
+function FileUpload() {
+  const [file, setFile] = useState(null);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const fileInputRef = useRef(null);
+
+  const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+  const ALLOWED_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "application/pdf"
+  ];
+
+  const handleFileChange = (event) =&gt; {
+    const selectedFile = event.target.files[0];
+
+    setError("");
+    setMessage("");
+
+    if (!selectedFile) {
+      return;
+    }
+
+    // File type validation
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setError("Only JPG, PNG and PDF files are allowed.");
+      event.target.value = "";
+      setFile(null);
+      return;
+    }
+
+    // File size validation
+    if (selectedFile.size &gt; MAX_SIZE) {
+      setError("File size must be less than 5 MB.");
+      event.target.value = "";
+      setFile(null);
+      return;
+    }
+
+    setFile(selectedFile);
+  };
+
+  const handleUpload = async () =&gt; {
+    if (!file) {
+      setError("Please select a file first.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+
+      setMessage(data.message || "File uploaded successfully.");
+      setFile(null);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (err) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Upload File&lt;/h2&gt;
+
+      &lt;input
+        ref={fileInputRef}
+        type="file"
+        accept=".jpg,.jpeg,.png,.pdf"
+        onChange={handleFileChange}
+      /&gt;
+
+      {file &amp;&amp; (
+        &lt;p&gt;
+          Selected: &lt;strong&gt;{file.name}&lt;/strong&gt;
+        &lt;/p&gt;
+      )}
+
+      {error &amp;&amp; (
+        &lt;p style={{ color: "red" }}&gt;{error}&lt;/p&gt;
+      )}
+
+      {message &amp;&amp; (
+        &lt;p style={{ color: "green" }}&gt;{message}&lt;/p&gt;
+      )}
+
+      &lt;button
+        onClick={handleUpload}
+        disabled={!file || loading}
+      &gt;
+        {loading ? "Uploading..." : "Upload"}
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default FileUpload;</code></pre>
+
+          <div class="success p-3 mt-4">
+            <strong>What this code demonstrates:</strong>
+            <span class="badge text-bg-primary ms-1">useState</span>
+            <span class="badge text-bg-primary">useRef</span>
+            <span class="badge text-bg-primary">File API</span>
+            <span class="badge text-bg-primary">FormData</span>
+            <span class="badge text-bg-primary">fetch</span>
+            <span class="badge text-bg-primary">validation</span>
+            <span class="badge text-bg-primary">loading/error state</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="validation" class="card main-card answer-section">
+        <div class="section-head cyan">8. File Validation</div>
+        <div class="card-body p-4">
+          <p>Validation should happen on the frontend for a better user experience, but it should <strong>also happen on the backend</strong>. Client-side validation can be bypassed.</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="step">
+                <h5>Type</h5>
+                <p class="mb-0">Allow only expected types such as JPEG, PNG and PDF.</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="step">
+                <h5>Size</h5>
+                <p class="mb-0">Reject files larger than the application's limit.</p>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-warning mt-4">
+            <strong>Security point:</strong> Do not trust only the file extension or browser MIME type. The backend should independently validate file type, size, filename handling and storage permissions.
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card main-card answer-section">
+        <div class="section-head red">9. Common Developer Mistakes</div>
+        <div class="card-body p-4">
+          <div class="alert mistake"><strong>1. Sending the File object as normal JSON</strong><br>A file upload normally uses <code>FormData</code> with a multipart request rather than <code>JSON.stringify(file)</code>.</div>
+          <div class="alert mistake"><strong>2. Manually setting multipart Content-Type</strong><br>With browser <code>fetch</code> and <code>FormData</code>, let the browser generate the multipart boundary.</div>
+          <div class="alert mistake"><strong>3. No file validation</strong><br>Always consider file type and size before upload, and validate again on the backend.</div>
+          <div class="alert mistake"><strong>4. No loading state</strong><br>The user should know that an upload is in progress and the button should normally be disabled during the request.</div>
+          <div class="alert mistake"><strong>5. No error handling</strong><br>Network errors and server errors should be handled and shown clearly.</div>
+          <div class="alert mistake"><strong>6. Assuming React stores the file permanently</strong><br>React only handles the browser-side file object. Permanent storage belongs to the backend or storage service.</div>
+          <div class="alert mistake"><strong>7. Forgetting to reset the input</strong><br>If the same file needs to be selected again, resetting the input value can be useful.</div>
+        </div>
+      </div>
+
+      <div id="interviewer" class="card main-card answer-section">
+        <div class="section-head purple">10. How I Would Explain My Implementation to the Interviewer</div>
+        <div class="card-body p-4">
+          <div class="alert interview">
+            <strong>Interview explanation:</strong>
+            <p class="mt-2 mb-0">“I implemented the file upload as a controlled workflow around the browser File API. First, I use an input of type file to let the user select a file. In the change handler, I get the File object and validate its type and size. I store the valid file in React state. When the user clicks Upload, I create a FormData object and append the file under the key ‘file’. I send that FormData to the backend using a POST request. I also added loading, success and error states so the UI clearly communicates the upload status. For security, I would repeat validation on the backend because client-side validation cannot be trusted.”</p>
+          </div>
+
+          <h5 class="mt-4">Explain the code in this order</h5>
+          <ol>
+            <li><strong>Input:</strong> “This is where the user selects a file.”</li>
+            <li><strong>State:</strong> “I store the selected file and UI states in React.”</li>
+            <li><strong>Validation:</strong> “I check type and maximum size.”</li>
+            <li><strong>FormData:</strong> “I package the file for a multipart request.”</li>
+            <li><strong>API:</strong> “I send it to the backend with POST.”</li>
+            <li><strong>UX:</strong> “I show Uploading, success and error states.”</li>
+            <li><strong>Security:</strong> “Backend validation is still required.”</li>
+          </ol>
+
+          <div class="alert alert-success mb-0">
+            <strong>Strong interview line:</strong> “The important part is not just selecting a file; it is handling the complete upload lifecycle: selection, validation, request creation, API submission, loading state, error handling and successful completion.”
+          </div>
+        </div>
+      </div>
+
+      <div id="followups" class="card main-card answer-section">
+        <div class="section-head orange">11. Common Follow-Up Questions</div>
+        <div class="card-body p-4">
+          <div class="accordion" id="questions">
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">Why do we use FormData?</button></h2>
+              <div id="q1" class="accordion-collapse collapse show"><div class="accordion-body">It provides a convenient way to construct multipart form data, including binary files, for an HTTP request.</div></div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">Can we upload multiple files?</button></h2>
+              <div id="q2" class="accordion-collapse collapse"><div class="accordion-body">Yes. Use <code>multiple</code> on the input and process <code>event.target.files</code>, which is a FileList.</div></div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">Can we show an image preview?</button></h2>
+              <div id="q3" class="accordion-collapse collapse"><div class="accordion-body">Yes. For images, <code>URL.createObjectURL(file)</code> can create a temporary preview URL. Remember to revoke object URLs when appropriate.</div></div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">Where is the file actually stored?</button></h2>
+              <div id="q4" class="accordion-collapse collapse"><div class="accordion-body">Usually on a backend server, object storage or another storage service. React only handles the browser-side selection and upload request.</div></div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">Why validate on the backend too?</button></h2>
+              <div id="q5" class="accordion-collapse collapse"><div class="accordion-body">Because users can bypass frontend JavaScript and send requests directly. Backend validation is required for security and correctness.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card main-card answer-section">
+        <div class="section-head dark">12. Quick Recap</div>
+        <div class="card-body p-4">
+          <table class="table table-bordered align-middle">
+            <tbody>
+              <tr><th>File selection</th><td><code>&lt;input type="file"&gt;</code></td></tr>
+              <tr><th>File object</th><td>Browser provides a <code>File</code> object.</td></tr>
+              <tr><th>State</th><td>React can store the selected file and upload status.</td></tr>
+              <tr><th>Validation</th><td>Check type and size on frontend and backend.</td></tr>
+              <tr><th>Request body</th><td>Use <code>FormData</code> for a normal multipart file upload.</td></tr>
+              <tr><th>API</th><td>Send the FormData to the backend using POST.</td></tr>
+              <tr><th>Storage</th><td>Backend/storage service stores the uploaded file.</td></tr>
+            </tbody>
+          </table>
+          <div class="alert alert-primary mb-0">
+            <strong>Final memory formula:</strong><br>
+            <code>File Input → File Object → Validate → FormData → POST API → Backend Storage → UI Response</code>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+  <small>React File Upload • Machine Coding Round Documentation • Bootstrap 5</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

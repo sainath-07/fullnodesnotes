@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interview Thinking Puzzles & Brain Teasers</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; color:#212529; }
+    .sticky-nav { position:sticky; top:0; z-index:1020; backdrop-filter:blur(8px); background:rgba(255,255,255,.94); border-bottom:1px solid #dee2e6; }
+    .doc-card { border:0; box-shadow:0 .35rem 1rem rgba(0,0,0,.08); margin-bottom:1.5rem; }
+    .card-header { font-weight:700; }
+    .question-number { min-width:42px; }
+    .diagram { background:#f8f9fa; border:1px dashed #adb5bd; border-radius:.5rem; padding:1rem; font-family:monospace; white-space:pre-wrap; }
+    .tip { border-left:4px solid #0d6efd; }
+    .tag { font-size:.78rem; }
+    section { scroll-margin-top:75px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-nav">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#top">🧠 Interview Thinking Puzzles</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#what">What are these?</a></li>
+        <li class="nav-item"><a class="nav-link" href="#approach">How to think</a></li>
+        <li class="nav-item"><a class="nav-link" href="#puzzles">Question bank</a></li>
+        <li class="nav-item"><a class="nav-link" href="#patterns">Patterns</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tips">Interview tips</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main id="top" class="container py-4">
+
+<section id="what">
+  <div class="card doc-card">
+    <div class="card-header bg-primary text-white">1. What are these questions called?</div>
+    <div class="card-body">
+      <h4>Logical / Lateral Thinking Puzzles</h4>
+      <p>The cake-cutting question you mentioned is commonly grouped under <strong>logic puzzles, brain teasers, lateral-thinking puzzles, mathematical puzzles, and interview puzzle questions</strong>.</p>
+      <div class="alert alert-info">
+        <strong>Important:</strong> There is no single official name for every puzzle in this family. Interviewers often use these questions to test problem solving rather than a particular programming language or data structure.
+      </div>
+      <p>For example, “cut a cake into 4 pieces in 2 tries” tests whether you can change the way you visualize the problem. A normal approach may think only about cuts from the top; a better approach considers cuts in three dimensions.</p>
+      <div class="diagram">Think beyond the obvious:
+
+2D thinking:       3D thinking:
+
+   \  |  /             ─────────
+    \ | /              ─────────
+  ────┼────            │  cake  │
+    / | \              ─────────
+   /  |  \                  │
+                            │
+
+The trick is often changing the model of the problem.</div>
+    </div>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="card doc-card">
+    <div class="card-header bg-success text-white">2. How to approach these puzzles</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6"><div class="card h-100 border-0 bg-light"><div class="card-body"><h5>① Clarify the rules</h5><p>Ask what counts as a cut, whether pieces can be moved, whether cuts must be straight, and whether dimensions matter.</p></div></div></div>
+        <div class="col-md-6"><div class="card h-100 border-0 bg-light"><div class="card-body"><h5>② Draw it</h5><p>Use a quick sketch. Many “impossible” puzzles become simple when represented visually.</p></div></div></div>
+        <div class="col-md-6"><div class="card h-100 border-0 bg-light"><div class="card-body"><h5>③ Challenge assumptions</h5><p>Ask yourself: “What am I assuming that the question never said?”</p></div></div></div>
+        <div class="col-md-6"><div class="card h-100 border-0 bg-light"><div class="card-body"><h5>④ Look for a different dimension</h5><p>Try time, space, ordering, grouping, probability, or an unusual interpretation.</p></div></div></div>
+      </div>
+      <div class="alert alert-warning mt-4 mb-0">
+        <strong>Interview habit:</strong> Don't jump straight to the answer. Explain your assumptions and thought process. The interviewer is often evaluating how you attack an unfamiliar problem.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="puzzles">
+  <div class="card doc-card">
+    <div class="card-header bg-dark text-white">3. Question Bank — Try These Before Looking Up Solutions</div>
+    <div class="card-body">
+      <p class="text-muted">The goal is not to memorize answers. Try each puzzle on paper first. The categories below overlap, because many good puzzles use more than one idea.</p>
+
+      <div class="accordion" id="puzzleAccordion">
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#p1">A. Cutting, Shapes & Spatial Thinking</button></h2>
+          <div id="p1" class="accordion-collapse collapse show" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol>
+              <li><strong>Cake into 4 pieces in 2 cuts:</strong> Cut a cake into four pieces using only two straight cuts. How?</li>
+              <li><strong>Cake into 8 pieces:</strong> What is the maximum number of pieces obtainable from a cake using three straight cuts?</li>
+              <li><strong>Pizza cuts:</strong> What is the maximum number of pizza pieces obtainable with n straight cuts, assuming every cut crosses previous cuts at different points?</li>
+              <li><strong>Chocolate bar:</strong> A rectangular chocolate bar has 24 squares. What is the minimum number of breaks needed to separate every square if you can stack pieces?</li>
+              <li><strong>Cube painting:</strong> A cube is painted on every outside face and then cut into 27 equal small cubes. How many small cubes have 3 painted faces? 2? 1? 0?</li>
+              <li><strong>Rope into shapes:</strong> With a fixed-length rope, how can you make different shapes with the same perimeter but different areas?</li>
+              <li><strong>Coin arrangement:</strong> Move a small number of coins to transform one geometric arrangement into another.</li>
+              <li><strong>Measure 3D volume:</strong> Using containers of fixed capacities, measure an exact target volume.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p2">B. Weighing, Balance & Minimum Attempts</button></h2>
+          <div id="p2" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="9">
+              <li><strong>12 coins:</strong> One of 12 coins is counterfeit and may be heavier or lighter. Find it in 3 balance-scale weighings.</li>
+              <li><strong>8 balls:</strong> One ball is heavier than the others. Find it with a balance scale in 2 weighings.</li>
+              <li><strong>9 balls:</strong> One ball is heavier. Find it in 2 weighings.</li>
+              <li><strong>Fake coin:</strong> Find the odd coin among N coins with the fewest weighings.</li>
+              <li><strong>1000 bottles:</strong> One bottle is poisoned. With a limited number of testers and one testing round, how can you identify it?</li>
+              <li><strong>Unequal weights:</strong> You have a set of weights and a balance scale. How can you represent as many integer weights as possible?</li>
+              <li><strong>Egg dropping:</strong> Given floors and eggs, determine the minimum number of drops needed to guarantee finding the critical floor.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p3">C. River Crossing & State-Transition Puzzles</button></h2>
+          <div id="p3" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="16">
+              <li><strong>Wolf, goat and cabbage:</strong> Move all three across a river without leaving forbidden pairs alone.</li>
+              <li><strong>Jealous husbands:</strong> Transport several couples across a river without violating the constraints.</li>
+              <li><strong>Bridge and torch:</strong> People with different crossing times must cross a bridge with one torch. Minimize total time.</li>
+              <li><strong>Missionaries and cannibals:</strong> Move everyone across while keeping each bank valid.</li>
+              <li><strong>Three explorers and three supplies:</strong> Design a sequence of legal transfers under capacity constraints.</li>
+              <li><strong>Two containers:</strong> Reach a target quantity using only fill, empty, and pour operations.</li>
+              <li><strong>Parking puzzle:</strong> Move objects through a constrained space using the fewest moves.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p4">D. Switches, Lamps & Deduction</button></h2>
+          <div id="p4" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="23">
+              <li><strong>Three switches, three bulbs:</strong> You are outside a room. Three switches control three bulbs inside. Enter the room only once. Match them.</li>
+              <li><strong>100 prisoners and switches:</strong> Design a strategy that eventually determines whether everyone has visited a room.</li>
+              <li><strong>100 doors:</strong> 100 doors are toggled according to a sequence of passes. Which doors remain open?</li>
+              <li><strong>Three boxes:</strong> All labels are wrong. You may inspect one item from one box. Correct all labels.</li>
+              <li><strong>Two ropes:</strong> Each rope takes exactly one hour to burn but burns unevenly. Measure 45 minutes.</li>
+              <li><strong>Light switches in a long corridor:</strong> Minimize trips while determining which switches control which lights.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p5">E. Probability & Expected-Value Thinking</button></h2>
+          <div id="p5" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="29">
+              <li><strong>Two children:</strong> A family has two children. Given one is a boy, what is the probability both are boys? Discuss the assumptions.</li>
+              <li><strong>Monty Hall:</strong> Three doors, one prize, two goats. After the host reveals a goat, should you switch?</li>
+              <li><strong>Birthday paradox:</strong> How many people are needed before two sharing a birthday becomes more likely than not?</li>
+              <li><strong>Two envelopes:</strong> You have two envelopes, one containing twice as much money as the other. Should you switch?</li>
+              <li><strong>Random coin:</strong> Design a fair coin-flip method using a biased coin.</li>
+              <li><strong>Dice probability:</strong> Compare different dice combinations and determine which produces a target sum more often.</li>
+              <li><strong>Expected waiting time:</strong> How long do you expect to wait before a particular sequence of coin flips appears?</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p6">F. Number & Mathematical Pattern Puzzles</button></h2>
+          <div id="p6" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="36">
+              <li><strong>Missing number:</strong> Find the missing number in a sequence, but justify the rule rather than guessing.</li>
+              <li><strong>100 prisoners / lockers:</strong> Find the mathematical pattern behind repeated toggling.</li>
+              <li><strong>Digital clock:</strong> Count how many times a certain digit or pattern appears in a day.</li>
+              <li><strong>Clock hands:</strong> How many times do the hour and minute hands overlap in 12 hours?</li>
+              <li><strong>Cutting a rope:</strong> Divide a rope into equal lengths with a minimum number of cuts under special constraints.</li>
+              <li><strong>Age puzzle:</strong> Infer ages from relationships between ages at different points in time.</li>
+              <li><strong>Train puzzle:</strong> Two trains move toward each other with different speeds. A fly travels between them. How far does the fly travel before they meet?</li>
+              <li><strong>Infinite hotel:</strong> Explain how an infinite hotel can accommodate more guests even when it is full.</li>
+              <li><strong>Chessboard grains:</strong> Double grains of rice on every square of a chessboard. How large does the number become?</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p7">G. Optimization & Minimum-Move Puzzles</button></h2>
+          <div id="p7" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="45">
+              <li><strong>Bridge and torch:</strong> Find the minimum total crossing time.</li>
+              <li><strong>Light bulb / switches:</strong> Find a strategy using the fewest visits.</li>
+              <li><strong>Minimum coins:</strong> Make an amount using the minimum number of coins.</li>
+              <li><strong>Minimum cuts:</strong> Divide an object into required pieces using the fewest cuts.</li>
+              <li><strong>Scheduling jobs:</strong> Arrange jobs to minimize total waiting time.</li>
+              <li><strong>Two eggs:</strong> Minimize worst-case attempts to find the critical floor.</li>
+              <li><strong>Traveling salesman:</strong> Visit every city once and return to the start with minimum total distance.</li>
+              <li><strong>Interval selection:</strong> Choose the maximum number of non-overlapping activities.</li>
+              <li><strong>Meeting room puzzle:</strong> Determine the minimum number of rooms needed for overlapping meetings.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p8">H. Recursion, Game & Strategy Puzzles</button></h2>
+          <div id="p8" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="54">
+              <li><strong>Tower of Hanoi:</strong> Move N disks between rods using the minimum number of moves.</li>
+              <li><strong>Nim game:</strong> Given piles of stones, determine whether the first player has a winning strategy.</li>
+              <li><strong>Take-away game:</strong> Players remove 1, 2, or 3 objects. Find winning positions.</li>
+              <li><strong>100 coins game:</strong> Players flip coins under a defined rule. Determine the winning strategy.</li>
+              <li><strong>Poisoned bottle strategy:</strong> Use binary states to identify one bad item.</li>
+              <li><strong>Prisoners and boxes:</strong> Find a strategy that gives prisoners a surprisingly high chance of success.</li>
+              <li><strong>Chessboard tiling:</strong> Can a board with specified squares removed be tiled with dominoes?</li>
+              <li><strong>Handshake puzzle:</strong> Determine possible numbers of handshakes under different constraints.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p9">I. Truth, Lies & Information Puzzles</button></h2>
+          <div id="p9" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="62">
+              <li><strong>Two guards, two doors:</strong> One always lies and one always tells the truth. Ask one question to find the safe door.</li>
+              <li><strong>Knights and knaves:</strong> Some people always tell the truth; others always lie. Determine identities from statements.</li>
+              <li><strong>One-question island:</strong> Find a question whose answer reveals the required information.</li>
+              <li><strong>Three people:</strong> Each person gives a statement about the others. Determine who is lying.</li>
+              <li><strong>Counterfeit label puzzle:</strong> Use the smallest number of questions to identify a hidden item.</li>
+              <li><strong>Yes/no oracle:</strong> Find a strategy to identify one object among many with binary questions.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p10">J. Algorithmic Puzzles That Lead to DSA</button></h2>
+          <div id="p10" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="68">
+              <li><strong>Find the duplicate:</strong> Find a duplicate number under memory constraints.</li>
+              <li><strong>Two sum:</strong> Find two numbers that add to a target.</li>
+              <li><strong>Maximum subarray:</strong> Find the contiguous subarray with maximum sum.</li>
+              <li><strong>Longest substring without repeats:</strong> Find the longest substring with unique characters.</li>
+              <li><strong>Merge intervals:</strong> Combine overlapping intervals.</li>
+              <li><strong>Meeting rooms:</strong> Determine whether all meetings can be attended.</li>
+              <li><strong>Trapping rain water:</strong> Calculate water trapped between bars.</li>
+              <li><strong>Product except self:</strong> Calculate each output without using division.</li>
+              <li><strong>Search rotated array:</strong> Search efficiently in a rotated sorted array.</li>
+              <li><strong>Top K elements:</strong> Find the K largest/smallest elements efficiently.</li>
+              <li><strong>Median of two sorted arrays:</strong> Find the median without merging both arrays.</li>
+              <li><strong>Word ladder:</strong> Transform one word to another using valid intermediate words with minimum steps.</li>
+            </ol>
+          </div></div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p11">K. Classic “Think Differently” Puzzles</button></h2>
+          <div id="p11" class="accordion-collapse collapse" data-bs-parent="#puzzleAccordion"><div class="accordion-body">
+            <ol start="80">
+              <li><strong>Barber puzzle:</strong> Identify the contradiction in a self-referential rule.</li>
+              <li><strong>Man in elevator:</strong> Explain a person's unusual elevator behavior from clues.</li>
+              <li><strong>Dead man in a field:</strong> Solve a mystery using apparently unrelated objects.</li>
+              <li><strong>Matchstick equations:</strong> Move one matchstick to make an equation correct.</li>
+              <li><strong>Matchstick shapes:</strong> Move a limited number of sticks to transform one shape into another.</li>
+              <li><strong>Two fathers and two sons:</strong> Three people go fishing and each catches one fish. How can that be?</li>
+              <li><strong>Surgeon puzzle:</strong> A surgeon says “this boy is my son” despite the stated family relationship. Explain.</li>
+              <li><strong>Calendar puzzle:</strong> Determine a date from a set of indirect clues.</li>
+              <li><strong>Clock without numbers:</strong> Estimate or determine time using only relationships between hands.</li>
+              <li><strong>Hotel bill puzzle:</strong> Find the apparent missing money and explain the accounting error.</li>
+            </ol>
+          </div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="patterns">
+  <div class="card doc-card">
+    <div class="card-header bg-info text-dark">4. Patterns Behind These Questions</div>
+    <div class="card-body">
+      <p>After solving many puzzles, you will notice that the same ideas repeat.</p>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light"><tr><th>Pattern</th><th>What to ask</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Change representation</td><td>Can I draw/model it differently?</td><td>Cake cuts, cube painting</td></tr>
+            <tr><td>Divide into groups</td><td>Can I split possibilities into equal groups?</td><td>8 balls, counterfeit coin</td></tr>
+            <tr><td>Binary information</td><td>Can each yes/no answer eliminate half the possibilities?</td><td>Poisoned bottle</td></tr>
+            <tr><td>State transitions</td><td>What states are possible after each move?</td><td>River crossing</td></tr>
+            <tr><td>Greedy choice</td><td>What locally best choice helps the global result?</td><td>Activity selection</td></tr>
+            <tr><td>Dynamic programming</td><td>Can I reuse answers to smaller versions?</td><td>Egg dropping, take-away games</td></tr>
+            <tr><td>Graph thinking</td><td>Can I represent things as nodes and connections?</td><td>Word ladder, travel problems</td></tr>
+            <tr><td>Invariants</td><td>What property never changes?</td><td>Chessboard tiling, parity puzzles</td></tr>
+            <tr><td>Counting</td><td>Can I count possibilities instead of trying each one?</td><td>Birthday paradox, handshakes</td></tr>
+            <tr><td>Constraint elimination</td><td>Which possibilities can I immediately rule out?</td><td>Logic-grid puzzles</td></tr>
+            <tr><td>Information theory</td><td>How much information does each move/question give?</td><td>Minimum weighing questions</td></tr>
+            <tr><td>Optimization</td><td>What is the minimum/maximum possible?</td><td>Minimum cuts, bridge and torch</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tips">
+  <div class="card doc-card">
+    <div class="card-header bg-warning text-dark">5. Interview Tips</div>
+    <div class="card-body">
+      <div class="alert alert-success">
+        <strong>Don't worry if you cannot solve it immediately.</strong> These questions are intentionally unfamiliar. Interviewers often care about how you explore the problem.
+      </div>
+      <ol>
+        <li>Restate the problem in your own words.</li>
+        <li>Ask about ambiguous rules.</li>
+        <li>Start with a small example.</li>
+        <li>Draw a picture or table.</li>
+        <li>Write down what is fixed and what can change.</li>
+        <li>Try the obvious solution first, then challenge it.</li>
+        <li>Look for symmetry, grouping, parity, binary choices, or repeated states.</li>
+        <li>Before optimizing, make sure the basic solution is correct.</li>
+        <li>Explain failed approaches instead of silently abandoning them.</li>
+        <li>When you find a trick, explain <em>why</em> it works.</li>
+      </ol>
+      <div class="card tip bg-light mt-3">
+        <div class="card-body">
+          <h5>🧠 A powerful checklist</h5>
+          <p class="mb-1"><strong>1.</strong> What are the rules?</p>
+          <p class="mb-1"><strong>2.</strong> What am I assuming?</p>
+          <p class="mb-1"><strong>3.</strong> Can I draw it?</p>
+          <p class="mb-1"><strong>4.</strong> Can I split the possibilities?</p>
+          <p class="mb-1"><strong>5.</strong> Can I work backwards?</p>
+          <p class="mb-1"><strong>6.</strong> Can I change the dimension or representation?</p>
+          <p class="mb-0"><strong>7.</strong> Is there an invariant or repeated state?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card doc-card">
+    <div class="card-header bg-secondary text-white">6. Suggested Learning Order</div>
+    <div class="card-body">
+      <p>If your goal is to become strong at interview problem solving, don't solve these randomly. Try this progression:</p>
+      <div class="row g-3">
+        <div class="col-md-3"><div class="p-3 border rounded h-100"><strong>Level 1</strong><br>Matchsticks<br>Two fathers/two sons<br>Three switches<br>Two ropes</div></div>
+        <div class="col-md-3"><div class="p-3 border rounded h-100"><strong>Level 2</strong><br>River crossing<br>8 balls<br>Water jug<br>100 doors</div></div>
+        <div class="col-md-3"><div class="p-3 border rounded h-100"><strong>Level 3</strong><br>Monty Hall<br>12 coins<br>Bridge & torch<br>Prisoners</div></div>
+        <div class="col-md-3"><div class="p-3 border rounded h-100"><strong>Level 4</strong><br>Egg dropping<br>Nim<br>Graph puzzles<br>Optimization problems</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-muted py-4">
+  <p class="mb-1">Interview Thinking Puzzles — Personal Practice Notes</p>
+  <small>Try to solve each problem before searching for its solution.</small>
+</footer>
+
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

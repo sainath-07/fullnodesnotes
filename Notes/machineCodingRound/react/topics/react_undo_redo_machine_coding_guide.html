@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Undo / Redo with React - Machine Coding Round Guide</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:#f4f6f9;color:#212529;line-height:1.7}
+.sticky-nav{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.main-card{border:0;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.08);overflow:hidden}
+.sidebar{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+.sidebar .list-group-item{border:0;padding:13px 16px}
+.sidebar .list-group-item:hover{background:#e9f1ff;color:#0d6efd}
+.answer-section{scroll-margin-top:90px;margin-bottom:30px}
+.section-head{color:#fff;padding:14px 20px;font-weight:700}
+.blue{background:#2563eb}.green{background:#198754}.orange{background:#fd7e14}
+.purple{background:#6f42c1}.dark{background:#212529}.red{background:#dc3545}.cyan{background:#0dcaf0;color:#052c35}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:12px;overflow-x:auto;font-size:.88rem}
+code{color:#d63384}pre code{color:inherit}
+.step{border:2px solid #dee2e6;border-radius:12px;padding:16px;text-align:center;height:100%;background:#fff}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:2rem;color:#2563eb}
+.interview{border-left:5px solid #0d6efd;background:#eef5ff}
+.mistake{border-left:5px solid #dc3545;background:#fff1f2}
+.success{border-left:5px solid #198754;background:#effcf6}
+.tip{border-left:5px solid #fd7e14;background:#fff8ef}
+.info{border-left:5px solid #0dcaf0;background:#effcff}
+.small-label{text-transform:uppercase;letter-spacing:1px;font-size:.75rem;color:#6c757d;font-weight:700}
+.stack{border:2px solid #adb5bd;border-radius:12px;background:#fff;padding:12px}
+.stack-item{border:1px solid #dee2e6;background:#f8f9fa;border-radius:8px;padding:9px;margin-top:7px}
+@media(max-width:991px){.sidebar{position:static;max-height:none;margin-bottom:20px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow">
+<div class="container-fluid px-4">
+<a class="navbar-brand fw-bold" href="#top">Undo / Redo</a>
+<span class="navbar-text text-white-50">React Machine Coding Round</span>
+</div>
+</nav>
+
+<header id="top" class="hero py-5">
+<div class="container">
+<div class="small-label text-white-50">React.js • Frontend Machine Coding</div>
+<h1 class="display-5 fw-bold">Undo / Redo with React</h1>
+<p class="lead mb-0">A practical interview guide using the history pattern to move backward and forward through previous application states.</p>
+</div>
+</header>
+
+<main class="container-fluid px-4 py-4">
+<div class="row g-4">
+
+<!-- LEFT SIDE -->
+<aside class="col-lg-3">
+<div class="card main-card sidebar">
+<div class="card-header bg-dark text-white fw-bold">Topics</div>
+<div class="list-group list-group-flush">
+<a class="list-group-item" href="#what">1. What is Undo/Redo?</a>
+<a class="list-group-item" href="#problem">2. What Problem Does It Resolve?</a>
+<a class="list-group-item" href="#why">3. Why Do We Need It?</a>
+<a class="list-group-item" href="#how">4. How Does It Work?</a>
+<a class="list-group-item" href="#visual">5. Visual Explanation</a>
+<a class="list-group-item" href="#concept">6. Core Concept: History</a>
+<a class="list-group-item" href="#requirements">7. Machine Coding Requirements</a>
+<a class="list-group-item" href="#fullcode">8. Full Code</a>
+<a class="list-group-item" href="#edge">9. Edge Cases</a>
+<a class="list-group-item" href="#mistakes">10. Common Developer Mistakes</a>
+<a class="list-group-item" href="#interviewer">11. Explain to Interviewer</a>
+<a class="list-group-item" href="#followups">12. Follow-up Questions</a>
+<a class="list-group-item" href="#recap">13. Quick Recap</a>
+</div>
+</div>
+</aside>
+
+<!-- RIGHT SIDE -->
+<section class="col-lg-9">
+
+<section id="what" class="card main-card answer-section">
+<div class="section-head blue">1. What is Undo / Redo?</div>
+<div class="card-body p-4">
+<p><strong>Definition:</strong> Undo/Redo is a state-history pattern that lets a user move backward to a previous state and forward again to a state that was undone.</p>
+<div class="alert alert-primary">
+<strong>Layman example:</strong> Imagine writing on paper and keeping a copy of every version after each change. If you make a mistake, you can go back to the previous copy. If you change your mind, you can move forward again.
+</div>
+<p>In React, we can implement this by keeping a <strong>history of states</strong> and maintaining a pointer to the current state.</p>
+<div class="row g-3 mt-3">
+<div class="col-md-3"><div class="step"><strong>Past</strong><br>Previous states</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>Present</strong><br>Current state</div></div>
+<div class="col-md-1 arrow">←</div>
+<div class="col-md-3"><div class="step"><strong>Future</strong><br>Redo states</div></div>
+</div>
+</div>
+</section>
+
+<section id="problem" class="card main-card answer-section">
+<div class="section-head green">2. What Problem Does Undo / Redo Resolve?</div>
+<div class="card-body p-4">
+<p>Users often make changes and then realize they want to reverse one or more of those changes.</p>
+<div class="row g-3">
+<div class="col-md-4"><div class="step"><strong>Text Editor</strong><br><small>Undo typing or deletion.</small></div></div>
+<div class="col-md-4"><div class="step"><strong>Drawing App</strong><br><small>Undo strokes and redo them.</small></div></div>
+<div class="col-md-4"><div class="step"><strong>Form Builder</strong><br><small>Restore earlier field changes.</small></div></div>
+<div class="col-md-4"><div class="step"><strong>Todo App</strong><br><small>Undo add/delete/update actions.</small></div></div>
+<div class="col-md-4"><div class="step"><strong>Design Tools</strong><br><small>Move through editing history.</small></div></div>
+<div class="col-md-4"><div class="step"><strong>Data Editor</strong><br><small>Reverse accidental changes.</small></div></div>
+</div>
+<div class="alert alert-success mt-4 mb-0"><strong>Problem solved:</strong> Users can safely experiment with changes because they have a way to return to earlier states.</div>
+</div>
+</section>
+
+<section id="why" class="card main-card answer-section">
+<div class="section-head purple">3. Why Do We Need Undo / Redo?</div>
+<div class="card-body p-4">
+<ul>
+<li>Improves user control over editing.</li>
+<li>Allows accidental changes to be reversed.</li>
+<li>Lets users experiment without fear of permanently losing earlier work.</li>
+<li>Provides a familiar editing experience.</li>
+<li>Can be implemented with a reusable state-history pattern.</li>
+</ul>
+<div class="tip p-3">
+<strong>Machine-coding expectation:</strong> The interviewer is usually looking for correct state management, a clear history model, proper handling of new changes after undo, and disabled states for unavailable actions.
+</div>
+</div>
+</section>
+
+<section id="how" class="card main-card answer-section">
+<div class="section-head orange">4. How Does Undo / Redo Work?</div>
+<div class="card-body p-4">
+<p>The simplest mental model is <strong>Past → Present → Future</strong>.</p>
+<ol>
+<li><strong>Past:</strong> States before the current state.</li>
+<li><strong>Present:</strong> The state currently displayed.</li>
+<li><strong>Future:</strong> States available through Redo.</li>
+</ol>
+
+<h5 class="mt-4">When a new change happens</h5>
+<p>Add the new state after the current state and discard the old future states.</p>
+
+<h5 class="mt-4">When Undo happens</h5>
+<p>Move one position backward in history.</p>
+
+<h5 class="mt-4">When Redo happens</h5>
+<p>Move one position forward in history.</p>
+
+<div class="alert alert-info">
+<strong>Important rule:</strong> If the user performs Undo and then makes a brand-new change, the old Redo history should normally be removed because that future branch no longer represents the current editing path.
+</div>
+</div>
+</section>
+
+<section id="visual" class="card main-card answer-section">
+<div class="section-head blue">5. Visual Explanation — Step by Step</div>
+<div class="card-body p-4">
+<h5>Initial state</h5>
+<div class="row g-2">
+<div class="col-md-3"><div class="step"><strong>A</strong><br>Initial</div></div>
+<div class="col-md-9 d-flex align-items-center"><span class="badge text-bg-primary">Current index = 0</span></div>
+</div>
+
+<h5 class="mt-4">User makes changes</h5>
+<div class="row g-2 align-items-center">
+<div class="col-md-2"><div class="step">A</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">B</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">C</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">D<br><small>Present</small></div></div>
+</div>
+
+<h5 class="mt-4">User clicks Undo</h5>
+<div class="row g-2 align-items-center">
+<div class="col-md-2"><div class="step">A</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">B</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">C<br><small>Present</small></div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">D<br><small>Redo available</small></div></div>
+</div>
+
+<h5 class="mt-4">User clicks Redo</h5>
+<div class="row g-2 align-items-center">
+<div class="col-md-2"><div class="step">A</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">B</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step">C</div></div><div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>D</strong><br><small>Present again</small></div></div>
+</div>
+
+<div class="alert alert-primary mt-4 mb-0"><strong>Memory formula:</strong> <code>New Change → Add History → Undo = index - 1 → Redo = index + 1</code></div>
+</div>
+</section>
+
+<section id="concept" class="card main-card answer-section">
+<div class="section-head cyan">6. Core Concept — History + Current Index</div>
+<div class="card-body p-4">
+<p>A clean implementation can keep two important pieces of information:</p>
+<div class="row g-3">
+<div class="col-md-6">
+<div class="step">
+<h5>history</h5>
+<p class="mb-0">An array containing every state in the current editing path.</p>
+</div>
+</div>
+<div class="col-md-6">
+<div class="step">
+<h5>currentIndex</h5>
+<p class="mb-0">The position of the state currently displayed.</p>
+</div>
+</div>
+</div>
+
+<h5 class="mt-4">Example</h5>
+<pre><code>history = ["Hello", "Hello World", "Hello World!"]
+currentIndex = 2</code></pre>
+
+<p>Here, <code>"Hello World!"</code> is the present state. Undo changes the index to <code>1</code>, while Redo can move it back to <code>2</code>.</p>
+
+<div class="stack mt-4">
+<strong>History Stack</strong>
+<div class="stack-item">Index 0 → "Hello"</div>
+<div class="stack-item">Index 1 → "Hello World"</div>
+<div class="stack-item">Index 2 → "Hello World!" ← Current</div>
+</div>
+</div>
+</section>
+
+<section id="requirements" class="card main-card answer-section">
+<div class="section-head green">7. Machine Coding Requirements</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Basic Version</h5>
+<ul class="mb-0">
+<li>Text input or textarea.</li>
+<li>Undo button.</li>
+<li>Redo button.</li>
+<li>Show current value.</li>
+<li>Disable Undo when no past state exists.</li>
+<li>Disable Redo when no future state exists.</li>
+</ul>
+</div></div>
+</div>
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Interview-Ready Version</h5>
+<ul class="mb-0">
+<li>History management.</li>
+<li>New branch clears Redo history.</li>
+<li>Buttons update correctly.</li>
+<li>Reset support.</li>
+<li>Clear explanation of time/space trade-offs.</li>
+<li>Reusable hook possibility.</li>
+</ul>
+</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="card main-card answer-section">
+<div class="section-head dark">8. Full React Code</div>
+<div class="card-body p-4">
+<p>This implementation creates a small text editor with Undo, Redo and Reset.</p>
+
+<h5>UndoRedoEditor.jsx</h5>
+<pre><code>import { useState } from "react";
+
+function UndoRedoEditor() {
+  const [history, setHistory] = useState([""]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const currentValue = history[currentIndex];
+
+  const handleChange = (event) =&gt; {
+    const newValue = event.target.value;
+
+    // Remove the future states after the current position.
+    const newHistory = history.slice(0, currentIndex + 1);
+
+    // Add the new state.
+    newHistory.push(newValue);
+
+    setHistory(newHistory);
+    setCurrentIndex(newHistory.length - 1);
+  };
+
+  const handleUndo = () =&gt; {
+    if (currentIndex === 0) {
+      return;
+    }
+
+    setCurrentIndex((index) =&gt; index - 1);
+  };
+
+  const handleRedo = () =&gt; {
+    if (currentIndex === history.length - 1) {
+      return;
+    }
+
+    setCurrentIndex((index) =&gt; index + 1);
+  };
+
+  const handleReset = () =&gt; {
+    setHistory([""]);
+    setCurrentIndex(0);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Undo / Redo Editor&lt;/h2&gt;
+
+      &lt;textarea
+        value={currentValue}
+        onChange={handleChange}
+        rows={8}
+        placeholder="Start typing..."
+      /&gt;
+
+      &lt;div&gt;
+        &lt;button
+          onClick={handleUndo}
+          disabled={currentIndex === 0}
+        &gt;
+          Undo
+        &lt;/button&gt;
+
+        &lt;button
+          onClick={handleRedo}
+          disabled={currentIndex === history.length - 1}
+        &gt;
+          Redo
+        &lt;/button&gt;
+
+        &lt;button onClick={handleReset}&gt;
+          Reset
+        &lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;p&gt;
+        History size: {history.length}
+      &lt;/p&gt;
+
+      &lt;p&gt;
+        Current index: {currentIndex}
+      &lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default UndoRedoEditor;</code></pre>
+
+<div class="alert alert-success mt-4">
+<strong>Key line for the interview:</strong>
+<code>history.slice(0, currentIndex + 1)</code> removes the future branch before adding a new change.
+</div>
+
+<h5 class="mt-4">Why does that line matter?</h5>
+<pre><code>History:  A → B → C → D
+                    ↑
+                 Current
+
+Undo:
+History:  A → B → C → D
+                 ↑
+              Current
+
+New change: E
+
+Correct:
+History:  A → B → C → E
+
+The old D branch is discarded.</code></pre>
+</div>
+</section>
+
+<section id="edge" class="card main-card answer-section">
+<div class="section-head orange">9. Important Edge Cases</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-6"><div class="step"><strong>Undo at first state</strong><br>Do nothing. Keep index at 0.</div></div>
+<div class="col-md-6"><div class="step"><strong>Redo at latest state</strong><br>Do nothing. Keep index at the last position.</div></div>
+<div class="col-md-6"><div class="step"><strong>Undo → New Change</strong><br>Clear future/Redo states.</div></div>
+<div class="col-md-6"><div class="step"><strong>Reset</strong><br>Replace history with the initial state.</div></div>
+</div>
+
+<h5 class="mt-4">Complexity</h5>
+<table class="table table-bordered">
+<thead class="table-dark"><tr><th>Operation</th><th>Typical cost in this implementation</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Undo</td><td>O(1)</td><td>Only the index changes.</td></tr>
+<tr><td>Redo</td><td>O(1)</td><td>Only the index changes.</td></tr>
+<tr><td>Read current state</td><td>O(1)</td><td>Access by index.</td></tr>
+<tr><td>New change</td><td>O(n) worst case</td><td><code>slice()</code> copies part of the history array.</td></tr>
+<tr><td>Space</td><td>O(n)</td><td>Previous states are retained.</td></tr>
+</tbody>
+</table>
+<div class="alert alert-info mb-0"><strong>Interview note:</strong> For very large documents or high-frequency changes, storing a full snapshot for every keystroke can consume significant memory. Production editors may use batching, command history, patches/diffs or specialized history structures.</div>
+</div>
+</section>
+
+<section id="mistakes" class="card main-card answer-section">
+<div class="section-head red">10. Common Developer Mistakes</div>
+<div class="card-body p-4">
+<div class="alert mistake"><strong>1. Not clearing Redo history after a new change</strong><br>After Undo, if the user creates a new state, the old future branch should normally be discarded.</div>
+<div class="alert mistake"><strong>2. Allowing Undo below the first state</strong><br>Always prevent the index from becoming negative.</div>
+<div class="alert mistake"><strong>3. Allowing Redo beyond the latest state</strong><br>Check whether the current index is already at the last history item.</div>
+<div class="alert mistake"><strong>4. Mutating the history array directly</strong><br>React state should be updated immutably. Use operations such as <code>slice()</code> and create a new array.</div>
+<div class="alert mistake"><strong>5. Storing only the previous value</strong><br>One previous value is not enough for multiple Undo operations. You need a history of states or commands.</div>
+<div class="alert mistake"><strong>6. Saving every keystroke without considering memory</strong><br>A large editor can create a very large history. Consider debouncing, batching or a command/patch strategy when appropriate.</div>
+<div class="alert mistake"><strong>7. Using stale state incorrectly</strong><br>When the next state depends on the previous state, use React's functional state update form where appropriate.</div>
+</div>
+</section>
+
+<section id="interviewer" class="card main-card answer-section">
+<div class="section-head purple">11. How I Would Explain My Implementation to the Interviewer</div>
+<div class="card-body p-4">
+<div class="alert interview">
+<strong>Interview explanation:</strong>
+<p class="mt-2 mb-0">“I implemented Undo and Redo using a history array and a current index. Every valid change creates a new state and moves the current index to that state. Undo moves the index one step backward, while Redo moves it one step forward. An important case is when the user performs Undo and then makes a new change. In that case, I remove the old future states before adding the new state, because the previous Redo branch is no longer valid. I also disable Undo and Redo when movement is not possible.”</p>
+</div>
+
+<h5 class="mt-4">Explain the implementation in this order</h5>
+<ol>
+<li><strong>State:</strong> “I maintain history and currentIndex.”</li>
+<li><strong>Current value:</strong> “The displayed value comes from history[currentIndex].”</li>
+<li><strong>New change:</strong> “I remove future states and append the new state.”</li>
+<li><strong>Undo:</strong> “I decrement the index if possible.”</li>
+<li><strong>Redo:</strong> “I increment the index if possible.”</li>
+<li><strong>Reset:</strong> “I replace the history with the initial state.”</li>
+<li><strong>Edge cases:</strong> “I prevent moving outside the history boundaries.”</li>
+<li><strong>Complexity:</strong> “Undo and Redo are O(1), while storing snapshots uses O(n) space.”</li>
+</ol>
+
+<div class="alert alert-success mb-0">
+<strong>Strong interview line:</strong> “The core of Undo/Redo is not two buttons; it is maintaining a correct state history and a pointer to the current state.”
+</div>
+</div>
+</section>
+
+<section id="followups" class="card main-card answer-section">
+<div class="section-head blue">12. Common Follow-Up Questions</div>
+<div class="card-body p-4">
+<div class="accordion" id="questions">
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">Why do we need a currentIndex?</button></h2>
+<div id="q1" class="accordion-collapse collapse show"><div class="accordion-body">It tells us which state in the history array is currently active. It lets Undo and Redo move through the same history without deleting states immediately.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">Why clear Redo history after a new change?</button></h2>
+<div id="q2" class="accordion-collapse collapse"><div class="accordion-body">Because a new edit creates a new branch from the current state. The previous future states belong to the old branch.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">Can we implement Undo/Redo with two stacks?</button></h2>
+<div id="q3" class="accordion-collapse collapse"><div class="accordion-body">Yes. A common design uses a past stack and a future stack. New changes clear the future stack; Undo moves a state from past to future; Redo moves it back.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">How can this be optimized for a large editor?</button></h2>
+<div id="q4" class="accordion-collapse collapse"><div class="accordion-body">Instead of storing a full snapshot for every small change, use batching, debouncing, commands, patches/diffs or another history representation depending on the application.</div></div>
+</div>
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">Can Undo/Redo be extracted into a custom hook?</button></h2>
+<div id="q5" class="accordion-collapse collapse"><div class="accordion-body">Yes. A reusable <code>useUndoRedo</code> hook can encapsulate history, current index, undo, redo, reset and state-update logic.</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="recap" class="card main-card answer-section">
+<div class="section-head dark">13. Quick Recap</div>
+<div class="card-body p-4">
+<table class="table table-bordered align-middle">
+<tbody>
+<tr><th>History</th><td>Stores previous and current states.</td></tr>
+<tr><th>Current index</th><td>Points to the state currently displayed.</td></tr>
+<tr><th>Undo</th><td>Move one position backward.</td></tr>
+<tr><th>Redo</th><td>Move one position forward.</td></tr>
+<tr><th>New change after Undo</th><td>Remove future states and create a new branch.</td></tr>
+<tr><th>Boundary handling</th><td>Do not move before index 0 or beyond the last index.</td></tr>
+<tr><th>Space</th><td>Snapshot history uses O(n) space relative to the number/size of stored states.</td></tr>
+</tbody>
+</table>
+<div class="alert alert-primary mb-0">
+<strong>Final memory formula:</strong><br>
+<code>History + Current Index → New State → Undo(index - 1) → Redo(index + 1) → New Edit Clears Future</code>
+</div>
+</div>
+</section>
+
+</section>
+</div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+<small>Undo / Redo with React • Machine Coding Round Documentation • Bootstrap 5</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

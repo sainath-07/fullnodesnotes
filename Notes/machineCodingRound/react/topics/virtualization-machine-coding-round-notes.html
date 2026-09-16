@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtualization — React Machine Coding Round Notes</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#1f2937}
+.sticky-nav{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.doc-card{border:0;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.08);overflow:hidden}
+.card-header-custom{font-weight:700}
+.left-panel{position:sticky;top:82px;max-height:calc(100vh - 100px);overflow:auto}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:12px;overflow:auto;font-size:.88rem;line-height:1.55}
+code{color:#b91c1c} pre code{color:inherit}
+.step{border-left:4px solid #2563eb;padding:13px 16px;background:#fff;border-radius:10px;margin-bottom:10px}
+.flow-box{border:2px dashed #93c5fd;background:#eff6ff;border-radius:12px;padding:15px;text-align:center;height:100%}
+.arrow{text-align:center;font-size:1.5rem;font-weight:700}
+.mistake{border-left:4px solid #dc3545}
+.good{border-left:4px solid #198754}
+.tip{border-left:4px solid #f59e0b}
+.small-muted{color:#6b7280}
+.virtual-window{height:250px;overflow:hidden;border:3px solid #2563eb;border-radius:12px;background:#fff;position:relative}
+.item{height:42px;border-bottom:1px solid #ddd;padding:9px 14px;background:#f8fafc}
+.window-label{position:absolute;right:8px;top:8px;background:#2563eb;color:#fff;padding:5px 9px;border-radius:6px;font-size:.75rem;z-index:2}
+@media(max-width:991px){.left-panel{position:static;max-height:none}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-nav shadow">
+<div class="container-fluid px-4">
+<a class="navbar-brand fw-bold" href="#">React Machine Coding Notes</a>
+<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+<div class="collapse navbar-collapse" id="nav">
+<ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link" href="#what">What</a></li>
+<li class="nav-item"><a class="nav-link" href="#why">Why</a></li>
+<li class="nav-item"><a class="nav-link" href="#how">How</a></li>
+<li class="nav-item"><a class="nav-link" href="#visual">Visual Flow</a></li>
+<li class="nav-item"><a class="nav-link" href="#code">Full Code</a></li>
+<li class="nav-item"><a class="nav-link" href="#mistakes">Mistakes</a></li>
+<li class="nav-item"><a class="nav-link" href="#interview">Interview</a></li>
+</ul>
+</div>
+</div>
+</nav>
+
+<header class="hero py-5">
+<div class="container">
+<span class="badge bg-light text-primary mb-3">React • Machine Coding Round</span>
+<h1 class="display-6 fw-bold">Virtualization</h1>
+<p class="lead mb-0">Interview-ready notes for rendering very large lists efficiently by keeping only the visible items in the DOM.</p>
+</div>
+</header>
+
+<main class="container-fluid px-3 px-lg-4 py-4">
+<div class="row g-4">
+
+<!-- LEFT SIDE -->
+<aside class="col-lg-4">
+<div class="left-panel">
+
+<section class="card doc-card mb-4" id="what">
+<div class="card-header bg-primary text-white card-header-custom">LEFT — What is Virtualization?</div>
+<div class="card-body">
+<p><strong>Virtualization</strong> is a performance technique where a UI renders only the items that are currently visible, plus a small buffer around them, instead of rendering every item in a huge list.</p>
+<div class="alert alert-info"><strong>Simple idea:</strong> “If I have 100,000 rows, I don't need 100,000 DOM elements. I only need the rows the user can see.”</div>
+<p>It is also called <strong>windowing</strong> because the UI creates a small “window” into a much larger dataset.</p>
+</div>
+</section>
+
+<section class="card doc-card mb-4" id="why">
+<div class="card-header bg-success text-white card-header-custom">LEFT — Why is Virtualization Important?</div>
+<div class="card-body">
+<ul>
+<li>Reduces the number of DOM nodes.</li>
+<li>Reduces initial rendering work.</li>
+<li>Reduces memory usage for very large lists.</li>
+<li>Reduces the amount of React work needed when updating the visible list.</li>
+<li>Makes large tables, feeds and dropdowns more usable.</li>
+<li>Helps prevent the browser from struggling with thousands of mounted elements.</li>
+</ul>
+<div class="alert alert-warning mb-0"><strong>Important:</strong> Pagination reduces how much data you fetch. Virtualization reduces how many of those loaded items you render at once. They solve different problems and can be used together.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-dark text-white card-header-custom">LEFT — What Problem Does It Solve?</div>
+<div class="card-body">
+<p>Imagine:</p>
+<pre><code>100,000 products
+        ↓
+100,000 React elements
+        ↓
+100,000 DOM nodes
+        ↓
+Large memory + rendering cost
+        ↓
+Slow UI</code></pre>
+<p>With virtualization:</p>
+<pre><code>100,000 products
+        ↓
+Calculate visible range
+        ↓
+Render only ~20–50 rows
+        ↓
+User scrolls
+        ↓
+Replace visible rows with new rows</code></pre>
+</div>
+</section>
+
+<section class="card doc-card mb-4" id="how">
+<div class="card-header bg-info text-dark card-header-custom">LEFT — How Does Virtualization Work?</div>
+<div class="card-body">
+<ol>
+<li>Know the total number of items.</li>
+<li>Know or estimate the height of each row.</li>
+<li>Track the scroll position.</li>
+<li>Calculate which indexes are visible.</li>
+<li>Render only those indexes.</li>
+<li>Create a large scrollable area so the scrollbar still represents the full list.</li>
+<li>Move the visible rows to their correct visual position.</li>
+<li>Repeat when the user scrolls.</li>
+</ol>
+<div class="alert alert-success mb-0"><strong>Core formula for fixed-height rows:</strong><br><code>startIndex = floor(scrollTop / itemHeight)</code></div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-warning text-dark card-header-custom">LEFT — When Should I Use Virtualization?</div>
+<div class="card-body">
+<ul>
+<li>Thousands of table rows</li>
+<li>Large product lists</li>
+<li>Large chat/message histories</li>
+<li>File managers</li>
+<li>Activity feeds</li>
+<li>Large dropdowns/autocomplete results</li>
+<li>Data-heavy dashboards</li>
+</ul>
+<div class="alert alert-danger mb-0"><strong>Don't use it automatically.</strong> A list with 30 items usually does not need virtualization.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-secondary text-white card-header-custom">LEFT — Common Interview Questions</div>
+<div class="card-body">
+<ul>
+<li>What is virtualization?</li>
+<li>Why is virtualization needed?</li>
+<li>How does windowing work?</li>
+<li>What is the difference between virtualization and pagination?</li>
+<li>How do you calculate the visible items?</li>
+<li>Why do we need a spacer/container with a large height?</li>
+<li>What is overscan?</li>
+<li>How do variable-height rows make virtualization harder?</li>
+<li>Can virtualization and infinite scrolling be used together?</li>
+</ul>
+</div>
+</section>
+
+<section class="card doc-card mb-4" id="mistakes">
+<div class="card-header bg-danger text-white card-header-custom">LEFT — Common Developer Mistakes</div>
+<div class="card-body">
+<ol>
+<li>Rendering the complete huge array and calling it virtualization.</li>
+<li>Not creating enough scrollable space, causing the scrollbar to represent only the rendered items.</li>
+<li>Calculating visible indexes incorrectly.</li>
+<li>Forgetting a buffer/overscan, causing blank gaps during fast scrolling.</li>
+<li>Using array indexes as keys when items have stable IDs.</li>
+<li>Assuming every row has the same height when the UI actually has variable heights.</li>
+<li>Doing expensive work on every scroll event without optimization.</li>
+<li>Using virtualization for small lists where the complexity is unnecessary.</li>
+<li>Confusing virtualization with lazy loading or pagination.</li>
+<li>Ignoring accessibility and keyboard navigation.</li>
+</ol>
+</div>
+</section>
+
+<section class="card doc-card mb-4" id="interview">
+<div class="card-header bg-dark text-white card-header-custom">LEFT — How I Would Explain It to the Interviewer</div>
+<div class="card-body">
+<div class="alert alert-light border">
+“I would use virtualization when a list contains a very large number of items. Instead of mounting every item in the DOM, I calculate the visible range from the scroll position and row height and render only that range plus an overscan buffer. I keep a spacer with the total list height so the scrollbar behaves as if the whole list is rendered. As the user scrolls, I update the visible range. This reduces DOM nodes, memory usage and rendering work.”
+</div>
+<div class="alert alert-warning mb-0"><strong>Strong interview point:</strong> “Virtualization is about rendering fewer UI elements, not fetching less data.”</div>
+</div>
+</section>
+
+</div>
+</aside>
+
+<!-- RIGHT SIDE -->
+<section class="col-lg-8">
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-primary text-white card-header-custom">RIGHT — Selected Related Answer: Virtualization vs Pagination vs Lazy Loading</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Technique</th><th>Main goal</th><th>What it reduces</th></tr></thead>
+<tbody>
+<tr><td><strong>Virtualization</strong></td><td>Render only visible items</td><td>DOM/rendering/memory work</td></tr>
+<tr><td><strong>Pagination</strong></td><td>Fetch data in pages</td><td>Network/data volume</td></tr>
+<tr><td><strong>Lazy Loading</strong></td><td>Load code/content when needed</td><td>Initial loading work</td></tr>
+<tr><td><strong>Infinite Scrolling</strong></td><td>Load more data as the user reaches the end</td><td>Initial data fetch</td></tr>
+</tbody>
+</table>
+<div class="alert alert-success mb-0"><strong>They can work together:</strong> Infinite scrolling can fetch pages, while virtualization renders only the visible portion of the already-loaded items.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4" id="visual">
+<div class="card-header bg-info text-dark card-header-custom">RIGHT — Visual Explanation</div>
+<div class="card-body">
+<div class="row g-3 align-items-center">
+<div class="col-md-4"><div class="flow-box"><strong>100,000 items</strong><br>Data exists<br><small>But don't mount all of it</small></div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="flow-box"><strong>Scroll position</strong><br><code>scrollTop</code></div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="flow-box"><strong>Calculate range</strong><br>start + end index</div></div>
+</div>
+<div class="arrow my-3">↓</div>
+
+<div class="virtual-window">
+<div class="window-label">VISIBLE WINDOW</div>
+<div class="item">Item 10</div>
+<div class="item">Item 11</div>
+<div class="item">Item 12</div>
+<div class="item">Item 13</div>
+<div class="item">Item 14</div>
+<div class="item">Item 15</div>
+</div>
+
+<div class="arrow my-3">↓</div>
+<div class="row g-3">
+<div class="col-md-4"><div class="flow-box"><strong>Render visible rows</strong><br>Example: 10–15</div></div>
+<div class="col-md-4"><div class="flow-box"><strong>Overscan</strong><br>Also render nearby rows</div></div>
+<div class="col-md-4"><div class="flow-box"><strong>Scroll again</strong><br>Calculate a new range</div></div>
+</div>
+<div class="alert alert-success mt-4 mb-0"><strong>Simple picture:</strong> The dataset can be huge, but the DOM contains only a small moving window of rows.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-dark text-white card-header-custom">RIGHT — Step-by-Step Working</div>
+<div class="card-body">
+<div class="step"><strong>Step 1 — Full dataset:</strong> Suppose there are 10,000 items.</div>
+<div class="step"><strong>Step 2 — Fixed row height:</strong> Suppose each row is 50px.</div>
+<div class="step"><strong>Step 3 — Viewport:</strong> The container is 500px tall, so roughly 10 rows fit.</div>
+<div class="step"><strong>Step 4 — Scroll:</strong> If <code>scrollTop = 1000</code>, then <code>1000 / 50 = 20</code>, so the visible area starts around item 20.</div>
+<div class="step"><strong>Step 5 — Overscan:</strong> Render a few rows before and after the visible range.</div>
+<div class="step"><strong>Step 6 — Position:</strong> Use a spacer/transform so those few rows appear at the correct position in the large virtual list.</div>
+<div class="step"><strong>Step 7 — Repeat:</strong> On scroll, calculate a new range and render the new window.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4" id="code">
+<div class="card-header bg-warning text-dark card-header-custom">RIGHT — Full React Machine-Coding Example</div>
+<div class="card-body">
+<p>This implementation demonstrates the core virtualization algorithm using fixed-height rows. It intentionally avoids a third-party library so you can explain the mechanics in an interview.</p>
+
+<pre><code>import React, { useMemo, useState } from "react";
+
+const ITEM_HEIGHT = 50;
+const CONTAINER_HEIGHT = 500;
+const OVERSCAN = 5;
+
+const items = Array.from(
+  { length: 10000 },
+  (_, index) =&gt; ({
+    id: index + 1,
+    name: `Item ${index + 1}`,
+  })
+);
+
+function VirtualList() {
+  const [scrollTop, setScrollTop] = useState(0);
+
+  // How many items can fit inside the viewport?
+  const visibleCount = Math.ceil(
+    CONTAINER_HEIGHT / ITEM_HEIGHT
+  );
+
+  // Find the first item that should appear near the viewport.
+  const firstVisibleIndex = Math.floor(
+    scrollTop / ITEM_HEIGHT
+  );
+
+  // Render a few extra items before the viewport.
+  // This is called overscan and helps prevent blank gaps
+  // during fast scrolling.
+  const startIndex = Math.max(
+    0,
+    firstVisibleIndex - OVERSCAN
+  );
+
+  // Render extra items after the viewport as well.
+  const endIndex = Math.min(
+    items.length,
+    firstVisibleIndex + visibleCount + OVERSCAN
+  );
+
+  // Only this small slice is rendered.
+  const visibleItems = useMemo(
+    () =&gt; items.slice(startIndex, endIndex),
+    [startIndex, endIndex]
+  );
+
+  const totalHeight = items.length * ITEM_HEIGHT;
+
+  return (
+    &lt;div
+      style={{
+        height: CONTAINER_HEIGHT,
+        overflowY: "auto",
+        border: "1px solid #ccc",
+      }}
+      onScroll={(event) =&gt; {
+        setScrollTop(event.currentTarget.scrollTop);
+      }}
+    &gt;
+      {/*
+        This element represents the height of the complete list.
+        The browser therefore gives us a scrollbar for all items
+        even though only a small slice is mounted.
+      */}
+      &lt;div
+        style={{
+          height: totalHeight,
+          position: "relative",
+        }}
+      &gt;
+        {visibleItems.map((item, index) =&gt; {
+          const actualIndex = startIndex + index;
+
+          return (
+            &lt;div
+              key={item.id}
+              style={{
+                position: "absolute",
+
+                // Place the virtual row at its real position
+                // inside the complete virtual list.
+                top: actualIndex * ITEM_HEIGHT,
+
+                height: ITEM_HEIGHT,
+                width: "100%",
+                boxSizing: "border-box",
+                borderBottom: "1px solid #ddd",
+                padding: "14px",
+                background: "#fff",
+              }}
+            &gt;
+              {item.name}
+            &lt;/div&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default VirtualList;</code></pre>
+
+<div class="alert alert-info">
+<strong>Important:</strong> This is the core algorithm, not a production-grade virtualization library. Real applications may need support for variable row heights, keyboard navigation, accessibility, resize handling, horizontal lists, sticky rows, and more.
+</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-success text-white card-header-custom">RIGHT — Understand the Most Important Code</div>
+<div class="card-body">
+<h6 class="fw-bold">1. Calculate visible index</h6>
+<pre><code>const firstVisibleIndex =
+  Math.floor(scrollTop / ITEM_HEIGHT);</code></pre>
+<p>If:</p>
+<pre><code>scrollTop = 1000
+ITEM_HEIGHT = 50
+
+1000 / 50 = 20
+
+firstVisibleIndex = 20</code></pre>
+
+<h6 class="fw-bold mt-4">2. Add overscan</h6>
+<pre><code>const startIndex =
+  Math.max(0, firstVisibleIndex - OVERSCAN);
+
+const endIndex =
+  Math.min(
+    items.length,
+    firstVisibleIndex + visibleCount + OVERSCAN
+  );</code></pre>
+<p class="small-muted">Overscan means rendering a few extra rows outside the visible viewport so fast scrolling does not reveal blank areas.</p>
+
+<h6 class="fw-bold mt-4">3. Render only the slice</h6>
+<pre><code>items.slice(startIndex, endIndex)</code></pre>
+<p class="mb-0">If there are 10,000 items but only 20–30 are needed, React renders only those 20–30.</p>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-primary text-white card-header-custom">RIGHT — Why Do We Need the Large Spacer?</div>
+<div class="card-body">
+<p>A common question in interviews is:</p>
+<div class="alert alert-light border"><strong>“If you're rendering only 20 items, how does the scrollbar know that there are 10,000?”</strong></div>
+<p>We create a container whose height represents the complete virtual list:</p>
+<pre><code>const totalHeight =
+  items.length * ITEM_HEIGHT;</code></pre>
+<p>For 10,000 items at 50px:</p>
+<pre><code>10,000 × 50
+= 500,000px</code></pre>
+<p>Then the visible rows are positioned inside that large virtual space.</p>
+<div class="alert alert-success mb-0"><strong>Result:</strong> The browser thinks the scrollable area is huge, while React mounts only a small number of actual rows.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-secondary text-white card-header-custom">RIGHT — What is Overscan?</div>
+<div class="card-body">
+<p><strong>Overscan</strong> means rendering a few extra items before and after the visible area.</p>
+<div class="row g-3 text-center">
+<div class="col-md-4"><div class="flow-box"><strong>Before viewport</strong><br>5 extra rows</div></div>
+<div class="col-md-4"><div class="flow-box"><strong>Viewport</strong><br>Visible rows</div></div>
+<div class="col-md-4"><div class="flow-box"><strong>After viewport</strong><br>5 extra rows</div></div>
+</div>
+<div class="alert alert-warning mt-3 mb-0"><strong>Why?</strong> If the user scrolls quickly, the nearby rows are already mounted, reducing the chance of seeing blank space.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-danger text-white card-header-custom">RIGHT — Common Mistakes Explained</div>
+<div class="card-body">
+<div class="alert alert-danger mistake"><strong>1. Rendering the entire array</strong><br>If you call <code>items.map()</code> over 100,000 items and mount every row, you are not virtualizing.</div>
+<div class="alert alert-danger mistake"><strong>2. Forgetting the virtual total height</strong><br>Without the spacer/virtual height, the scrollbar only represents the small rendered window.</div>
+<div class="alert alert-danger mistake"><strong>3. No overscan</strong><br>Fast scrolling can expose blank gaps while new rows are being rendered.</div>
+<div class="alert alert-danger mistake"><strong>4. Variable-height assumption</strong><br>The simple <code>scrollTop / itemHeight</code> calculation works naturally for fixed-height rows. Variable heights require more sophisticated measurement/index calculations.</div>
+<div class="alert alert-danger mistake"><strong>5. Bad keys</strong><br>Use a stable unique item ID when available, not a random value generated on each render.</div>
+<div class="alert alert-danger mistake"><strong>6. Heavy scroll work</strong><br>A complex scroll handler can become expensive. Keep the calculation lightweight and consider batching or scheduling updates where appropriate.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-info text-dark card-header-custom">RIGHT — Virtualization + Infinite Scrolling</div>
+<div class="card-body">
+<p>These techniques solve different problems and can be combined.</p>
+<div class="row g-3">
+<div class="col-md-6">
+<div class="flow-box">
+<strong>Infinite scrolling</strong><br>
+“Do I need more data?”<br><br>
+Fetch the next page when the user approaches the end.
+</div>
+</div>
+<div class="col-md-6">
+<div class="flow-box">
+<strong>Virtualization</strong><br>
+“Which loaded data should be in the DOM?”<br><br>
+Render only the visible window.
+</div>
+</div>
+</div>
+<div class="alert alert-success mt-3 mb-0">
+<strong>Strong architecture:</strong> Fetch data in pages + keep the loaded data + virtualize the large rendered collection.
+</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-dark text-white card-header-custom">RIGHT — Complexity</div>
+<div class="card-body">
+<table class="table table-bordered align-middle">
+<thead class="table-light"><tr><th>Operation</th><th>Typical idea</th></tr></thead>
+<tbody>
+<tr><td>Initial rendering</td><td>Approximately O(visible items + overscan), rather than O(total items) DOM creation.</td></tr>
+<tr><td>Memory for DOM</td><td>Approximately proportional to rendered window size.</td></tr>
+<tr><td>Finding fixed-height start index</td><td>O(1): <code>floor(scrollTop / itemHeight)</code>.</td></tr>
+<tr><td>Data storage</td><td>Still depends on how much application data you keep in memory; virtualization does not automatically reduce stored JavaScript data.</td></tr>
+</tbody>
+</table>
+<div class="alert alert-warning mb-0"><strong>Interview precision:</strong> Virtualization mainly reduces DOM and rendering cost. It does not automatically reduce the amount of data held in JavaScript memory.</div>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-success text-white card-header-custom">RIGHT — Interview Follow-Up Answers</div>
+<div class="card-body">
+<ol>
+<li class="mb-3"><strong>What is windowing?</strong><br><span class="small-muted">Another common name for list virtualization: render a moving window of items instead of the whole list.</span></li>
+<li class="mb-3"><strong>Why use overscan?</strong><br><span class="small-muted">To render nearby rows so fast scrolling is less likely to reveal blank space.</span></li>
+<li class="mb-3"><strong>Does virtualization reduce API calls?</strong><br><span class="small-muted">No. Pagination/infinite scrolling can reduce initial data fetching. Virtualization controls what gets mounted in the DOM.</span></li>
+<li class="mb-3"><strong>Can I virtualize variable-height rows?</strong><br><span class="small-muted">Yes, but it is more complex because the implementation must measure or estimate item sizes and maintain accurate positions.</span></li>
+<li class="mb-3"><strong>When should I not virtualize?</strong><br><span class="small-muted">For small lists where normal rendering is fast and the added implementation complexity provides little benefit.</span></li>
+</ol>
+</div>
+</section>
+
+<section class="card doc-card mb-4">
+<div class="card-header bg-warning text-dark card-header-custom">RIGHT — Quick Revision</div>
+<div class="card-body">
+<div class="row g-2 text-center">
+<div class="col-6 col-md-3"><div class="flow-box"><strong>ScrollTop</strong><br>position</div></div>
+<div class="col-6 col-md-3"><div class="flow-box"><strong>Calculate</strong><br>start/end</div></div>
+<div class="col-6 col-md-3"><div class="flow-box"><strong>Overscan</strong><br>buffer</div></div>
+<div class="col-6 col-md-3"><div class="flow-box"><strong>Render</strong><br>small window</div></div>
+</div>
+<div class="alert alert-info mt-3 mb-0">
+<strong>One-line interview answer:</strong>
+“Virtualization renders only the visible portion of a large list, plus a small overscan buffer, while a virtual container preserves the correct total scroll height.”
+</div>
+</div>
+</section>
+
+</section>
+</div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+<small>React Machine Coding Notes • Virtualization / Windowing</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

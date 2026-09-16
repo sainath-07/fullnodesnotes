@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom useFetch with React - Machine Coding Round Guide</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:#f4f6f9;color:#212529;line-height:1.7}
+.sticky-nav{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#172554,#2563eb);color:#fff}
+.main-card{border:0;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.08);overflow:hidden}
+.sidebar{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+.sidebar .list-group-item{border:0;padding:13px 16px}
+.sidebar .list-group-item:hover{background:#e9f1ff;color:#0d6efd}
+.answer-section{scroll-margin-top:90px;margin-bottom:30px}
+.section-head{color:#fff;padding:14px 20px;font-weight:700}
+.blue{background:#2563eb}.green{background:#198754}.orange{background:#fd7e14}
+.purple{background:#6f42c1}.dark{background:#212529}.red{background:#dc3545}.cyan{background:#0dcaf0;color:#052c35}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:12px;overflow-x:auto;font-size:.83rem}
+code{color:#d63384}pre code{color:inherit}
+.step{border:2px solid #dee2e6;border-radius:12px;padding:16px;text-align:center;height:100%;background:#fff}
+.arrow{display:flex;align-items:center;justify-content:center;font-size:2rem;color:#2563eb}
+.interview{border-left:5px solid #0d6efd;background:#eef5ff}
+.mistake{border-left:5px solid #dc3545;background:#fff1f2}
+.success{border-left:5px solid #198754;background:#effcf6}
+.tip{border-left:5px solid #fd7e14;background:#fff8ef}
+.info{border-left:5px solid #0dcaf0;background:#effcff}
+.flow{font-family:monospace;background:#f8f9fa;border-radius:12px;padding:20px;line-height:2}
+.badge-pill{border-radius:30px}
+@media(max-width:991px){.sidebar{position:static;max-height:none;margin-bottom:20px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-nav shadow">
+<div class="container-fluid px-4">
+<a class="navbar-brand fw-bold" href="#top">Custom useFetch</a>
+<span class="navbar-text text-white-50">React Machine Coding Round</span>
+</div>
+</nav>
+
+<header id="top" class="hero py-5">
+<div class="container">
+<div class="text-white-50 text-uppercase small fw-bold">React.js • Frontend Machine Coding</div>
+<h1 class="display-5 fw-bold">Custom useFetch Hook with React</h1>
+<p class="lead mb-0">Build a reusable hook that handles API fetching, loading, errors, data and request cancellation.</p>
+</div>
+</header>
+
+<main class="container-fluid px-4 py-4">
+<div class="row g-4">
+
+<!-- LEFT SIDE -->
+<aside class="col-lg-3">
+<div class="card main-card sidebar">
+<div class="card-header bg-dark text-white fw-bold">Topics</div>
+<div class="list-group list-group-flush">
+<a class="list-group-item" href="#what">1. What is useFetch?</a>
+<a class="list-group-item" href="#problem">2. What Problem Does It Resolve?</a>
+<a class="list-group-item" href="#why">3. Why Create a Custom Hook?</a>
+<a class="list-group-item" href="#how">4. How Does It Work?</a>
+<a class="list-group-item" href="#visual">5. Visual Explanation</a>
+<a class="list-group-item" href="#requirements">6. Machine Coding Requirements</a>
+<a class="list-group-item" href="#fullcode">7. Full Code</a>
+<a class="list-group-item" href="#effect">8. Why useEffect?</a>
+<a class="list-group-item" href="#abort">9. AbortController</a>
+<a class="list-group-item" href="#mistakes">10. Common Developer Mistakes</a>
+<a class="list-group-item" href="#interviewer">11. Explain to Interviewer</a>
+<a class="list-group-item" href="#followups">12. Follow-up Questions</a>
+<a class="list-group-item" href="#recap">13. Quick Recap</a>
+</div>
+</div>
+</aside>
+
+<!-- RIGHT SIDE -->
+<section class="col-lg-9">
+
+<section id="what" class="card main-card answer-section">
+<div class="section-head blue">1. What is a Custom useFetch Hook?</div>
+<div class="card-body p-4">
+<p><strong>Definition:</strong> A custom <code>useFetch</code> hook is a reusable React function that contains common API-fetching logic such as making a request, storing the response, tracking loading state and handling errors.</p>
+<div class="alert alert-primary">
+<strong>Layman example:</strong> Imagine you order food from a restaurant. Instead of every customer learning how to call the restaurant, wait for the food and handle “restaurant closed” errors, one helper can manage the whole process. Different pages can use the same helper.
+</div>
+
+<div class="row g-3">
+<div class="col-md-4"><div class="step"><strong>Request</strong><br>Call API using a URL.</div></div>
+<div class="col-md-4"><div class="step"><strong>Response</strong><br>Store returned data.</div></div>
+<div class="col-md-4"><div class="step"><strong>Status</strong><br>Track loading and error.</div></div>
+</div>
+
+<p class="mt-4 mb-0">The hook hides repetitive fetching logic from UI components and exposes a simple interface such as <code>{ data, loading, error }</code>.</p>
+</div>
+</section>
+
+<section id="problem" class="card main-card answer-section">
+<div class="section-head green">2. What Problem Does It Resolve?</div>
+<div class="card-body p-4">
+<p>Without a custom hook, multiple components may repeat the same <code>useEffect</code>, <code>fetch()</code>, loading state and error handling code.</p>
+<div class="row g-3">
+<div class="col-md-6"><div class="step"><strong>Without useFetch</strong><br><small>Users, Products, Orders and Posts components can each contain duplicated API logic.</small></div></div>
+<div class="col-md-6"><div class="step"><strong>With useFetch</strong><br><small>One reusable hook handles the common request lifecycle.</small></div></div>
+</div>
+<div class="alert alert-success mt-4">
+<strong>Problem solved:</strong> It reduces duplicate code and gives different components a consistent way to handle API requests.
+</div>
+</div>
+</section>
+
+<section id="why" class="card main-card answer-section">
+<div class="section-head purple">3. Why Create a Custom Hook?</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-4"><div class="step"><h5>♻️ Reuse</h5><p class="mb-0">Use the same fetching logic in many components.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🧹 Cleaner Components</h5><p class="mb-0">UI components focus on displaying data.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>⚠️ Error Handling</h5><p class="mb-0">Centralize common request error handling.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>⏳ Loading</h5><p class="mb-0">Expose one consistent loading state.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🛑 Cancellation</h5><p class="mb-0">Cancel stale requests with AbortController.</p></div></div>
+<div class="col-md-4"><div class="step"><h5>🧪 Testing</h5><p class="mb-0">Fetching logic can be tested separately from UI.</p></div></div>
+</div>
+</div>
+</section>
+
+<section id="how" class="card main-card answer-section">
+<div class="section-head orange">4. How Does useFetch Work?</div>
+<div class="card-body p-4">
+<ol>
+<li>Component calls <code>useFetch(url)</code>.</li>
+<li>The hook initializes <code>data</code>, <code>loading</code> and <code>error</code>.</li>
+<li><code>useEffect</code> starts the request when the URL changes.</li>
+<li>Set <code>loading</code> to <code>true</code>.</li>
+<li>Call <code>fetch(url)</code>.</li>
+<li>Check whether the HTTP response is successful.</li>
+<li>Convert the response to JSON.</li>
+<li>Store the data.</li>
+<li>If something fails, store an error.</li>
+<li>Set <code>loading</code> back to <code>false</code>.</li>
+<li>Return the state to the component.</li>
+</ol>
+
+<div class="alert alert-info">
+<strong>Core idea:</strong> <code>useFetch</code> is a reusable stateful function. It manages the API request lifecycle, while the component decides how to display the result.
+</div>
+</div>
+</section>
+
+<section id="visual" class="card main-card answer-section">
+<div class="section-head blue">5. Visual Explanation — Simple Steps</div>
+<div class="card-body p-4">
+
+<div class="row g-2 align-items-stretch">
+<div class="col-md-2"><div class="step"><strong>1</strong><br>Component calls<br><code>useFetch(url)</code></div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>2</strong><br><code>useEffect</code><br>runs</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>3</strong><br>Set loading<br>true</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-2"><div class="step"><strong>4</strong><br>Fetch API</div></div>
+</div>
+
+<div class="text-center fs-2 my-2">↓</div>
+
+<div class="row g-2 align-items-stretch">
+<div class="col-md-3"><div class="step"><strong>5A — Success</strong><br>Parse JSON → setData()</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>5B — Failure</strong><br>setError()</div></div>
+<div class="col-md-1 arrow">→</div>
+<div class="col-md-3"><div class="step"><strong>6</strong><br>loading = false</div></div>
+</div>
+
+<h5 class="mt-4">Hook → Component flow</h5>
+<div class="flow">
+Component<br>
+&nbsp;&nbsp;↓<br>
+useFetch("/api/products")<br>
+&nbsp;&nbsp;↓<br>
+useEffect()<br>
+&nbsp;&nbsp;↓<br>
+fetch(url)<br>
+&nbsp;&nbsp;↓<br>
+┌───────────────┬───────────────┐<br>
+│ Success       │ Error         │<br>
+│ setData()     │ setError()    │<br>
+└───────────────┴───────────────┘<br>
+&nbsp;&nbsp;↓<br>
+loading = false<br>
+&nbsp;&nbsp;↓<br>
+Component re-renders
+</div>
+</div>
+</section>
+
+<section id="requirements" class="card main-card answer-section">
+<div class="section-head green">6. Machine Coding Requirements</div>
+<div class="card-body p-4">
+<div class="row g-3">
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Basic Requirements</h5>
+<ul class="mb-0">
+<li>Create a custom <code>useFetch</code> hook.</li>
+<li>Accept a URL.</li>
+<li>Fetch data when URL changes.</li>
+<li>Expose data.</li>
+<li>Expose loading state.</li>
+<li>Expose error state.</li>
+</ul>
+</div></div>
+</div>
+<div class="col-md-6">
+<div class="card h-100 border"><div class="card-body">
+<h5>Interview-Ready Improvements</h5>
+<ul class="mb-0">
+<li>Abort stale requests.</li>
+<li>Support request options.</li>
+<li>Provide refetch functionality.</li>
+<li>Handle HTTP errors.</li>
+<li>Support POST/PUT/DELETE.</li>
+<li>Prevent race conditions.</li>
+</ul>
+</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="card main-card answer-section">
+<div class="section-head dark">7. Full React Code</div>
+<div class="card-body p-4">
+
+<h5>useFetch.js</h5>
+<pre><code>import { useEffect, useState } from "react";
+
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+
+    const fetchData = async () =&gt; {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(url, {
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Request failed: ${response.status}`
+          );
+        }
+
+        const result = await response.json();
+
+        setData(result);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () =&gt; {
+      controller.abort();
+    };
+  }, [url]);
+
+  return {
+    data,
+    loading,
+    error
+  };
+}
+
+export default useFetch;</code></pre>
+
+<h5 class="mt-4">App.jsx — Using the Hook</h5>
+<pre><code>import useFetch from "./useFetch";
+
+function App() {
+  const {
+    data,
+    loading,
+    error
+  } = useFetch(
+    "https://jsonplaceholder.typicode.com/users"
+  );
+
+  if (loading) {
+    return &lt;h2&gt;Loading...&lt;/h2&gt;;
+  }
+
+  if (error) {
+    return &lt;h2&gt;Error: {error}&lt;/h2&gt;;
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Users&lt;/h1&gt;
+
+      {data?.map((user) =&gt; (
+        &lt;div key={user.id}&gt;
+          {user.name}
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+
+<div class="success p-3 mt-4">
+<strong>Key implementation concepts:</strong>
+<span class="badge text-bg-primary ms-1">custom hook</span>
+<span class="badge text-bg-primary">useEffect</span>
+<span class="badge text-bg-primary">useState</span>
+<span class="badge text-bg-primary">AbortController</span>
+<span class="badge text-bg-primary">loading</span>
+<span class="badge text-bg-primary">error</span>
+</div>
+</div>
+</section>
+
+<section id="effect" class="card main-card answer-section">
+<div class="section-head orange">8. Why useEffect?</div>
+<div class="card-body p-4">
+<p>Fetching data is a side effect. React's <code>useEffect</code> is used to perform side effects after rendering and when dependencies change.</p>
+
+<div class="row g-3">
+<div class="col-md-6"><div class="step"><strong>Dependency</strong><br><code>[url]</code><br><small>Run the request when the URL changes.</small></div></div>
+<div class="col-md-6"><div class="step"><strong>Cleanup</strong><br><code>controller.abort()</code><br><small>Cancel the previous request when necessary.</small></div></div>
+</div>
+
+<div class="alert alert-warning mt-4">
+<strong>Important:</strong> Do not call <code>fetch()</code> directly during the component's render. Rendering should remain predictable; side effects belong in an effect or another appropriate event-driven mechanism.
+</div>
+
+<h5 class="mt-4">Dependency flow</h5>
+<pre><code>useFetch("/users")
+      ↓
+useEffect runs
+      ↓
+fetch("/users")
+
+URL changes:
+"/users" → "/products"
+      ↓
+cleanup previous effect
+      ↓
+new effect runs
+      ↓
+fetch("/products")</code></pre>
+</div>
+</section>
+
+<section id="abort" class="card main-card answer-section">
+<div class="section-head cyan">9. Why AbortController?</div>
+<div class="card-body p-4">
+<p><strong>Definition:</strong> <code>AbortController</code> lets us cancel an in-progress fetch request.</p>
+<div class="alert alert-primary">
+<strong>Layman example:</strong> Imagine you ask a waiter for Product A information, but before the waiter returns, you change your mind and ask for Product B. You do not want the old Product A response to unnecessarily continue.
+</div>
+
+<div class="flow">
+User requests URL A<br>
+&nbsp;&nbsp;↓<br>
+Request A starts<br>
+&nbsp;&nbsp;↓<br>
+User changes URL<br>
+&nbsp;&nbsp;↓<br>
+Cleanup runs<br>
+&nbsp;&nbsp;↓<br>
+Abort request A<br>
+&nbsp;&nbsp;↓<br>
+Request B starts
+</div>
+
+<div class="alert alert-success mt-4 mb-0">
+<strong>Interview point:</strong> Aborting stale requests reduces unnecessary work and helps prevent outdated responses from affecting the UI.
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="card main-card answer-section">
+<div class="section-head red">10. Common Developer Mistakes</div>
+<div class="card-body p-4">
+<div class="alert mistake"><strong>1. Forgetting the dependency array</strong><br>Without correct dependencies, the request may run repeatedly or fail to run when the URL changes.</div>
+<div class="alert mistake"><strong>2. Fetching during render</strong><br>Do not make API calls directly in the component body. Use <code>useEffect</code> for this side effect.</div>
+<div class="alert mistake"><strong>3. Not handling HTTP errors</strong><br><code>fetch()</code> does not automatically reject for HTTP 404 or 500. Check <code>response.ok</code> or the status code.</div>
+<div class="alert mistake"><strong>4. Forgetting loading state</strong><br>Users need feedback while a request is in progress.</div>
+<div class="alert mistake"><strong>5. Forgetting error state</strong><br>Network failures and unsuccessful HTTP responses should produce useful UI feedback.</div>
+<div class="alert mistake"><strong>6. Updating state after stale requests</strong><br>Use <code>AbortController</code> or another race-condition strategy when requests can overlap.</div>
+<div class="alert mistake"><strong>7. Incorrect cleanup</strong><br>Abort the controller in the effect cleanup and ignore the expected <code>AbortError</code>.</div>
+<div class="alert mistake"><strong>8. Making the hook too specific</strong><br>Hard-coding one API or one response shape reduces reusability. Keep the basic hook generic.</div>
+<div class="alert mistake"><strong>9. Overusing useFetch</strong><br>For complex applications, a dedicated server-state library may provide caching, retries, invalidation and deduplication that a small custom hook does not.</div>
+</div>
+</section>
+
+<section id="interviewer" class="card main-card answer-section">
+<div class="section-head purple">11. How I Would Explain My Implementation to the Interviewer</div>
+<div class="card-body p-4">
+<div class="alert interview">
+<strong>Interview explanation:</strong>
+<p class="mt-2 mb-0">“I created a reusable custom hook called useFetch to centralize API request logic. The hook accepts a URL and internally manages data, loading and error state. I use useEffect because fetching is a side effect, and the URL is a dependency so the request runs whenever it changes. I check response.ok because fetch does not reject automatically for HTTP error statuses. I also use AbortController in the cleanup function to cancel stale requests. The component only consumes the returned data, loading and error states, so the UI code stays clean.”</p>
+</div>
+
+<h5 class="mt-4">Explain it in this order</h5>
+<ol>
+<li><strong>Problem:</strong> “API logic was duplicated across components.”</li>
+<li><strong>Solution:</strong> “I extracted the common logic into a custom hook.”</li>
+<li><strong>Inputs:</strong> “The hook accepts a URL.”</li>
+<li><strong>State:</strong> “It manages data, loading and error.”</li>
+<li><strong>Effect:</strong> “useEffect starts the request when the URL changes.”</li>
+<li><strong>Validation:</strong> “I check response.ok for HTTP errors.”</li>
+<li><strong>Cleanup:</strong> “AbortController cancels stale requests.”</li>
+<li><strong>Output:</strong> “The hook returns an object consumed by the component.”</li>
+</ol>
+
+<div class="alert alert-success mb-0">
+<strong>Strong interview line:</strong> “I am separating data-fetching concerns from presentation concerns so multiple components can reuse the same request lifecycle logic.”
+</div>
+</div>
+</section>
+
+<section id="followups" class="card main-card answer-section">
+<div class="section-head blue">12. Common Follow-Up Questions</div>
+<div class="card-body p-4">
+<div class="accordion" id="questions">
+
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">Why is it called a custom hook?</button></h2>
+<div id="q1" class="accordion-collapse collapse show"><div class="accordion-body">It is a reusable JavaScript function whose name starts with <code>use</code> and which can call React hooks such as <code>useState</code> and <code>useEffect</code>.</div></div>
+</div>
+
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">Why check response.ok?</button></h2>
+<div id="q2" class="accordion-collapse collapse"><div class="accordion-body">The Fetch API generally resolves its promise for HTTP responses such as 404 or 500. Checking <code>response.ok</code> lets the hook convert unsuccessful HTTP statuses into an application error.</div></div>
+</div>
+
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">How can you add refetch?</button></h2>
+<div id="q3" class="accordion-collapse collapse"><div class="accordion-body">Keep the fetch logic inside a function and expose a state value such as <code>reloadKey</code>. Incrementing it can trigger the effect again, or the hook can expose a stable refetch function.</div></div>
+</div>
+
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">How can you support POST requests?</button></h2>
+<div id="q4" class="accordion-collapse collapse"><div class="accordion-body">Accept a request options object containing method, headers and body, or separate read and mutation hooks depending on the application's complexity.</div></div>
+</div>
+
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">What about caching?</button></h2>
+<div id="q5" class="accordion-collapse collapse"><div class="accordion-body">A basic custom hook does not need to implement caching. For production applications with complex server state, libraries such as TanStack Query can provide caching, retries, invalidation and request deduplication.</div></div>
+</div>
+
+<div class="accordion-item">
+<h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">What is a race condition here?</button></h2>
+<div id="q6" class="accordion-collapse collapse"><div class="accordion-body">It can happen when multiple requests overlap and an older request finishes after a newer request, potentially replacing fresh data with stale data. Cancellation or request identity checks can help.</div></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="recap" class="card main-card answer-section">
+<div class="section-head dark">13. Quick Recap</div>
+<div class="card-body p-4">
+<table class="table table-bordered align-middle">
+<tbody>
+<tr><th>Custom hook</th><td>Reusable function that encapsulates React hook logic.</td></tr>
+<tr><th>Input</th><td>URL, and optionally request configuration.</td></tr>
+<tr><th>State</th><td><code>data</code>, <code>loading</code>, <code>error</code>.</td></tr>
+<tr><th>useEffect</th><td>Runs the fetch side effect when dependencies change.</td></tr>
+<tr><th>response.ok</th><td>Checks whether the HTTP response indicates success.</td></tr>
+<tr><th>AbortController</th><td>Cancels stale/in-progress fetch requests.</td></tr>
+<tr><th>Benefit</th><td>Reusable and cleaner API-fetching logic.</td></tr>
+</tbody>
+</table>
+
+<div class="alert alert-primary mb-0">
+<strong>Final memory formula:</strong><br>
+<code>useFetch(url) → useEffect → Loading → Fetch → Data/Error → Cleanup → Return State</code>
+</div>
+</div>
+</section>
+
+</section>
+</div>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+<small>Custom useFetch with React • Machine Coding Round Documentation • Bootstrap 5</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
