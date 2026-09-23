@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine Coding Round - Custom useLocalStorage</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--sidebar:330px;--nav:#172033;--blue:#0d6efd;--soft:#f5f7fb;--border:#e3e7ef}
+body{background:var(--soft);color:#202633;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.navbar{background:var(--nav);position:sticky;top:0;z-index:1050;box-shadow:0 2px 12px #0002}
+.navbar-brand{font-weight:700}
+.page-wrap{display:flex;max-width:1500px;margin:auto;min-height:calc(100vh - 56px)}
+.sidebar{width:var(--sidebar);background:#fff;border-right:1px solid var(--border);padding:22px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+.content{flex:1;padding:28px}
+.question-btn{width:100%;text-align:left;border:1px solid var(--border);background:#fff;border-radius:10px;padding:11px 13px;margin-bottom:8px;font-weight:600;color:#334155;transition:.2s}
+.question-btn:hover,.question-btn.active{background:#eaf3ff;border-color:#9ec5fe;color:#084298}
+.card{border:0;box-shadow:0 4px 18px #17203312;border-radius:14px;margin-bottom:22px}
+.card-header{border:0;border-radius:14px 14px 0 0!important;font-weight:700}
+.codebox{background:#101827;color:#e7edf7;border-radius:12px;padding:18px;overflow:auto;font-size:.88rem;line-height:1.55}
+pre{margin:0}
+.step{display:flex;gap:14px;align-items:flex-start;margin:14px 0}
+.step-num{min-width:34px;height:34px;border-radius:50%;background:#0d6efd;color:#fff;display:grid;place-items:center;font-weight:700}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:center;padding:18px;background:#f8f9fa;border-radius:12px}
+.flow-box{padding:12px 15px;border-radius:10px;background:#fff;border:1px solid #cfd7e6;font-weight:600;text-align:center}
+.arrow{font-size:1.4rem;color:#6c757d}
+.interview{border-left:5px solid #198754;background:#eefaf3;padding:16px;border-radius:10px}
+.badge-soft{background:#eaf3ff;color:#084298}
+@media(max-width:900px){.page-wrap{display:block}.sidebar{width:100%;height:auto;position:relative;top:0;border-right:0}.content{padding:18px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark">
+  <div class="container-fluid px-4">
+    <span class="navbar-brand"><i class="bi bi-code-slash me-2"></i>Machine Coding: Custom useLocalStorage</span>
+    <span class="text-white-50 small">React Hook Interview Guide</span>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<aside class="sidebar">
+  <div class="mb-3">
+    <div class="fw-bold fs-5">Questions</div>
+    <div class="text-secondary small">Click a question to show its answer →</div>
+  </div>
+  <button class="question-btn active" data-target="what">1. What is useLocalStorage?</button>
+  <button class="question-btn" data-target="why">2. Why create a custom hook?</button>
+  <button class="question-btn" data-target="how">3. How does it work?</button>
+  <button class="question-btn" data-target="problem">4. What problem does it solve?</button>
+  <button class="question-btn" data-target="fullcode">5. Full Code</button>
+  <button class="question-btn" data-target="walkthrough">6. Step-by-Step Code Walkthrough</button>
+  <button class="question-btn" data-target="mistakes">7. Common Developer Mistakes</button>
+  <button class="question-btn" data-target="interviewer">8. How do I explain it to interviewer?</button>
+  <button class="question-btn" data-target="edge">9. Edge Cases</button>
+  <button class="question-btn" data-target="summary">10. Interview Quick Recap</button>
+</aside>
+
+<main class="content">
+  <div class="mb-4">
+    <span class="badge badge-soft mb-2">Machine Coding Round</span>
+    <h1 class="fw-bold">Custom <code>useLocalStorage</code> Hook</h1>
+    <p class="lead text-secondary">Build a reusable React hook that keeps state synchronized with browser <code>localStorage</code>.</p>
+  </div>
+
+  <section id="what" class="answer-section">
+    <div class="card">
+      <div class="card-header bg-primary text-white p-3">What is a Custom useLocalStorage Hook?</div>
+      <div class="card-body">
+        <h5>Definition</h5>
+        <p>A custom <code>useLocalStorage</code> hook is a reusable React hook that behaves like <code>useState</code>, but also saves the value in the browser's <code>localStorage</code>.</p>
+        <div class="alert alert-info"><strong>Layman example:</strong> <code>useState</code> is like writing a note on a temporary whiteboard. <code>localStorage</code> is like writing the same note in a notebook that remains after you leave the room.</div>
+        <p>When the page is refreshed, the hook reads the previously stored value and restores it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="why" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-success text-white p-3">Why create a custom hook?</div>
+      <div class="card-body">
+        <p>Without a custom hook, every component would repeat the same logic:</p>
+        <ul>
+          <li>Read from <code>localStorage</code>.</li>
+          <li>Parse the stored JSON.</li>
+          <li>Keep React state.</li>
+          <li>Write updated state back to storage.</li>
+          <li>Handle invalid or missing data.</li>
+        </ul>
+        <div class="alert alert-success"><strong>Goal:</strong> Put this repeated logic in one reusable hook and use it anywhere with <code>const [value, setValue] = useLocalStorage(key, initialValue)</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-info text-dark p-3">How does it work?</div>
+      <div class="card-body">
+        <div class="flow">
+          <div class="flow-box">Component calls<br><code>useLocalStorage()</code></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Read existing<br><code>localStorage</code></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Initialize<br>React state</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">State changes</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Save JSON<br>to storage</div>
+        </div>
+        <div class="mt-4">
+          <div class="step"><span class="step-num">1</span><div><strong>Read:</strong> Try to get the value using <code>localStorage.getItem(key)</code>.</div></div>
+          <div class="step"><span class="step-num">2</span><div><strong>Parse:</strong> Convert the JSON string back into a JavaScript value with <code>JSON.parse()</code>.</div></div>
+          <div class="step"><span class="step-num">3</span><div><strong>Initialize:</strong> Put that value into <code>useState</code>.</div></div>
+          <div class="step"><span class="step-num">4</span><div><strong>Watch:</strong> Use <code>useEffect</code> whenever the value or key changes.</div></div>
+          <div class="step"><span class="step-num">5</span><div><strong>Save:</strong> Convert the value to a JSON string using <code>JSON.stringify()</code> and store it.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-warning p-3">What problem does it solve?</div>
+      <div class="card-body">
+        <p>React state normally disappears when the page is refreshed. <code>localStorage</code> lets us persist small pieces of client-side data.</p>
+        <table class="table table-bordered align-middle">
+          <thead><tr><th>Without Hook</th><th>With useLocalStorage</th></tr></thead>
+          <tbody>
+            <tr><td>Repeated storage code</td><td>Reusable logic</td></tr>
+            <tr><td>Manual JSON parsing/stringifying</td><td>Handled inside hook</td></tr>
+            <tr><td>Refresh can reset state</td><td>State can be restored from storage</td></tr>
+            <tr><td>Harder to maintain</td><td>One central implementation</td></tr>
+          </tbody>
+        </table>
+        <div class="alert alert-warning"><strong>Important:</strong> localStorage is browser-side persistence, not a secure database. Do not store passwords, access tokens, or sensitive secrets there unless the application's security model explicitly supports it.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fullcode" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-dark text-white p-3">Full Code</div>
+      <div class="card-body">
+        <h6>useLocalStorage.js</h6>
+        <div class="codebox"><pre><code>import { useEffect, useState } from "react";
+
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() =&gt; {
+    try {
+      const storedValue = localStorage.getItem(key);
+
+      if (storedValue !== null) {
+        return JSON.parse(storedValue);
+      }
+
+      return initialValue;
+    } catch (error) {
+      console.error("Failed to read localStorage:", error);
+      return initialValue;
+    }
+  });
+
+  useEffect(() =&gt; {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error("Failed to write localStorage:", error);
+    }
+  }, [key, value]);
+
+  return [value, setValue];
+}
+
+export default useLocalStorage;</code></pre></div>
+
+        <h6 class="mt-4">App.jsx — Example Usage</h6>
+        <div class="codebox"><pre><code>import useLocalStorage from "./useLocalStorage";
+
+function App() {
+  const [name, setName] = useLocalStorage("userName", "");
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Hello, {name || "Guest"}&lt;/h2&gt;
+
+      &lt;input
+        value={name}
+        onChange={(e) =&gt; setName(e.target.value)}
+        placeholder="Enter your name"
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre></div>
+
+        <div class="alert alert-primary mt-4 mb-0"><strong>Result:</strong> Type a name → state updates → effect stores it → refresh the page → the name is restored.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="walkthrough" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-secondary text-white p-3">Step-by-Step Code Walkthrough</div>
+      <div class="card-body">
+        <h6>1. Function accepts a key and initial value</h6>
+        <div class="codebox mb-3"><pre><code>function useLocalStorage(key, initialValue) {</code></pre></div>
+        <p><code>key</code> identifies the storage item. <code>initialValue</code> is used when nothing exists yet.</p>
+
+        <h6>2. Lazy state initialization</h6>
+        <div class="codebox mb-3"><pre><code>useState(() =&gt; {
+  const storedValue = localStorage.getItem(key);
+  ...
+});</code></pre></div>
+        <p>The function reads storage when React initializes the state. Lazy initialization avoids putting the read expression directly into every render.</p>
+
+        <h6>3. Convert JSON back to JavaScript</h6>
+        <div class="codebox mb-3"><pre><code>return JSON.parse(storedValue);</code></pre></div>
+        <p><code>localStorage</code> stores strings. JSON lets us persist objects, arrays, numbers, booleans, and strings in a consistent way.</p>
+
+        <h6>4. Save when state changes</h6>
+        <div class="codebox mb-3"><pre><code>useEffect(() =&gt; {
+  localStorage.setItem(key, JSON.stringify(value));
+}, [key, value]);</code></pre></div>
+        <p>The effect runs after React commits a render where <code>key</code> or <code>value</code> changed.</p>
+
+        <h6>5. Return the same API as useState</h6>
+        <div class="codebox"><pre><code>return [value, setValue];</code></pre></div>
+        <p>This makes the custom hook easy to adopt because components use it almost exactly like <code>useState</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="mistakes" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-danger text-white p-3">Common Developer Mistakes</div>
+      <div class="card-body">
+        <div class="alert alert-danger"><strong>1. Forgetting JSON.stringify()</strong><br><code>localStorage.setItem(key, value)</code> converts data to a string. For objects/arrays, explicitly use <code>JSON.stringify(value)</code>.</div>
+        <div class="alert alert-danger"><strong>2. Forgetting JSON.parse()</strong><br>If you store an object as JSON and retrieve it without parsing, you get a string instead of the original object.</div>
+        <div class="alert alert-danger"><strong>3. Reading storage on every render</strong><br>Do not blindly call <code>localStorage.getItem()</code> as the direct state value on every render. Use lazy initialization.</div>
+        <div class="alert alert-danger"><strong>4. Missing effect dependencies</strong><br>If the key/value are omitted from the dependency array, updates can become stale or fail to persist as expected.</div>
+        <div class="alert alert-danger"><strong>5. No error handling</strong><br><code>JSON.parse()</code> can fail if stored data is malformed. Storage can also fail due to browser restrictions or quota limits.</div>
+        <div class="alert alert-danger"><strong>6. Using it for sensitive data</strong><br>localStorage is accessible to JavaScript running on the page. Treat it as client-side storage, not a secure vault.</div>
+        <div class="alert alert-danger"><strong>7. Ignoring SSR environments</strong><br>In environments such as Next.js server rendering, <code>localStorage</code> is not available on the server. Browser-only access must be handled appropriately.</div>
+        <div class="alert alert-danger"><strong>8. Forgetting the initial-value behavior</strong><br>When no saved value exists, return the provided <code>initialValue</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interviewer" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-success text-white p-3">How I Would Explain It to the Interviewer</div>
+      <div class="card-body">
+        <div class="interview">
+          <p class="mb-0">"I would create a reusable custom hook called <code>useLocalStorage</code>. The hook accepts a storage key and an initial value. During state initialization, I first check whether that key already exists in localStorage. If it exists, I parse the stored JSON and use it as the initial state; otherwise, I use the provided initial value. Then I use <code>useEffect</code> to synchronize the latest React state back to localStorage whenever the key or value changes. Finally, I return <code>[value, setValue]</code>, so the component can use it almost like the normal <code>useState</code> hook. I also add error handling for malformed JSON and storage failures."</p>
+        </div>
+
+        <h5 class="mt-4">Whiteboard / Visual Explanation</h5>
+        <div class="flow">
+          <div class="flow-box">Component<br><small>useLocalStorage("name","")</small></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">localStorage<br><small>getItem("name")</small></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">React State<br><small>useState(...)</small></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">User updates<br><small>setValue()</small></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">useEffect<br><small>setItem()</small></div>
+        </div>
+
+        <h5 class="mt-4">What I would say while coding</h5>
+        <ol>
+          <li>"First, I'll create a reusable hook that accepts <code>key</code> and <code>initialValue</code>."</li>
+          <li>"I'll use lazy initialization so I can read the saved value while initializing state."</li>
+          <li>"Because localStorage stores strings, I'll use JSON.parse and JSON.stringify."</li>
+          <li>"I'll synchronize changes with useEffect."</li>
+          <li>"I'll return the state and setter so the API looks like useState."</li>
+          <li>"Finally, I'll test refresh behavior and invalid storage data."</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="edge" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-dark text-white p-3">Edge Cases to Test</div>
+      <div class="card-body">
+        <ul>
+          <li>No existing storage key → use <code>initialValue</code>.</li>
+          <li>Stored string value → restore correctly.</li>
+          <li>Stored object/array → parse correctly.</li>
+          <li>Malformed JSON → catch error and use fallback.</li>
+          <li>State changes multiple times → storage stays synchronized.</li>
+          <li>Page refresh → persisted value should be restored.</li>
+          <li>Storage key changes → new key should be used.</li>
+        </ul>
+        <div class="alert alert-secondary mb-0"><strong>Machine-round tip:</strong> After coding, demonstrate at least one refresh test. It proves the persistence requirement rather than only showing code.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="summary" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-primary text-white p-3">Interview Quick Recap</div>
+      <div class="card-body">
+        <table class="table table-striped align-middle">
+          <tbody>
+            <tr><th>What?</th><td>Reusable hook that combines React state with localStorage persistence.</td></tr>
+            <tr><th>Why?</th><td>Prevents repeated storage synchronization logic across components.</td></tr>
+            <tr><th>Read?</th><td><code>localStorage.getItem()</code> + <code>JSON.parse()</code></td></tr>
+            <tr><th>Write?</th><td><code>localStorage.setItem()</code> + <code>JSON.stringify()</code></td></tr>
+            <tr><th>React tools?</th><td><code>useState</code> + <code>useEffect</code></td></tr>
+            <tr><th>Return?</th><td><code>[value, setValue]</code></td></tr>
+            <tr><th>Main concern?</th><td>localStorage is browser storage, has string-only values, and should not be treated as secure storage.</td></tr>
+          </tbody>
+        </table>
+        <div class="alert alert-primary mb-0"><strong>One-line memory trick:</strong> <code>Read → Parse → State → Change → Stringify → Save</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-secondary py-4 small">
+    Custom useLocalStorage • Machine Coding Round Notes
+  </footer>
+</main>
+</div>
+
+<script>
+const buttons = document.querySelectorAll(".question-btn");
+const sections = document.querySelectorAll(".answer-section");
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    const target = button.dataset.target;
+    buttons.forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    sections.forEach(section => section.classList.toggle("d-none", section.id !== target));
+    window.scrollTo({top: 0, behavior: "smooth"});
+  });
+});
+</script>
+</body>
+</html>

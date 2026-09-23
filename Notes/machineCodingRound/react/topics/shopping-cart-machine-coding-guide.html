@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine Coding Round - Shopping Cart</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--nav:#172033;--soft:#f5f7fb;--border:#e3e7ef}
+body{background:var(--soft);color:#202633;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.navbar{background:var(--nav);position:sticky;top:0;z-index:1050;box-shadow:0 2px 12px #0002}
+.navbar-brand{font-weight:700}
+.page-wrap{display:flex;max-width:1500px;margin:auto;min-height:calc(100vh - 56px)}
+.sidebar{width:330px;background:#fff;border-right:1px solid var(--border);padding:22px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+.content{flex:1;padding:28px}
+.question-btn{width:100%;text-align:left;border:1px solid var(--border);background:#fff;border-radius:10px;padding:11px 13px;margin-bottom:8px;font-weight:600;color:#334155;transition:.2s}
+.question-btn:hover,.question-btn.active{background:#eaf3ff;border-color:#9ec5fe;color:#084298}
+.card{border:0;box-shadow:0 4px 18px #17203312;border-radius:14px;margin-bottom:22px}
+.card-header{border:0;border-radius:14px 14px 0 0!important;font-weight:700}
+.codebox{background:#101827;color:#e7edf7;border-radius:12px;padding:18px;overflow:auto;font-size:.86rem;line-height:1.55}
+pre{margin:0}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:center;padding:18px;background:#f8f9fa;border-radius:12px}
+.flow-box{padding:12px 15px;border-radius:10px;background:#fff;border:1px solid #cfd7e6;font-weight:600;text-align:center}
+.arrow{font-size:1.4rem;color:#6c757d}
+.step{display:flex;gap:14px;align-items:flex-start;margin:14px 0}
+.step-num{min-width:34px;height:34px;border-radius:50%;background:#0d6efd;color:#fff;display:grid;place-items:center;font-weight:700}
+.interview{border-left:5px solid #198754;background:#eefaf3;padding:16px;border-radius:10px}
+.badge-soft{background:#eaf3ff;color:#084298}
+.cart-demo{border:1px solid #dee2e6;border-radius:12px;padding:18px;background:#fff}
+.cart-row{display:flex;justify-content:space-between;gap:15px;align-items:center;border-bottom:1px solid #eee;padding:12px 0}
+.cart-row:last-child{border-bottom:0}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:32px;height:32px;border:1px solid #ced4da;background:#fff;border-radius:7px}
+@media(max-width:900px){.page-wrap{display:block}.sidebar{width:100%;height:auto;position:relative;top:0;border-right:0}.content{padding:18px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark">
+  <div class="container-fluid px-4">
+    <span class="navbar-brand"><i class="bi bi-cart3 me-2"></i>Machine Coding: Shopping Cart</span>
+    <span class="text-white-50 small">React Interview Guide</span>
+  </div>
+</nav>
+
+<div class="page-wrap">
+<aside class="sidebar">
+  <div class="mb-3">
+    <div class="fw-bold fs-5">Questions</div>
+    <div class="text-secondary small">Click a question to show the answer →</div>
+  </div>
+  <button class="question-btn active" data-target="what">1. What is a Shopping Cart?</button>
+  <button class="question-btn" data-target="why">2. Why is it needed?</button>
+  <button class="question-btn" data-target="requirements">3. What are the requirements?</button>
+  <button class="question-btn" data-target="how">4. How does it work?</button>
+  <button class="question-btn" data-target="state">5. How should I manage state?</button>
+  <button class="question-btn" data-target="fullcode">6. Full Code</button>
+  <button class="question-btn" data-target="walkthrough">7. Step-by-Step Code Walkthrough</button>
+  <button class="question-btn" data-target="mistakes">8. Common Developer Mistakes</button>
+  <button class="question-btn" data-target="interviewer">9. How do I explain it to interviewer?</button>
+  <button class="question-btn" data-target="edge">10. Edge Cases & Testing</button>
+  <button class="question-btn" data-target="improve">11. How can I improve it?</button>
+  <button class="question-btn" data-target="summary">12. Interview Quick Recap</button>
+</aside>
+
+<main class="content">
+  <div class="mb-4">
+    <span class="badge badge-soft mb-2">Machine Coding Round</span>
+    <h1 class="fw-bold">Shopping Cart in React</h1>
+    <p class="lead text-secondary">Build a reusable shopping cart with add, remove, quantity update, subtotal, and total calculation.</p>
+  </div>
+
+  <section id="what" class="answer-section">
+    <div class="card">
+      <div class="card-header bg-primary text-white p-3">What is a Shopping Cart?</div>
+      <div class="card-body">
+        <h5>Definition</h5>
+        <p>A shopping cart is a UI feature that lets users collect products they want to buy, change quantities, remove products, and see the calculated amount before checkout.</p>
+        <div class="alert alert-info"><strong>Layman example:</strong> Think about a physical supermarket basket. You put products into the basket, increase or decrease how many you want, remove products you changed your mind about, and finally check the total bill.</div>
+        <h6>Typical cart data</h6>
+        <div class="codebox"><pre><code>[
+  {
+    id: 1,
+    title: "Wireless Headphones",
+    price: 2000,
+    quantity: 2
+  },
+  {
+    id: 2,
+    title: "Keyboard",
+    price: 1500,
+    quantity: 1
+  }
+]</code></pre></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-success text-white p-3">Why is a Shopping Cart Needed?</div>
+      <div class="card-body">
+        <ul>
+          <li>Users can select multiple products before checkout.</li>
+          <li>Users can change product quantity.</li>
+          <li>Users can remove unwanted products.</li>
+          <li>The UI can calculate subtotal and total dynamically.</li>
+          <li>Cart state can be shared across product and cart screens.</li>
+        </ul>
+        <div class="alert alert-success"><strong>Machine-round goal:</strong> Show that you can manage state, update arrays immutably, render lists, handle user actions, and derive calculated values from state.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="requirements" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-warning p-3">Requirements to Clarify Before Coding</div>
+      <div class="card-body">
+        <table class="table table-bordered align-middle">
+          <thead><tr><th>Requirement</th><th>Expected Behavior</th></tr></thead>
+          <tbody>
+            <tr><td>Add product</td><td>Add product if it is not already in cart.</td></tr>
+            <tr><td>Add duplicate</td><td>Increase its quantity instead of creating another row.</td></tr>
+            <tr><td>Increase quantity</td><td>Increment quantity by 1.</td></tr>
+            <tr><td>Decrease quantity</td><td>Decrement quantity; remove when quantity reaches 0.</td></tr>
+            <tr><td>Remove</td><td>Delete the selected product completely.</td></tr>
+            <tr><td>Subtotal</td><td>Sum of price × quantity for every item.</td></tr>
+            <tr><td>Empty cart</td><td>Show a clear empty-cart message.</td></tr>
+          </tbody>
+        </table>
+        <div class="alert alert-secondary mb-0"><strong>Interview tip:</strong> Ask whether the interviewer expects persistence, backend synchronization, discounts, tax, stock validation, or checkout. Do not over-engineer before requirements are clear.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-info text-dark p-3">How Does the Shopping Cart Work?</div>
+      <div class="card-body">
+        <div class="flow">
+          <div class="flow-box">Product List</div><span class="arrow">→</span>
+          <div class="flow-box">Add to Cart</div><span class="arrow">→</span>
+          <div class="flow-box">Cart State</div><span class="arrow">→</span>
+          <div class="flow-box">Update Quantity</div><span class="arrow">→</span>
+          <div class="flow-box">Calculate Total</div><span class="arrow">→</span>
+          <div class="flow-box">Checkout</div>
+        </div>
+        <div class="mt-4">
+          <div class="step"><span class="step-num">1</span><div><strong>User clicks Add to Cart.</strong> Check whether that product already exists in the cart.</div></div>
+          <div class="step"><span class="step-num">2</span><div><strong>If it exists,</strong> increase its quantity. Otherwise add a new cart item with quantity 1.</div></div>
+          <div class="step"><span class="step-num">3</span><div><strong>Quantity buttons</strong> create a new cart array instead of mutating the existing state.</div></div>
+          <div class="step"><span class="step-num">4</span><div><strong>Totals are derived</strong> from the current cart using <code>reduce()</code>.</div></div>
+          <div class="step"><span class="step-num">5</span><div><strong>React re-renders</strong> the cart whenever state changes.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="state" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-secondary text-white p-3">How Should I Manage Cart State?</div>
+      <div class="card-body">
+        <p>For a small machine coding problem, local component state is enough. If multiple distant components need the cart, Context API or a state library can be introduced.</p>
+        <div class="codebox"><pre><code>const [cart, setCart] = useState([]);</code></pre></div>
+        <h6 class="mt-4">Think of the state as the source of truth:</h6>
+        <div class="flow">
+          <div class="flow-box">cart state</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Cart UI</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">User action</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">setCart(newCart)</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Updated UI</div>
+        </div>
+        <div class="alert alert-primary mt-4 mb-0"><strong>Important:</strong> Avoid directly changing <code>cart</code>. Create a new array/object and pass it to the state setter.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fullcode" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-dark text-white p-3">Full Code — React Shopping Cart</div>
+      <div class="card-body">
+        <h6>App.jsx</h6>
+        <div class="codebox"><pre><code>import { useMemo, useState } from "react";
+
+const products = [
+  { id: 1, title: "Wireless Headphones", price: 2000 },
+  { id: 2, title: "Keyboard", price: 1500 },
+  { id: 3, title: "Mouse", price: 800 },
+  { id: 4, title: "Monitor", price: 12000 }
+];
+
+function App() {
+  const [cart, setCart] = useState([]);
+
+  const addToCart = (product) =&gt; {
+    setCart((currentCart) =&gt; {
+      const existingItem = currentCart.find(
+        (item) =&gt; item.id === product.id
+      );
+
+      if (existingItem) {
+        return currentCart.map((item) =&gt;
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+
+      return [...currentCart, { ...product, quantity: 1 }];
+    });
+  };
+
+  const increaseQuantity = (id) =&gt; {
+    setCart((currentCart) =&gt;
+      currentCart.map((item) =&gt;
+        item.id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (id) =&gt; {
+    setCart((currentCart) =&gt;
+      currentCart
+        .map((item) =&gt;
+          item.id === id
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) =&gt; item.quantity &gt; 0)
+    );
+  };
+
+  const removeFromCart = (id) =&gt; {
+    setCart((currentCart) =&gt;
+      currentCart.filter((item) =&gt; item.id !== id)
+    );
+  };
+
+  const totalItems = useMemo(
+    () =&gt; cart.reduce((sum, item) =&gt; sum + item.quantity, 0),
+    [cart]
+  );
+
+  const totalAmount = useMemo(
+    () =&gt;
+      cart.reduce(
+        (sum, item) =&gt; sum + item.price * item.quantity,
+        0
+      ),
+    [cart]
+  );
+
+  return (
+    &lt;div className="container py-4"&gt;
+      &lt;h1&gt;Shopping Cart&lt;/h1&gt;
+
+      &lt;h3 className="mt-4"&gt;Products&lt;/h3&gt;
+
+      &lt;div&gt;
+        {products.map((product) =&gt; (
+          &lt;div key={product.id}&gt;
+            &lt;span&gt;{product.title} - ₹{product.price}&lt;/span&gt;
+
+            &lt;button onClick={() =&gt; addToCart(product)}&gt;
+              Add to Cart
+            &lt;/button&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+
+      &lt;hr /&gt;
+
+      &lt;h3&gt;Cart ({totalItems} items)&lt;/h3&gt;
+
+      {cart.length === 0 ? (
+        &lt;p&gt;Your cart is empty.&lt;/p&gt;
+      ) : (
+        &lt;&gt;
+          {cart.map((item) =&gt; (
+            &lt;div key={item.id}&gt;
+              &lt;strong&gt;{item.title}&lt;/strong&gt;
+              &lt;p&gt;₹{item.price} × {item.quantity}&lt;/p&gt;
+
+              &lt;button onClick={() =&gt; decreaseQuantity(item.id)}&gt;
+                -
+              &lt;/button&gt;
+
+              &lt;span&gt; {item.quantity} &lt;/span&gt;
+
+              &lt;button onClick={() =&gt; increaseQuantity(item.id)}&gt;
+                +
+              &lt;/button&gt;
+
+              &lt;button onClick={() =&gt; removeFromCart(item.id)}&gt;
+                Remove
+              &lt;/button&gt;
+            &lt;/div&gt;
+          ))}
+
+          &lt;h3&gt;Total: ₹{totalAmount}&lt;/h3&gt;
+
+          &lt;button&gt;Checkout&lt;/button&gt;
+        &lt;/&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre></div>
+
+        <div class="alert alert-primary mt-4"><strong>Core operations:</strong> <code>find()</code> checks whether an item exists, <code>map()</code> updates an item, <code>filter()</code> removes an item, and <code>reduce()</code> calculates totals.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="walkthrough" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-secondary text-white p-3">Step-by-Step Code Walkthrough</div>
+      <div class="card-body">
+        <h6>1. Start with empty cart state</h6>
+        <div class="codebox mb-3"><pre><code>const [cart, setCart] = useState([]);</code></pre></div>
+        <p>The cart is an array because it contains multiple products.</p>
+
+        <h6>2. Add a product</h6>
+        <div class="codebox mb-3"><pre><code>const existingItem = currentCart.find(
+  (item) =&gt; item.id === product.id
+);</code></pre></div>
+        <p>First check whether the product already exists. This prevents duplicate rows for the same product.</p>
+
+        <h6>3. Increase duplicate quantity</h6>
+        <div class="codebox mb-3"><pre><code>return currentCart.map((item) =&gt;
+  item.id === product.id
+    ? { ...item, quantity: item.quantity + 1 }
+    : item
+);</code></pre></div>
+        <p><code>map()</code> creates a new array. Only the matching product gets a new object with an increased quantity.</p>
+
+        <h6>4. Add a new product</h6>
+        <div class="codebox mb-3"><pre><code>return [...currentCart, { ...product, quantity: 1 }];</code></pre></div>
+        <p>The spread operator creates a new array and adds the product with quantity 1.</p>
+
+        <h6>5. Remove a product</h6>
+        <div class="codebox mb-3"><pre><code>setCart((currentCart) =&gt;
+  currentCart.filter((item) =&gt; item.id !== id)
+);</code></pre></div>
+
+        <h6>6. Calculate the total</h6>
+        <div class="codebox mb-3"><pre><code>cart.reduce(
+  (sum, item) =&gt; sum + item.price * item.quantity,
+  0
+);</code></pre></div>
+        <p>For every item, calculate <strong>price × quantity</strong> and add it to the running total.</p>
+
+        <h6>7. Why functional state updates?</h6>
+        <div class="codebox"><pre><code>setCart((currentCart) =&gt; {
+  // calculate the next state from currentCart
+});</code></pre></div>
+        <p>This is safer when the next state depends on the previous state, especially when multiple updates may be queued.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="mistakes" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-danger text-white p-3">Common Developer Mistakes</div>
+      <div class="card-body">
+        <div class="alert alert-danger"><strong>1. Mutating state directly</strong><br>Bad: <code>item.quantity++</code> on the existing state object. Prefer creating a new object with <code>{ ...item, quantity: item.quantity + 1 }</code>.</div>
+        <div class="alert alert-danger"><strong>2. Adding duplicate product rows</strong><br>Clicking Add twice should normally increase quantity rather than create two separate rows for the same product.</div>
+        <div class="alert alert-danger"><strong>3. Using array index as the React key</strong><br>Use a stable product ID such as <code>key={item.id}</code>.</div>
+        <div class="alert alert-danger"><strong>4. Incorrect total calculation</strong><br>Total should normally be <code>price × quantity</code> for each item, then summed.</div>
+        <div class="alert alert-danger"><strong>5. Allowing quantity to become 0 or negative</strong><br>Decide the rule clearly. This implementation removes the item when quantity falls below 1.</div>
+        <div class="alert alert-danger"><strong>6. Mixing derived state with source state</strong><br>Do not unnecessarily store <code>totalAmount</code> separately when it can be calculated from <code>cart</code>. This avoids stale totals.</div>
+        <div class="alert alert-danger"><strong>7. Forgetting the empty state</strong><br>Always handle <code>cart.length === 0</code> with a useful message or empty-cart UI.</div>
+        <div class="alert alert-danger"><strong>8. Over-engineering too early</strong><br>For a small machine round, start with useState. Add Context, Redux, API calls, persistence, or backend synchronization only when requirements need them.</div>
+        <div class="alert alert-danger"><strong>9. Trusting client-side prices for payment</strong><br>The UI can calculate a display total, but a real checkout should validate prices, stock, discounts, and the final amount on the server.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interviewer" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-success text-white p-3">How I Would Explain It to the Interviewer</div>
+      <div class="card-body">
+        <div class="interview">
+          <p class="mb-0">"First, I'll clarify the cart requirements: add products, prevent duplicate product rows by increasing quantity, increase and decrease quantity, remove products, show an empty state, and calculate the total. I'll keep the cart array as the single source of truth. When adding a product, I'll use <code>find()</code> to check whether it already exists. If it exists, I'll use <code>map()</code> to increase its quantity; otherwise I'll append a new item with quantity 1. For removing, I'll use <code>filter()</code>. The total is derived using <code>reduce()</code> rather than stored separately. I will update state immutably and use stable product IDs as React keys. After the basic version works, I'll test duplicate adds, quantity boundaries, removal, empty state, and total calculation."</p>
+        </div>
+
+        <h5 class="mt-4">Visual Explanation to Draw on the Whiteboard</h5>
+        <div class="flow">
+          <div class="flow-box">Products<br><small>id, price, title</small></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Add to Cart</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">cart[]<br><small>single source of truth</small></div>
+          <span class="arrow">→</span>
+          <div class="flow-box">+ / − / Remove</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">reduce()<br><small>total</small></div>
+        </div>
+
+        <h5 class="mt-4">What I would say while coding</h5>
+        <ol>
+          <li>"I'll start with the cart state as an empty array."</li>
+          <li>"I'll use the product ID as the unique identifier."</li>
+          <li>"Before adding, I'll check whether the product is already in the cart."</li>
+          <li>"For updates, I'll avoid mutation and create new arrays and objects."</li>
+          <li>"I'll calculate totals from the cart instead of storing a second total state."</li>
+          <li>"Finally, I'll test all user actions and edge cases."</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="edge" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-dark text-white p-3">Edge Cases & Testing Checklist</div>
+      <div class="card-body">
+        <div class="cart-demo">
+          <div class="cart-row"><span>1. Add a product</span><span class="badge text-bg-success">Works</span></div>
+          <div class="cart-row"><span>2. Add the same product again</span><span class="badge text-bg-success">Quantity +1</span></div>
+          <div class="cart-row"><span>3. Increase quantity</span><span class="badge text-bg-success">+1</span></div>
+          <div class="cart-row"><span>4. Decrease quantity</span><span class="badge text-bg-success">−1</span></div>
+          <div class="cart-row"><span>5. Decrease quantity from 1</span><span class="badge text-bg-success">Item removed</span></div>
+          <div class="cart-row"><span>6. Remove item</span><span class="badge text-bg-success">Removed</span></div>
+          <div class="cart-row"><span>7. Remove last item</span><span class="badge text-bg-success">Empty state</span></div>
+          <div class="cart-row"><span>8. Verify total after every change</span><span class="badge text-bg-success">Recalculated</span></div>
+        </div>
+        <div class="alert alert-secondary mt-4 mb-0"><strong>Bonus:</strong> If the interviewer asks for persistence, store the cart in localStorage. If they ask for global access across the application, consider Context API or a state-management library.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="improve" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-primary text-white p-3">How Can I Improve It?</div>
+      <div class="card-body">
+        <ol>
+          <li><strong>Persistence:</strong> Sync the cart with localStorage so refresh does not lose it.</li>
+          <li><strong>Global state:</strong> Use Context API or Redux Toolkit when many components need cart state.</li>
+          <li><strong>API integration:</strong> Load products from a backend instead of a hard-coded array.</li>
+          <li><strong>Validation:</strong> Check stock and current server-side prices before checkout.</li>
+          <li><strong>Performance:</strong> Avoid unnecessary calculations and component re-renders when the cart grows.</li>
+          <li><strong>UX:</strong> Add loading states, disabled quantity controls, confirmation feedback, and an accessible checkout flow.</li>
+        </ol>
+        <div class="alert alert-info mb-0"><strong>Interview strategy:</strong> Finish the required version first. Then explain these as possible extensions instead of trying to implement every feature before the core cart works.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="summary" class="answer-section d-none">
+    <div class="card">
+      <div class="card-header bg-primary text-white p-3">Interview Quick Recap</div>
+      <div class="card-body">
+        <table class="table table-striped align-middle">
+          <tbody>
+            <tr><th>State</th><td><code>cart[]</code> is the source of truth.</td></tr>
+            <tr><th>Add</th><td><code>find()</code> → existing item? Update quantity : append item.</td></tr>
+            <tr><th>Update</th><td><code>map()</code> creates a new array with updated item.</td></tr>
+            <tr><th>Remove</th><td><code>filter()</code> removes the selected item.</td></tr>
+            <tr><th>Total</th><td><code>reduce()</code> calculates price × quantity.</td></tr>
+            <tr><th>React principle</th><td>Do not mutate state directly.</td></tr>
+            <tr><th>Key</th><td>Use stable IDs, not array indexes.</td></tr>
+            <tr><th>Testing</th><td>Test add, duplicate add, +, −, remove, empty cart, and totals.</td></tr>
+          </tbody>
+        </table>
+        <div class="alert alert-primary mb-0"><strong>One-line memory trick:</strong> <code>Find → Add/Map → Filter → Reduce → Render</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-secondary py-4 small">
+    Shopping Cart • Machine Coding Round Notes
+  </footer>
+</main>
+</div>
+
+<script>
+const buttons = document.querySelectorAll(".question-btn");
+const sections = document.querySelectorAll(".answer-section");
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    const target = button.dataset.target;
+    buttons.forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    sections.forEach(section => section.classList.toggle("d-none", section.id !== target));
+    window.scrollTo({top: 0, behavior: "smooth"});
+  });
+});
+</script>
+</body>
+</html>

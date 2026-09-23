@@ -841,7 +841,7 @@ Countdown timer
 Password strength indicator
 
 # Intermediate → Advanced
-Debounced search(3) - completed
+Debounced search(3) - completedN
 Autocomplete- completed
 Infinite scrolling - completed
 lazy loading- completed
@@ -851,16 +851,61 @@ Sort/filter/pagination table
 Data table- completed
 Multi-step form- completed
 Drag and drop- completed
-File upload
-Optimistic UI
+File upload- completed
+Optimistic UI- completed
 Undo/redo
 Tree view
 Custom useFetch
-Nested comments
+Nested comments,  
 Custom useDebounce
 Shopping cart
 Custom usePrevious
 Custom useLocalStorage
+
+=============
+
+Your actual remaining roadmap
+
+If I were organizing your preparation, I'd now make this your list:
+
+🔴 Must Learn
+1. OTP Input
+2. Image Carousel
+3. Star Rating
+4. Toast Notification
+5. Kanban Board
+6. Tic-Tac-Toe
+7. Calendar
+8. Checkbox Tree
+9. File Explorer
+10. Responsive Navbar
+
+🟠 Next Level
+11. Progress Bar
+12. Theme Toggle / Dark Mode
+13. Context Menu
+14. Tooltip / Popover
+15. Chips Input
+16. Transfer List
+17. Traffic Light
+18. Dashboard
+19. Chat UI
+20. Email Client
+
+🟡 Advanced variations
+21. Modal + Focus Trap
+22. Autocomplete + Keyboard Navigation
+23. Data Table + Row Selection
+24. Data Table + Inline Editing
+25. Infinite Scroll + IntersectionObserver
+26. File Upload + Progress
+27. File Upload + Preview + Cancel
+28. Tree + Checkbox + Indeterminate State
+29. Kanban + Persistence
+30. Multi-step Form + URL State
+
+
+==============
 
 
 🏗️ React Machine Coding Round
