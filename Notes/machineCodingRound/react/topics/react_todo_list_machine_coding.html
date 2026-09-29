@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Todo List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529;font-family:"Segoe UI",Arial,sans-serif;line-height:1.65}
+    .sticky-nav{position:sticky;top:0;z-index:1000;background:#212529;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+    .sticky-nav a{color:#fff;text-decoration:none;font-size:.88rem;padding:.65rem .75rem;display:inline-block}
+    .sticky-nav a:hover{background:#343a40;border-radius:6px}
+    .hero{background:linear-gradient(135deg,#198754,#087f5b);color:#fff;border-radius:0 0 20px 20px;padding:42px 20px;margin-bottom:28px}
+    .hero h1{font-weight:700}
+    .card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:22px}
+    .card-header{border-radius:14px 14px 0 0!important;font-weight:700}
+    .question-panel{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow-y:auto}
+    .question-list button{text-align:left;width:100%;border:0;background:#fff;padding:12px 14px;border-bottom:1px solid #eee;color:#343a40}
+    .question-list button:hover,.question-list button.active{background:#e8f7ef;color:#198754;font-weight:600}
+    .answer-section{scroll-margin-top:90px}
+    pre{background:#1e1e1e;color:#e8e8e8;padding:18px;border-radius:10px;overflow-x:auto;font-size:.86rem;line-height:1.55}
+    code{color:#d63384} pre code{color:inherit}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:15px;background:#fff;text-align:center;height:100%}
+    .arrow{display:flex;align-items:center;justify-content:center;font-size:25px;color:#198754;font-weight:bold}
+    .mistake{border-left:5px solid #dc3545}
+    .tip{border-left:5px solid #198754}
+    .interview{border-left:5px solid #0d6efd}
+    .badge-soft{background:#e8f7ef;color:#198754;padding:5px 9px;border-radius:20px;font-size:.8rem}
+    .mini-title{font-weight:700;color:#495057}
+    .checklist li{margin-bottom:7px}
+    @media(max-width:991px){.question-panel{position:static;max-height:none;margin-bottom:20px}}
+  </style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <div class="container-fluid px-3">
+    <div class="d-flex flex-wrap align-items-center">
+      <strong class="text-white me-3">React Todo List</strong>
+      <a href="#what">What</a>
+      <a href="#why">Why</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#state">State Design</a>
+      <a href="#flow">Execution Flow</a>
+      <a href="#implementation">Implementation</a>
+      <a href="#code">Full Code</a>
+      <a href="#interview1">1-Min</a>
+      <a href="#interview5">5-Min</a>
+      <a href="#mistakes">Mistakes</a>
+      <a href="#questions">Interview Q&A</a>
+      <a href="#recap">Recap</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge bg-light text-success mb-2">Machine Coding Round</span>
+    <h1>React Todo List</h1>
+    <p class="lead mb-1">A practical React machine-coding task for managing a list of tasks.</p>
+    <p class="mb-0">Goal: Add todos, mark them completed, delete them, and keep the UI synchronized with state.</p>
+  </div>
+</header>
+
+<main class="container pb-5">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-4">
+      <div class="card question-panel">
+        <div class="card-header bg-dark text-white">Left Side — Questions</div>
+        <div class="question-list">
+          <button class="active" onclick="showAnswer('what')">1. What is Todo List?</button>
+          <button onclick="showAnswer('why')">2. What problem does it solve?</button>
+          <button onclick="showAnswer('requirements')">3. What are the requirements?</button>
+          <button onclick="showAnswer('state')">4. What state do I need?</button>
+          <button onclick="showAnswer('flow')">5. How does it execute?</button>
+          <button onclick="showAnswer('implementation')">6. How did I implement it?</button>
+          <button onclick="showAnswer('code')">7. What is the full code?</button>
+          <button onclick="showAnswer('interview1')">8. How do I explain it in 1 minute?</button>
+          <button onclick="showAnswer('interview5')">9. How do I explain it in 5 minutes?</button>
+          <button onclick="showAnswer('mistakes')">10. What common mistakes should I avoid?</button>
+          <button onclick="showAnswer('questions')">11. What interview questions can be asked?</button>
+          <button onclick="showAnswer('recap')">12. What should I remember?</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section class="col-lg-8">
+
+      <div id="what" class="card answer-section">
+        <div class="card-header bg-success text-white">1. What is a Todo List?</div>
+        <div class="card-body">
+          <p><strong>Technical definition:</strong> A Todo List is a React application that allows users to create, display, update, and remove tasks.</p>
+          <div class="alert alert-info">
+            <strong>Layman example:</strong> Imagine writing tasks in a notebook: "Study React", "Practice DSA", "Go to gym". You can add a new task, tick it when completed, and remove it when it is no longer needed.
+          </div>
+          <p><span class="badge-soft">Core React concepts</span>
+            <strong>State → Forms/Input → Events → Array operations → Conditional rendering → Re-render</strong>
+          </p>
+        </div>
+      </div>
+
+      <div id="why" class="card answer-section">
+        <div class="card-header bg-primary text-white">2. What Problem Does a Todo List Solve?</div>
+        <div class="card-body">
+          <p>A Todo List demonstrates how an application manages a collection of changing data.</p>
+          <ul class="checklist">
+            <li>Users can create new tasks.</li>
+            <li>Users can see all current tasks.</li>
+            <li>Users can mark tasks as completed.</li>
+            <li>Users can delete tasks.</li>
+            <li>The UI stays synchronized with application state.</li>
+          </ul>
+          <div class="alert alert-warning mb-0">
+            <strong>Machine-coding point:</strong> The task is simple visually, but it tests important concepts such as array state updates, immutable updates, event handling, controlled inputs, list rendering, and keys.
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card answer-section">
+        <div class="card-header bg-info text-dark">3. Requirements</div>
+        <div class="card-body">
+          <h6 class="mini-title">Minimum requirements</h6>
+          <ol>
+            <li>Input field for entering a todo.</li>
+            <li>Add button to create a todo.</li>
+            <li>Display all todos in a list.</li>
+            <li>Mark a todo as completed.</li>
+            <li>Delete a todo.</li>
+            <li>Do not add an empty todo.</li>
+          </ol>
+
+          <h6 class="mini-title">Good clarification questions for the interviewer</h6>
+          <ul>
+            <li>Should duplicate todos be allowed?</li>
+            <li>Should completed tasks be deleted or only marked completed?</li>
+            <li>Do we need edit functionality?</li>
+            <li>Do we need localStorage persistence?</li>
+            <li>Do we need filters such as All / Active / Completed?</li>
+            <li>Do we need a character limit?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="state" class="card answer-section">
+        <div class="card-header bg-warning text-dark">4. State Design — What State Do I Need?</div>
+        <div class="card-body">
+          <p>For the basic version, I need <strong>two pieces of state</strong>.</p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <h6 class="mini-title">1. input</h6>
+                  <p>Stores what the user is currently typing.</p>
+                  <code>const [input, setInput] = useState("");</code>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <h6 class="mini-title">2. todos</h6>
+                  <p>Stores the list of task objects.</p>
+                  <code>const [todos, setTodos] = useState([]);</code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h6 class="mini-title mt-3">Todo object structure</h6>
+<pre><code>{
+  id: 1,
+  text: "Learn React",
+  completed: false
+}</code></pre>
+
+          <div class="alert alert-success mb-0">
+            <strong>Why an object?</strong> A todo may need more information than just text. Keeping <code>id</code>, <code>text</code>, and <code>completed</code> makes future features easier to add.
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card answer-section">
+        <div class="card-header bg-warning text-dark">5. Execution Flow — Simple Visual Explanation</div>
+        <div class="card-body">
+          <p><strong>Adding a Todo:</strong></p>
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md-2"><div class="flow-box"><strong>1</strong><br>User types<br>task</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>2</strong><br>Input state<br>updates</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>3</strong><br>Click Add</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>4</strong><br>New todo added</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md-3"><div class="flow-box"><strong>5</strong><br>todos state changes</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>6</strong><br>React re-renders</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>7</strong><br>New task appears</div></div>
+          </div>
+
+          <hr>
+
+          <p><strong>Completing a Todo:</strong></p>
+          <div class="alert alert-primary">
+            Click checkbox → find matching todo → create a new todo object with <code>completed</code> toggled → replace the todos array → React re-renders → UI shows completed state.
+          </div>
+
+          <p><strong>Deleting a Todo:</strong></p>
+          <div class="alert alert-danger mb-0">
+            Click Delete → filter out the selected todo → update todos state → React re-renders → selected task disappears.
+          </div>
+        </div>
+      </div>
+
+      <div id="implementation" class="card answer-section">
+        <div class="card-header bg-primary text-white">6. How I Have Implemented It — Interview Explanation</div>
+        <div class="card-body">
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 1 — Manage the input</strong>
+              <p class="mb-0">I use a controlled input. The input value is stored in React state and <code>onChange</code> updates that state whenever the user types.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 2 — Add a todo</strong>
+              <p class="mb-0">When Add is clicked, I validate that the input is not empty, create a todo object with a unique id, and append it to the existing array.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 3 — Display todos</strong>
+              <p class="mb-0">I use <code>map()</code> to render every todo. Each item receives a stable <code>key</code> using its id.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 4 — Toggle completion</strong>
+              <p class="mb-0">I use <code>map()</code> to create a new array. Only the selected todo gets its <code>completed</code> value toggled.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 5 — Delete</strong>
+              <p class="mb-0">I use <code>filter()</code> to create a new array without the selected todo.</p>
+            </div>
+          </div>
+
+          <div class="alert alert-success mb-0">
+            <strong>One-line implementation summary:</strong>
+            "I manage the input and todo collection using React state, use controlled input for user entry, map for rendering and updating individual todos, and filter for deletion."
+          </div>
+        </div>
+      </div>
+
+      <div id="code" class="card answer-section">
+        <div class="card-header bg-dark text-white">7. Full React Code</div>
+        <div class="card-body">
+<pre><code>import { useState } from "react";
+
+function TodoList() {
+  const [input, setInput] = useState("");
+  const [todos, setTodos] = useState([]);
+
+  const handleAddTodo = () =&gt; {
+    const text = input.trim();
+
+    if (!text) return;
+
+    const newTodo = {
+      id: Date.now(),
+      text,
+      completed: false
+    };
+
+    setTodos(prevTodos =&gt; [...prevTodos, newTodo]);
+    setInput("");
+  };
+
+  const handleToggleTodo = (id) =&gt; {
+    setTodos(prevTodos =&gt;
+      prevTodos.map(todo =&gt;
+        todo.id === id
+          ? { ...todo, completed: !todo.completed }
+          : todo
+      )
+    );
+  };
+
+  const handleDeleteTodo = (id) =&gt; {
+    setTodos(prevTodos =&gt;
+      prevTodos.filter(todo =&gt; todo.id !== id)
+    );
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Todo List&lt;/h2&gt;
+
+      &lt;input
+        type="text"
+        value={input}
+        onChange={(e) =&gt; setInput(e.target.value)}
+        placeholder="Enter a task"
+      /&gt;
+
+      &lt;button onClick={handleAddTodo}&gt;
+        Add
+      &lt;/button&gt;
+
+      &lt;ul&gt;
+        {todos.map(todo =&gt; (
+          &lt;li key={todo.id}&gt;
+            &lt;input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() =&gt; handleToggleTodo(todo.id)}
+            /&gt;
+
+            &lt;span
+              style={{
+                textDecoration:
+                  todo.completed ? "line-through" : "none"
+              }}
+            &gt;
+              {todo.text}
+            &lt;/span&gt;
+
+            &lt;button
+              onClick={() =&gt; handleDeleteTodo(todo.id)}
+            &gt;
+              Delete
+            &lt;/button&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default TodoList;</code></pre>
+
+          <h6 class="mini-title mt-3">Important code patterns</h6>
+
+<pre><code>// Add
+setTodos(prev =&gt; [...prev, newTodo]);
+
+// Toggle
+setTodos(prev =&gt;
+  prev.map(todo =&gt;
+    todo.id === id
+      ? { ...todo, completed: !todo.completed }
+      : todo
+  )
+);
+
+// Delete
+setTodos(prev =&gt;
+  prev.filter(todo =&gt; todo.id !== id)
+);</code></pre>
+
+          <div class="alert alert-info mb-0">
+            <strong>Interview point:</strong> Notice that I am not modifying the existing array directly. I create a new array using spread, map, or filter.
+          </div>
+        </div>
+      </div>
+
+      <div id="interview1" class="card answer-section">
+        <div class="card-header bg-success text-white">8. How to Explain Todo List in 1 Minute</div>
+        <div class="card-body">
+          <p><strong>Interview-ready answer:</strong></p>
+          <div class="alert alert-light border">
+            "I implemented a Todo List in React using two pieces of state: one for the current input value and one for the list of todos. Each todo contains an id, text, and completed status. The input is controlled using React state. When the user clicks Add, I validate the input, create a new todo object, and append it to the existing array. I use map to render the todos and also to toggle the completed state of a selected todo. For deletion, I use filter to create a new array without that todo. I use functional state updates because these operations depend on the previous todo list, and I use the todo id as the React key."
+          </div>
+
+          <h6 class="mini-title">1-minute structure</h6>
+          <ol>
+            <li><strong>State:</strong> input + todos</li>
+            <li><strong>Add:</strong> create object and append</li>
+            <li><strong>Render:</strong> map()</li>
+            <li><strong>Complete:</strong> map() + toggle</li>
+            <li><strong>Delete:</strong> filter()</li>
+            <li><strong>Important:</strong> immutable array updates + stable key</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="interview5" class="card answer-section">
+        <div class="card-header bg-primary text-white">9. How to Explain Todo List in 5 Minutes</div>
+        <div class="card-body">
+
+          <h6 class="mini-title">Minute 1 — Clarify requirements</h6>
+          <p>I first identify the basic operations: add, display, complete, and delete. I also clarify edge cases such as empty input, duplicate tasks, editing, persistence, and filtering.</p>
+
+          <h6 class="mini-title">Minute 2 — Design the data</h6>
+          <p>I keep two states: the input text and the todos array. Each todo is an object containing an id, text, and completed boolean.</p>
+
+          <h6 class="mini-title">Minute 3 — Implement Add</h6>
+          <p>I make the input controlled. On Add, I trim the input, reject an empty value, create a new object, append it using the spread operator, and clear the input.</p>
+
+          <h6 class="mini-title">Minute 4 — Implement Toggle and Delete</h6>
+          <p>For completion, I use <code>map()</code> to return a new array and toggle only the matching todo. For deletion, I use <code>filter()</code> to remove the matching id.</p>
+
+          <h6 class="mini-title">Minute 5 — Discuss React quality</h6>
+          <ul>
+            <li>Use stable keys for list items.</li>
+            <li>Do not mutate the existing array.</li>
+            <li>Use functional state updates when depending on previous state.</li>
+            <li>Validate user input.</li>
+            <li>Keep event handlers small and readable.</li>
+            <li>Discuss possible extensions if the interviewer asks for more.</li>
+          </ul>
+
+          <div class="alert alert-success mb-0">
+            <strong>Strong closing line:</strong>
+            "The important part of this implementation is not just displaying tasks; it is correctly managing a changing collection of state while keeping the UI predictable and synchronized."
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card answer-section">
+        <div class="card-header bg-danger text-white">10. Common Developer Mistakes</div>
+        <div class="card-body">
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 1 — Mutating the todos array directly</strong>
+<pre><code>// Wrong
+todos.push(newTodo);
+
+// Better
+setTodos(prevTodos =&gt; [...prevTodos, newTodo]);</code></pre>
+              <p class="mb-0">React state should be updated by creating a new array instead of directly mutating the existing one.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 2 — Using array index as key</strong>
+<pre><code>// Avoid when a stable id is available
+{todos.map((todo, index) =&gt;
+  &lt;li key={index}&gt;...&lt;/li&gt;
+)}
+
+// Prefer
+{todos.map(todo =&gt;
+  &lt;li key={todo.id}&gt;...&lt;/li&gt;
+)}</code></pre>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 3 — Allowing empty todos</strong>
+<pre><code>const text = input.trim();
+
+if (!text) return;</code></pre>
+              <p class="mb-0">Always validate user input before adding it.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 4 — Forgetting to clear input</strong>
+              <p class="mb-0">After adding successfully, call <code>setInput("")</code> so the input is ready for the next task.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 5 — Updating the wrong todo</strong>
+              <p class="mb-0">Always compare the selected todo's unique id before changing or deleting it.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 6 — Forgetting checkbox controlled behavior</strong>
+              <p class="mb-0">For a controlled checkbox, keep <code>checked</code> connected to state and update it through the event handler.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-0">
+            <div class="card-body">
+              <strong>Mistake 7 — Overengineering too early</strong>
+              <p class="mb-0">Do not start with Redux, complex architecture, or unnecessary libraries. First implement the requested requirements cleanly, then extend if asked.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="questions" class="card answer-section">
+        <div class="card-header bg-secondary text-white">11. Interview Questions You May Be Asked</div>
+        <div class="card-body">
+          <div class="accordion" id="qaAccordion">
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  Why did you use map() for toggle?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Because I need to inspect every todo and return a new array. Only the todo whose id matches should receive the updated completed value.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  Why did you use filter() for delete?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">filter returns a new array containing only the items that satisfy the condition, so I can keep every todo except the selected one.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  Why not use todos.push()?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">push mutates the existing array. In React, I prefer immutable updates so I create a new array and pass it to the state setter.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  Why is a key required in a list?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">The key helps React identify which list items have changed, been added, or been removed. A stable unique id is preferred.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">
+                  How would you add Edit functionality?
+                </button>
+              </h2>
+              <div id="q5" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">I would keep an editing id and input value, then use map() to replace only the matching todo's text when the user saves.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">
+                  How would you persist todos after page refresh?
+                </button>
+              </h2>
+              <div id="q6" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">For a simple client-side requirement, I can synchronize the todos state with localStorage using useEffect. For a real application, I could persist them through a backend API and database.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q7">
+                  How would you add All / Active / Completed filters?
+                </button>
+              </h2>
+              <div id="q7" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">I would keep a filter state such as "all", "active", or "completed", then derive the displayed list using filter() rather than creating separate copies of the todo state.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card answer-section">
+        <div class="card-header bg-dark text-white">12. Quick Revision — Remember This</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>State</strong>
+                  <p><code>input</code> + <code>todos</code></p>
+                  <strong>Add</strong>
+                  <p class="mb-0"><code>[...prevTodos, newTodo]</code></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>Toggle</strong>
+                  <p><code>map()</code></p>
+                  <strong>Delete</strong>
+                  <p class="mb-0"><code>filter()</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-primary mt-3">
+            <strong>Core mental model:</strong><br>
+            User input → State → Add/Toggle/Delete handler → New array → React re-render → Updated Todo List
+          </div>
+
+          <h6 class="mini-title">Machine Coding Checklist</h6>
+          <ul class="checklist">
+            <li>Clarify requirements before coding.</li>
+            <li>Identify the minimum state.</li>
+            <li>Use controlled input.</li>
+            <li>Validate empty input.</li>
+            <li>Use stable unique keys.</li>
+            <li>Do not mutate arrays directly.</li>
+            <li>Use map() for updating an item.</li>
+            <li>Use filter() for removing an item.</li>
+            <li>Use functional updates when working from previous state.</li>
+            <li>Explain your decisions while coding.</li>
+          </ul>
+
+          <div class="alert alert-success mb-0">
+            <strong>Most important pattern to memorize:</strong><br>
+            <code>Add → spread</code> &nbsp; | &nbsp;
+            <code>Update → map</code> &nbsp; | &nbsp;
+            <code>Delete → filter</code>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<script>
+function showAnswer(id){
+  const target=document.getElementById(id);
+  if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
+  document.querySelectorAll(".question-list button").forEach(btn=>btn.classList.remove("active"));
+  document.querySelectorAll(".question-list button").forEach(btn=>{
+    if(btn.getAttribute("onclick")==="showAnswer('"+id+"')") btn.classList.add("active");
+  });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

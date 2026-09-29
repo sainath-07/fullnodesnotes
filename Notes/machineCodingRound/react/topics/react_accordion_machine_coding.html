@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Accordion</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529;font-family:"Segoe UI",Arial,sans-serif;line-height:1.65}
+    .sticky-nav{position:sticky;top:0;z-index:1000;background:#212529;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+    .sticky-nav a{color:#fff;text-decoration:none;font-size:.85rem;padding:.65rem .72rem;display:inline-block}
+    .sticky-nav a:hover{background:#343a40;border-radius:6px}
+    .hero{background:linear-gradient(135deg,#fd7e14,#c95d00);color:#fff;border-radius:0 0 20px 20px;padding:42px 20px;margin-bottom:28px}
+    .hero h1{font-weight:700}
+    .card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:22px}
+    .card-header{border-radius:14px 14px 0 0!important;font-weight:700}
+    .question-panel{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow-y:auto}
+    .question-list button{text-align:left;width:100%;border:0;background:#fff;padding:12px 14px;border-bottom:1px solid #eee;color:#343a40}
+    .question-list button:hover,.question-list button.active{background:#fff2e8;color:#d35400;font-weight:600}
+    .answer-section{scroll-margin-top:90px}
+    pre{background:#1e1e1e;color:#e8e8e8;padding:18px;border-radius:10px;overflow-x:auto;font-size:.86rem;line-height:1.55}
+    code{color:#d63384} pre code{color:inherit}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:15px;background:#fff;text-align:center;height:100%}
+    .arrow{display:flex;align-items:center;justify-content:center;font-size:25px;color:#fd7e14;font-weight:bold}
+    .mistake{border-left:5px solid #dc3545}
+    .tip{border-left:5px solid #198754}
+    .interview{border-left:5px solid #0d6efd}
+    .badge-soft{background:#fff2e8;color:#d35400;padding:5px 9px;border-radius:20px;font-size:.8rem}
+    .mini-title{font-weight:700;color:#495057}
+    .checklist li{margin-bottom:7px}
+    .demo-accordion{border:1px solid #dee2e6;border-radius:10px;overflow:hidden;background:#fff}
+    .demo-question{padding:13px 15px;border:0;border-bottom:1px solid #eee;background:#fff;width:100%;text-align:left;font-weight:600}
+    .demo-answer{padding:13px 15px;background:#f8f9fa;border-bottom:1px solid #eee}
+    .formula{background:#f8f9fa;border-left:5px solid #fd7e14;border-radius:10px;padding:14px}
+    @media(max-width:991px){.question-panel{position:static;max-height:none;margin-bottom:20px}}
+  </style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <div class="container-fluid px-3">
+    <div class="d-flex flex-wrap align-items-center">
+      <strong class="text-white me-3">React Accordion</strong>
+      <a href="#what">What</a>
+      <a href="#why">Why</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#state">State</a>
+      <a href="#flow">Execution Flow</a>
+      <a href="#implementation">Implementation</a>
+      <a href="#code">Full Code</a>
+      <a href="#interview1">1-Min</a>
+      <a href="#interview5">5-Min</a>
+      <a href="#mistakes">Mistakes</a>
+      <a href="#questions">Interview Q&A</a>
+      <a href="#recap">Recap</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge bg-light text-dark mb-2">Machine Coding Round</span>
+    <h1>React Accordion</h1>
+    <p class="lead mb-1">A common React machine-coding task for expanding and collapsing sections of content.</p>
+    <p class="mb-0">Goal: Let users open and close content sections while keeping the UI state predictable.</p>
+  </div>
+</header>
+
+<main class="container pb-5">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-4">
+      <div class="card question-panel">
+        <div class="card-header bg-dark text-white">Left Side — Questions</div>
+        <div class="question-list">
+          <button class="active" onclick="showAnswer('what')">1. What is Accordion?</button>
+          <button onclick="showAnswer('why')">2. What problem does it solve?</button>
+          <button onclick="showAnswer('requirements')">3. What are the requirements?</button>
+          <button onclick="showAnswer('state')">4. What state do I need?</button>
+          <button onclick="showAnswer('flow')">5. How does it execute?</button>
+          <button onclick="showAnswer('implementation')">6. How did I implement it?</button>
+          <button onclick="showAnswer('code')">7. What is the full code?</button>
+          <button onclick="showAnswer('interview1')">8. How do I explain it in 1 minute?</button>
+          <button onclick="showAnswer('interview5')">9. How do I explain it in 5 minutes?</button>
+          <button onclick="showAnswer('mistakes')">10. What common mistakes should I avoid?</button>
+          <button onclick="showAnswer('questions')">11. What interview questions can be asked?</button>
+          <button onclick="showAnswer('recap')">12. What should I remember?</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section class="col-lg-8">
+
+      <div id="what" class="card answer-section">
+        <div class="card-header bg-warning text-dark">1. What is an Accordion?</div>
+        <div class="card-body">
+          <p><strong>Technical definition:</strong> An Accordion is a UI component that displays multiple headers or questions and allows users to expand or collapse the content associated with each header.</p>
+
+          <div class="alert alert-info">
+            <strong>Layman example:</strong> Imagine a list of questions in a notebook. You see only the questions initially. When you click one question, its answer opens. Click it again and the answer closes.
+          </div>
+
+          <p><span class="badge-soft">Core React concepts</span>
+            <strong>State → Event Handling → Conditional Rendering → Array Methods → UI Synchronization</strong>
+          </p>
+
+          <div class="demo-accordion">
+            <button class="demo-question">What is React?</button>
+            <div class="demo-answer">React is a JavaScript library for building user interfaces.</div>
+            <button class="demo-question">What is useState?</button>
+            <div class="demo-answer">useState allows a React component to store and update state.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="why" class="card answer-section">
+        <div class="card-header bg-success text-white">2. What Problem Does an Accordion Solve?</div>
+        <div class="card-body">
+          <p>An Accordion helps organize a large amount of related content into compact expandable sections.</p>
+          <ul>
+            <li>Reduces visual clutter.</li>
+            <li>Keeps long pages easier to scan.</li>
+            <li>Shows details only when the user asks for them.</li>
+            <li>Works well for FAQs, settings, documentation, and product details.</li>
+            <li>Demonstrates state-driven UI behavior in React.</li>
+          </ul>
+
+          <div class="alert alert-warning mb-0">
+            <strong>Machine-coding point:</strong> The interviewer is usually testing state management, click handling, conditional rendering, list rendering, and whether you can handle the requirement of one-open-at-a-time versus multiple-open behavior.
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card answer-section">
+        <div class="card-header bg-info text-dark">3. Requirements</div>
+        <div class="card-body">
+          <h6 class="mini-title">Basic requirements</h6>
+          <ol>
+            <li>Display multiple accordion items.</li>
+            <li>Each item has a title and content.</li>
+            <li>Clicking a title opens its content.</li>
+            <li>Clicking the same title again closes it.</li>
+            <li>Clearly show which item is open.</li>
+          </ol>
+
+          <h6 class="mini-title">Important clarification</h6>
+          <div class="alert alert-primary">
+            <strong>Ask the interviewer:</strong> "Should only one accordion item be open at a time, or can multiple items be open simultaneously?"
+          </div>
+
+          <h6 class="mini-title">Possible variations</h6>
+          <ul>
+            <li><strong>Single-open:</strong> opening one item closes the previous item.</li>
+            <li><strong>Multi-open:</strong> multiple items can remain open.</li>
+            <li>First item can be open by default.</li>
+            <li>Items can be disabled.</li>
+            <li>Content can be loaded lazily.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="state" class="card answer-section">
+        <div class="card-header bg-warning text-dark">4. State Design — What State Do I Need?</div>
+        <div class="card-body">
+          <p>For a <strong>single-open Accordion</strong>, one simple piece of state is enough: the id of the currently open item.</p>
+
+<pre><code>const [openId, setOpenId] = useState(null);</code></pre>
+
+          <p>If the user opens item 2:</p>
+<pre><code>openId = 2</code></pre>
+
+          <p>Then item 2 is rendered as open.</p>
+
+          <div class="formula">
+            <strong>Toggle logic:</strong><br>
+            If clicked item is already open → close it.<br>
+            Otherwise → make clicked item the new open item.
+          </div>
+
+<pre><code>setOpenId(prevId =&gt;
+  prevId === id ? null : id
+);</code></pre>
+
+          <h6 class="mini-title mt-3">For multiple-open Accordion</h6>
+          <p>You can store an array or Set of open ids instead of a single id.</p>
+
+<pre><code>const [openIds, setOpenIds] = useState([]);</code></pre>
+
+          <div class="alert alert-success mb-0">
+            <strong>Interview concept:</strong> Choose the state structure based on the requirement. One-open means one id. Multi-open means multiple ids.
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card answer-section">
+        <div class="card-header bg-warning text-dark">5. Execution Flow — Simple Visual Explanation</div>
+        <div class="card-body">
+
+          <p><strong>Single-open Accordion:</strong></p>
+
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md-2"><div class="flow-box"><strong>1</strong><br>Initial state<br><code>null</code></div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>2</strong><br>User clicks<br>Item 1</div></div>
+            <div class="col-md-2 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>3</strong><br>setOpenId(1)</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>4</strong><br>Content opens</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md-3"><div class="flow-box"><strong>5</strong><br>User clicks Item 2</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>6</strong><br>openId becomes 2</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>7</strong><br>Item 1 closes, Item 2 opens</div></div>
+          </div>
+
+          <div class="alert alert-primary mt-4 mb-0">
+            <strong>Core flow:</strong><br>
+            User click → toggle handler → openId changes → React re-renders → matching content is conditionally displayed.
+          </div>
+        </div>
+      </div>
+
+      <div id="implementation" class="card answer-section">
+        <div class="card-header bg-primary text-white">6. How I Have Implemented It — Interview Explanation</div>
+        <div class="card-body">
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 1 — Define Accordion data</strong>
+              <p class="mb-0">I keep each item as an object containing an id, title, and content.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 2 — Track the open item</strong>
+              <p class="mb-0">For a single-open Accordion, I store the currently open item's id in <code>openId</code>.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 3 — Render items dynamically</strong>
+              <p class="mb-0">I use <code>map()</code> to generate each Accordion item from the data array.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 4 — Handle click</strong>
+              <p class="mb-0">When the user clicks an item, I compare its id with <code>openId</code>. If it is already open, I close it; otherwise I set it as the open item.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 5 — Conditional rendering</strong>
+              <p class="mb-0">I display the content only when the item's id matches <code>openId</code>.</p>
+            </div>
+          </div>
+
+          <div class="alert alert-success mb-0">
+            <strong>One-line implementation summary:</strong>
+            "I store the open item's id in state, dynamically render the Accordion items, toggle the id on click, and conditionally render content when the item's id matches the active open id."
+          </div>
+        </div>
+      </div>
+
+      <div id="code" class="card answer-section">
+        <div class="card-header bg-dark text-white">7. Full React Code — Single Item Open at a Time</div>
+        <div class="card-body">
+
+<pre><code>import { useState } from "react";
+
+function Accordion() {
+  const [openId, setOpenId] = useState(null);
+
+  const items = [
+    {
+      id: 1,
+      title: "What is React?",
+      content:
+        "React is a JavaScript library for building user interfaces."
+    },
+    {
+      id: 2,
+      title: "What is useState?",
+      content:
+        "useState allows a component to store and update state."
+    },
+    {
+      id: 3,
+      title: "What is JSX?",
+      content:
+        "JSX is a syntax extension that allows UI markup inside JavaScript."
+    }
+  ];
+
+  const handleToggle = (id) =&gt; {
+    setOpenId(prevId =&gt;
+      prevId === id ? null : id
+    );
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Accordion&lt;/h2&gt;
+
+      {items.map(item =&gt; (
+        &lt;div key={item.id}&gt;
+
+          &lt;button
+            onClick={() =&gt; handleToggle(item.id)}
+          &gt;
+            {item.title}
+          &lt;/button&gt;
+
+          {openId === item.id &amp;&amp; (
+            &lt;div&gt;
+              {item.content}
+            &lt;/div&gt;
+          )}
+
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+export default Accordion;</code></pre>
+
+          <h6 class="mini-title mt-3">Important toggle logic</h6>
+
+<pre><code>const handleToggle = (id) =&gt; {
+  setOpenId(prevId =&gt;
+    prevId === id ? null : id
+  );
+};</code></pre>
+
+          <p><strong>Meaning:</strong></p>
+          <ul>
+            <li>If the clicked item is already open → set state to <code>null</code> → close it.</li>
+            <li>If another item is open → replace its id with the clicked item's id.</li>
+            <li>If nothing is open → store the clicked item's id.</li>
+          </ul>
+
+          <div class="alert alert-info mb-0">
+            <strong>Why this is good:</strong> One state value controls the entire Accordion, so the state is simple and there is no need for separate boolean state variables for every item.
+          </div>
+        </div>
+      </div>
+
+      <div id="interview1" class="card answer-section">
+        <div class="card-header bg-success text-white">8. How to Explain Accordion in 1 Minute</div>
+        <div class="card-body">
+          <p><strong>Interview-ready answer:</strong></p>
+
+          <div class="alert alert-light border">
+            "I implemented an Accordion component in React where multiple sections can be expanded or collapsed. I first represent the Accordion items as an array containing an id, title, and content. For the single-open requirement, I use one piece of state called openId to store the currently expanded item's id. I dynamically render the items using map. When a user clicks a title, I compare its id with openId. If it is already open, I set openId to null to close it; otherwise, I set openId to that item's id. During rendering, I conditionally display the content only when the item's id matches openId. This keeps the state simple and gives me one source of truth."
+          </div>
+
+          <h6 class="mini-title">1-minute structure</h6>
+          <ol>
+            <li><strong>Data:</strong> id + title + content</li>
+            <li><strong>State:</strong> openId</li>
+            <li><strong>Render:</strong> map()</li>
+            <li><strong>Click:</strong> toggle openId</li>
+            <li><strong>Content:</strong> conditional rendering</li>
+            <li><strong>Rule:</strong> one open item at a time</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="interview5" class="card answer-section">
+        <div class="card-header bg-primary text-white">9. How to Explain Accordion in 5 Minutes</div>
+        <div class="card-body">
+
+          <h6 class="mini-title">Minute 1 — Clarify the requirement</h6>
+          <p>I first ask whether the Accordion should allow only one open item or multiple open items. This decision changes the state design.</p>
+
+          <h6 class="mini-title">Minute 2 — Design the data</h6>
+          <p>I represent each item as an object with an id, title, and content. This makes the component easy to render dynamically.</p>
+
+          <h6 class="mini-title">Minute 3 — Design the state</h6>
+          <p>For a single-open Accordion, I use one <code>openId</code> state. I don't create <code>isOpen</code> state for every item because one id can represent the entire selection.</p>
+
+          <h6 class="mini-title">Minute 4 — Implement interaction</h6>
+          <p>I use map() to render the items and a click handler to toggle the open id. If the same item is clicked again, I close it. If another item is clicked, the new id replaces the old one.</p>
+
+          <h6 class="mini-title">Minute 5 — Discuss improvements</h6>
+          <ul>
+            <li>Support multiple open items.</li>
+            <li>Add keyboard accessibility.</li>
+            <li>Add ARIA attributes.</li>
+            <li>Add disabled items.</li>
+            <li>Add animation for opening and closing.</li>
+            <li>Lazy-load expensive content when required.</li>
+          </ul>
+
+          <div class="alert alert-success mb-0">
+            <strong>Strong closing line:</strong>
+            "The main design decision is how I represent the open state. For single-open behavior, one open id is enough; for multi-open behavior, I would maintain multiple open ids."
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card answer-section">
+        <div class="card-header bg-danger text-white">10. Common Developer Mistakes</div>
+        <div class="card-body">
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 1 — Creating separate state for every item</strong>
+<pre><code>// Avoid this pattern
+const [isItem1Open, setIsItem1Open] = useState(false);
+const [isItem2Open, setIsItem2Open] = useState(false);
+const [isItem3Open, setIsItem3Open] = useState(false);</code></pre>
+              <p class="mb-0">For a dynamic Accordion, one <code>openId</code> state is much easier for single-open behavior.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 2 — Not clarifying single vs multiple open</strong>
+              <p class="mb-0">This is an important requirement because it directly affects the state structure.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 3 — Using array index as key</strong>
+<pre><code>// Avoid when a stable id exists
+{items.map((item, index) =&gt;
+  &lt;div key={index}&gt;...&lt;/div&gt;
+)}
+
+// Prefer
+{items.map(item =&gt;
+  &lt;div key={item.id}&gt;...&lt;/div&gt;
+)}</code></pre>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 4 — Wrong toggle condition</strong>
+              <p class="mb-0">Make sure clicking an already-open item closes it, while clicking another item opens the new item.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 5 — Rendering every answer all the time</strong>
+              <p class="mb-0">If the requirement is to show only the selected content, conditionally render the content based on the open id.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 6 — Ignoring accessibility</strong>
+              <p class="mb-0">A production Accordion should consider keyboard interaction, focus behavior, semantic buttons, and ARIA attributes where appropriate.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-0">
+            <div class="card-body">
+              <strong>Mistake 7 — Overengineering animations first</strong>
+              <p class="mb-0">First implement correct state and behavior. Add animation only after the core functionality works.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="questions" class="card answer-section">
+        <div class="card-header bg-secondary text-white">11. Interview Questions You May Be Asked</div>
+        <div class="card-body">
+          <div class="accordion" id="qaAccordion">
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  Why did you use openId instead of a boolean?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">A boolean can tell me whether something is open, but it cannot identify which item is open. An id directly represents the selected item and makes single-open behavior simple.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  How would you allow multiple items to remain open?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">I would store multiple open ids, for example in an array or Set, and add/remove an id when the user clicks an item.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  Why use map()?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">map() allows the Accordion to be generated from data, so I don't need to manually write every item and the component can support any number of items.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  How would you make the Accordion reusable?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Pass the Accordion items through props and keep the open-state logic inside the component. This allows different pages to provide different content.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">
+                  How would you add an active/open icon?
+                </button>
+              </h2>
+              <div id="q5" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Compare <code>openId</code> with the current item's id and render one icon for the open state and another for the closed state.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">
+                  How would you add animation?
+                </button>
+              </h2>
+              <div id="q6" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">After the behavior works, I can use CSS transitions/animations or an animation library. I would avoid making animation logic responsible for the actual open/close state.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q7">
+                  How would you make it accessible?
+                </button>
+              </h2>
+              <div id="q7" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Use real buttons for headers, support keyboard activation, expose expanded state with appropriate ARIA attributes, connect the button to its panel, and manage focus when needed.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q8">
+                  What is the time complexity of rendering the Accordion?
+                </button>
+              </h2>
+              <div id="q8" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">If there are n Accordion items, map() processes n items during rendering, so the list rendering is O(n). The state update itself is O(1) for the single open id.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card answer-section">
+        <div class="card-header bg-dark text-white">12. Quick Revision — Remember This</div>
+        <div class="card-body">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>State</strong>
+                  <p class="mb-0"><code>openId</code></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>Render</strong>
+                  <p class="mb-0"><code>map()</code></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>Show/Hide</strong>
+                  <p class="mb-0">Conditional rendering</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-primary mt-3">
+            <strong>Core mental model:</strong><br>
+            User clicks → compare id → update openId → React re-renders → matching content opens/closes
+          </div>
+
+          <div class="alert alert-success">
+            <strong>Most important interview idea:</strong><br>
+            "For single-open behavior, one openId is enough. For multiple-open behavior, maintain a collection of open ids."
+          </div>
+
+          <h6 class="mini-title">Machine Coding Checklist</h6>
+          <ul>
+            <li>Clarify single-open vs multi-open behavior.</li>
+            <li>Represent items as data.</li>
+            <li>Use stable ids.</li>
+            <li>Use openId for single-open behavior.</li>
+            <li>Render items using map().</li>
+            <li>Toggle the selected item correctly.</li>
+            <li>Conditionally render content.</li>
+            <li>Show clear open/closed visual state.</li>
+            <li>Discuss accessibility when appropriate.</li>
+            <li>Keep animation separate from core state logic.</li>
+          </ul>
+
+          <div class="alert alert-warning mb-0">
+            <strong>Pattern to memorize:</strong><br>
+            <code>Items Data → openId State → Click → Toggle → Conditional Rendering → UI</code>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<script>
+function showAnswer(id){
+  const target=document.getElementById(id);
+  if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
+  document.querySelectorAll(".question-list button").forEach(btn=>btn.classList.remove("active"));
+  document.querySelectorAll(".question-list button").forEach(btn=>{
+    if(btn.getAttribute("onclick")==="showAnswer('"+id+"')") btn.classList.add("active");
+  });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

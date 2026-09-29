@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Counter</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f5f7fb;
+      color: #212529;
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.65;
+    }
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #212529;
+      box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    }
+    .sticky-nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: .9rem;
+      padding: .65rem .8rem;
+      display: inline-block;
+    }
+    .sticky-nav a:hover { background: #343a40; border-radius: 6px; }
+    .hero {
+      background: linear-gradient(135deg, #0d6efd, #084298);
+      color: white;
+      border-radius: 0 0 20px 20px;
+      padding: 42px 20px;
+      margin-bottom: 28px;
+    }
+    .hero h1 { font-weight: 700; }
+    .card {
+      border: 0;
+      border-radius: 14px;
+      box-shadow: 0 5px 18px rgba(0,0,0,.07);
+      margin-bottom: 22px;
+    }
+    .card-header {
+      border-radius: 14px 14px 0 0 !important;
+      font-weight: 700;
+    }
+    .question-panel {
+      position: sticky;
+      top: 70px;
+      max-height: calc(100vh - 90px);
+      overflow-y: auto;
+    }
+    .question-list button {
+      text-align: left;
+      width: 100%;
+      border: 0;
+      background: #fff;
+      padding: 12px 14px;
+      border-bottom: 1px solid #eee;
+      color: #343a40;
+    }
+    .question-list button:hover,
+    .question-list button.active {
+      background: #e9f2ff;
+      color: #0d6efd;
+      font-weight: 600;
+    }
+    .answer-section { scroll-margin-top: 90px; }
+    pre {
+      background: #1e1e1e;
+      color: #e8e8e8;
+      padding: 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    code { color: #d63384; }
+    pre code { color: inherit; }
+    .flow-box {
+      border: 2px solid #dee2e6;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fff;
+      text-align: center;
+      height: 100%;
+    }
+    .arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      color: #0d6efd;
+      font-weight: bold;
+    }
+    .mistake { border-left: 5px solid #dc3545; }
+    .tip { border-left: 5px solid #198754; }
+    .interview { border-left: 5px solid #0d6efd; }
+    .badge-soft {
+      background: #e9f2ff;
+      color: #0d6efd;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: .8rem;
+    }
+    .mini-title { font-weight: 700; color: #495057; }
+    .checklist li { margin-bottom: 7px; }
+    @media (max-width: 991px) {
+      .question-panel {
+        position: static;
+        max-height: none;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="sticky-nav">
+  <div class="container-fluid px-3">
+    <div class="d-flex flex-wrap align-items-center">
+      <strong class="text-white me-3">React Counter</strong>
+      <a href="#what">What</a>
+      <a href="#why">Why</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#flow">Execution Flow</a>
+      <a href="#implementation">Implementation</a>
+      <a href="#code">Full Code</a>
+      <a href="#interview1">1-Min Explanation</a>
+      <a href="#interview5">5-Min Explanation</a>
+      <a href="#mistakes">Mistakes</a>
+      <a href="#questions">Interview Q&A</a>
+      <a href="#recap">Recap</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge bg-light text-primary mb-2">Machine Coding Round</span>
+    <h1>React Counter</h1>
+    <p class="lead mb-1">A simple but important React machine-coding task to demonstrate state, events, rendering, and component design.</p>
+    <p class="mb-0">Goal: Build a counter with <strong>Increment</strong>, <strong>Decrement</strong>, and <strong>Reset</strong> actions.</p>
+  </div>
+</header>
+
+<main class="container pb-5">
+
+  <!-- LEFT / RIGHT INTRO -->
+  <div class="row g-4">
+    <aside class="col-lg-4">
+      <div class="card question-panel">
+        <div class="card-header bg-dark text-white">Left Side — Questions</div>
+        <div class="question-list">
+          <button class="active" onclick="showAnswer('what')">1. What is Counter?</button>
+          <button onclick="showAnswer('why')">2. Why build Counter?</button>
+          <button onclick="showAnswer('requirements')">3. What are the requirements?</button>
+          <button onclick="showAnswer('flow')">4. How does it execute?</button>
+          <button onclick="showAnswer('implementation')">5. How did I implement it?</button>
+          <button onclick="showAnswer('code')">6. What is the full code?</button>
+          <button onclick="showAnswer('interview1')">7. How do I explain it in 1 minute?</button>
+          <button onclick="showAnswer('interview5')">8. How do I explain it in 5 minutes?</button>
+          <button onclick="showAnswer('mistakes')">9. What mistakes should I avoid?</button>
+          <button onclick="showAnswer('questions')">10. What interview questions can be asked?</button>
+          <button onclick="showAnswer('recap')">11. What should I remember?</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="col-lg-8">
+
+      <div id="what" class="card answer-section">
+        <div class="card-header bg-primary text-white">1. What is a Counter?</div>
+        <div class="card-body">
+          <p><strong>Technical definition:</strong> A Counter is a small React application that stores a numeric value in component state and changes that value when the user interacts with buttons.</p>
+          <div class="alert alert-info">
+            <strong>Layman example:</strong> Imagine a room light switch. Every time you press a button, something changes. Here, pressing <strong>+</strong> increases the number, <strong>-</strong> decreases it, and <strong>Reset</strong> brings it back to the starting value.
+          </div>
+          <p class="mb-0"><span class="badge-soft">Core React concepts</span> <strong>useState → Event Handling → State Update → Re-render → Updated UI</strong></p>
+        </div>
+      </div>
+
+      <div id="why" class="card answer-section">
+        <div class="card-header bg-success text-white">2. Why build a Counter?</div>
+        <div class="card-body">
+          <p>The Counter looks simple, but it tests the fundamentals of React.</p>
+          <ul class="checklist">
+            <li>Can you create and manage state using <code>useState</code>?</li>
+            <li>Can you handle button click events?</li>
+            <li>Can you update state correctly?</li>
+            <li>Do you understand that changing state causes React to re-render?</li>
+            <li>Can you keep UI and state synchronized?</li>
+            <li>Can you write clean, readable component code?</li>
+          </ul>
+          <div class="alert alert-warning mb-0">
+            <strong>Machine-coding point:</strong> The interviewer is usually checking your implementation approach, not the difficulty of the Counter itself.
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card answer-section">
+        <div class="card-header bg-info text-dark">3. Requirements</div>
+        <div class="card-body">
+          <ol>
+            <li>Initial counter value should be <strong>0</strong>.</li>
+            <li><strong>Increment</strong> button increases the value by 1.</li>
+            <li><strong>Decrement</strong> button decreases the value by 1.</li>
+            <li><strong>Reset</strong> button changes the value back to 0.</li>
+            <li>The displayed number should update immediately after each action.</li>
+          </ol>
+
+          <h6 class="mini-title">Optional requirements you may clarify</h6>
+          <ul>
+            <li>Should negative values be allowed?</li>
+            <li>Should there be a minimum or maximum value?</li>
+            <li>Should the step be configurable, such as +5 / -5?</li>
+            <li>Should buttons become disabled at limits?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="flow" class="card answer-section">
+        <div class="card-header bg-warning text-dark">4. Execution Flow — Simple Visual Explanation</div>
+        <div class="card-body">
+          <p><strong>Think of the Counter as a small cycle:</strong></p>
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md-2"><div class="flow-box"><strong>1</strong><br>Initial State<br><code>0</code></div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>2</strong><br>User clicks<br>Button</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>3</strong><br>setCount()<br>updates state</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>4</strong><br>React re-renders<br>UI</div></div>
+          </div>
+
+          <div class="alert alert-primary mt-4">
+            <strong>Example:</strong><br>
+            count = 0 → click Increment → setCount(1) → React re-renders → screen shows 1
+            <br><br>
+            Then: 1 → click Increment → 2 → screen shows 2
+          </div>
+
+          <h6 class="mini-title">What happens when Decrement is clicked?</h6>
+          <p class="mb-0"><code>count = 2</code> → click Decrement → <code>setCount(1)</code> → React re-renders → UI shows <code>1</code>.</p>
+        </div>
+      </div>
+
+      <div id="implementation" class="card answer-section">
+        <div class="card-header bg-primary text-white">5. How I Have Implemented It — Interview Explanation</div>
+        <div class="card-body">
+          <p>You can explain your implementation in this order:</p>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 1 — Create state</strong>
+              <p class="mb-0">I use React's <code>useState</code> hook to store the current counter value. I initialize it with 0.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 2 — Create actions</strong>
+              <p class="mb-0">I create separate click handlers for increment, decrement, and reset so each action has a clear responsibility.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 3 — Update state</strong>
+              <p class="mb-0">Increment adds 1, decrement subtracts 1, and reset sets the value back to 0.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 4 — Render state</strong>
+              <p class="mb-0">I display the state variable inside JSX. Whenever state changes, React re-renders the component and the updated value appears on screen.</p>
+            </div>
+          </div>
+
+          <div class="alert alert-success mb-0">
+            <strong>One-line implementation summary:</strong>
+            "I used <code>useState</code> to maintain the counter value, event handlers to modify the state, and JSX to render the latest state in the UI."
+          </div>
+        </div>
+      </div>
+
+      <div id="code" class="card answer-section">
+        <div class="card-header bg-dark text-white">6. Full React Code</div>
+        <div class="card-body">
+<pre><code>import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const handleIncrement = () => {
+    setCount(prevCount => prevCount + 1);
+  };
+
+  const handleDecrement = () => {
+    setCount(prevCount => prevCount - 1);
+  };
+
+  const handleReset = () => {
+    setCount(0);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Counter: {count}&lt;/h2&gt;
+
+      &lt;button onClick={handleIncrement}&gt;
+        Increment
+      &lt;/button&gt;
+
+      &lt;button onClick={handleDecrement}&gt;
+        Decrement
+      &lt;/button&gt;
+
+      &lt;button onClick={handleReset}&gt;
+        Reset
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Counter;</code></pre>
+
+          <h6 class="mini-title mt-3">Why use the previous-state form?</h6>
+          <p><code>setCount(prevCount =&gt; prevCount + 1)</code> tells React: "Take the latest previous value and increase it by 1."</p>
+          <div class="alert alert-info mb-0">
+            This form is especially useful when the new state depends on the previous state.
+          </div>
+        </div>
+      </div>
+
+      <div id="interview1" class="card answer-section">
+        <div class="card-header bg-success text-white">7. How to Explain Counter in 1 Minute</div>
+        <div class="card-body">
+          <p><strong>Interview-ready answer:</strong></p>
+          <div class="alert alert-light border">
+            "I implemented a simple Counter component in React using the <code>useState</code> hook. The counter starts from 0 and I maintain its value in component state. I created three actions: Increment, Decrement, and Reset. Increment increases the previous value by 1, Decrement decreases it by 1, and Reset sets it back to 0. Each button uses an <code>onClick</code> event handler to update the state. Whenever the state changes, React re-renders the component and displays the latest counter value. I used the functional state-update form for increment and decrement because the new value depends on the previous state."
+          </div>
+
+          <h6 class="mini-title">1-minute structure to remember</h6>
+          <ol>
+            <li><strong>State:</strong> useState(0)</li>
+            <li><strong>Actions:</strong> increment, decrement, reset</li>
+            <li><strong>Events:</strong> onClick</li>
+            <li><strong>Update:</strong> setCount(previous =&gt; previous ± 1)</li>
+            <li><strong>UI:</strong> React re-renders with the new value</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="interview5" class="card answer-section">
+        <div class="card-header bg-primary text-white">8. How to Explain Counter in 5 Minutes</div>
+        <div class="card-body">
+          <h6 class="mini-title">Minute 1 — Understand the requirement</h6>
+          <p>I first clarify the expected behavior: starting value, increment/decrement behavior, reset behavior, and whether negative values are allowed.</p>
+
+          <h6 class="mini-title">Minute 2 — Design the state</h6>
+          <p>I only need one piece of state: <code>count</code>. The initial value is 0. Since the UI depends directly on this value, React state is appropriate.</p>
+
+          <h6 class="mini-title">Minute 3 — Implement actions</h6>
+          <p>I create handlers for Increment, Decrement, and Reset. For increment/decrement, I use the functional updater because the new value depends on the previous state.</p>
+
+          <h6 class="mini-title">Minute 4 — Connect state to UI</h6>
+          <p>I render <code>{count}</code> in JSX and attach handlers to buttons using <code>onClick</code>. A state update causes React to render the updated value.</p>
+
+          <h6 class="mini-title">Minute 5 — Discuss edge cases and quality</h6>
+          <ul>
+            <li>Negative values: clarify whether they are allowed.</li>
+            <li>Minimum/maximum: add conditions if the requirement specifies limits.</li>
+            <li>Multiple rapid updates: use functional updates when depending on previous state.</li>
+            <li>Maintainability: keep handlers readable and responsibilities clear.</li>
+          </ul>
+
+          <div class="alert alert-success mb-0">
+            <strong>Strong closing line:</strong>
+            "The implementation is intentionally simple because the main goal is to demonstrate correct React state management, event handling, rendering, and handling of requirements."
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card answer-section">
+        <div class="card-header bg-danger text-white">9. Common Developer Mistakes</div>
+        <div class="card-body">
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 1 — Directly changing state</strong>
+<pre><code>// Wrong
+count = count + 1;</code></pre>
+              <p class="mb-0">React state should be changed through its setter, such as <code>setCount</code>.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 2 — Calling the function immediately</strong>
+<pre><code>// Wrong
+&lt;button onClick={handleIncrement()}&gt;
+  Increment
+&lt;/button&gt;
+
+// Correct
+&lt;button onClick={handleIncrement}&gt;
+  Increment
+&lt;/button&gt;</code></pre>
+              <p class="mb-0">The second version passes the function to React. The first version executes it during rendering.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 3 — Ignoring previous state</strong>
+<pre><code>// Less robust when new state depends on old state
+setCount(count + 1);
+
+// Preferred for previous-state updates
+setCount(prevCount =&gt; prevCount + 1);</code></pre>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 4 — Mutating state directly</strong>
+              <p class="mb-0">Do not treat React state like a normal variable. Use the setter provided by <code>useState</code>.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 5 — Forgetting requirements</strong>
+              <p class="mb-0">For example, the interviewer may ask for a minimum value, maximum value, step size, or disabled buttons. Clarify requirements before coding.</p>
+            </div>
+          </div>
+
+          <div class="card tip mb-0">
+            <div class="card-body">
+              <strong>Developer tip:</strong> Before writing code, spend a few seconds identifying state, user actions, UI output, and edge cases.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="questions" class="card answer-section">
+        <div class="card-header bg-secondary text-white">10. Interview Questions You May Be Asked</div>
+        <div class="card-body">
+          <div class="accordion" id="qaAccordion">
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  Why did you use useState?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Because the counter value changes based on user interaction and the UI needs to update whenever that value changes.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  Why use a functional state update?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">When the next state depends on the previous state, the functional updater gives the updater the latest previous state.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  What happens after setCount()?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">React schedules the state update and then re-renders the component so the UI can reflect the new state.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  Can the Counter allow negative values?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Yes, unless the requirement says otherwise. If zero is the minimum, the decrement handler can check the current value before updating.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">
+                  How would you add +5 and -5?
+                </button>
+              </h2>
+              <div id="q5" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Use the same state and change the update to <code>prevCount =&gt; prevCount + 5</code> or <code>prevCount =&gt; prevCount - 5</code>.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">
+                  How would you prevent the counter from going below 0?
+                </button>
+              </h2>
+              <div id="q6" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">
+<pre><code>const handleDecrement = () =&gt; {
+  setCount(prevCount =&gt;
+    Math.max(0, prevCount - 1)
+  );
+};</code></pre>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card answer-section">
+        <div class="card-header bg-dark text-white">11. Quick Revision — Remember This</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>State</strong>
+                  <p><code>const [count, setCount] = useState(0)</code></p>
+                  <strong>Events</strong>
+                  <p class="mb-0"><code>onClick</code></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>Updates</strong>
+                  <p><code>prev =&gt; prev + 1</code><br><code>prev =&gt; prev - 1</code></p>
+                  <strong>Reset</strong>
+                  <p class="mb-0"><code>setCount(0)</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-primary mt-3">
+            <strong>Core mental model:</strong><br>
+            User action → Event handler → State update → React re-render → Updated UI
+          </div>
+
+          <h6 class="mini-title">Machine Coding Checklist</h6>
+          <ul class="checklist">
+            <li>Understand requirements before coding.</li>
+            <li>Identify the minimum required state.</li>
+            <li>Implement user actions with event handlers.</li>
+            <li>Use state setters instead of direct mutation.</li>
+            <li>Use functional updates when depending on previous state.</li>
+            <li>Check edge cases requested by the interviewer.</li>
+            <li>Explain your implementation while coding.</li>
+            <li>Keep the solution simple and readable.</li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+</main>
+
+<script>
+  function showAnswer(id) {
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    document.querySelectorAll(".question-list button").forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    const buttons = document.querySelectorAll(".question-list button");
+    buttons.forEach(btn => {
+      if (btn.getAttribute("onclick") === "showAnswer('" + id + "')") {
+        btn.classList.add("active");
+      }
+    });
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

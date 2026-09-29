@@ -840,19 +840,19 @@ Stopwatch
 Countdown timer
 Password strength indicator
 
-# Intermediate → Advanced
-Debounced search(3) - completedN
-Autocomplete- completed
-Infinite scrolling - completed
-lazy loading- completed
-pagaination- completed
-Virtualized list- completed
+# Intermediate → Advanced -- completed
+Debounced search(3) 
+Autocomplete
+Infinite scrolling 
+lazy loading
+pagaination
+Virtualized list
 Sort/filter/pagination table
-Data table- completed
-Multi-step form- completed
-Drag and drop- completed
-File upload- completed
-Optimistic UI- completed
+Data table
+Multi-step form
+Drag and drop
+File upload
+Optimistic UI
 Undo/redo
 Tree view
 Custom useFetch

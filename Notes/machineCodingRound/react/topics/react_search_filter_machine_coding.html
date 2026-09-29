@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Search / Filter</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529;font-family:"Segoe UI",Arial,sans-serif;line-height:1.65}
+    .sticky-nav{position:sticky;top:0;z-index:1000;background:#212529;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+    .sticky-nav a{color:#fff;text-decoration:none;font-size:.86rem;padding:.65rem .72rem;display:inline-block}
+    .sticky-nav a:hover{background:#343a40;border-radius:6px}
+    .hero{background:linear-gradient(135deg,#6f42c1,#4c2a85);color:#fff;border-radius:0 0 20px 20px;padding:42px 20px;margin-bottom:28px}
+    .hero h1{font-weight:700}
+    .card{border:0;border-radius:14px;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:22px}
+    .card-header{border-radius:14px 14px 0 0!important;font-weight:700}
+    .question-panel{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow-y:auto}
+    .question-list button{text-align:left;width:100%;border:0;background:#fff;padding:12px 14px;border-bottom:1px solid #eee;color:#343a40}
+    .question-list button:hover,.question-list button.active{background:#f0eafb;color:#6f42c1;font-weight:600}
+    .answer-section{scroll-margin-top:90px}
+    pre{background:#1e1e1e;color:#e8e8e8;padding:18px;border-radius:10px;overflow-x:auto;font-size:.86rem;line-height:1.55}
+    code{color:#d63384} pre code{color:inherit}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:15px;background:#fff;text-align:center;height:100%}
+    .arrow{display:flex;align-items:center;justify-content:center;font-size:25px;color:#6f42c1;font-weight:bold}
+    .mistake{border-left:5px solid #dc3545}
+    .tip{border-left:5px solid #198754}
+    .interview{border-left:5px solid #0d6efd}
+    .badge-soft{background:#f0eafb;color:#6f42c1;padding:5px 9px;border-radius:20px;font-size:.8rem}
+    .mini-title{font-weight:700;color:#495057}
+    .checklist li{margin-bottom:7px}
+    .formula{font-size:1.05rem;background:#f8f9fa;border-radius:10px;padding:14px;border-left:5px solid #6f42c1}
+    @media(max-width:991px){.question-panel{position:static;max-height:none;margin-bottom:20px}}
+  </style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <div class="container-fluid px-3">
+    <div class="d-flex flex-wrap align-items-center">
+      <strong class="text-white me-3">React Search / Filter</strong>
+      <a href="#what">What</a>
+      <a href="#why">Why</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#state">State</a>
+      <a href="#flow">Execution Flow</a>
+      <a href="#implementation">Implementation</a>
+      <a href="#code">Full Code</a>
+      <a href="#interview1">1-Min</a>
+      <a href="#interview5">5-Min</a>
+      <a href="#mistakes">Mistakes</a>
+      <a href="#questions">Interview Q&A</a>
+      <a href="#recap">Recap</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge bg-light text-dark mb-2">Machine Coding Round</span>
+    <h1>React Search / Filter</h1>
+    <p class="lead mb-1">A common React machine-coding task for searching and filtering a list of data.</p>
+    <p class="mb-0">Goal: Let the user type a search term and show only matching items without modifying the original data.</p>
+  </div>
+</header>
+
+<main class="container pb-5">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-4">
+      <div class="card question-panel">
+        <div class="card-header bg-dark text-white">Left Side — Questions</div>
+        <div class="question-list">
+          <button class="active" onclick="showAnswer('what')">1. What is Search / Filter?</button>
+          <button onclick="showAnswer('why')">2. What problem does it solve?</button>
+          <button onclick="showAnswer('requirements')">3. What are the requirements?</button>
+          <button onclick="showAnswer('state')">4. What state do I need?</button>
+          <button onclick="showAnswer('flow')">5. How does it execute?</button>
+          <button onclick="showAnswer('implementation')">6. How did I implement it?</button>
+          <button onclick="showAnswer('code')">7. What is the full code?</button>
+          <button onclick="showAnswer('interview1')">8. How do I explain it in 1 minute?</button>
+          <button onclick="showAnswer('interview5')">9. How do I explain it in 5 minutes?</button>
+          <button onclick="showAnswer('mistakes')">10. What common mistakes should I avoid?</button>
+          <button onclick="showAnswer('questions')">11. What interview questions can be asked?</button>
+          <button onclick="showAnswer('recap')">12. What should I remember?</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section class="col-lg-8">
+
+      <div id="what" class="card answer-section">
+        <div class="card-header bg-primary text-white">1. What is Search / Filter?</div>
+        <div class="card-body">
+          <p><strong>Technical definition:</strong> Search/filter is a UI feature that takes user input and displays only the items from a data collection that satisfy a condition.</p>
+          <div class="alert alert-info">
+            <strong>Layman example:</strong> Imagine a list of 100 products in a shop. Instead of looking through all 100 products, you type <strong>"phone"</strong>. The application shows products related to "phone".
+          </div>
+          <p><span class="badge-soft">Core React concepts</span>
+            <strong>Controlled Input → State → filter() → Derived Data → Conditional Rendering</strong>
+          </p>
+          <div class="formula">
+            <strong>Basic idea:</strong><br>
+            Original Data + Search Term → <code>filter()</code> → Matching Data → Display
+          </div>
+        </div>
+      </div>
+
+      <div id="why" class="card answer-section">
+        <div class="card-header bg-success text-white">2. What Problem Does Search / Filter Solve?</div>
+        <div class="card-body">
+          <p>Search/filter helps users quickly find relevant information from a larger collection of data.</p>
+          <ul class="checklist">
+            <li>Reduces the amount of information shown at one time.</li>
+            <li>Helps users find a specific item quickly.</li>
+            <li>Improves usability when a list becomes large.</li>
+            <li>Demonstrates array filtering and conditional rendering.</li>
+            <li>Tests React state and controlled inputs.</li>
+          </ul>
+          <div class="alert alert-warning mb-0">
+            <strong>Machine-coding point:</strong> The interviewer is checking whether you can connect user input to state, derive filtered results correctly, and keep the original data unchanged.
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card answer-section">
+        <div class="card-header bg-info text-dark">3. Requirements</div>
+        <div class="card-body">
+          <h6 class="mini-title">Basic requirements</h6>
+          <ol>
+            <li>Display a list of products/users/items.</li>
+            <li>Provide a search input.</li>
+            <li>Update the search value when the user types.</li>
+            <li>Filter the original list based on the search value.</li>
+            <li>Display only matching results.</li>
+            <li>Show a "No results found" message when nothing matches.</li>
+            <li>Searching should be case-insensitive.</li>
+          </ol>
+
+          <h6 class="mini-title">Good clarification questions</h6>
+          <ul>
+            <li>Should the search match the beginning of the text or anywhere inside it?</li>
+            <li>Should the search be case-insensitive?</li>
+            <li>Should we search only the name or multiple fields?</li>
+            <li>Should filtering happen immediately while typing?</li>
+            <li>For a large dataset, should search happen locally or through an API?</li>
+            <li>Do we need debounce for the search input?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="state" class="card answer-section">
+        <div class="card-header bg-warning text-dark">4. State Design — What State Do I Need?</div>
+        <div class="card-body">
+          <p>For a basic client-side search, I usually need only the <strong>search term</strong> as state.</p>
+
+<pre><code>const [search, setSearch] = useState("");</code></pre>
+
+          <h6 class="mini-title">What about filtered results?</h6>
+          <p>For this basic version, I do <strong>not</strong> need another state variable for filtered results.</p>
+
+          <div class="alert alert-success">
+            <strong>Why?</strong> The filtered list can be derived from the original data and the current search term.
+          </div>
+
+<pre><code>const filteredProducts = products.filter(product =&gt;
+  product.name
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);</code></pre>
+
+          <div class="alert alert-primary mb-0">
+            <strong>Important interview concept:</strong> Avoid storing derived data in state when it can be calculated directly from existing state/props.
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card answer-section">
+        <div class="card-header bg-warning text-dark">5. Execution Flow — Simple Visual Explanation</div>
+        <div class="card-body">
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md-2"><div class="flow-box"><strong>1</strong><br>User types<br>"phone"</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>2</strong><br>search state<br>becomes "phone"</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>3</strong><br>filter()<br>runs</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-2"><div class="flow-box"><strong>4</strong><br>Matching items<br>are selected</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md-3"><div class="flow-box"><strong>5</strong><br>Filtered array<br>is derived</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>6</strong><br>React renders<br>filtered items</div></div>
+            <div class="col-md-1 arrow">→</div>
+            <div class="col-md-3"><div class="flow-box"><strong>7</strong><br>User sees<br>results</div></div>
+          </div>
+
+          <div class="alert alert-primary mt-4 mb-0">
+            <strong>Example:</strong><br>
+            Products = [Laptop, Phone, Watch, Headphones]<br>
+            Search = "phone"<br>
+            <code>filter()</code> checks every product → Phone matches → UI displays Phone.
+          </div>
+        </div>
+      </div>
+
+      <div id="implementation" class="card answer-section">
+        <div class="card-header bg-primary text-white">6. How I Have Implemented It — Interview Explanation</div>
+        <div class="card-body">
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 1 — Start with the original data</strong>
+              <p class="mb-0">I keep the original products/items list unchanged. It can come from props, an API, or component data.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 2 — Create search state</strong>
+              <p class="mb-0">I use <code>useState</code> to store whatever the user enters into the search box.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 3 — Make the input controlled</strong>
+              <p class="mb-0">The input's <code>value</code> comes from the search state, and <code>onChange</code> updates that state.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 4 — Derive filtered data</strong>
+              <p class="mb-0">I use <code>filter()</code> against the original list. I convert both values to lowercase so the search is case-insensitive.</p>
+            </div>
+          </div>
+
+          <div class="card interview mb-3">
+            <div class="card-body">
+              <strong>Step 5 — Render the result</strong>
+              <p class="mb-0">I use <code>map()</code> to display the filtered items. If the result is empty, I show a "No results found" message.</p>
+            </div>
+          </div>
+
+          <div class="alert alert-success mb-0">
+            <strong>One-line implementation summary:</strong>
+            "I keep the original data unchanged, store only the search term in state, derive the matching items using filter(), and render the derived result."
+          </div>
+        </div>
+      </div>
+
+      <div id="code" class="card answer-section">
+        <div class="card-header bg-dark text-white">7. Full React Code</div>
+        <div class="card-body">
+<pre><code>import { useState } from "react";
+
+function SearchFilter() {
+  const [search, setSearch] = useState("");
+
+  const products = [
+    { id: 1, name: "Laptop" },
+    { id: 2, name: "Mobile Phone" },
+    { id: 3, name: "Smart Watch" },
+    { id: 4, name: "Headphones" },
+    { id: 5, name: "Phone Case" }
+  ];
+
+  const filteredProducts = products.filter(product =&gt;
+    product.name
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Product Search&lt;/h2&gt;
+
+      &lt;input
+        type="text"
+        value={search}
+        onChange={(e) =&gt; setSearch(e.target.value)}
+        placeholder="Search products..."
+      /&gt;
+
+      {filteredProducts.length === 0 ? (
+        &lt;p&gt;No results found&lt;/p&gt;
+      ) : (
+        &lt;ul&gt;
+          {filteredProducts.map(product =&gt; (
+            &lt;li key={product.id}&gt;
+              {product.name}
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default SearchFilter;</code></pre>
+
+          <h6 class="mini-title mt-3">Important search logic</h6>
+<pre><code>const filteredProducts = products.filter(product =&gt;
+  product.name
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);</code></pre>
+
+          <p><strong>What this means:</strong></p>
+          <ol>
+            <li><code>products.filter()</code> checks every product.</li>
+            <li><code>product.name</code> gets the product name.</li>
+            <li><code>toLowerCase()</code> makes comparison case-insensitive.</li>
+            <li><code>includes()</code> checks whether the search text exists anywhere in the name.</li>
+            <li>Only matching products are returned in the new array.</li>
+          </ol>
+
+          <div class="alert alert-info mb-0">
+            <strong>Important:</strong> <code>filter()</code> does not change the original array. It returns a new array containing the matching elements.
+          </div>
+        </div>
+      </div>
+
+      <div id="interview1" class="card answer-section">
+        <div class="card-header bg-success text-white">8. How to Explain Search / Filter in 1 Minute</div>
+        <div class="card-body">
+          <p><strong>Interview-ready answer:</strong></p>
+          <div class="alert alert-light border">
+            "I implemented a client-side search feature in React. I keep the original data unchanged and use a controlled input to store the user's search term in state. Whenever the user types, the search state updates and the component re-renders. I then derive the filtered list by using JavaScript's filter method on the original data. I convert both the item value and search term to lowercase so the search is case-insensitive, and I use includes to support partial matches. Finally, I use map to render the filtered results and display a no-results message when the filtered array is empty. I don't store the filtered list separately because it is derived from the original data and search term."
+          </div>
+
+          <h6 class="mini-title">1-minute structure</h6>
+          <ol>
+            <li><strong>Input:</strong> controlled search box</li>
+            <li><strong>State:</strong> search term</li>
+            <li><strong>Filter:</strong> filter() + includes()</li>
+            <li><strong>Case:</strong> toLowerCase()</li>
+            <li><strong>Display:</strong> map()</li>
+            <li><strong>Empty result:</strong> No results found</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="interview5" class="card answer-section">
+        <div class="card-header bg-primary text-white">9. How to Explain Search / Filter in 5 Minutes</div>
+        <div class="card-body">
+
+          <h6 class="mini-title">Minute 1 — Clarify the requirement</h6>
+          <p>I first confirm what needs to be searched, whether the search is case-insensitive, whether partial matches are allowed, and whether the data is local or coming from an API.</p>
+
+          <h6 class="mini-title">Minute 2 — Decide the state</h6>
+          <p>I only store the search term in state. I don't store filtered results because filtered results can be calculated from the original data and search term.</p>
+
+          <h6 class="mini-title">Minute 3 — Implement controlled input</h6>
+          <p>The input value is controlled by React. <code>onChange</code> updates the search state on every keystroke.</p>
+
+          <h6 class="mini-title">Minute 4 — Implement filtering</h6>
+          <p>I use <code>filter()</code> and compare normalized strings using <code>toLowerCase()</code> and <code>includes()</code>. The original array remains unchanged.</p>
+
+          <h6 class="mini-title">Minute 5 — Discuss scalability</h6>
+          <p>For a small client-side list, filtering during rendering is simple and sufficient. For a very large dataset or server-side search, I would consider debouncing the input, pagination, API-based filtering, caching, or other performance techniques depending on the requirements.</p>
+
+          <div class="alert alert-success mb-0">
+            <strong>Strong closing line:</strong>
+            "For the basic machine-coding requirement, I prefer the simplest correct solution: keep source data unchanged, store the search term, derive filtered data, and render the result."
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card answer-section">
+        <div class="card-header bg-danger text-white">10. Common Developer Mistakes</div>
+        <div class="card-body">
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 1 — Mutating the original data</strong>
+              <p class="mb-0">Do not remove items from the source array just because they don't match. Keep the original data intact and derive a filtered array.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 2 — Case-sensitive search unintentionally</strong>
+<pre><code>// Can fail for different letter cases
+product.name.includes(search)
+
+// Better
+product.name.toLowerCase()
+  .includes(search.toLowerCase())</code></pre>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 3 — Using filter incorrectly</strong>
+              <p class="mb-0">Remember that <code>filter()</code> expects a condition that returns true for items that should remain in the result.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 4 — Storing derived filtered data unnecessarily</strong>
+<pre><code>// Usually unnecessary
+const [filteredProducts, setFilteredProducts] = useState([]);</code></pre>
+              <p class="mb-0">If filtered data can be calculated directly from source data and search state, derive it instead of creating another state source.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 5 — Forgetting stable keys</strong>
+              <p class="mb-0">When rendering results with <code>map()</code>, provide a stable unique <code>key</code>, normally the item's id.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-3">
+            <div class="card-body">
+              <strong>Mistake 6 — No empty-state handling</strong>
+              <p class="mb-0">When no item matches, show a clear message instead of leaving the user wondering whether the application is broken.</p>
+            </div>
+          </div>
+
+          <div class="card mistake mb-0">
+            <div class="card-body">
+              <strong>Mistake 7 — Adding debounce without a requirement</strong>
+              <p class="mb-0">For a small local list, debounce may be unnecessary. Discuss it when the dataset is large or the search calls an API on each keystroke.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="questions" class="card answer-section">
+        <div class="card-header bg-secondary text-white">11. Interview Questions You May Be Asked</div>
+        <div class="card-body">
+          <div class="accordion" id="qaAccordion">
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  Why did you use filter()?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">filter() creates a new array containing only the elements that satisfy a condition, which matches the requirement of showing only search results.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  Why use includes()?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">includes() supports partial matching. For example, searching "phone" can match "Mobile Phone" and "Phone Case".</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  Why use toLowerCase()?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">It normalizes both strings so "Phone", "phone", and "PHONE" can be treated as the same search text.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  Why not store filteredProducts in state?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Because it is derived data. Storing both the source and derived result can create two sources of truth and unnecessary synchronization work.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">
+                  What is debounce and when would you use it?
+                </button>
+              </h2>
+              <div id="q5" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Debounce delays an operation until the user stops typing for a specified period. It is useful when each search triggers an expensive operation such as an API request.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6">
+                  What is the time complexity of filter()?
+                </button>
+              </h2>
+              <div id="q6" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">For n items, filter() generally checks each item once, so the filtering operation is O(n). Rendering the matching results adds work proportional to the number of displayed items.</div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q7">
+                  How would you search multiple fields?
+                </button>
+              </h2>
+              <div id="q7" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">
+<pre><code>const filtered = users.filter(user =&gt;
+  user.name.toLowerCase().includes(search) ||
+  user.email.toLowerCase().includes(search)
+);</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q8">
+                  How would you handle a very large dataset?
+                </button>
+              </h2>
+              <div id="q8" class="accordion-collapse collapse" data-bs-parent="#qaAccordion">
+                <div class="accordion-body">Depending on requirements, I could use debounced server-side search, pagination, virtualization, memoization, or a backend search mechanism rather than filtering a huge dataset entirely on every keystroke in the browser.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card answer-section">
+        <div class="card-header bg-dark text-white">12. Quick Revision — Remember This</div>
+        <div class="card-body">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>State</strong>
+                  <p class="mb-0"><code>search</code></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>Filter</strong>
+                  <p class="mb-0"><code>filter()</code> + <code>includes()</code></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light h-100">
+                <div class="card-body">
+                  <strong>Display</strong>
+                  <p class="mb-0"><code>map()</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-primary mt-3">
+            <strong>Core mental model:</strong><br>
+            User types → search state updates → filter original data → matching array → map results → updated UI
+          </div>
+
+          <div class="alert alert-success">
+            <strong>Most important interview idea:</strong><br>
+            "Filtered results are derived data. Keep the source data unchanged and calculate the filtered result from the source data and search term."
+          </div>
+
+          <h6 class="mini-title">Machine Coding Checklist</h6>
+          <ul class="checklist">
+            <li>Clarify what fields should be searchable.</li>
+            <li>Use a controlled input.</li>
+            <li>Store the search term in state.</li>
+            <li>Keep original data unchanged.</li>
+            <li>Use filter() to derive matching items.</li>
+            <li>Normalize case when required.</li>
+            <li>Use stable keys when rendering.</li>
+            <li>Handle empty search results.</li>
+            <li>Discuss debounce only when it makes sense.</li>
+            <li>For large data, discuss server-side search, pagination, or virtualization.</li>
+          </ul>
+
+          <div class="alert alert-warning mb-0">
+            <strong>Pattern to memorize:</strong><br>
+            <code>Input → State → filter() → map() → UI</code>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<script>
+function showAnswer(id){
+  const target=document.getElementById(id);
+  if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
+  document.querySelectorAll(".question-list button").forEach(btn=>btn.classList.remove("active"));
+  document.querySelectorAll(".question-list button").forEach(btn=>{
+    if(btn.getAttribute("onclick")==="showAnswer('"+id+"')") btn.classList.add("active");
+  });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

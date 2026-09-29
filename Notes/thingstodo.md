@@ -1,13 +1,229 @@
 #### THINGS TO DO.......>>>>>>>.
 
 1. After completion of any library/framework add quick revision topics/notes, I can revise later.
+2. weekly once revision.
+
+### TRACK Daily activity.... =======================================================
+
+23/09/26
+
+dsa: completed all basic recusion question need to start with next level2
+django : completed upto all curd operations
+
+
+27/09/26
+completed linux, once revisie all commands
+
+28/09/26
+linux: class 12 completed , complete one more class.
+
+
+### To do ================================================
+
+### most important
+
+1. november end complete deveops, once you complete devops you can start ai engineering learning, replacing.
+2. this week 28monday sep complete revision of django.
+3. next week 5monday oct complete revision of node
+after completing revision of both node and django, add maching coding task start with node. and then django.Create a road map before starting the both task so that you can have idea when you can finish them.
+4. complete all react machine coding task
+
+
+
+-1. once i need to go though 2 recursion sums.
+0. note down all react machine coding task, including recently added for task extension.
+1. practice full array and star patterns sum from sheet.
+1. add developement syntax which are used in daily life like how you added for js javascript_developer_toolkit_dsa_modern_web.
+add file tree view with add and delete folder and rename folder.
+2. add when to use whick cache and drf curd  opeartion way in notes
+morigna powder
+add machine codking round of error boundaires with suspense, error boundraies implementation with app level, route level etc..
+suspense with new browser router and old browser router
+fetch on render, fetch then render, fetch along with render
+for tree view task: add more feature like add file, delete file (delete all its children)
+for comment tree view task: add delete coment feature and save it.
+think about govt, private  continue after few years && backup plan, future plan
+how to do moon lighting job
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### DAILY THINGS WHICH I DO =======================================================
+
+1. daily morning devops, you can replace it with ai engineering skills if you complete it early.
+2. 1hr dsa, remaining motham skills upgrade
+3. Saturday revision
+4. sunday full upskilling , mainly which is in more lagg.
+5. daily react machine coding, node, Django.
+6. start and complete nextjs
+
+MISTAKES :
+1. not revising
+2. in incorrect notes making ,not in structed way
+3. no consistency 
+4. not watching classes while travelling
+5. not giving 100% focus while listening classes
+
+
+### CREATE NOTES =======================================================
+
+start creating notes of below one with ai.
+
+part-a
+redis
+postgrese,sql
+reduxtoolkit
+react router dom
+css 
+tailwind
+bootstrap 
+material ui
+
+part-b
+full system design
+frontend system design
+database scaling and schema designing
+backend system design
+graphql & graphql with apollo client
+gen ai
+agentic ai
+radixui
+react native
+react hook form
+zod
+
 
 ### REVISIE =======================================================
 
-1. GIT COMMANDS
-2. LINUX COMMMANDS
+devops
+1. LINUX COMMMANDS
+2. GIT COMMANDS
 3. JENKINS WORKFLOW
 4. DOCKER COMMANDS
+
+programming languages , libraries and frameworks.
 
 5. JS AND JS INTERNALS
 6. NODE AND NODEJS INTERNALS
@@ -30,13 +246,34 @@ node
 daily devops
 daily DSA
 
+nextjs
 postgrese/sql
 redis
+css,bootstrap,tailwind,materialui
+redux toolkit
+react router dom
+apache e-charts
 
+project,interview,revision
 nodejs microservices
 websockets
-projects
-get ready and apply for interviews
+project,interview,revision
+
+### AFTER SWICH TO START ============================================
+
+full system design
+frontend system design
+database scaling and schema designing
+backend system design
+
+graphql & graphql with apollo client
+gen ai
+agentic ai
+
+radixui
+react native
+react hook form
+zod
 
 ### IN RESUME =======================================================
 
@@ -68,37 +305,3 @@ ag-grid
 apache e-charts
 
 devops
-
-### AFTER SWICH TO START ============================================
-
-full system design
-frontend system design
-database scaling and schema designing
-backend system design
-
-nextjs
-postgrese/sql
-graphql & graphql with apollo client
-gen ai
-agentic ai
-
-radixui
-react native
-react hook form
-zod
-
-### Completed ============================================
-
-<!-- 2. revise till now completed classes of django -->
-
-### To do ================================================
-
-### most important
-
-6. complete react internal doc and django this week
-
-1. practice full array and star patterns sum from sheet.
-1. prarctice mongodb queries and take snapshot of syntax and cheetsheet.
-1. november end complete deveops
-1. add developement syntax which are used in daily life like how you added for js javascript_developer_toolkit_dsa_modern_web.
-1. check class 2 and class 3 notes of devops.
