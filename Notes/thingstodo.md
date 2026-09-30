@@ -15,18 +15,31 @@ django : completed upto all curd operations
 completed linux, once revisie all commands
 
 28/09/26
-linux: class 12 completed , complete one more class.
+linux: class 12 and 13 completed and added notes
+dsa - solved 2 recursion few problems
+django - revised full authentication classes
+
+29/09/26
+git class 14  completed and added notes. class 15 need to add  notes.
+dsa problems - 2recursion problems completed need to solve moore.
+django-
+
+30/09/26
 
 
 ### To do ================================================
 
 ### most important
+complete below of them
+django
+react machine coding task
+2 recursion problems
+git
+
 
 1. november end complete deveops, once you complete devops you can start ai engineering learning, replacing.
-2. this week 28monday sep complete revision of django.
 3. next week 5monday oct complete revision of node
 after completing revision of both node and django, add maching coding task start with node. and then django.Create a road map before starting the both task so that you can have idea when you can finish them.
-4. complete all react machine coding task
 
 
 
