@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modal with React Portal - Machine Coding Round</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; color:#212529; }
+    .navbar { position:sticky; top:0; z-index:1030; }
+    .hero { background:linear-gradient(135deg,#212529,#495057); color:white; }
+    .sidebar { position:sticky; top:76px; max-height:calc(100vh - 90px); overflow:auto; }
+    .nav-pills .nav-link { color:#495057; text-align:left; border-radius:8px; margin-bottom:4px; }
+    .nav-pills .nav-link.active { background:#212529; color:white; }
+    .content-card { border:0; box-shadow:0 4px 18px rgba(0,0,0,.07); margin-bottom:22px; scroll-margin-top:90px; }
+    .section-title { font-weight:700; }
+    .mini-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#6c757d; }
+    pre { background:#111827; color:#e5e7eb; padding:18px; border-radius:10px; overflow:auto; font-size:.84rem; }
+    code { color:#d63384; }
+    pre code { color:inherit; }
+    .flow-step { border-left:4px solid #212529; padding:12px 16px; background:#f8f9fa; margin-bottom:10px; border-radius:0 8px 8px 0; }
+    .arrow { text-align:center; font-size:1.3rem; color:#6c757d; }
+    .tip { border-left:4px solid #0d6efd; }
+    .danger { border-left:4px solid #dc3545; }
+    .success { border-left:4px solid #198754; }
+    .interviewer { background:#eef5ff; border:1px solid #cfe2ff; }
+    .diagram { background:#f8f9fa; border:1px solid #dee2e6; border-radius:12px; padding:20px; }
+    .box { border:2px solid #6c757d; border-radius:8px; padding:12px; text-align:center; background:white; }
+    .portal-box { border:2px dashed #0d6efd; background:#eef5ff; }
+    .modal-demo-backdrop { background:rgba(0,0,0,.55); border-radius:10px; padding:35px; }
+    .modal-demo { background:white; border-radius:10px; padding:20px; max-width:420px; margin:auto; box-shadow:0 15px 40px rgba(0,0,0,.25); }
+    @media (max-width: 991px) { .sidebar { position:static; max-height:none; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">React Machine Coding Guide</a>
+    <span class="text-white-50 small">Modal</span>
+  </div>
+</nav>
+
+<header class="hero py-5">
+  <div class="container">
+    <span class="badge bg-light text-dark mb-3">Machine Coding Round</span>
+    <h1 class="display-5 fw-bold">Modal with React Portal</h1>
+    <p class="lead mb-0">Build a reusable modal using <code>createPortal</code>, close it with Escape, and close it when the backdrop itself is clicked.</p>
+  </div>
+</header>
+
+<div class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="card sidebar shadow-sm border-0">
+        <div class="card-body">
+          <div class="mini-label mb-2">Questions</div>
+          <div class="nav nav-pills flex-column" id="sideNav">
+            <a class="nav-link active" href="#what">What is a Modal?</a>
+            <a class="nav-link" href="#portal">What is createPortal?</a>
+            <a class="nav-link" href="#why">Why use a Portal?</a>
+            <a class="nav-link" href="#requirements">Requirements</a>
+            <a class="nav-link" href="#escape">Escape Key with useEffect</a>
+            <a class="nav-link" href="#backdrop">Backdrop Click: target vs currentTarget</a>
+            <a class="nav-link" href="#how">How does it work?</a>
+            <a class="nav-link" href="#flow">Execution Flow</a>
+            <a class="nav-link" href="#implementation">How I implemented it</a>
+            <a class="nav-link" href="#fullcode">Full Code</a>
+            <a class="nav-link" href="#mistakes">Common Developer Mistakes</a>
+            <a class="nav-link" href="#interview1">1-Minute Explanation</a>
+            <a class="nav-link" href="#interview5">5-Minute Explanation</a>
+            <a class="nav-link" href="#edge">Edge Cases</a>
+            <a class="nav-link" href="#improvements">Improvements</a>
+            <a class="nav-link" href="#recap">Quick Recap</a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="col-lg-9">
+
+      <section id="what" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">What?</div>
+          <h2 class="section-title">What is a Modal?</h2>
+          <p>A <strong>modal</strong> is a temporary UI layer that appears above the current page and asks the user to focus on a specific action or piece of information.</p>
+          <p>Examples include:</p>
+          <ul>
+            <li>Delete confirmation</li>
+            <li>Login/signup form</li>
+            <li>Product details</li>
+            <li>Image preview</li>
+            <li>Payment confirmation</li>
+          </ul>
+
+          <div class="modal-demo-backdrop mt-3">
+            <div class="modal-demo">
+              <h5>Delete item?</h5>
+              <p class="text-muted mb-3">Are you sure you want to delete this item?</p>
+              <button class="btn btn-secondary btn-sm me-2">Cancel</button>
+              <button class="btn btn-danger btn-sm">Delete</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="portal" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">React Portal</div>
+          <h2 class="section-title">What is <code>createPortal</code>?</h2>
+          <p><code>createPortal</code> allows React to render a component's DOM into a different DOM node while the component remains part of the same React tree.</p>
+
+          <pre><code>import { createPortal } from "react-dom";
+
+return createPortal(
+  &lt;div&gt;Modal content&lt;/div&gt;,
+  document.getElementById("modal-root")
+);</code></pre>
+
+          <div class="diagram mt-3">
+            <div class="row align-items-center g-3">
+              <div class="col-md-4">
+                <div class="box">
+                  <strong>#root</strong><br>
+                  App content
+                </div>
+              </div>
+              <div class="col-md-4 text-center fs-2">→</div>
+              <div class="col-md-4">
+                <div class="box portal-box">
+                  <strong>#modal-root</strong><br>
+                  Modal DOM
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info tip mt-3">
+            <strong>Simple interview answer:</strong> “I use a React Portal so the modal is rendered outside the normal application DOM container, which helps avoid layout and stacking issues such as parent <code>overflow</code> or <code>z-index</code> problems.”
+          </div>
+        </div>
+      </section>
+
+      <section id="why" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Why?</div>
+          <h2 class="section-title">Why use a Portal for a Modal?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>1. Avoid overflow issues</strong><br>A modal should not be clipped by a parent container with <code>overflow: hidden</code>.</div></div>
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>2. Easier stacking</strong><br>Rendering near the document body makes full-screen overlays and z-index management easier.</div></div>
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>3. Cleaner DOM structure</strong><br>The modal is separated from page layout while remaining controlled by React.</div></div>
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>4. Reusable UI</strong><br>The same Modal component can be used for delete dialogs, forms, previews, and confirmations.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="requirements" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Machine Coding Requirement</div>
+          <h2 class="section-title">What should I build?</h2>
+          <ol>
+            <li>Parent component controls whether the modal is open.</li>
+            <li>Modal renders using <code>createPortal</code>.</li>
+            <li>Clicking the close button closes the modal.</li>
+            <li>Pressing <strong>Escape</strong> closes the modal.</li>
+            <li>Clicking the backdrop closes the modal.</li>
+            <li>Clicking the actual modal content does <strong>not</strong> close it.</li>
+            <li>Event listener must be cleaned up when the modal closes/unmounts.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="escape" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Keyboard Interaction</div>
+          <h2 class="section-title">Close Modal with Escape using <code>useEffect</code></h2>
+          <p>When the modal is open, attach a <code>keydown</code> event listener to the document. If the pressed key is <code>Escape</code>, call <code>onClose()</code>.</p>
+
+          <pre><code>useEffect(() =&gt; {
+  if (!isOpen) return;
+
+  const handleKeyDown = (e) =&gt; {
+    if (e.key === "Escape") {
+      onClose();
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+
+  return () =&gt; {
+    document.removeEventListener("keydown", handleKeyDown);
+  };
+}, [isOpen, onClose]);</code></pre>
+
+          <div class="alert alert-warning">
+            <strong>Why cleanup?</strong> Without <code>removeEventListener</code>, old listeners can remain attached and cause duplicate handlers, memory leaks, or unexpected behavior.
+          </div>
+
+          <div class="alert alert-primary tip">
+            <strong>Interview sentence:</strong> “I only attach the keyboard listener when the modal is open and clean it up in the effect cleanup function.”
+          </div>
+        </div>
+      </section>
+
+      <section id="backdrop" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Backdrop Interaction</div>
+          <h2 class="section-title">Why <code>e.target === e.currentTarget</code>?</h2>
+
+          <p>This is one of the most important Modal interview patterns.</p>
+
+          <pre><code>const handleBackdropClick = (e) =&gt; {
+  if (e.target === e.currentTarget) {
+    onClose();
+  }
+};</code></pre>
+
+          <h5>What is the difference?</h5>
+          <ul>
+            <li><code>e.target</code> = the actual element that was clicked.</li>
+            <li><code>e.currentTarget</code> = the element whose handler is currently running.</li>
+          </ul>
+
+          <div class="diagram">
+            <div class="modal-demo-backdrop">
+              <div class="modal-demo">
+                <strong>Modal content</strong>
+                <p class="mb-0 text-muted">Click here → target is the modal content.</p>
+              </div>
+            </div>
+            <div class="mt-3">
+              <strong>Click backdrop:</strong>
+              <code>target === currentTarget</code> → close modal ✅
+            </div>
+            <div>
+              <strong>Click modal content:</strong>
+              <code>target !== currentTarget</code> → keep modal open ✅
+            </div>
+          </div>
+
+          <div class="alert alert-info mt-3">
+            <strong>Simple memory trick:</strong><br>
+            <code>target</code> = “What did I actually click?”<br>
+            <code>currentTarget</code> = “Which element owns this handler?”
+          </div>
+        </div>
+      </section>
+
+      <section id="how" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">How?</div>
+          <h2 class="section-title">How does the Modal work?</h2>
+          <pre><code>Click "Open Modal"
+        ↓
+setIsOpen(true)
+        ↓
+Modal component renders
+        ↓
+createPortal()
+        ↓
+Modal appears inside #modal-root
+        ↓
+User can close by:
+  ├─ Close button
+  ├─ Escape key
+  └─ Backdrop click
+        ↓
+onClose()
+        ↓
+setIsOpen(false)
+        ↓
+Modal disappears</code></pre>
+        </div>
+      </section>
+
+      <section id="flow" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Execution Flow</div>
+          <h2 class="section-title">Visual explanation in simple steps</h2>
+
+          <div class="flow-step"><strong>Step 1 — Parent owns state:</strong> <code>isOpen</code> determines whether the Modal should be shown.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 2 — Open:</strong> Clicking the button calls <code>setIsOpen(true)</code>.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 3 — Portal:</strong> Modal returns <code>createPortal(..., document.getElementById("modal-root"))</code>.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 4 — Keyboard listener:</strong> While open, <code>useEffect</code> listens for <code>keydown</code>.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 5 — Close:</strong> Escape, close button, or backdrop click calls <code>onClose()</code>.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 6 — Cleanup:</strong> The effect removes the keydown listener when the modal closes/unmounts.</div>
+        </div>
+      </section>
+
+      <section id="implementation" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Implementation</div>
+          <h2 class="section-title">How I have implemented it — interviewer explanation</h2>
+          <div class="interviewer p-4 rounded">
+            <p class="mb-2"><strong>1. Parent state:</strong> “I keep <code>isOpen</code> in the parent because the parent decides whether the modal should exist.”</p>
+            <p class="mb-2"><strong>2. Reusable Modal:</strong> “The Modal receives <code>isOpen</code>, <code>onClose</code>, and children as props.”</p>
+            <p class="mb-2"><strong>3. Portal:</strong> “I use <code>createPortal</code> to render the modal into a dedicated <code>#modal-root</code> element.”</p>
+            <p class="mb-2"><strong>4. Escape:</strong> “When the modal is open, <code>useEffect</code> registers a document-level keydown listener and closes on Escape.”</p>
+            <p class="mb-2"><strong>5. Backdrop:</strong> “I check <code>e.target === e.currentTarget</code> so only a click directly on the backdrop closes the modal.”</p>
+            <p class="mb-0"><strong>6. Cleanup:</strong> “I remove the keydown listener in the effect cleanup to avoid stale or duplicate listeners.”</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="fullcode" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Full Code</div>
+          <h2 class="section-title">React Modal using createPortal</h2>
+          <p><strong>index.html:</strong> Add a dedicated DOM node for the portal.</p>
+
+          <pre><code>&lt;body&gt;
+  &lt;div id="root"&gt;&lt;/div&gt;
+  &lt;div id="modal-root"&gt;&lt;/div&gt;
+
+  &lt;script type="module" src="/src/main.jsx"&gt;&lt;/script&gt;
+&lt;/body&gt;</code></pre>
+
+          <p class="mt-4"><strong>Modal.jsx:</strong></p>
+          <pre><code>import { useEffect } from "react";
+import { createPortal } from "react-dom";
+
+function Modal({ isOpen, onClose, children }) {
+
+  useEffect(() =&gt; {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) =&gt; {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () =&gt; {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  const handleBackdropClick = (e) =&gt; {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  return createPortal(
+    &lt;div
+      className="modal-backdrop"
+      onClick={handleBackdropClick}
+      role="presentation"
+    &gt;
+      &lt;div
+        className="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      &gt;
+        {children}
+
+        &lt;button
+          type="button"
+          onClick={onClose}
+          aria-label="Close modal"
+        &gt;
+          ×
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;,
+    document.getElementById("modal-root")
+  );
+}
+
+export default Modal;</code></pre>
+
+          <p class="mt-4"><strong>App.jsx:</strong></p>
+          <pre><code>import { useState } from "react";
+import Modal from "./Modal";
+
+function App() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    &lt;div&gt;
+      &lt;button onClick={() =&gt; setIsOpen(true)}&gt;
+        Open Modal
+      &lt;/button&gt;
+
+      &lt;Modal
+        isOpen={isOpen}
+        onClose={() =&gt; setIsOpen(false)}
+      &gt;
+        &lt;h2 id="modal-title"&gt;Delete Item&lt;/h2&gt;
+        &lt;p&gt;Are you sure you want to delete this item?&lt;/p&gt;
+
+        &lt;button onClick={() =&gt; setIsOpen(false)}&gt;
+          Cancel
+        &lt;/button&gt;
+
+        &lt;button
+          onClick={() =&gt; {
+            console.log("Delete confirmed");
+            setIsOpen(false);
+          }}
+        &gt;
+          Delete
+        &lt;/button&gt;
+      &lt;/Modal&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+
+          <div class="alert alert-secondary mt-3">
+            <strong>Core logic to remember:</strong>
+            <code>isOpen → createPortal → Escape / backdrop / close button → onClose → isOpen=false</code>
+          </div>
+        </div>
+      </section>
+
+      <section id="mistakes" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Common Developer Mistakes</div>
+          <h2 class="section-title">Mistakes to avoid</h2>
+
+          <div class="alert alert-danger danger">
+            <strong>1. Forgetting the Portal target</strong><br>
+            <code>document.getElementById("modal-root")</code> must exist in the HTML.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>2. Closing when clicking inside the modal</strong><br>
+            Do not simply use <code>onClick={onClose}</code> on the entire backdrop. Use <code>e.target === e.currentTarget</code>.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>3. Forgetting Escape listener cleanup</strong><br>
+            Always remove the exact same handler in the <code>useEffect</code> cleanup.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>4. Adding the listener even when the modal is closed</strong><br>
+            Return early when <code>isOpen</code> is false.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>5. Wrong dependency array</strong><br>
+            If <code>onClose</code> is used inside the effect, account for it in the dependency array or stabilize the callback appropriately.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>6. Using array indexes for unrelated modal identity</strong><br>
+            For dynamic lists, use stable IDs for modal content and selected items.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>7. Ignoring accessibility</strong><br>
+            Use <code>role="dialog"</code>, <code>aria-modal="true"</code>, an accessible label, and a real close button.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>8. Not handling body scroll</strong><br>
+            A production modal may need to prevent background scrolling while open.
+          </div>
+        </div>
+      </section>
+
+      <section id="interview1" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Interview</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+          <div class="interviewer rounded p-4">
+            <p class="mb-0">“I built a reusable Modal component controlled by an <code>isOpen</code> state in the parent. I use React's <code>createPortal</code> to render the modal into a dedicated <code>modal-root</code> outside the main application DOM container. This helps avoid layout, overflow, and stacking issues. For closing behavior, I support three methods: a close button, the Escape key, and clicking the backdrop. I use <code>useEffect</code> to add a document-level keydown listener only while the modal is open, and I remove it in the cleanup function. For backdrop clicks, I check <code>e.target === e.currentTarget</code>, which means the modal closes only when the backdrop itself was clicked, not when the user clicks inside the modal content.”</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="interview5" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Interview</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+          <ol>
+            <li><strong>Requirement:</strong> “The modal should open, display arbitrary children, and provide predictable closing behavior.”</li>
+            <li><strong>State ownership:</strong> “The parent owns <code>isOpen</code> because it controls whether the modal is rendered.”</li>
+            <li><strong>Portal:</strong> “The Modal uses <code>createPortal</code> to render into <code>#modal-root</code>.”</li>
+            <li><strong>Why Portal:</strong> “This separates the modal's DOM position from parent layout constraints such as overflow and stacking contexts.”</li>
+            <li><strong>Escape handling:</strong> “When open, a <code>keydown</code> listener checks <code>e.key === 'Escape'</code> and calls <code>onClose</code>.”</li>
+            <li><strong>Cleanup:</strong> “The listener is removed when the effect is cleaned up, preventing duplicate listeners.”</li>
+            <li><strong>Backdrop handling:</strong> “I compare <code>target</code> and <code>currentTarget</code> so only direct backdrop clicks close the modal.”</li>
+            <li><strong>Reusability:</strong> “The modal accepts <code>children</code>, so it can be reused for forms, confirmations, previews, or other content.”</li>
+            <li><strong>Accessibility:</strong> “I add dialog semantics, an accessible label, and a keyboard-accessible close button.”</li>
+          </ol>
+
+          <div class="alert alert-primary tip">
+            <strong>Strong closing line:</strong> “The key design is that the parent owns the open state, the Modal owns interaction behavior, and the Portal controls where the modal is mounted in the DOM.”
+          </div>
+        </div>
+      </section>
+
+      <section id="edge" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Edge Cases</div>
+          <h2 class="section-title">What can the interviewer test?</h2>
+          <ul>
+            <li>Open and close the modal repeatedly.</li>
+            <li>Press Escape while the modal is open.</li>
+            <li>Press Escape when the modal is closed.</li>
+            <li>Click the backdrop.</li>
+            <li>Click inside modal content and verify it stays open.</li>
+            <li>Render long content and verify scrolling works.</li>
+            <li>Open a form inside the modal.</li>
+            <li>Open multiple modal-like flows without leaving stale event listeners.</li>
+            <li>Test keyboard accessibility.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="improvements" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Advanced Follow-up</div>
+          <h2 class="section-title">How can you improve it?</h2>
+          <ul>
+            <li>Trap keyboard focus inside the modal while it is open.</li>
+            <li>Return focus to the element that opened the modal.</li>
+            <li>Prevent background page scrolling.</li>
+            <li>Add enter/exit animations.</li>
+            <li>Support a configurable <code>closeOnBackdropClick</code> prop.</li>
+            <li>Support a configurable <code>closeOnEscape</code> prop.</li>
+            <li>Add nested-modal or stacking management only if the product actually requires it.</li>
+            <li>Create a reusable modal API using <code>children</code> and composable actions.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="recap" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Quick Recap</div>
+          <h2 class="section-title">Remember this interview flow</h2>
+
+          <pre><code>Parent
+  ↓
+isOpen = true
+  ↓
+Modal component
+  ↓
+createPortal()
+  ↓
+#modal-root
+  ↓
+┌──────────────────────────────┐
+│          Backdrop            │
+│                              │
+│     ┌─────────────────┐      │
+│     │  Modal Content  │      │
+│     └─────────────────┘      │
+│                              │
+└──────────────────────────────┘
+     ↓          ↓          ↓
+  Button     Escape     Backdrop
+     \          |          /
+      \         |         /
+          onClose()
+              ↓
+        isOpen = false</code></pre>
+
+          <div class="alert alert-success success">
+            <strong>One-line memory trick:</strong><br>
+            <code>Portal → Escape → Backdrop → Cleanup</code>
+          </div>
+
+          <div class="alert alert-info">
+            <strong>Most important code to remember:</strong>
+            <br><code>if (e.key === "Escape") onClose();</code>
+            <br><code>if (e.target === e.currentTarget) onClose();</code>
+            <br><code>createPortal(children, document.getElementById("modal-root"))</code>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const links = document.querySelectorAll('#sideNav .nav-link');
+  const sections = document.querySelectorAll('main section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector('#sideNav a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -65% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Form Validation - React Machine Coding Round</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; color:#212529; }
+    .navbar { position:sticky; top:0; z-index:1030; }
+    .hero { background:linear-gradient(135deg,#212529,#495057); color:white; }
+    .sidebar { position:sticky; top:76px; max-height:calc(100vh - 90px); overflow:auto; }
+    .nav-pills .nav-link { color:#495057; text-align:left; border-radius:8px; margin-bottom:4px; }
+    .nav-pills .nav-link.active { background:#212529; color:white; }
+    .content-card { border:0; box-shadow:0 4px 18px rgba(0,0,0,.07); margin-bottom:22px; scroll-margin-top:90px; }
+    .section-title { font-weight:700; }
+    .mini-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#6c757d; }
+    pre { background:#111827; color:#e5e7eb; padding:18px; border-radius:10px; overflow:auto; font-size:.86rem; }
+    code { color:#d63384; }
+    pre code { color:inherit; }
+    .flow-step { border-left:4px solid #212529; padding:12px 16px; background:#f8f9fa; margin-bottom:10px; border-radius:0 8px 8px 0; }
+    .arrow { text-align:center; font-size:1.3rem; color:#6c757d; }
+    .tip { border-left:4px solid #0d6efd; }
+    .danger { border-left:4px solid #dc3545; }
+    .success { border-left:4px solid #198754; }
+    .interviewer { background:#eef5ff; border:1px solid #cfe2ff; }
+    @media (max-width: 991px) {
+      .sidebar { position:static; max-height:none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">React Machine Coding Guide</a>
+    <span class="text-white-50 small">Form Validation</span>
+  </div>
+</nav>
+
+<header class="hero py-5">
+  <div class="container">
+    <span class="badge bg-light text-dark mb-3">Machine Coding Round</span>
+    <h1 class="display-5 fw-bold">Form Validation</h1>
+    <p class="lead mb-0">Build a reliable form that validates user input, shows useful errors, prevents invalid submission, and gives clear feedback.</p>
+  </div>
+</header>
+
+<div class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="card sidebar shadow-sm border-0">
+        <div class="card-body">
+          <div class="mini-label mb-2">Questions</div>
+          <div class="nav nav-pills flex-column" id="sideNav">
+            <a class="nav-link active" href="#what">What is Form Validation?</a>
+            <a class="nav-link" href="#why">Why is it needed?</a>
+            <a class="nav-link" href="#requirements">Requirements</a>
+            <a class="nav-link" href="#how">How does it work?</a>
+            <a class="nav-link" href="#flow">Execution Flow</a>
+            <a class="nav-link" href="#implementation">How I implemented it</a>
+            <a class="nav-link" href="#fullcode">Full React Code</a>
+            <a class="nav-link" href="#mistakes">Common Developer Mistakes</a>
+            <a class="nav-link" href="#interview1">1-Minute Explanation</a>
+            <a class="nav-link" href="#interview5">5-Minute Explanation</a>
+            <a class="nav-link" href="#edge">Edge Cases</a>
+            <a class="nav-link" href="#optimizations">Improvements</a>
+            <a class="nav-link" href="#recap">Quick Recap</a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="col-lg-9">
+
+      <section id="what" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">What?</div>
+          <h2 class="section-title">What is Form Validation?</h2>
+          <p><strong>Form validation</strong> is the process of checking whether the data entered by a user is correct, complete, and in the expected format before accepting or submitting the form.</p>
+          <div class="alert alert-primary">
+            <strong>Simple example:</strong> If the Email field is empty or does not look like an email address, show an error instead of submitting invalid data.
+          </div>
+          <h5>Typical fields</h5>
+          <ul>
+            <li>Name — required and minimum length.</li>
+            <li>Email — required and valid email format.</li>
+            <li>Password — required and minimum length.</li>
+            <li>Confirm Password — must match password.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="why" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Why?</div>
+          <h2 class="section-title">What problem does it solve?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>1. Prevents bad input</strong><br>Stops incomplete or incorrectly formatted data from being submitted.</div></div>
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>2. Better user experience</strong><br>Tells users exactly what needs to be corrected.</div></div>
+            <div class="col-md-6"><div class="alert alert-success h-100"><strong>3. Reduces server errors</strong><br>Basic client-side validation catches obvious mistakes early.</div></div>
+            <div class="col-md-6"><div class="alert alert-warning h-100"><strong>Important</strong><br>Client-side validation is not a security boundary. The backend must validate again.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="requirements" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Machine Coding Requirement</div>
+          <h2 class="section-title">What should I build?</h2>
+          <p>A practical React form can include:</p>
+          <ol>
+            <li>Controlled inputs using <code>useState</code>.</li>
+            <li>Validation rules for each field.</li>
+            <li>Error messages near the relevant fields.</li>
+            <li>Submit handling that runs validation first.</li>
+            <li>Success message after valid submission.</li>
+            <li>Basic accessible labels and <code>aria-invalid</code>.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="how" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">How?</div>
+          <h2 class="section-title">How does Form Validation work?</h2>
+          <p>The core idea is simple:</p>
+          <pre><code>User enters data
+      ↓
+React stores input in state
+      ↓
+User clicks Submit
+      ↓
+Run validation rules
+      ↓
+Are there errors?
+   ↙           ↘
+ YES            NO
+ ↓               ↓
+Show errors    Submit / process data</code></pre>
+          <div class="alert alert-info tip">
+            <strong>Interview sentence:</strong> “I keep the form values in controlled state, validate those values on submit, store field-level errors, and only proceed when the error object is empty.”
+          </div>
+        </div>
+      </section>
+
+      <section id="flow" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Execution Flow</div>
+          <h2 class="section-title">Visual explanation</h2>
+          <div class="flow-step"><strong>Step 1 — User types:</strong> Each input updates the <code>formData</code> state.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 2 — User submits:</strong> <code>handleSubmit</code> prevents the browser's default submit.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 3 — Validate:</strong> Check required fields, email format, password length, and password confirmation.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 4 — Store errors:</strong> Put messages into an <code>errors</code> object using field names as keys.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 5 — Decision:</strong> If errors exist, render them. Otherwise process the valid form.</div>
+          <div class="arrow">↓</div>
+          <div class="flow-step"><strong>Step 6 — Success:</strong> Show a success message and optionally reset the form.</div>
+        </div>
+      </section>
+
+      <section id="implementation" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Implementation</div>
+          <h2 class="section-title">How I have implemented it — interviewer explanation</h2>
+          <div class="interviewer p-4 rounded">
+            <p class="mb-2"><strong>1. State:</strong> “I use one <code>formData</code> object for all input values and one <code>errors</code> object for validation messages.”</p>
+            <p class="mb-2"><strong>2. Controlled inputs:</strong> “Each input gets its value from state and updates state through a common change handler.”</p>
+            <p class="mb-2"><strong>3. Validation:</strong> “I created a validation function that returns field-level errors instead of mixing validation logic into the JSX.”</p>
+            <p class="mb-2"><strong>4. Submit:</strong> “On submit, I prevent the default browser action, validate the form, and stop if errors exist.”</p>
+            <p class="mb-0"><strong>5. Success:</strong> “If validation passes, I process the data and show a success message.”</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="fullcode" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Full Code</div>
+          <h2 class="section-title">React Form Validation</h2>
+          <p>This version demonstrates controlled inputs, reusable validation, field errors, submit handling, and password confirmation.</p>
+          <pre><code>import { useState } from "react";
+
+function FormValidation() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e) =&gt; {
+    const { name, value } = e.target;
+
+    setFormData((prev) =&gt; ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Clear the old error while the user corrects the field.
+    setErrors((prev) =&gt; ({
+      ...prev,
+      [name]: ""
+    }));
+
+    setSubmitted(false);
+  };
+
+  const validate = () =&gt; {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.trim().length &lt; 3) {
+      newErrors.name = "Name must be at least 3 characters";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Enter a valid email";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length &lt; 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    return newErrors;
+  };
+
+  const handleSubmit = (e) =&gt; {
+    e.preventDefault();
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length &gt; 0) {
+      setSubmitted(false);
+      return;
+    }
+
+    console.log("Valid form data:", formData);
+    setSubmitted(true);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;Registration Form&lt;/h2&gt;
+
+      &lt;form onSubmit={handleSubmit} noValidate&gt;
+
+        &lt;div&gt;
+          &lt;label htmlFor="name"&gt;Name&lt;/label&gt;
+          &lt;input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            aria-invalid={!!errors.name}
+          /&gt;
+          {errors.name &amp;&amp; &lt;p&gt;{errors.name}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        &lt;div&gt;
+          &lt;label htmlFor="email"&gt;Email&lt;/label&gt;
+          &lt;input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            aria-invalid={!!errors.email}
+          /&gt;
+          {errors.email &amp;&amp; &lt;p&gt;{errors.email}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        &lt;div&gt;
+          &lt;label htmlFor="password"&gt;Password&lt;/label&gt;
+          &lt;input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            aria-invalid={!!errors.password}
+          /&gt;
+          {errors.password &amp;&amp; &lt;p&gt;{errors.password}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        &lt;div&gt;
+          &lt;label htmlFor="confirmPassword"&gt;
+            Confirm Password
+          &lt;/label&gt;
+          &lt;input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            aria-invalid={!!errors.confirmPassword}
+          /&gt;
+          {errors.confirmPassword &amp;&amp; (
+            &lt;p&gt;{errors.confirmPassword}&lt;/p&gt;
+          )}
+        &lt;/div&gt;
+
+        &lt;button type="submit"&gt;Submit&lt;/button&gt;
+
+        {submitted &amp;&amp; (
+          &lt;p&gt;Form submitted successfully!&lt;/p&gt;
+        )}
+      &lt;/form&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default FormValidation;</code></pre>
+
+          <div class="alert alert-secondary mt-3">
+            <strong>Core logic to remember:</strong>
+            <code>input → state → validate() → errors → submit only if valid</code>
+          </div>
+        </div>
+      </section>
+
+      <section id="mistakes" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Common Developer Mistakes</div>
+          <h2 class="section-title">Mistakes to avoid in a machine coding round</h2>
+
+          <div class="alert alert-danger danger">
+            <strong>1. Only validating on the frontend</strong><br>
+            Frontend validation improves UX, but backend validation is still required.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>2. Mutating state directly</strong><br>
+            Wrong: <code>formData.name = value</code>. Use the state setter and create a new object.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>3. Mixing all validation logic inside JSX</strong><br>
+            Keep validation in a separate function so the component remains readable.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>4. Forgetting <code>preventDefault()</code></strong><br>
+            The browser may perform its normal form submission and reload the page.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>5. Showing one generic error</strong><br>
+            “Invalid form” is less useful than “Email is required” or “Passwords do not match.”
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>6. Incorrect empty-string checks</strong><br>
+            For text fields, <code>trim()</code> helps catch values containing only spaces.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>7. Forgetting password confirmation</strong><br>
+            If the form contains confirm password, compare it with the actual password.
+          </div>
+
+          <div class="alert alert-danger danger">
+            <strong>8. No loading/submission strategy for API calls</strong><br>
+            In a real application, disable submit while an API request is in progress.
+          </div>
+        </div>
+      </section>
+
+      <section id="interview1" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Interview</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+          <div class="interviewer rounded p-4">
+            <p class="mb-0">“I implemented form validation using controlled React inputs. I maintain the input values in a <code>formData</code> state object and keep validation messages in an <code>errors</code> object. When the user submits the form, I prevent the default submission and run a separate validation function. That function checks required fields, name length, email format, password length, and password confirmation. If validation errors exist, I display field-level messages and stop submission. If there are no errors, I process the form data and show a success message. I also clear a field's previous error when the user starts correcting it. In a production application, I would perform the same important validation on the backend because frontend validation alone is not a security mechanism.”</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="interview5" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Interview</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+          <ol>
+            <li><strong>Requirement:</strong> “The goal is to prevent invalid form data and give useful feedback.”</li>
+            <li><strong>State design:</strong> “I use <code>formData</code> for values and <code>errors</code> for field-level validation messages.”</li>
+            <li><strong>Controlled inputs:</strong> “The input value comes from React state, and <code>onChange</code> updates that state.”</li>
+            <li><strong>Validation:</strong> “I keep validation rules inside a dedicated <code>validate()</code> function.”</li>
+            <li><strong>Submit flow:</strong> “I call <code>preventDefault()</code>, run validation, and return early when errors exist.”</li>
+            <li><strong>Success flow:</strong> “When the returned error object is empty, the data is considered valid and can be sent to an API.”</li>
+            <li><strong>UX:</strong> “I show errors next to their fields and clear them when the user edits the field.”</li>
+            <li><strong>Production consideration:</strong> “The backend must validate again because users can bypass client-side JavaScript.”</li>
+          </ol>
+          <div class="alert alert-primary tip">
+            <strong>Strong closing line:</strong> “My implementation separates state management, validation, presentation, and submission logic, which makes the form easier to maintain and extend.”
+          </div>
+        </div>
+      </section>
+
+      <section id="edge" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Edge Cases</div>
+          <h2 class="section-title">What can the interviewer test?</h2>
+          <ul>
+            <li>Submit the completely empty form.</li>
+            <li>Enter only spaces in the name field.</li>
+            <li>Enter an invalid email such as <code>abc@</code>.</li>
+            <li>Enter a password shorter than the required length.</li>
+            <li>Enter different password and confirm-password values.</li>
+            <li>Correct an invalid field and submit again.</li>
+            <li>Double-click the submit button during an API request.</li>
+            <li>Receive a server-side validation error after client validation succeeds.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="optimizations" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Advanced Follow-up</div>
+          <h2 class="section-title">How can you improve it?</h2>
+          <ul>
+            <li>Validate on blur for better immediate feedback.</li>
+            <li>Use a reusable validation schema/function for larger forms.</li>
+            <li>Disable submit while an API request is running.</li>
+            <li>Focus the first invalid field after submission.</li>
+            <li>Add accessible error descriptions with <code>aria-describedby</code>.</li>
+            <li>Handle server-side validation errors separately from client-side errors.</li>
+            <li>For large forms, consider libraries such as React Hook Form with a schema validator.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="recap" class="card content-card">
+        <div class="card-body p-4">
+          <div class="mini-label">Quick Recap</div>
+          <h2 class="section-title">Remember this interview flow</h2>
+          <pre><code>FORM VALIDATION
+      ↓
+Controlled Inputs
+      ↓
+formData State
+      ↓
+User clicks Submit
+      ↓
+preventDefault()
+      ↓
+validate()
+      ↓
+errors object
+   ↙         ↘
+Errors       No Errors
+  ↓              ↓
+Show errors   Process / API
+                 ↓
+              Success</code></pre>
+          <div class="alert alert-success success">
+            <strong>One-line memory trick:</strong>
+            <code>Store → Validate → Show errors → Stop or Submit</code>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const links = document.querySelectorAll('#sideNav .nav-link');
+  const sections = document.querySelectorAll('main section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(link => link.classList.remove('active'));
+        const active = document.querySelector('#sideNav a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -65% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>

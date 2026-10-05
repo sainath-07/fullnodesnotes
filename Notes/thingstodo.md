@@ -3,6 +3,7 @@
 1. After completion of any library/framework add quick revision topics/notes, I can revise later.
 2. weekly once revision.
 
+
 ### TRACK Daily activity.... =======================================================
 
 23/09/26
@@ -20,21 +21,42 @@ dsa - solved 2 recursion few problems
 django - revised full authentication classes
 
 29/09/26
-git class 14  completed and added notes. class 15 need to add  notes.
+git class 14  and class 15 completed
 dsa problems - 2recursion problems completed need to solve moore.
 django-
 
 30/09/26
-
+git class 16  and class 17 completed
 
 ### To do ================================================
 
 ### most important
-complete below of them
-django
-react machine coding task
-2 recursion problems
-git
+1. complete Django full
+2. complete git full
+3. complete 2 recursion problems full
+4. complete react machine coding round till now.
+
+======next week=======
+1. Jenkins
+2. full react machine coding round
+3. sql
+4. node
+5. recursion next 2 levels.
+
+after completiion of node and djnago revision,
+once go through pending topics of node and django
+along with machine coding round.
+
+    
+======next week=======
+1. docker
+2. postgrese
+3. css and tailwind
+4. full nodejs machine coding  round
+5. revise all array sum and complete upto pattern9.
+
+
+
 
 
 1. november end complete deveops, once you complete devops you can start ai engineering learning, replacing.
@@ -42,7 +64,7 @@ git
 after completing revision of both node and django, add maching coding task start with node. and then django.Create a road map before starting the both task so that you can have idea when you can finish them.
 
 
-
+-2 list of datatypes and validation in sql
 -1. once i need to go though 2 recursion sums.
 0. note down all react machine coding task, including recently added for task extension.
 1. practice full array and star patterns sum from sheet.
@@ -184,13 +206,14 @@ how to do moon lighting job
 
 
 ### DAILY THINGS WHICH I DO =======================================================
+speed . correct . focused . revision . consistency .No distraction 
+switch as soon as possible.
 
 1. daily morning devops, you can replace it with ai engineering skills if you complete it early.
 2. 1hr dsa, remaining motham skills upgrade
 3. Saturday revision
 4. sunday full upskilling , mainly which is in more lagg.
-5. daily react machine coding, node, Django.
-6. start and complete nextjs
+5. daily react machine coding/task, node, Django.
 
 MISTAKES :
 1. not revising
