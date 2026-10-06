@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Toast Notification</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529}
+    .navbar{position:sticky;top:0;z-index:1030}
+    .hero{background:linear-gradient(135deg,#212529,#495057);color:#fff;border-radius:0 0 20px 20px}
+    .card{border:0;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:1.5rem}
+    .left-nav{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+    .left-nav .list-group-item{border:0;cursor:pointer;padding:.72rem 1rem}
+    .left-nav .list-group-item:hover{background:#eef2f7}
+    .left-nav .list-group-item.active{background:#212529;color:#fff}
+    .section-title{font-weight:700}
+    .small-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:#6c757d;font-weight:700}
+    pre{background:#17191c;color:#e9ecef;padding:18px;border-radius:10px;overflow:auto;font-size:14px;line-height:1.55}
+    code{color:#d63384}
+    pre code{color:inherit}
+    .tip,.success-tip,.danger-tip,.warning-tip{padding:14px 16px;border-radius:8px}
+    .tip{border-left:4px solid #0d6efd;background:#eef5ff}
+    .success-tip{border-left:4px solid #198754;background:#edf9f2}
+    .danger-tip{border-left:4px solid #dc3545;background:#fff0f1}
+    .warning-tip{border-left:4px solid #ffc107;background:#fff9e6}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:16px;background:#fff;height:100%}
+    .flow-arrow{font-size:2rem;color:#6c757d;display:flex;align-items:center;justify-content:center}
+    .toast-demo{background:#fff;border:1px solid #dee2e6;border-left:5px solid #198754;border-radius:10px;padding:14px 16px;box-shadow:0 5px 15px rgba(0,0,0,.12);max-width:430px}
+    .toast-demo.error{border-left-color:#dc3545}
+    .toast-demo.warning{border-left-color:#ffc107}
+    .toast-demo.info{border-left-color:#0d6efd}
+    .toast-stack{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+    .badge-soft{background:#e9ecef;color:#343a40}
+    .mini-btn{border:0;border-radius:7px;padding:7px 11px;font-size:13px}
+    @media(max-width:991px){.left-nav{position:static;max-height:none}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#top">
+      <i class="bi bi-bell-fill me-2"></i>Toast Notification — Machine Coding Round
+    </a>
+    <span class="text-white-50 small">React Interview Guide</span>
+  </div>
+</nav>
+
+<header id="top" class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-dark mb-3">React • Machine Coding • Interview Ready</span>
+        <h1 class="display-5 fw-bold">Toast Notification</h1>
+        <p class="lead mb-0">Learn how to build a reusable React toast system with success/error/info types, auto-dismiss, manual close, multiple toasts, timer cleanup, and a simple global API.</p>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white text-dark rounded-4 p-4">
+          <div class="small-label">Core requirements</div>
+          <ul class="mb-0 mt-2">
+            <li>Show a toast message</li>
+            <li>Success / Error / Info / Warning</li>
+            <li>Auto-dismiss after a delay</li>
+            <li>Manual close button</li>
+            <li>Multiple toast support</li>
+            <li>Reusable context/provider</li>
+            <li>Timer cleanup</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <aside class="col-lg-3">
+      <div class="card left-nav">
+        <div class="card-header bg-white fw-bold">Questions</div>
+        <div class="list-group list-group-flush">
+          <a class="list-group-item active" href="#what">What is Toast Notification?</a>
+          <a class="list-group-item" href="#why">Why do we need it?</a>
+          <a class="list-group-item" href="#requirements">Requirements</a>
+          <a class="list-group-item" href="#how">How does it work?</a>
+          <a class="list-group-item" href="#architecture">How should I design it?</a>
+          <a class="list-group-item" href="#flow">Execution Flow</a>
+          <a class="list-group-item" href="#visual">Visual Explanation</a>
+          <a class="list-group-item" href="#fullcode">Full Code</a>
+          <a class="list-group-item" href="#one">Explain in 1 Minute</a>
+          <a class="list-group-item" href="#five">Explain in 5 Minutes</a>
+          <a class="list-group-item" href="#mistakes">Common Developer Mistakes</a>
+          <a class="list-group-item" href="#edge">Edge Cases</a>
+          <a class="list-group-item" href="#interviewer">How I Implemented It</a>
+          <a class="list-group-item" href="#followups">Interviewer Follow-ups</a>
+          <a class="list-group-item" href="#recap">Quick Recap</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT SIDE -->
+    <section class="col-lg-9">
+
+      <div id="what" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">What?</div>
+          <h2 class="section-title">What is a Toast Notification?</h2>
+          <p>A <strong>Toast Notification</strong> is a small temporary message displayed on the screen to give the user feedback about an action without interrupting the current page.</p>
+          <p>Examples include:</p>
+          <ul>
+            <li>“Profile updated successfully.”</li>
+            <li>“Failed to upload file.”</li>
+            <li>“Item added to cart.”</li>
+            <li>“Your session will expire soon.”</li>
+          </ul>
+
+          <div class="toast-stack my-3">
+            <div class="toast-demo">
+              <strong><i class="bi bi-check-circle-fill me-2"></i>Success</strong>
+              <div class="small mt-1">Profile updated successfully.</div>
+            </div>
+            <div class="toast-demo error">
+              <strong><i class="bi bi-x-circle-fill me-2"></i>Error</strong>
+              <div class="small mt-1">Unable to save changes.</div>
+            </div>
+          </div>
+
+          <div class="tip">
+            <strong>Interview definition:</strong>
+            “A Toast Notification is a non-blocking feedback component that appears temporarily, informs the user about an action, and usually disappears automatically or can be dismissed manually.”
+          </div>
+        </div>
+      </div>
+
+      <div id="why" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Why?</div>
+          <h2 class="section-title">What problem does it solve?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="flow-box"><h5>Immediate feedback</h5><p class="mb-0">Users immediately know whether an action succeeded or failed.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Non-blocking UX</h5><p class="mb-0">Unlike alerts or modal dialogs, a toast does not stop the user's workflow.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Reusable notifications</h5><p class="mb-0">One toast system can be used by forms, API calls, uploads, payments, and other features.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Consistent UI</h5><p class="mb-0">All success, error, warning, and information messages can follow one design.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Requirements</div>
+          <h2 class="section-title">What should I implement?</h2>
+          <ol>
+            <li>Create a reusable toast component.</li>
+            <li>Support toast types such as success, error, warning, and info.</li>
+            <li>Allow any component to trigger a toast.</li>
+            <li>Automatically remove a toast after a configurable duration.</li>
+            <li>Allow manual dismissal.</li>
+            <li>Support multiple toasts at the same time.</li>
+            <li>Give every toast a unique ID.</li>
+            <li>Position the toast container consistently.</li>
+            <li>Clean up timers when a toast is removed or the component unmounts.</li>
+          </ol>
+
+          <div class="success-tip">
+            <strong>Machine coding strategy:</strong> First build one toast → add state array → add add/remove functions → add auto-dismiss → add types → expose a reusable <code>useToast()</code> API.
+          </div>
+        </div>
+      </div>
+
+      <div id="how" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">How?</div>
+          <h2 class="section-title">How does it work?</h2>
+
+          <p>The central idea is to keep a list of active toast objects in state.</p>
+
+          <pre><code>const [toasts, setToasts] = useState([]);
+
+Example:
+
+[
+  {
+    id: 101,
+    message: "Profile updated",
+    type: "success",
+    duration: 3000
+  },
+  {
+    id: 102,
+    message: "Network error",
+    type: "error",
+    duration: 5000
+  }
+]</code></pre>
+
+          <p>When a component calls <code>showToast()</code>:</p>
+          <ol>
+            <li>Create a unique ID.</li>
+            <li>Create a toast object.</li>
+            <li>Add it to the state array.</li>
+            <li>React renders the new toast.</li>
+            <li>Start a timer for automatic removal.</li>
+            <li>Remove the toast when the timer expires or the user clicks close.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="architecture" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Architecture</div>
+          <h2 class="section-title">How should I design it?</h2>
+
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md"><div class="flow-box"><strong>App</strong><br>Wrap with ToastProvider</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>useToast()</strong><br>Component gets showToast()</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>Provider</strong><br>Stores toast array</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>ToastContainer</strong><br>Renders all active toasts</div></div>
+          </div>
+
+          <div class="tip mt-3">
+            <strong>Why Context?</strong> A toast is usually needed from many unrelated components. Context avoids passing <code>showToast</code> through multiple layers of props.
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Execution Flow</div>
+          <h2 class="section-title">Step-by-step execution</h2>
+
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md"><div class="flow-box"><strong>1</strong><br>User clicks Save</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>2</strong><br>API succeeds</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>3</strong><br><code>showToast()</code></div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>4</strong><br>Toast added to state</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md"><div class="flow-box"><strong>5</strong><br>Toast renders</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>6</strong><br>Timer starts</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>7</strong><br>Timer expires</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>8</strong><br>Toast removed</div></div>
+          </div>
+
+          <div class="success-tip mt-3">
+            <strong>Manual close:</strong> User clicks × → <code>removeToast(id)</code> → filter that ID out of state → React removes the toast.
+          </div>
+        </div>
+      </div>
+
+      <div id="visual" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Visual Explanation</div>
+          <h2 class="section-title">How the toast state changes</h2>
+
+          <pre><code>Initial:
+
+toasts = []
+
+
+User triggers success:
+
+showToast("Saved!", "success")
+
+        ↓
+
+toasts = [
+  {
+    id: 1,
+    message: "Saved!",
+    type: "success"
+  }
+]
+
+        ↓
+
+React renders:
+
+┌──────────────────────────────┐
+│ ✓  Saved!                 ×  │
+└──────────────────────────────┘
+
+        ↓
+     3000 ms
+
+removeToast(1)
+
+        ↓
+
+toasts = []
+
+
+Toast disappears.</code></pre>
+
+          <h5 class="mt-4">Multiple toast flow</h5>
+          <pre><code>showToast("Saved", "success")
+showToast("Upload failed", "error")
+showToast("New update", "info")
+
+             ↓
+
+[
+  { id: 1, ... },
+  { id: 2, ... },
+  { id: 3, ... }
+]
+
+             ↓
+
+┌─────────────────────┐
+│ ✓ Saved          ×  │
+├─────────────────────┤
+│ ✕ Upload failed  ×  │
+├─────────────────────┤
+│ i New update      × │
+└─────────────────────┘</code></pre>
+        </div>
+      </div>
+
+      <div id="fullcode" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Full Code</div>
+          <h2 class="section-title">React Toast Notification — Interview Version</h2>
+          <p>This implementation uses Context so any component inside the provider can trigger notifications.</p>
+
+          <h5>1. ToastContext.jsx</h5>
+          <pre><code>import {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState
+} from "react";
+
+const ToastContext = createContext(null);
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const timers = useRef(new Map());
+
+  const removeToast = useCallback((id) =&gt; {
+    setToasts((prev) =&gt;
+      prev.filter((toast) =&gt; toast.id !== id)
+    );
+
+    const timer = timers.current.get(id);
+
+    if (timer) {
+      clearTimeout(timer);
+      timers.current.delete(id);
+    }
+  }, []);
+
+  const showToast = useCallback(
+    ({
+      message,
+      type = "info",
+      duration = 3000
+    }) =&gt; {
+      const id = Date.now() + Math.random();
+
+      const newToast = {
+        id,
+        message,
+        type
+      };
+
+      setToasts((prev) =&gt; [...prev, newToast]);
+
+      if (duration &gt; 0) {
+        const timer = setTimeout(() =&gt; {
+          removeToast(id);
+        }, duration);
+
+        timers.current.set(id, timer);
+      }
+
+      return id;
+    },
+    [removeToast]
+  );
+
+  // Cleanup all timers when provider unmounts.
+  const clearAll = useCallback(() =&gt; {
+    timers.current.forEach((timer) =&gt; {
+      clearTimeout(timer);
+    });
+
+    timers.current.clear();
+    setToasts([]);
+  }, []);
+
+  return (
+    &lt;ToastContext.Provider
+      value={{
+        toasts,
+        showToast,
+        removeToast,
+        clearAll
+      }}
+    &gt;
+      {children}
+
+      &lt;ToastContainer
+        toasts={toasts}
+        onClose={removeToast}
+      /&gt;
+    &lt;/ToastContext.Provider&gt;
+  );
+}
+
+export function useToast() {
+  const context = useContext(ToastContext);
+
+  if (!context) {
+    throw new Error(
+      "useToast must be used inside ToastProvider"
+    );
+  }
+
+  return context;
+}
+
+function ToastContainer({ toasts, onClose }) {
+  return (
+    &lt;div
+      className="toast-container"
+      aria-live="polite"
+      aria-atomic="true"
+    &gt;
+      {toasts.map((toast) =&gt; (
+        &lt;Toast
+          key={toast.id}
+          toast={toast}
+          onClose={onClose}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+function Toast({ toast, onClose }) {
+  const iconMap = {
+    success: "✓",
+    error: "✕",
+    warning: "!",
+    info: "i"
+  };
+
+  return (
+    &lt;div
+      className={`toast toast-${toast.type}`}
+      role="status"
+    &gt;
+      &lt;span className="toast-icon"&gt;
+        {iconMap[toast.type]}
+      &lt;/span&gt;
+
+      &lt;span className="toast-message"&gt;
+        {toast.message}
+      &lt;/span&gt;
+
+      &lt;button
+        type="button"
+        className="toast-close"
+        aria-label="Close notification"
+        onClick={() =&gt; onClose(toast.id)}
+      &gt;
+        ×
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+          <h5 class="mt-4">2. App.jsx</h5>
+          <pre><code>import { ToastProvider } from "./ToastContext";
+import SaveButton from "./SaveButton";
+
+function App() {
+  return (
+    &lt;ToastProvider&gt;
+      &lt;SaveButton /&gt;
+    &lt;/ToastProvider&gt;
+  );
+}
+
+export default App;</code></pre>
+
+          <h5 class="mt-4">3. Any component can trigger a toast</h5>
+          <pre><code>import { useToast } from "./ToastContext";
+
+function SaveButton() {
+  const { showToast } = useToast();
+
+  const handleSave = async () =&gt; {
+    try {
+      // await saveData();
+
+      showToast({
+        message: "Profile saved successfully!",
+        type: "success",
+        duration: 3000
+      });
+    } catch (error) {
+      showToast({
+        message: "Unable to save profile.",
+        type: "error",
+        duration: 5000
+      });
+    }
+  };
+
+  return (
+    &lt;button onClick={handleSave}&gt;
+      Save
+    &lt;/button&gt;
+  );
+}
+
+export default SaveButton;</code></pre>
+
+          <h5 class="mt-4">4. Basic CSS</h5>
+          <pre><code>.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  width: min(380px, calc(100vw - 40px));
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 16px;
+  border-radius: 10px;
+
+  background: white;
+  box-shadow: 0 8px 25px rgba(0,0,0,.15);
+  border-left: 5px solid;
+}
+
+.toast-success {
+  border-color: #198754;
+}
+
+.toast-error {
+  border-color: #dc3545;
+}
+
+.toast-warning {
+  border-color: #ffc107;
+}
+
+.toast-info {
+  border-color: #0d6efd;
+}
+
+.toast-icon {
+  font-weight: bold;
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+}</code></pre>
+
+          <div class="warning-tip mt-3">
+            <strong>Interview note:</strong> In a simpler machine-coding round, you can implement the same idea using a local <code>useState([])</code> inside the component. Introduce Context when the interviewer asks how multiple unrelated components should trigger toasts.
+          </div>
+        </div>
+      </div>
+
+      <div id="one" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+
+          <div class="success-tip">
+            “I built a reusable Toast Notification system using React Context. The provider maintains an array of active toast objects, where each toast has a unique ID, message, type, and duration. Any child component can call <code>showToast()</code> through a custom <code>useToast</code> hook. When a toast is added, React renders it in a fixed toast container and a timer automatically removes it after the configured duration. I also provide a close button for manual dismissal. I keep timer references in a ref so I can clear individual timers and clean up all timers when the provider unmounts. Context makes the notification system available across the application without prop drilling.”
+          </div>
+        </div>
+      </div>
+
+      <div id="five" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+
+          <ol>
+            <li><strong>Requirement:</strong> “We need a non-blocking notification system that can display temporary messages.”</li>
+            <li><strong>State design:</strong> “I store all active notifications in an array because multiple toasts may be visible simultaneously.”</li>
+            <li><strong>Toast object:</strong> “Each toast has a unique ID, message, type, and optional duration.”</li>
+            <li><strong>Adding:</strong> “The <code>showToast</code> function creates a toast object and appends it to the array.”</li>
+            <li><strong>Rendering:</strong> “ToastContainer maps over the array and renders each toast using its ID as the React key.”</li>
+            <li><strong>Auto-dismiss:</strong> “After the duration, <code>setTimeout</code> calls <code>removeToast(id)</code>.”</li>
+            <li><strong>Manual dismiss:</strong> “The close button also calls <code>removeToast(id)</code>.”</li>
+            <li><strong>Timer management:</strong> “I store timeout IDs in a ref-based Map, allowing me to clear a specific timer when a toast is manually removed.”</li>
+            <li><strong>Global access:</strong> “I use Context because toast notifications may be triggered from many parts of the application.”</li>
+            <li><strong>Cleanup:</strong> “When the provider unmounts, I clear every timer so there are no stale callbacks.”</li>
+            <li><strong>Accessibility:</strong> “I use an appropriate live region and meaningful button labels so notification updates can be communicated to assistive technology.”</li>
+          </ol>
+
+          <div class="tip">
+            <strong>Strong closing line:</strong>
+            “The key design decision is separating notification management from individual pages. The provider owns the toast state and lifecycle, while consuming components only call a simple <code>showToast</code> API.”
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Debugging</div>
+          <h2 class="section-title">Common Developer Mistakes</h2>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Mistake</th>
+                  <th>Why it is a problem</th>
+                  <th>Better approach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Using one boolean like <code>showToast</code></td>
+                  <td>Cannot represent multiple active notifications.</td>
+                  <td>Use an array of toast objects.</td>
+                </tr>
+                <tr>
+                  <td>No unique ID</td>
+                  <td>You cannot reliably remove one toast.</td>
+                  <td>Generate a unique ID for every toast.</td>
+                </tr>
+                <tr>
+                  <td>Using array index as React key</td>
+                  <td>Removing/reordering toasts can cause incorrect reconciliation.</td>
+                  <td>Use the toast's stable unique ID.</td>
+                </tr>
+                <tr>
+                  <td>Creating timers without cleanup</td>
+                  <td>Stale timers can fire after a toast is already removed or after unmount.</td>
+                  <td>Store timer IDs and call <code>clearTimeout</code>.</td>
+                </tr>
+                <tr>
+                  <td>Calling setTimeout directly during render</td>
+                  <td>Every render can create another timer.</td>
+                  <td>Create side effects in appropriate lifecycle logic.</td>
+                </tr>
+                <tr>
+                  <td>Not clearing manual-close timer</td>
+                  <td>A closed toast may still have a timer waiting to run.</td>
+                  <td>Clear the corresponding timer when removing manually.</td>
+                </tr>
+                <tr>
+                  <td>Prop drilling showToast</td>
+                  <td>Notification API becomes difficult to use across deep components.</td>
+                  <td>Use Context for app-wide toast behavior.</td>
+                </tr>
+                <tr>
+                  <td>Mixing API logic into Toast component</td>
+                  <td>The UI becomes tightly coupled to backend behavior.</td>
+                  <td>Let the caller decide when to show success/error messages.</td>
+                </tr>
+                <tr>
+                  <td>No maximum/overflow strategy</td>
+                  <td>Hundreds of notifications can fill the screen.</td>
+                  <td>Consider a maximum visible count or queue.</td>
+                </tr>
+                <tr>
+                  <td>Missing accessibility</td>
+                  <td>Screen-reader users may miss important feedback.</td>
+                  <td>Use live-region semantics and accessible close controls.</td>
+                </tr>
+                <tr>
+                  <td>Toast disappears too quickly</td>
+                  <td>Users may not have time to read the message.</td>
+                  <td>Use a sensible default duration and allow configuration.</td>
+                </tr>
+                <tr>
+                  <td>Long message breaks layout</td>
+                  <td>Toast may overflow on smaller screens.</td>
+                  <td>Use responsive width and text wrapping.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="danger-tip mt-3">
+            <strong>Most common interview bug:</strong> Creating a new timer every render or forgetting to clear timers. Explain that timers are side effects and need controlled lifecycle management.
+          </div>
+        </div>
+      </div>
+
+      <div id="edge" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Testing</div>
+          <h2 class="section-title">Edge Cases & Test Cases</h2>
+          <ul>
+            <li>Show one success toast.</li>
+            <li>Show error, warning, and info toasts.</li>
+            <li>Show multiple toasts quickly.</li>
+            <li>Close one toast manually while others remain.</li>
+            <li>Verify each toast disappears after its own duration.</li>
+            <li>Use duration <code>0</code> for a persistent toast if supported.</li>
+            <li>Unmount the provider while timers are active.</li>
+            <li>Trigger the same message multiple times.</li>
+            <li>Display a very long message.</li>
+            <li>Test on mobile width.</li>
+            <li>Verify keyboard access to the close button.</li>
+            <li>Verify screen-reader live-region behavior.</li>
+            <li>Consider a maximum visible toast count.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="interviewer" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Implementation Explanation</div>
+          <h2 class="section-title">How I implemented it — interviewer flow</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>1. I started with toast state</h5>
+                <p>“I used an array because multiple toast notifications can exist at the same time.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>2. I created showToast</h5>
+                <p>“The function creates a unique ID and adds a toast object to state.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>3. I created removeToast</h5>
+                <p>“I remove only the toast whose ID matches the requested ID.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>4. I added auto-dismiss</h5>
+                <p>“Every toast gets its own timeout based on its duration.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>5. I added Context</h5>
+                <p>“I exposed showToast through a custom hook so any descendant can trigger notifications.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>6. I handled cleanup</h5>
+                <p>“I clear timers when a toast is manually removed and when the provider unmounts.”</p>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use an array?”</h5>
+          <div class="success-tip">
+            “Because users can trigger several notifications close together. An array lets each toast have its own identity, message, type, and lifecycle.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use Context?”</h5>
+          <div class="success-tip">
+            “Toast notifications are cross-cutting UI. Context gives unrelated components access to the same notification API without passing props through every intermediate component.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use useRef for timers?”</h5>
+          <div class="success-tip">
+            “Timer IDs are mutable values that do not need to trigger a React render. A ref is a suitable place to retain them between renders so I can clear the correct timer.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “How would you improve it for production?”</h5>
+          <div class="success-tip">
+            “I would add a maximum visible count, queue management, pause-on-hover if required, animation, controlled placement, deduplication for repeated messages, better live-region behavior, and tests for timer lifecycle.”
+          </div>
+        </div>
+      </div>
+
+      <div id="followups" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Follow-ups</div>
+          <h2 class="section-title">Possible interviewer questions</h2>
+
+          <div class="accordion" id="followupAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  How would you implement a maximum of 3 visible toasts?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Keep only the latest three in the rendered list, or maintain a queue where additional notifications wait until an existing toast is removed.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  How would you pause the timer when the user hovers over a toast?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Store the remaining duration and timer start time, clear the timeout on mouse enter, then restart it with the remaining duration on mouse leave.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-item">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  Should every toast have a timeout?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Not necessarily. Some notifications, especially important errors or actions requiring attention, can remain until the user dismisses them. A duration of zero can represent a persistent toast.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  Toast vs Modal — what is the difference?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  A toast is generally non-blocking and temporary. A modal interrupts the current workflow and normally requires user interaction before the user can continue.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card mb-5">
+        <div class="card-body p-4">
+          <div class="small-label">Quick Recap</div>
+          <h2 class="section-title">Remember these 8 points</h2>
+
+          <div class="row g-2">
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">1. Array → active toasts</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">2. ID → identity</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">3. showToast → add</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">4. removeToast → delete</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">5. setTimeout → auto close</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">6. Context → global access</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">7. Ref → timer IDs</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">8. Cleanup → safe lifecycle</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white-50 py-4">
+  <div class="container text-center small">
+    React Machine Coding Round • Toast Notification • Practice the explanation before coding.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('.left-nav .list-group-item').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.left-nav .list-group-item')
+        .forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

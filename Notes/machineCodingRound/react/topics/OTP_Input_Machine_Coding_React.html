@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Machine Coding - OTP Input</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; color:#212529; }
+    .sticky-top { top:0; z-index:1020; }
+    .navbar-brand { font-weight:700; }
+    .hero { background:linear-gradient(135deg,#212529,#495057); color:#fff; border-radius:0 0 18px 18px; }
+    .card { border:0; box-shadow:0 5px 18px rgba(0,0,0,.07); }
+    .section-title { font-weight:700; }
+    .left-nav .list-group-item { border:0; cursor:pointer; padding:.75rem 1rem; }
+    .left-nav .list-group-item:hover { background:#eef2f7; }
+    .left-nav .list-group-item.active { background:#212529; color:#fff; }
+    pre { background:#17191c; color:#e9ecef; border-radius:10px; padding:18px; overflow:auto; font-size:14px; line-height:1.55; }
+    code { color:#d63384; }
+    pre code { color:inherit; }
+    .answer-card { min-height:160px; }
+    .flow-box { border:2px solid #dee2e6; border-radius:12px; padding:16px; background:#fff; height:100%; }
+    .flow-arrow { font-size:2rem; color:#6c757d; display:flex; align-items:center; justify-content:center; }
+    .otp-demo { display:flex; gap:8px; justify-content:center; }
+    .otp-demo input { width:48px; height:56px; text-align:center; font-size:24px; font-weight:700; border:2px solid #ced4da; border-radius:10px; }
+    .tip { border-left:4px solid #0d6efd; background:#eef5ff; padding:14px 16px; border-radius:8px; }
+    .danger-tip { border-left:4px solid #dc3545; background:#fff0f1; padding:14px 16px; border-radius:8px; }
+    .success-tip { border-left:4px solid #198754; background:#edf9f2; padding:14px 16px; border-radius:8px; }
+    .badge-soft { background:#e9ecef; color:#343a40; }
+    .small-label { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#6c757d; font-weight:700; }
+    .toc-link { text-decoration:none; color:inherit; }
+    @media(max-width:991px){ .left-nav{position:static!important;} }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark sticky-top shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#top"><i class="bi bi-shield-lock me-2"></i>OTP Input — Machine Coding Round</a>
+    <span class="text-white-50 small">React Interview Guide</span>
+  </div>
+</nav>
+
+<header id="top" class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-dark mb-3">React • Machine Coding • Interview Ready</span>
+        <h1 class="display-5 fw-bold">OTP Input Component</h1>
+        <p class="lead mb-0">A practical guide to understand, build, explain, and debug a multi-box OTP input in a React machine coding round.</p>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white text-dark rounded-4 p-4">
+          <div class="small-label">Core requirements</div>
+          <ul class="mb-0 mt-2">
+            <li>One digit per box</li>
+            <li>Auto-focus next box</li>
+            <li>Backspace moves backward</li>
+            <li>Paste complete OTP</li>
+            <li>Only numeric input</li>
+            <li>Submit only when complete</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-fluid py-4">
+  <div class="row g-4">
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="card left-nav sticky-top" style="top:70px;">
+        <div class="card-header bg-white fw-bold">Questions</div>
+        <div class="list-group list-group-flush">
+          <a class="list-group-item active" href="#what">What is OTP Input?</a>
+          <a class="list-group-item" href="#why">Why do we need it?</a>
+          <a class="list-group-item" href="#requirements">Requirements</a>
+          <a class="list-group-item" href="#how">How does it work?</a>
+          <a class="list-group-item" href="#flow">Execution Flow</a>
+          <a class="list-group-item" href="#visual">Visual Explanation</a>
+          <a class="list-group-item" href="#code">Full Code</a>
+          <a class="list-group-item" href="#explain1">Explain in 1 Minute</a>
+          <a class="list-group-item" href="#explain5">Explain in 5 Minutes</a>
+          <a class="list-group-item" href="#mistakes">Common Developer Mistakes</a>
+          <a class="list-group-item" href="#edge">Edge Cases</a>
+          <a class="list-group-item" href="#interviewer">How I Implemented It</a>
+          <a class="list-group-item" href="#recap">Quick Recap</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section class="col-lg-9">
+
+      <div id="what" class="card mb-4 answer-card">
+        <div class="card-body p-4">
+          <div class="small-label">What?</div>
+          <h2 class="section-title">What is OTP Input?</h2>
+          <p>An <strong>OTP Input</strong> is a UI component used to enter a One-Time Password, usually received through SMS, email, or an authenticator service.</p>
+          <p>Instead of using one large input, the OTP is commonly displayed as separate boxes. For example, a 6-digit OTP appears as:</p>
+          <div class="otp-demo my-3">
+            <input value="4" readonly><input value="8" readonly><input value="2" readonly><input value="7" readonly><input value="1" readonly><input value="9" readonly>
+          </div>
+          <div class="tip"><strong>Interview definition:</strong> “OTP Input is a controlled React component that manages multiple digit fields, handles focus movement, validates input, supports backspace and paste, and submits the OTP when all digits are entered.”</div>
+        </div>
+      </div>
+
+      <div id="why" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Why?</div>
+          <h2 class="section-title">What problem does it solve?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="flow-box"><h5>Better UX</h5><p class="mb-0">Users can visually understand exactly how many digits are required.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Fast entry</h5><p class="mb-0">The component automatically moves focus after every digit.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Input control</h5><p class="mb-0">It prevents invalid characters and limits each box to one digit.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Real-world authentication</h5><p class="mb-0">It is commonly used in login verification, signup, payments, and password recovery.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Requirements</div>
+          <h2 class="section-title">What should I implement?</h2>
+          <ol>
+            <li>Render 6 individual input boxes.</li>
+            <li>Allow only one numeric character in each box.</li>
+            <li>Automatically focus the next input after typing.</li>
+            <li>When Backspace is pressed on an empty box, focus the previous box.</li>
+            <li>Support pasting a complete OTP.</li>
+            <li>Show an error if the OTP is incomplete.</li>
+            <li>Submit the complete OTP.</li>
+            <li>Keep the inputs controlled through React state.</li>
+          </ol>
+          <div class="success-tip"><strong>Machine coding tip:</strong> Build the basic typing + focus behavior first. Then add Backspace, paste, validation, and polish.</div>
+        </div>
+      </div>
+
+      <div id="how" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">How?</div>
+          <h2 class="section-title">How does it work?</h2>
+          <p>The main idea is simple: keep all OTP digits in one state array and keep references to all input elements.</p>
+          <pre><code>const [otp, setOtp] = useState(Array(length).fill(""));
+
+const inputRefs = useRef([]);
+
+otp = ["", "", "", "", "", ""]</code></pre>
+          <p>When the user types a digit:</p>
+          <ol>
+            <li>Read the typed value.</li>
+            <li>Keep only the last valid digit.</li>
+            <li>Update the corresponding index in <code>otp</code>.</li>
+            <li>Move focus to the next input.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div id="flow" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Execution Flow</div>
+          <h2 class="section-title">Step-by-step execution</h2>
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md"><div class="flow-box"><strong>1</strong><br>Render 6 inputs</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>2</strong><br>User types <b>5</b></div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>3</strong><br>Update <code>otp[0]</code></div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>4</strong><br>Focus input 2</div></div>
+          </div>
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md"><div class="flow-box"><strong>5</strong><br>Repeat for each digit</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>6</strong><br>OTP becomes complete</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>7</strong><br>Validate / submit</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="visual" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Visual Explanation</div>
+          <h2 class="section-title">How the state and focus move</h2>
+          <pre><code>Initial:
+["", "", "", "", "", ""]
+  ↑
+Focus: Box 1
+
+User types 4:
+["4", "", "", "", "", ""]
+       ↑
+     Focus Box 2
+
+User types 8:
+["4", "8", "", "", "", ""]
+           ↑
+         Focus Box 3
+
+...
+
+Final:
+["4", "8", "2", "7", "1", "9"]
+
+OTP = otp.join("") = "482719"</code></pre>
+          <div class="danger-tip"><strong>Important:</strong> State stores the OTP value; refs control DOM focus. Do not use state alone to move focus.</div>
+        </div>
+      </div>
+
+      <div id="code" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Full Code</div>
+          <h2 class="section-title">React OTP Input — Interview Version</h2>
+          <p>This version covers typing, numeric validation, auto-focus, Backspace, arrow navigation, paste, and submission.</p>
+          <pre><code>import { useRef, useState } from "react";
+
+function OTPInput({ length = 6, onSubmit }) {
+  const [otp, setOtp] = useState(Array(length).fill(""));
+  const [error, setError] = useState("");
+
+  const inputRefs = useRef([]);
+
+  const focusInput = (index) => {
+    if (index &gt;= 0 &amp;&amp; index &lt; length) {
+      inputRefs.current[index]?.focus();
+    }
+  };
+
+  const handleChange = (e, index) => {
+    const value = e.target.value;
+
+    // Keep only digits.
+    const digit = value.replace(/\D/g, "").slice(-1);
+
+    if (!digit) return;
+
+    const nextOtp = [...otp];
+    nextOtp[index] = digit;
+    setOtp(nextOtp);
+    setError("");
+
+    // Move focus forward.
+    if (index &lt; length - 1) {
+      focusInput(index + 1);
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace") {
+      if (otp[index]) {
+        const nextOtp = [...otp];
+        nextOtp[index] = "";
+        setOtp(nextOtp);
+      } else if (index &gt; 0) {
+        const nextOtp = [...otp];
+        nextOtp[index - 1] = "";
+        setOtp(nextOtp);
+        focusInput(index - 1);
+      }
+    }
+
+    if (e.key === "ArrowLeft") {
+      focusInput(index - 1);
+    }
+
+    if (e.key === "ArrowRight") {
+      focusInput(index + 1);
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, length);
+
+    if (!pasted) return;
+
+    const nextOtp = Array(length).fill("");
+
+    pasted.split("").forEach((digit, index) => {
+      nextOtp[index] = digit;
+    });
+
+    setOtp(nextOtp);
+
+    const nextFocus = Math.min(pasted.length, length - 1);
+    focusInput(nextFocus);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (otp.some((digit) => digit === "")) {
+      setError(`Please enter all ${length} digits.`);
+      return;
+    }
+
+    const finalOtp = otp.join("");
+    setError("");
+    onSubmit?.(finalOtp);
+  };
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;div className="otp-container"&gt;
+        {otp.map((digit, index) =&gt; (
+          &lt;input
+            key={index}
+            ref={(el) =&gt; (inputRefs.current[index] = el)}
+            value={digit}
+            maxLength={1}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            onChange={(e) =&gt; handleChange(e, index)}
+            onKeyDown={(e) =&gt; handleKeyDown(e, index)}
+            onPaste={handlePaste}
+            aria-label={`OTP digit ${index + 1}`}
+          /&gt;
+        ))}
+      &lt;/div&gt;
+
+      {error &amp;&amp; &lt;p className="error"&gt;{error}&lt;/p&gt;}
+
+      &lt;button type="submit"&gt;Verify OTP&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}
+
+export default OTPInput;</code></pre>
+
+          <h5 class="mt-4">Parent usage</h5>
+          <pre><code>&lt;OTPInput
+  length={6}
+  onSubmit={(otp) =&gt; {
+    console.log("OTP:", otp);
+    // Call verify OTP API here
+  }}
+/&gt;</code></pre>
+        </div>
+      </div>
+
+      <div id="explain1" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+          <div class="success-tip">
+            “I built the OTP input as a controlled React component. I store all OTP digits in an array state, for example <code>["4","8","","","",""]</code>. I create multiple input boxes and store their DOM references using <code>useRef</code>. When the user enters a digit, I update the corresponding state index and automatically focus the next input. For Backspace, if the current box is empty, I move focus to the previous box. I also handle paste by reading the clipboard, extracting digits, and distributing them across the inputs. Finally, before submission I check that every position is filled and combine the array using <code>join("")</code> to get the final OTP.”
+          </div>
+        </div>
+      </div>
+
+      <div id="explain5" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+          <ol>
+            <li><strong>Requirement:</strong> “The user needs to enter a fixed-length OTP, one digit per box.”</li>
+            <li><strong>State:</strong> “I use an array because every input corresponds to one index.”</li>
+            <li><strong>Refs:</strong> “I use <code>useRef</code> to store each input DOM element so I can control focus without storing DOM nodes in state.”</li>
+            <li><strong>Typing:</strong> “On change, I sanitize the value, update that index, and move focus forward.”</li>
+            <li><strong>Backspace:</strong> “If the current input has a value, I clear it. If it is already empty, I clear the previous digit and focus the previous input.”</li>
+            <li><strong>Paste:</strong> “I prevent the browser's default paste behavior, extract digits, distribute them across the array, and update state once.”</li>
+            <li><strong>Validation:</strong> “On submit, I check for empty positions and then join the digits to create the final OTP string.”</li>
+            <li><strong>Accessibility/mobile:</strong> “I add labels, numeric input mode, and one-time-code autocomplete to improve the experience.”</li>
+          </ol>
+          <div class="tip"><strong>Strong closing line:</strong> “The important design decision is separating value management in React state from focus management through refs.”</div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Debugging</div>
+          <h2 class="section-title">Common Developer Mistakes</h2>
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr><th>Mistake</th><th>Why it is a problem</th><th>Better approach</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Using one string without indexes</td><td>Harder to manage individual boxes and focus.</td><td>Use an array with one value per input.</td></tr>
+                <tr><td>Directly changing state array</td><td>React may not detect the update correctly.</td><td>Create a copy: <code>const next = [...otp]</code>.</td></tr>
+                <tr><td>Using document.querySelector for focus</td><td>Couples component logic to global DOM.</td><td>Use <code>useRef</code> for input elements.</td></tr>
+                <tr><td>Not limiting to one digit</td><td>A user can type multiple characters into one box.</td><td>Use <code>maxLength={1}</code> plus sanitization.</td></tr>
+                <tr><td>Allowing letters/symbols</td><td>OTP should normally contain digits only.</td><td>Sanitize with a numeric check or regex.</td></tr>
+                <tr><td>Backspace only clears current box</td><td>Users expect Backspace to navigate backward.</td><td>If empty, clear/focus previous box.</td></tr>
+                <tr><td>No paste handling</td><td>Users often copy OTPs from SMS/email.</td><td>Handle <code>onPaste</code> and distribute digits.</td></tr>
+                <tr><td>Submitting incomplete OTP</td><td>Creates unnecessary API calls.</td><td>Validate all positions before API call.</td></tr>
+                <tr><td>Focus changes inside state</td><td>Focus is DOM behavior, not application data.</td><td>Keep focus in refs.</td></tr>
+                <tr><td>Forgetting accessibility</td><td>Screen readers and mobile users may struggle.</td><td>Add <code>aria-label</code>, <code>inputMode</code>, and autocomplete.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="edge" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Edge Cases</div>
+          <h2 class="section-title">What should I test?</h2>
+          <ul>
+            <li>Type one digit in each box.</li>
+            <li>Type a letter — it should be ignored.</li>
+            <li>Type a long value — only one digit should remain.</li>
+            <li>Press Backspace on a filled box.</li>
+            <li>Press Backspace on an empty box.</li>
+            <li>Press ArrowLeft / ArrowRight.</li>
+            <li>Paste a complete 6-digit OTP.</li>
+            <li>Paste text containing letters and digits.</li>
+            <li>Paste more digits than the configured length.</li>
+            <li>Submit with missing digits.</li>
+            <li>Submit a complete OTP.</li>
+            <li>Change OTP length from 6 to another value.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="interviewer" class="card mb-4">
+        <div class="card-body p-4">
+          <div class="small-label">Implementation Explanation</div>
+          <h2 class="section-title">How I implemented it — interviewer flow</h2>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>1. I started with the UI</h5>
+                <p>“First, I rendered six controlled input boxes based on the OTP length.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>2. I added state</h5>
+                <p>“I used an array so each digit has a predictable index.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>3. I added focus management</h5>
+                <p>“I stored input references in <code>useRef</code> and moved focus after input.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>4. I handled Backspace</h5>
+                <p>“Backspace clears the current value or moves to the previous field when empty.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>5. I handled paste</h5>
+                <p>“I distribute pasted digits across the OTP fields instead of putting everything into one box.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>6. I added validation</h5>
+                <p>“I prevent submission until all OTP positions contain a digit.”</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card mb-5">
+        <div class="card-body p-4">
+          <div class="small-label">Quick Recap</div>
+          <h2 class="section-title">Remember these 7 points</h2>
+          <div class="row g-2">
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">1. Array state → values</span></div>
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">2. useRef → focus</span></div>
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">3. onChange → digit</span></div>
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">4. Backspace → previous</span></div>
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">5. Paste → distribute</span></div>
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">6. Validation → complete</span></div>
+            <div class="col-md-4"><span class="badge badge-soft p-2 w-100">7. join("") → final OTP</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white-50 py-4">
+  <div class="container text-center small">
+    React Machine Coding Round • OTP Input • Practice explaining the implementation before coding.
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.left-nav .list-group-item').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.left-nav .list-group-item').forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Image Carousel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529}
+    .navbar{position:sticky;top:0;z-index:1030}
+    .hero{background:linear-gradient(135deg,#212529,#495057);color:#fff;border-radius:0 0 20px 20px}
+    .card{border:0;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:1.5rem}
+    .left-nav{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+    .left-nav .list-group-item{border:0;cursor:pointer;padding:.72rem 1rem}
+    .left-nav .list-group-item:hover{background:#eef2f7}
+    .left-nav .list-group-item.active{background:#212529;color:#fff}
+    .section-title{font-weight:700}
+    .small-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:#6c757d;font-weight:700}
+    pre{background:#17191c;color:#e9ecef;padding:18px;border-radius:10px;overflow:auto;font-size:14px;line-height:1.55}
+    code{color:#d63384}
+    pre code{color:inherit}
+    .tip,.success-tip,.danger-tip{padding:14px 16px;border-radius:8px}
+    .tip{border-left:4px solid #0d6efd;background:#eef5ff}
+    .success-tip{border-left:4px solid #198754;background:#edf9f2}
+    .danger-tip{border-left:4px solid #dc3545;background:#fff0f1}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:16px;background:#fff;height:100%}
+    .flow-arrow{font-size:2rem;color:#6c757d;display:flex;align-items:center;justify-content:center}
+    .carousel-demo{background:#111;border-radius:14px;overflow:hidden;position:relative}
+    .carousel-demo img{width:100%;height:260px;object-fit:cover;display:block}
+    .demo-caption{position:absolute;bottom:0;left:0;right:0;padding:35px 18px 14px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+    .demo-controls{position:absolute;top:50%;left:0;right:0;display:flex;justify-content:space-between;transform:translateY(-50%);padding:0 12px}
+    .demo-controls button{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.85)}
+    .dots{text-align:center;margin-top:12px}
+    .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#adb5bd;margin:0 4px}
+    .dot.active{background:#212529}
+    .badge-soft{background:#e9ecef;color:#343a40}
+    .checklist li{margin-bottom:8px}
+    @media(max-width:991px){.left-nav{position:static;max-height:none}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#top">
+      <i class="bi bi-images me-2"></i>Image Carousel — Machine Coding Round
+    </a>
+    <span class="text-white-50 small">React Interview Guide</span>
+  </div>
+</nav>
+
+<header id="top" class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-dark mb-3">React • Machine Coding • Interview Ready</span>
+        <h1 class="display-5 fw-bold">Image Carousel</h1>
+        <p class="lead mb-0">Learn how to build and explain a reusable image carousel with previous/next controls, indicators, autoplay, pause-on-hover, and clean React state management.</p>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white text-dark rounded-4 p-4">
+          <div class="small-label">Core requirements</div>
+          <ul class="mb-0 mt-2">
+            <li>Display one image at a time</li>
+            <li>Previous / Next buttons</li>
+            <li>Dot indicators</li>
+            <li>Infinite looping</li>
+            <li>Optional autoplay</li>
+            <li>Pause on hover</li>
+            <li>Keyboard navigation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <aside class="col-lg-3">
+      <div class="card left-nav">
+        <div class="card-header bg-white fw-bold">
+          Questions
+        </div>
+        <div class="list-group list-group-flush">
+          <a class="list-group-item active" href="#what">What is Image Carousel?</a>
+          <a class="list-group-item" href="#why">Why do we need it?</a>
+          <a class="list-group-item" href="#requirements">Requirements</a>
+          <a class="list-group-item" href="#how">How does it work?</a>
+          <a class="list-group-item" href="#state">What state is needed?</a>
+          <a class="list-group-item" href="#flow">Execution Flow</a>
+          <a class="list-group-item" href="#visual">Visual Explanation</a>
+          <a class="list-group-item" href="#fullcode">Full Code</a>
+          <a class="list-group-item" href="#one">Explain in 1 Minute</a>
+          <a class="list-group-item" href="#five">Explain in 5 Minutes</a>
+          <a class="list-group-item" href="#mistakes">Common Developer Mistakes</a>
+          <a class="list-group-item" href="#edge">Edge Cases</a>
+          <a class="list-group-item" href="#interviewer">How I Implemented It</a>
+          <a class="list-group-item" href="#recap">Quick Recap</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT SIDE -->
+    <section class="col-lg-9">
+
+      <div id="what" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">What?</div>
+          <h2 class="section-title">What is an Image Carousel?</h2>
+          <p>An <strong>Image Carousel</strong> is a UI component that displays a collection of images one at a time and allows the user to move between them.</p>
+          <p>For example, an e-commerce website may show multiple product images inside one area instead of displaying every image separately.</p>
+
+          <div class="carousel-demo">
+            <img src="https://picsum.photos/id/1018/1000/500" alt="Carousel example">
+            <div class="demo-caption">
+              <strong>Slide 1</strong><br>
+              One image is visible at a time.
+            </div>
+            <div class="demo-controls">
+              <button aria-label="Previous"><i class="bi bi-chevron-left"></i></button>
+              <button aria-label="Next"><i class="bi bi-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+
+          <div class="tip mt-3">
+            <strong>Interview definition:</strong>
+            “An image carousel is a reusable component that manages the currently visible slide and provides navigation through previous, next, indicators, and optionally autoplay.”
+          </div>
+        </div>
+      </div>
+
+      <div id="why" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Why?</div>
+          <h2 class="section-title">What problem does it solve?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="flow-box"><h5>Save screen space</h5><p class="mb-0">Multiple images can be presented inside a single compact UI area.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Better product browsing</h5><p class="mb-0">Users can quickly move through product, banner, gallery, or promotional images.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Controlled navigation</h5><p class="mb-0">Previous, next, dots, and keyboard controls provide predictable navigation.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Reusable component</h5><p class="mb-0">The same component can accept different image arrays and configuration options.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Requirements</div>
+          <h2 class="section-title">What should I implement?</h2>
+          <ol class="checklist">
+            <li>Receive an array of image objects through props.</li>
+            <li>Display the current image.</li>
+            <li>Implement Previous and Next buttons.</li>
+            <li>Loop from the last image back to the first.</li>
+            <li>Loop from the first image back to the last.</li>
+            <li>Display clickable dot indicators.</li>
+            <li>Add optional autoplay.</li>
+            <li>Pause autoplay when the user hovers over the carousel.</li>
+            <li>Support keyboard ArrowLeft and ArrowRight navigation.</li>
+            <li>Clean up timers and event listeners when the component unmounts.</li>
+          </ol>
+          <div class="success-tip"><strong>Machine coding strategy:</strong> First implement current index + previous/next. Then add indicators. After the core behavior works, add autoplay, pause-on-hover, keyboard support, and polish.</div>
+        </div>
+      </div>
+
+      <div id="how" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">How?</div>
+          <h2 class="section-title">How does it work?</h2>
+          <p>The carousel does not need to store every image in state. The image list comes from props; state only needs to track <strong>which image is currently visible</strong>.</p>
+          <pre><code>const [currentIndex, setCurrentIndex] = useState(0);
+
+images[currentIndex]</code></pre>
+
+          <p>For the Next button:</p>
+          <pre><code>setCurrentIndex((prev) =&gt;
+  (prev + 1) % images.length
+);</code></pre>
+
+          <p>For the Previous button:</p>
+          <pre><code>setCurrentIndex((prev) =&gt;
+  (prev - 1 + images.length) % images.length
+);</code></pre>
+
+          <div class="tip">
+            <strong>Key idea:</strong> The modulo operator <code>%</code> makes the carousel loop safely between <code>0</code> and <code>images.length - 1</code>.
+          </div>
+        </div>
+      </div>
+
+      <div id="state" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">State & Logic</div>
+          <h2 class="section-title">What state and React features are needed?</h2>
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr><th>Feature</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>useState</code></td><td>Stores the current slide index.</td></tr>
+                <tr><td><code>useEffect</code></td><td>Creates autoplay and keyboard event behavior.</td></tr>
+                <tr><td><code>useRef</code></td><td>Tracks hover state without causing unnecessary renders.</td></tr>
+                <tr><td><code>setInterval</code></td><td>Moves to the next slide automatically.</td></tr>
+                <tr><td>Modulo <code>%</code></td><td>Creates infinite circular navigation.</td></tr>
+                <tr><td>Props</td><td>Makes the carousel reusable with different images/configuration.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Execution Flow</div>
+          <h2 class="section-title">Step-by-step execution</h2>
+
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md"><div class="flow-box"><strong>1</strong><br>Receive images</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>2</strong><br><code>currentIndex = 0</code></div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>3</strong><br>Render first image</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>4</strong><br>User clicks Next</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md"><div class="flow-box"><strong>5</strong><br>Increment index</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>6</strong><br>React re-renders</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>7</strong><br>New image appears</div></div>
+          </div>
+
+          <div class="tip mt-3">
+            <strong>Autoplay flow:</strong> <code>useEffect</code> starts an interval → interval calls Next → index changes → component re-renders → cleanup clears the interval.
+          </div>
+        </div>
+      </div>
+
+      <div id="visual" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Visual Explanation</div>
+          <h2 class="section-title">How the index moves</h2>
+          <pre><code>images = [A, B, C, D]
+
+Initial:
+currentIndex = 0
+             ↓
+            [ A ] B  C  D
+
+Click NEXT:
+0 → 1
+A  [ B ] C  D
+
+Click NEXT:
+1 → 2
+A  B  [ C ] D
+
+Click NEXT:
+2 → 3
+A  B  C  [ D ]
+
+Click NEXT:
+3 → 0
+[ A ] B  C  D
+        ↑
+     loop back
+
+Click PREVIOUS from 0:
+0 → 3
+A  B  C  [ D ]
+        ↑
+     loop backward</code></pre>
+
+          <h5 class="mt-4">Autoplay visual</h5>
+          <pre><code>setInterval
+    ↓
+nextSlide()
+    ↓
+currentIndex changes
+    ↓
+React re-render
+    ↓
+new image displayed
+    ↓
+repeat every 3 seconds
+
+Mouse enters → pause
+Mouse leaves → resume</code></pre>
+        </div>
+      </div>
+
+      <div id="fullcode" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Full Code</div>
+          <h2 class="section-title">React Image Carousel — Interview Version</h2>
+          <p>This version includes navigation, indicators, autoplay, pause-on-hover, keyboard navigation, and timer cleanup.</p>
+
+          <pre><code>import { useEffect, useRef, useState } from "react";
+
+const images = [
+  {
+    id: 1,
+    url: "https://picsum.photos/id/1018/1000/600",
+    title: "Mountain"
+  },
+  {
+    id: 2,
+    url: "https://picsum.photos/id/1015/1000/600",
+    title: "River"
+  },
+  {
+    id: 3,
+    url: "https://picsum.photos/id/1019/1000/600",
+    title: "Nature"
+  },
+  {
+    id: 4,
+    url: "https://picsum.photos/id/1025/1000/600",
+    title: "Dog"
+  }
+];
+
+function ImageCarousel({
+  images,
+  autoPlay = true,
+  interval = 3000
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const carouselRef = useRef(null);
+
+  const nextSlide = () =&gt; {
+    setCurrentIndex((prev) =&gt;
+      (prev + 1) % images.length
+    );
+  };
+
+  const previousSlide = () =&gt; {
+    setCurrentIndex((prev) =&gt;
+      (prev - 1 + images.length) % images.length
+    );
+  };
+
+  const goToSlide = (index) =&gt; {
+    setCurrentIndex(index);
+  };
+
+  // Autoplay
+  useEffect(() =&gt; {
+    if (!autoPlay || isPaused || images.length &lt;= 1) {
+      return;
+    }
+
+    const timerId = setInterval(() =&gt; {
+      nextSlide();
+    }, interval);
+
+    return () =&gt; {
+      clearInterval(timerId);
+    };
+  }, [autoPlay, interval, isPaused, images.length]);
+
+  // Keyboard navigation
+  useEffect(() =&gt; {
+    const handleKeyDown = (event) =&gt; {
+      if (event.key === "ArrowRight") {
+        nextSlide();
+      }
+
+      if (event.key === "ArrowLeft") {
+        previousSlide();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () =&gt; {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  if (!images.length) {
+    return &lt;p&gt;No images available.&lt;/p&gt;;
+  }
+
+  const currentImage = images[currentIndex];
+
+  return (
+    &lt;div
+      ref={carouselRef}
+      className="carousel"
+      onMouseEnter={() =&gt; setIsPaused(true)}
+      onMouseLeave={() =&gt; setIsPaused(false)}
+      tabIndex={0}
+    &gt;
+
+      &lt;div className="image-wrapper"&gt;
+        &lt;img
+          src={currentImage.url}
+          alt={currentImage.title}
+        /&gt;
+
+        &lt;button
+          onClick={previousSlide}
+          aria-label="Previous image"
+          className="previous"
+        &gt;
+          ←
+        &lt;/button&gt;
+
+        &lt;button
+          onClick={nextSlide}
+          aria-label="Next image"
+          className="next"
+        &gt;
+          →
+        &lt;/button&gt;
+
+        &lt;div className="caption"&gt;
+          {currentImage.title}
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className="indicators"&gt;
+        {images.map((image, index) =&gt; (
+          &lt;button
+            key={image.id}
+            onClick={() =&gt; goToSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
+            className={
+              index === currentIndex ? "active" : ""
+            }
+          &gt;
+            ●
+          &lt;/button&gt;
+        ))}
+      &lt;/div&gt;
+
+      &lt;p&gt;
+        Slide {currentIndex + 1} of {images.length}
+      &lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default function App() {
+  return (
+    &lt;ImageCarousel
+      images={images}
+      autoPlay={true}
+      interval={3000}
+    /&gt;
+  );
+}</code></pre>
+
+          <h5 class="mt-4">Basic CSS</h5>
+          <pre><code>.carousel {
+  max-width: 700px;
+  margin: auto;
+}
+
+.image-wrapper {
+  position: relative;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.previous,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+}
+
+.previous {
+  left: 15px;
+}
+
+.next {
+  right: 15px;
+}
+
+.indicators {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.indicators button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.indicators button.active {
+  color: #000;
+}</code></pre>
+        </div>
+      </div>
+
+      <div id="one" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+          <div class="success-tip">
+            “I implemented the image carousel as a reusable React component. The image list is passed through props, and I keep only the current slide index in state. The Previous and Next buttons update that index using the modulo operator so the carousel loops from the last image to the first and vice versa. I also added dot indicators so the user can directly select a slide. For autoplay, I use <code>useEffect</code> with <code>setInterval</code>, and I clear the interval during cleanup to prevent memory leaks. I pause autoplay while the user hovers over the carousel and added keyboard navigation for the left and right arrow keys.”
+          </div>
+        </div>
+      </div>
+
+      <div id="five" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+
+          <ol>
+            <li><strong>Start with the requirement:</strong> “The component needs to display one image and allow navigation through a collection.”</li>
+            <li><strong>Data:</strong> “I keep the image data outside the component and pass it through props, making the component reusable.”</li>
+            <li><strong>State:</strong> “The only main state is <code>currentIndex</code>, because the images themselves do not need to be duplicated into state.”</li>
+            <li><strong>Next:</strong> “For Next, I increment the index. The modulo operator wraps the value back to zero after the last slide.”</li>
+            <li><strong>Previous:</strong> “For Previous, I subtract one and add the array length before applying modulo, which avoids a negative index.”</li>
+            <li><strong>Indicators:</strong> “Each indicator calls a function with its index, allowing direct navigation.”</li>
+            <li><strong>Autoplay:</strong> “I use <code>useEffect</code> and <code>setInterval</code> to automatically advance the slide.”</li>
+            <li><strong>Cleanup:</strong> “The effect returns <code>clearInterval</code> so the timer does not continue after unmount or effect changes.”</li>
+            <li><strong>Pause on hover:</strong> “I track hover state and stop autoplay while the user interacts with the carousel.”</li>
+            <li><strong>Keyboard:</strong> “I listen for ArrowLeft and ArrowRight and remove the event listener during cleanup.”</li>
+            <li><strong>Accessibility:</strong> “I provide meaningful alt text and aria-labels for navigation controls.”</li>
+          </ol>
+
+          <div class="tip">
+            <strong>Strong closing line:</strong>
+            “The main design principle is to keep the data immutable, store only the current index as state, and isolate side effects like timers and event listeners inside useEffect with proper cleanup.”
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Debugging</div>
+          <h2 class="section-title">Common Developer Mistakes</h2>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Mistake</th>
+                  <th>Why it is a problem</th>
+                  <th>Better approach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mutating the image array</td>
+                  <td>Can create unexpected state/data behavior.</td>
+                  <td>Keep the input data immutable.</td>
+                </tr>
+                <tr>
+                  <td>Storing all images in state unnecessarily</td>
+                  <td>Creates duplicated state.</td>
+                  <td>Receive images through props and store only the current index.</td>
+                </tr>
+                <tr>
+                  <td>Using <code>currentIndex + 1</code> without wrapping</td>
+                  <td>Eventually produces an out-of-range index.</td>
+                  <td>Use <code>(index + 1) % images.length</code>.</td>
+                </tr>
+                <tr>
+                  <td>Previous creates <code>-1</code></td>
+                  <td>Negative array index does not select the last item.</td>
+                  <td>Use <code>(index - 1 + length) % length</code>.</td>
+                </tr>
+                <tr>
+                  <td>Creating interval outside useEffect</td>
+                  <td>A new timer can be created on every render.</td>
+                  <td>Create and clean up timers inside <code>useEffect</code>.</td>
+                </tr>
+                <tr>
+                  <td>Forgetting clearInterval</td>
+                  <td>Can leave timers running after unmount.</td>
+                  <td>Return cleanup function from the effect.</td>
+                </tr>
+                <tr>
+                  <td>Forgetting removeEventListener</td>
+                  <td>Repeated listeners can accumulate.</td>
+                  <td>Remove the listener in effect cleanup.</td>
+                </tr>
+                <tr>
+                  <td>Autoplay continues while user interacts</td>
+                  <td>The slide may change while the user is reading/clicking.</td>
+                  <td>Pause autoplay on hover/focus.</td>
+                </tr>
+                <tr>
+                  <td>Missing alt text</td>
+                  <td>Bad accessibility and poor image context.</td>
+                  <td>Use meaningful <code>alt</code> text.</td>
+                </tr>
+                <tr>
+                  <td>Using array index as key when data has stable IDs</td>
+                  <td>Can make reconciliation less reliable when lists change.</td>
+                  <td>Use a stable image ID as the key.</td>
+                </tr>
+                <tr>
+                  <td>No empty-array handling</td>
+                  <td><code>images[0]</code> may be undefined.</td>
+                  <td>Render a fallback when there are no images.</td>
+                </tr>
+                <tr>
+                  <td>Not considering rapid button clicks</td>
+                  <td>Stale state can cause incorrect navigation in some implementations.</td>
+                  <td>Use functional state updates: <code>setCurrentIndex(prev =&gt; ...)</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="danger-tip mt-3">
+            <strong>Most important mistake:</strong> Creating <code>setInterval</code> on every render without cleanup. This can result in multiple timers changing the slide at the same time.
+          </div>
+        </div>
+      </div>
+
+      <div id="edge" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Testing</div>
+          <h2 class="section-title">Edge Cases & Test Cases</h2>
+          <ul class="checklist">
+            <li>Images array is empty.</li>
+            <li>Only one image is provided.</li>
+            <li>Click Next from the last image.</li>
+            <li>Click Previous from the first image.</li>
+            <li>Click every indicator.</li>
+            <li>Click Next repeatedly very quickly.</li>
+            <li>Enable and disable autoplay.</li>
+            <li>Hover over the carousel while autoplay is running.</li>
+            <li>Move the mouse away and verify autoplay resumes.</li>
+            <li>Press ArrowLeft and ArrowRight.</li>
+            <li>Unmount the component while autoplay is active.</li>
+            <li>Test broken/slow image URLs and appropriate fallback behavior.</li>
+            <li>Check mobile/responsive layout.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="interviewer" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Implementation Explanation</div>
+          <h2 class="section-title">How I implemented it — interviewer flow</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>1. I started with data</h5>
+                <p>“I created an array of image objects containing an ID, URL, and title.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>2. I created currentIndex</h5>
+                <p>“I used state to track which image is currently visible.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>3. I implemented Next/Previous</h5>
+                <p>“I used modulo arithmetic so navigation wraps around the image array.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>4. I added indicators</h5>
+                <p>“Each indicator maps to an image index and allows direct navigation.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>5. I added autoplay</h5>
+                <p>“I used useEffect with setInterval and returned clearInterval for cleanup.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>6. I added interaction</h5>
+                <p>“I pause autoplay on hover and support keyboard navigation with arrow keys.”</p>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use modulo?”</h5>
+          <div class="success-tip">
+            “Modulo keeps the index within the valid range. If there are four images, <code>(3 + 1) % 4</code> becomes <code>0</code>, so the carousel automatically returns to the first image.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use useEffect?”</h5>
+          <div class="success-tip">
+            “Autoplay and keyboard listeners are side effects. useEffect lets me create them after render and clean them up when dependencies change or the component unmounts.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why not store the current image itself?”</h5>
+          <div class="success-tip">
+            “The index is enough to derive the current image from the source array. Storing both would duplicate information and could create synchronization problems.”
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card mb-5">
+        <div class="card-body p-4">
+          <div class="small-label">Quick Recap</div>
+          <h2 class="section-title">Remember these 8 points</h2>
+          <div class="row g-2">
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">1. Props → images</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">2. State → index</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">3. Next → +1</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">4. Previous → -1</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">5. % → looping</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">6. useEffect → autoplay</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">7. Cleanup → safe timers</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">8. Accessibility → UX</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white-50 py-4">
+  <div class="container text-center small">
+    React Machine Coding Round • Image Carousel • Practice the explanation before coding.
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.left-nav .list-group-item').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.left-nav .list-group-item')
+        .forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

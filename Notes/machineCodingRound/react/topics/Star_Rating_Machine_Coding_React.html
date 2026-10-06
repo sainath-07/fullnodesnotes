@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Star Rating</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529}
+    .navbar{position:sticky;top:0;z-index:1030}
+    .hero{background:linear-gradient(135deg,#212529,#495057);color:#fff;border-radius:0 0 20px 20px}
+    .card{border:0;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:1.5rem}
+    .left-nav{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+    .left-nav .list-group-item{border:0;cursor:pointer;padding:.72rem 1rem}
+    .left-nav .list-group-item:hover{background:#eef2f7}
+    .left-nav .list-group-item.active{background:#212529;color:#fff}
+    .section-title{font-weight:700}
+    .small-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:#6c757d;font-weight:700}
+    pre{background:#17191c;color:#e9ecef;padding:18px;border-radius:10px;overflow:auto;font-size:14px;line-height:1.55}
+    code{color:#d63384}
+    pre code{color:inherit}
+    .tip,.success-tip,.danger-tip{padding:14px 16px;border-radius:8px}
+    .tip{border-left:4px solid #0d6efd;background:#eef5ff}
+    .success-tip{border-left:4px solid #198754;background:#edf9f2}
+    .danger-tip{border-left:4px solid #dc3545;background:#fff0f1}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:16px;background:#fff;height:100%}
+    .flow-arrow{font-size:2rem;color:#6c757d;display:flex;align-items:center;justify-content:center}
+    .star-demo{text-align:center;padding:25px;background:#fff;border:1px solid #e9ecef;border-radius:14px}
+    .stars{font-size:48px;letter-spacing:5px;line-height:1}
+    .star{color:#ced4da}
+    .star.filled{color:#ffc107}
+    .rating-label{font-weight:600;margin-top:12px}
+    .rating-box{display:inline-flex;gap:5px;padding:12px 16px;background:#f8f9fa;border-radius:12px}
+    .badge-soft{background:#e9ecef;color:#343a40}
+    @media(max-width:991px){.left-nav{position:static;max-height:none}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#top">
+      <i class="bi bi-star-fill me-2"></i>Star Rating — Machine Coding Round
+    </a>
+    <span class="text-white-50 small">React Interview Guide</span>
+  </div>
+</nav>
+
+<header id="top" class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-dark mb-3">React • Machine Coding • Interview Ready</span>
+        <h1 class="display-5 fw-bold">Star Rating Component</h1>
+        <p class="lead mb-0">Learn how to build and explain a reusable 5-star rating component with click selection, hover preview, reset behavior, accessibility, and controlled/uncontrolled usage.</p>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white text-dark rounded-4 p-4">
+          <div class="small-label">Core requirements</div>
+          <ul class="mb-0 mt-2">
+            <li>Render configurable stars</li>
+            <li>Click to select rating</li>
+            <li>Hover preview</li>
+            <li>Reset hover on mouse leave</li>
+            <li>Allow reset to zero</li>
+            <li>Show selected value</li>
+            <li>Keyboard/accessibility support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <aside class="col-lg-3">
+      <div class="card left-nav">
+        <div class="card-header bg-white fw-bold">Questions</div>
+        <div class="list-group list-group-flush">
+          <a class="list-group-item active" href="#what">What is Star Rating?</a>
+          <a class="list-group-item" href="#why">Why do we need it?</a>
+          <a class="list-group-item" href="#requirements">Requirements</a>
+          <a class="list-group-item" href="#how">How does it work?</a>
+          <a class="list-group-item" href="#state">What state is needed?</a>
+          <a class="list-group-item" href="#flow">Execution Flow</a>
+          <a class="list-group-item" href="#visual">Visual Explanation</a>
+          <a class="list-group-item" href="#fullcode">Full Code</a>
+          <a class="list-group-item" href="#one">Explain in 1 Minute</a>
+          <a class="list-group-item" href="#five">Explain in 5 Minutes</a>
+          <a class="list-group-item" href="#mistakes">Common Developer Mistakes</a>
+          <a class="list-group-item" href="#edge">Edge Cases</a>
+          <a class="list-group-item" href="#interviewer">How I Implemented It</a>
+          <a class="list-group-item" href="#followups">Interviewer Follow-ups</a>
+          <a class="list-group-item" href="#recap">Quick Recap</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT SIDE -->
+    <section class="col-lg-9">
+
+      <div id="what" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">What?</div>
+          <h2 class="section-title">What is a Star Rating?</h2>
+          <p>A <strong>Star Rating</strong> is a UI component that allows users to rate something, usually on a scale such as 1 to 5 stars.</p>
+          <p>It is commonly used for products, restaurants, movies, courses, applications, and reviews.</p>
+
+          <div class="star-demo my-3">
+            <div class="stars">
+              <span class="star filled">★</span>
+              <span class="star filled">★</span>
+              <span class="star filled">★</span>
+              <span class="star filled">★</span>
+              <span class="star">★</span>
+            </div>
+            <div class="rating-label">4 / 5</div>
+          </div>
+
+          <div class="tip">
+            <strong>Interview definition:</strong>
+            “A Star Rating is an interactive React component that lets a user select a rating from a fixed range. I manage the selected value with state and use a temporary hover value to provide immediate visual feedback.”
+          </div>
+        </div>
+      </div>
+
+      <div id="why" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Why?</div>
+          <h2 class="section-title">What problem does it solve?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="flow-box"><h5>Simple feedback</h5><p class="mb-0">Users can communicate satisfaction quickly without typing a review.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Better UX</h5><p class="mb-0">Stars provide an intuitive visual interaction for rating content.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Reusable UI</h5><p class="mb-0">The same component can be reused for products, services, courses, and reviews.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Immediate feedback</h5><p class="mb-0">Hover preview shows the user what rating will be selected before clicking.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Requirements</div>
+          <h2 class="section-title">What should I implement?</h2>
+          <ol>
+            <li>Render a configurable number of stars, such as 5.</li>
+            <li>Click a star to select the rating.</li>
+            <li>Highlight stars up to the selected value.</li>
+            <li>Show a temporary hover preview before clicking.</li>
+            <li>Reset the hover preview when the mouse leaves.</li>
+            <li>Allow the user to reset the rating to 0 if required.</li>
+            <li>Display the selected rating.</li>
+            <li>Support keyboard interaction for accessibility.</li>
+            <li>Allow the parent component to receive the selected rating.</li>
+          </ol>
+          <div class="success-tip"><strong>Machine coding strategy:</strong> Start with static stars → add selected state → add click → add hover state → add reset → add accessibility and reusable props.</div>
+        </div>
+      </div>
+
+      <div id="how" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">How?</div>
+          <h2 class="section-title">How does it work?</h2>
+          <p>The important idea is to keep <strong>selected rating</strong> and <strong>hovered rating</strong> separate.</p>
+
+          <pre><code>const [rating, setRating] = useState(0);
+const [hover, setHover] = useState(0);</code></pre>
+
+          <p>When rendering each star:</p>
+          <pre><code>const activeRating = hover || rating;
+
+starIndex &lt;= activeRating
+  ? "filled"
+  : "empty"</code></pre>
+
+          <div class="tip">
+            <strong>Why two values?</strong> The clicked rating is the user's actual selection. The hover value is only temporary visual feedback and should not change the saved rating until the user clicks.
+          </div>
+        </div>
+      </div>
+
+      <div id="state" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">State & Logic</div>
+          <h2 class="section-title">What state is needed?</h2>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr><th>State / Feature</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>rating</code></td><td>Stores the user's actual selected rating.</td></tr>
+                <tr><td><code>hover</code></td><td>Temporarily previews the rating while the mouse is over a star.</td></tr>
+                <tr><td><code>maxRating</code></td><td>Defines how many stars to render, usually 5.</td></tr>
+                <tr><td><code>onChange</code></td><td>Optional callback to notify the parent about the selected value.</td></tr>
+                <tr><td><code>button</code></td><td>Provides natural keyboard and accessibility behavior for interactive stars.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="star-demo mt-3">
+            <div class="small-label">State example</div>
+            <pre class="text-start mb-0"><code>rating = 3
+hover = 4
+
+activeRating = hover || rating
+              = 4
+
+Visual:
+★ ★ ★ ★ ☆</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Execution Flow</div>
+          <h2 class="section-title">Step-by-step execution</h2>
+
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md"><div class="flow-box"><strong>1</strong><br>Render 5 stars</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>2</strong><br>rating = 0</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>3</strong><br>User hovers Star 4</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>4</strong><br>hover = 4</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md"><div class="flow-box"><strong>5</strong><br>Stars 1–4 highlight</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>6</strong><br>User clicks Star 4</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>7</strong><br>rating = 4</div></div>
+          </div>
+
+          <div class="tip mt-3">
+            <strong>Important:</strong> Hover changes the preview. Click changes the actual rating.
+          </div>
+        </div>
+      </div>
+
+      <div id="visual" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Visual Explanation</div>
+          <h2 class="section-title">How the rating changes</h2>
+
+          <pre><code>Initial state:
+
+rating = 0
+hover  = 0
+
+☆ ☆ ☆ ☆ ☆
+
+
+Mouse moves over Star 3:
+
+rating = 0
+hover  = 3
+
+★ ★ ★ ☆ ☆
+        ↑
+   temporary preview
+
+
+User clicks Star 3:
+
+rating = 3
+hover  = 3
+
+★ ★ ★ ☆ ☆
+  ↑
+actual selection
+
+
+Mouse leaves:
+
+rating = 3
+hover  = 0
+
+★ ★ ★ ☆ ☆
+        ↑
+rating remains 3</code></pre>
+
+          <h5 class="mt-4">Reset example</h5>
+          <pre><code>User clicks selected Star 3 again:
+
+if (rating === value) {
+  setRating(0);
+} else {
+  setRating(value);
+}
+
+Result:
+
+☆ ☆ ☆ ☆ ☆
+rating = 0</code></pre>
+        </div>
+      </div>
+
+      <div id="fullcode" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Full Code</div>
+          <h2 class="section-title">React Star Rating — Interview Version</h2>
+          <p>This implementation supports configurable stars, click selection, hover preview, reset-to-zero, keyboard interaction, and a parent callback.</p>
+
+          <pre><code>import { useState } from "react";
+
+function StarRating({
+  maxRating = 5,
+  initialRating = 0,
+  onChange
+}) {
+  const [rating, setRating] = useState(initialRating);
+  const [hover, setHover] = useState(0);
+
+  const handleSelect = (value) =&gt; {
+    // Click the selected rating again to reset.
+    const newRating = rating === value ? 0 : value;
+
+    setRating(newRating);
+    onChange?.(newRating);
+  };
+
+  const handleKeyDown = (event, value) =&gt; {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleSelect(value);
+    }
+  };
+
+  const activeRating = hover || rating;
+
+  return (
+    &lt;div&gt;
+      &lt;div
+        role="radiogroup"
+        aria-label="Star rating"
+        className="star-rating"
+      &gt;
+        {Array.from({ length: maxRating }, (_, index) =&gt; {
+          const value = index + 1;
+          const isFilled = value &lt;= activeRating;
+
+          return (
+            &lt;button
+              key={value}
+              type="button"
+              role="radio"
+              aria-label={`${value} star${value &gt; 1 ? "s" : ""}`}
+              aria-checked={rating === value}
+              onClick={() =&gt; handleSelect(value)}
+              onMouseEnter={() =&gt; setHover(value)}
+              onMouseLeave={() =&gt; setHover(0)}
+              onKeyDown={(event) =&gt;
+                handleKeyDown(event, value)
+              }
+              className={isFilled ? "star filled" : "star"}
+            &gt;
+              ★
+            &lt;/button&gt;
+          );
+        })}
+      &lt;/div&gt;
+
+      &lt;p&gt;
+        Rating: {rating} / {maxRating}
+      &lt;/p&gt;
+
+      &lt;button
+        type="button"
+        onClick={() =&gt; {
+          setRating(0);
+          setHover(0);
+          onChange?.(0);
+        }}
+      &gt;
+        Clear Rating
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default StarRating;</code></pre>
+
+          <h5 class="mt-4">Basic CSS</h5>
+          <pre><code>.star-rating {
+  display: flex;
+  gap: 6px;
+}
+
+.star {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 42px;
+  color: #ced4da;
+  padding: 0;
+  line-height: 1;
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.star:focus-visible {
+  outline: 3px solid #0d6efd;
+  outline-offset: 4px;
+  border-radius: 5px;
+}</code></pre>
+
+          <h5 class="mt-4">Parent usage</h5>
+          <pre><code>&lt;StarRating
+  maxRating={5}
+  initialRating={3}
+  onChange={(rating) =&gt; {
+    console.log("Selected rating:", rating);
+  }}
+/&gt;</code></pre>
+        </div>
+      </div>
+
+      <div id="one" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+
+          <div class="success-tip">
+            “I built the Star Rating as a reusable React component. I render the stars dynamically using <code>Array.from</code>, so the number of stars can be configured. I keep the actual selected rating in one state variable and a separate hover state for temporary visual feedback. When the user hovers over a star, I highlight all stars up to that position. When the user clicks, I update the actual rating and notify the parent through an optional callback. I also allow clicking the selected star again to reset the rating to zero. For accessibility, I use buttons, keyboard handling, ARIA attributes, and visible focus styles.”
+          </div>
+        </div>
+      </div>
+
+      <div id="five" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+
+          <ol>
+            <li><strong>Requirement:</strong> “The user should be able to select a rating from 1 to 5 stars.”</li>
+            <li><strong>Dynamic rendering:</strong> “Instead of hardcoding five elements, I generate the stars based on <code>maxRating</code>.”</li>
+            <li><strong>Selected state:</strong> “I store the actual selected rating in <code>rating</code>.”</li>
+            <li><strong>Hover state:</strong> “I use <code>hover</code> separately because hover should only preview a value and should not change the selected rating.”</li>
+            <li><strong>Visual logic:</strong> “The effective value is <code>hover || rating</code>. Every star whose value is less than or equal to that value is highlighted.”</li>
+            <li><strong>Click:</strong> “On click, I update the selected rating. If the user clicks the same selected star again, I reset it to zero.”</li>
+            <li><strong>Parent communication:</strong> “I expose an optional <code>onChange</code> callback so the parent can save the rating or call an API.”</li>
+            <li><strong>Accessibility:</strong> “I use actual buttons so keyboard focus and activation work naturally, and I add ARIA information to communicate the rating semantics.”</li>
+            <li><strong>Styling:</strong> “The filled and empty states are represented using CSS classes rather than putting styling logic everywhere.”</li>
+          </ol>
+
+          <div class="tip">
+            <strong>Strong closing line:</strong>
+            “The main design decision is keeping the persistent selected value separate from the temporary hover value. That makes the component predictable and gives the user immediate visual feedback without accidentally changing the saved rating.”
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Debugging</div>
+          <h2 class="section-title">Common Developer Mistakes</h2>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Mistake</th>
+                  <th>Why it is a problem</th>
+                  <th>Better approach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Using only one state for rating and hover</td>
+                  <td>Hovering can accidentally overwrite the user's selected value.</td>
+                  <td>Keep <code>rating</code> and <code>hover</code> separate.</td>
+                </tr>
+                <tr>
+                  <td>Hardcoding five stars</td>
+                  <td>The component becomes less reusable.</td>
+                  <td>Render stars dynamically using <code>maxRating</code>.</td>
+                </tr>
+                <tr>
+                  <td>Using array index incorrectly</td>
+                  <td>Can create off-by-one errors when comparing star values.</td>
+                  <td>Use <code>const value = index + 1</code>.</td>
+                </tr>
+                <tr>
+                  <td>Changing rating on mouse enter</td>
+                  <td>The selected rating changes before the user clicks.</td>
+                  <td>Update <code>hover</code> on mouse enter; update <code>rating</code> on click.</td>
+                </tr>
+                <tr>
+                  <td>Not resetting hover</td>
+                  <td>The hover preview remains visible after the pointer leaves.</td>
+                  <td>Call <code>setHover(0)</code> on mouse leave.</td>
+                </tr>
+                <tr>
+                  <td>Using divs instead of buttons</td>
+                  <td>Keyboard and accessibility behavior becomes harder to implement.</td>
+                  <td>Use native <code>button</code> elements for interactive stars.</td>
+                </tr>
+                <tr>
+                  <td>No keyboard support</td>
+                  <td>Keyboard-only users cannot easily interact with the component.</td>
+                  <td>Use buttons and handle Enter/Space when custom behavior is needed.</td>
+                </tr>
+                <tr>
+                  <td>Calling an API directly inside every star</td>
+                  <td>Creates tightly coupled UI and API logic.</td>
+                  <td>Expose <code>onChange</code> and let the parent decide what to do.</td>
+                </tr>
+                <tr>
+                  <td>Mutating state directly</td>
+                  <td>Can produce inconsistent React behavior.</td>
+                  <td>Always use the state setter.</td>
+                </tr>
+                <tr>
+                  <td>No reset behavior</td>
+                  <td>User may not be able to remove an accidental selection.</td>
+                  <td>Provide Clear Rating or allow clicking the selected star again.</td>
+                </tr>
+                <tr>
+                  <td>Poor focus styling</td>
+                  <td>Keyboard users cannot tell which control is focused.</td>
+                  <td>Use <code>:focus-visible</code> styling.</td>
+                </tr>
+                <tr>
+                  <td>Not handling initial rating</td>
+                  <td>The component cannot easily display an existing product rating.</td>
+                  <td>Support an <code>initialRating</code> or controlled <code>value</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="danger-tip mt-3">
+            <strong>Most common interview bug:</strong> Mixing hover state with selected state. Explain clearly: <code>hover</code> is temporary preview; <code>rating</code> is the user's actual selection.
+          </div>
+        </div>
+      </div>
+
+      <div id="edge" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Testing</div>
+          <h2 class="section-title">Edge Cases & Test Cases</h2>
+
+          <ul>
+            <li>Initial rating is 0.</li>
+            <li>Initial rating is 3.</li>
+            <li>Click Star 1.</li>
+            <li>Click Star 5.</li>
+            <li>Click the selected star again to reset.</li>
+            <li>Hover Star 4 without clicking, then leave the component.</li>
+            <li>Verify hover preview disappears on mouse leave.</li>
+            <li>Use keyboard Enter and Space.</li>
+            <li>Test <code>maxRating={10}</code>.</li>
+            <li>Test <code>maxRating={1}</code>.</li>
+            <li>Verify parent <code>onChange</code> receives the correct value.</li>
+            <li>Check focus visibility.</li>
+            <li>Verify a rating can be cleared.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="interviewer" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Implementation Explanation</div>
+          <h2 class="section-title">How I implemented it — interviewer flow</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>1. I started with dynamic stars</h5>
+                <p>“I used <code>Array.from</code> with a configurable maximum rating instead of hardcoding the stars.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>2. I added selected state</h5>
+                <p>“I used <code>rating</code> to store the user's actual selection.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>3. I added hover preview</h5>
+                <p>“I added <code>hover</code> separately so the user can preview the rating before clicking.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>4. I added click behavior</h5>
+                <p>“Clicking a star updates the actual rating and sends it to the parent.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>5. I added reset</h5>
+                <p>“Clicking the selected star again or Clear Rating resets the component to zero.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>6. I added accessibility</h5>
+                <p>“I used buttons, keyboard activation, ARIA attributes, and visible focus styles.”</p>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why separate hover and rating?”</h5>
+          <div class="success-tip">
+            “Because they represent two different concepts. Rating is persistent user data, while hover is temporary UI feedback. Separating them prevents accidental changes to the selected value.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use buttons?”</h5>
+          <div class="success-tip">
+            “Because each star is an interactive control. A button gives me native keyboard focus and activation behavior and is more accessible than making a div clickable.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “How would you save it to the backend?”</h5>
+          <div class="success-tip">
+            “I would keep the component responsible for UI state and expose an <code>onChange</code> callback. The parent or a custom hook can then call the API and handle loading, success, and error states.”
+          </div>
+        </div>
+      </div>
+
+      <div id="followups" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Follow-ups</div>
+          <h2 class="section-title">Possible interviewer questions</h2>
+
+          <div class="accordion" id="followupAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  How would you make it a controlled component?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Accept <code>value</code> and <code>onChange</code> from the parent instead of owning the selected rating entirely inside the component.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  How would you support half-star ratings?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Use a smaller step such as <code>0.5</code>, detect whether the pointer is on the left or right half of a star, and render a partial fill using CSS or layered elements.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  How would you make it read-only?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Add a <code>readOnly</code> prop and skip click/hover handlers while rendering the current rating.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  How would you submit the rating?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Call an <code>onChange</code> callback from the component and let the parent perform the API request. This keeps the component reusable and separates UI from server logic.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card mb-5">
+        <div class="card-body p-4">
+          <div class="small-label">Quick Recap</div>
+          <h2 class="section-title">Remember these 8 points</h2>
+
+          <div class="row g-2">
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">1. Dynamic stars</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">2. rating → selected</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">3. hover → preview</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">4. click → select</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">5. mouse leave → reset hover</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">6. onChange → parent</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">7. buttons → accessibility</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">8. reset → zero</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white-50 py-4">
+  <div class="container text-center small">
+    React Machine Coding Round • Star Rating • Practice explaining the implementation before coding.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('.left-nav .list-group-item').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.left-nav .list-group-item')
+        .forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

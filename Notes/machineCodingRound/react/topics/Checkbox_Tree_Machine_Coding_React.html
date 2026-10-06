@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkbox Tree - React Machine Coding Round</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#212529}.top{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#111827,#343a40);color:#fff;padding:46px 0}.hero h1{font-weight:800}
+.layout{display:grid;grid-template-columns:270px 1fr;gap:28px}.side{position:sticky;top:78px;height:calc(100vh - 95px);overflow:auto}
+.side a{display:block;color:#495057;text-decoration:none;padding:9px 12px;border-radius:8px;margin-bottom:2px}
+.side a:hover,.side a.active{background:#212529;color:#fff}.card{border:0;border-radius:14px;box-shadow:0 4px 18px #00000012;margin-bottom:24px}
+.card-header{background:#fff;font-weight:700;padding:16px 20px;border-bottom:1px solid #edf0f3}
+.tip,.good,.bad,.warn{padding:15px 18px;border-radius:10px;margin:15px 0}.tip{background:#e9f5ff;border-left:5px solid #0d6efd}
+.good{background:#eaf8ef;border-left:5px solid #198754}.bad{background:#fff0f0;border-left:5px solid #dc3545}.warn{background:#fff8e6;border-left:5px solid #ffc107}
+pre{background:#111827;color:#e5e7eb;padding:18px;border-radius:10px;overflow:auto;font-size:.88rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:9px}.box{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:12px;font-weight:600}.arrow{font-size:1.3rem}
+.tree-demo{background:#fff;border:1px solid #dee2e6;border-radius:12px;padding:20px;max-width:620px;margin:auto}
+.tree-row{padding:7px 0}.indent1{margin-left:28px}.indent2{margin-left:56px}.indent3{margin-left:84px}
+.tree-line{display:inline-flex;align-items:center;gap:7px}.tree-line input{width:17px;height:17px}.partial{appearance:none;width:17px;height:17px;border:1px solid #6c757d;border-radius:3px;background:#6c757d;position:relative}.partial:after{content:"";position:absolute;left:3px;right:3px;top:7px;height:2px;background:#fff}
+.recap-item{padding:10px 0;border-bottom:1px solid #eee}.recap-item:last-child{border-bottom:0}
+@media(max-width:991px){.layout{grid-template-columns:1fr}.side{position:relative;top:0;height:auto}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark top shadow-sm">
+<div class="container"><span class="navbar-brand fw-bold"><i class="bi bi-diagram-3"></i> React Machine Coding</span><span class="text-white-50">Checkbox Tree</span></div>
+</nav>
+
+<section class="hero"><div class="container">
+<span class="badge bg-primary mb-3">Machine Coding Round</span>
+<h1>Checkbox Tree</h1>
+<p class="lead mb-0">Build a recursive tree of checkboxes with parent-child selection, automatic propagation, and indeterminate parent states.</p>
+</div></section>
+
+<div class="container py-4"><div class="layout">
+
+<aside class="side">
+<div class="card p-3"><h6 class="text-uppercase text-muted fw-bold mb-3">Questions</h6>
+<nav id="nav">
+<a class="active" href="#what">What is Checkbox Tree?</a>
+<a href="#why">Why / Problem Solved</a>
+<a href="#req">Requirements</a>
+<a href="#data">Data Structure</a>
+<a href="#state">State Design</a>
+<a href="#how">How Does It Work?</a>
+<a href="#parent">Parent-Child Logic</a>
+<a href="#indeterminate">Indeterminate State</a>
+<a href="#flow">Execution Flow</a>
+<a href="#visual">Visual Explanation</a>
+<a href="#code">Full Code</a>
+<a href="#one">1-Minute Explanation</a>
+<a href="#five">5-Minute Explanation</a>
+<a href="#mistakes">Common Developer Mistakes</a>
+<a href="#edge">Edge Cases</a>
+<a href="#interview">How I Implemented It</a>
+<a href="#follow">Interviewer Follow-ups</a>
+<a href="#recap">Quick Recap</a>
+</nav></div>
+</aside>
+
+<main>
+
+<section id="what" class="card"><div class="card-header">1. What is a Checkbox Tree?</div><div class="card-body">
+<p>A <strong>Checkbox Tree</strong> is a hierarchical UI where items are displayed as a tree and every node can be selected using a checkbox. A parent can contain children, and selecting or unselecting a parent can affect its descendants.</p>
+<div class="tree-demo">
+<div class="tree-row"><span class="tree-line"><input type="checkbox" checked> <strong>Projects</strong></span></div>
+<div class="tree-row indent1"><span class="tree-line"><input type="checkbox" checked> Frontend</span></div>
+<div class="tree-row indent2"><span class="tree-line"><input type="checkbox" checked> React</span></div>
+<div class="tree-row indent2"><span class="tree-line"><input type="checkbox"> Vue</span></div>
+<div class="tree-row indent1"><span class="tree-line"><input class="partial" type="checkbox"> Backend</span></div>
+<div class="tree-row indent2"><span class="tree-line"><input type="checkbox"> Node.js</span></div>
+<div class="tree-row indent2"><span class="tree-line"><input type="checkbox"> Java</span></div>
+</div>
+<div class="tip"><strong>Interview definition:</strong> “A Checkbox Tree is a recursive hierarchical component where parent and child checkbox states are related. Selecting a parent can select descendants, while child changes can update the parent's checked or indeterminate state.”</div>
+</div></section>
+
+<section id="why" class="card"><div class="card-header">2. What Problem Does It Solve?</div><div class="card-body">
+<p>Checkbox Trees are useful when information has a hierarchy and users need bulk selection.</p>
+<ul>
+<li>File and folder permissions</li><li>Role and permission management</li><li>Category selection</li><li>Product category filters</li><li>Organization/team selection</li><li>Nested menus and feature access</li>
+</ul>
+<div class="good"><strong>Machine coding insight:</strong> This task tests recursion, tree traversal, controlled inputs, immutable updates, parent-child relationships, and derived state.</div>
+</div></section>
+
+<section id="req" class="card"><div class="card-header">3. Requirements</div><div class="card-body">
+<ol>
+<li>Render nested nodes recursively.</li>
+<li>Each node has a checkbox.</li>
+<li>Selecting a parent selects all descendants.</li>
+<li>Unselecting a parent unselects all descendants.</li>
+<li>Selecting all children makes the parent checked.</li>
+<li>Selecting some children makes the parent indeterminate.</li>
+<li>Unselecting all children makes the parent unchecked.</li>
+<li>Support arbitrary nesting depth.</li>
+<li>Keep React state immutable.</li>
+</ol>
+<div class="tip"><strong>Build order:</strong> First render the tree. Then implement child selection. Then parent propagation. Finally add indeterminate state and edge cases.</div>
+</div></section>
+
+<section id="data" class="card"><div class="card-header">4. Data Structure</div><div class="card-body">
+<p>A nested object/array structure naturally represents the tree.</p>
+<pre><code>const treeData = [
+  {
+    id: 1,
+    label: "Frontend",
+    children: [
+      {
+        id: 2,
+        label: "React",
+        children: [
+          { id: 3, label: "Hooks", children: [] },
+          { id: 4, label: "Router", children: [] }
+        ]
+      },
+      {
+        id: 5,
+        label: "Vue",
+        children: []
+      }
+    ]
+  },
+  {
+    id: 6,
+    label: "Backend",
+    children: [
+      { id: 7, label: "Node.js", children: [] },
+      { id: 8, label: "Java", children: [] }
+    ]
+  }
+];</code></pre>
+<p>Each node has:</p>
+<ul><li><code>id</code> — unique identifier</li><li><code>label</code> — displayed name</li><li><code>children</code> — nested nodes</li></ul>
+<div class="warn"><strong>Why recursion?</strong> A tree can have any nesting depth. A recursive component can render a node and then render the same component for its children.</div>
+</div></section>
+
+<section id="state" class="card"><div class="card-header">5. State Design</div><div class="card-body">
+<p>For a scalable implementation, keep selected node IDs in a Set.</p>
+<pre><code>const [checkedIds, setCheckedIds] = useState(new Set());</code></pre>
+<p>Example:</p>
+<pre><code>checkedIds = new Set([3, 4, 5]);</code></pre>
+<p>This means nodes 3, 4 and 5 are selected.</p>
+<div class="tip"><strong>Why IDs?</strong> The tree data describes what exists. The selection state describes what the user selected. Keeping these separate makes the component easier to reason about.</div>
+</div></section>
+
+<section id="how" class="card"><div class="card-header">6. How Does It Work?</div><div class="card-body">
+<h5>Step 1 — Render recursively</h5>
+<pre><code>function TreeNode({ node }) {
+  return (
+    &lt;div&gt;
+      &lt;input type="checkbox" /&gt;
+      {node.label}
+
+      {node.children?.map(child =&gt; (
+        &lt;TreeNode key={child.id} node={child} /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+<h5>Step 2 — User checks a node</h5>
+<p>Find all descendants of that node and add their IDs to the checked set.</p>
+<h5>Step 3 — User unchecks a node</h5>
+<p>Find all descendants and remove their IDs.</p>
+<h5>Step 4 — Child changes</h5>
+<p>Parent status is derived from its children:</p>
+<pre><code>all children checked  → checked
+some children checked → indeterminate
+no children checked   → unchecked</code></pre>
+<h5>Step 5 — React re-renders</h5>
+<p>Updating the selection state causes the tree to recalculate every node's visual state.</p>
+</div></section>
+
+<section id="parent" class="card"><div class="card-header">7. Parent-Child Selection Logic</div><div class="card-body">
+<h5>Case 1 — Parent selected</h5>
+<pre><code>Parent
+ ├── Child A
+ ├── Child B
+ └── Child C
+
+Select Parent
+      ↓
+Parent = checked
+A = checked
+B = checked
+C = checked</code></pre>
+<h5>Case 2 — Parent unselected</h5>
+<pre><code>Unselect Parent
+      ↓
+Parent = unchecked
+A = unchecked
+B = unchecked
+C = unchecked</code></pre>
+<h5>Case 3 — Some children selected</h5>
+<pre><code>Parent
+ ├── ✓ Child A
+ ├── ✗ Child B
+ └── ✗ Child C
+
+Parent = indeterminate</code></pre>
+<h5>Case 4 — All children selected</h5>
+<pre><code>Parent
+ ├── ✓ Child A
+ ├── ✓ Child B
+ └── ✓ Child C
+
+Parent = checked</code></pre>
+<div class="good"><strong>Important:</strong> The parent state is derived from children. You don't need a separate “parentChecked” state that can become inconsistent.</div>
+</div></section>
+
+<section id="indeterminate" class="card"><div class="card-header">8. Indeterminate State — Important Interview Topic</div><div class="card-body">
+<p>A checkbox is <strong>indeterminate</strong> when some, but not all, descendants are selected.</p>
+<p>HTML does not expose indeterminate as a normal JSX attribute. We set it through a DOM ref.</p>
+<pre><code>const checkboxRef = useRef(null);
+
+useEffect(() =&gt; {
+  if (checkboxRef.current) {
+    checkboxRef.current.indeterminate = isIndeterminate;
+  }
+}, [isIndeterminate]);</code></pre>
+<p>So the three states are:</p>
+<table class="table table-bordered">
+<thead class="table-dark"><tr><th>Children</th><th>Parent</th></tr></thead>
+<tbody>
+<tr><td>0 selected</td><td>Unchecked</td></tr>
+<tr><td>Some selected</td><td>Indeterminate</td></tr>
+<tr><td>All selected</td><td>Checked</td></tr>
+</tbody>
+</table>
+<div class="warn"><strong>Interview point:</strong> <code>indeterminate</code> is a DOM property, not a normal boolean HTML attribute, so a ref is commonly used to set it.</div>
+</div></section>
+
+<section id="flow" class="card"><div class="card-header">9. Execution Flow</div><div class="card-body">
+<div class="flow"><div class="box">Tree Data</div><span class="arrow">→</span><div class="box">Recursive Render</div><span class="arrow">→</span><div class="box">Checkbox Click</div><span class="arrow">→</span><div class="box">Find Descendants</div></div>
+<hr>
+<div class="flow"><div class="box">Update checkedIds</div><span class="arrow">→</span><div class="box">Re-render</div><span class="arrow">→</span><div class="box">Calculate Parent State</div></div>
+<hr>
+<div class="flow"><div class="box">All children?</div><span class="arrow">→</span><div class="box">Checked</div><span class="arrow">or</span><div class="box">Some?</div><span class="arrow">→</span><div class="box">Indeterminate</div></div>
+</div></section>
+
+<section id="visual" class="card"><div class="card-header">10. Visual Explanation — Simple Steps</div><div class="card-body">
+<h6>Initial state</h6>
+<pre><code>Projects
+├── Frontend
+│   ├── React
+│   └── Vue
+└── Backend
+    ├── Node.js
+    └── Java
+
+checkedIds = {}</code></pre>
+<h6>User checks Frontend</h6>
+<pre><code>Frontend ✓
+├── React ✓
+└── Vue ✓
+
+checkedIds = { Frontend, React, Vue }</code></pre>
+<h6>User unchecks Vue</h6>
+<pre><code>Frontend —
+├── React ✓
+└── Vue ✗
+
+Frontend = indeterminate</code></pre>
+<h6>User checks Vue again</h6>
+<pre><code>Frontend ✓
+├── React ✓
+└── Vue ✓
+
+Frontend = checked</code></pre>
+<div class="good"><strong>Simple mental model:</strong> Parent → control all children. Children → determine parent's visual state.</div>
+</div></section>
+
+<section id="code" class="card"><div class="card-header">11. Full React Code</div><div class="card-body">
+<p><strong>CheckboxTree.jsx</strong></p>
+<pre><code>import { useEffect, useRef, useState } from "react";
+import "./CheckboxTree.css";
+
+const treeData = [
+  {
+    id: 1,
+    label: "Frontend",
+    children: [
+      {
+        id: 2,
+        label: "React",
+        children: [
+          { id: 3, label: "Hooks", children: [] },
+          { id: 4, label: "Router", children: [] }
+        ]
+      },
+      {
+        id: 5,
+        label: "Vue",
+        children: []
+      }
+    ]
+  },
+  {
+    id: 6,
+    label: "Backend",
+    children: [
+      { id: 7, label: "Node.js", children: [] },
+      { id: 8, label: "Java", children: [] }
+    ]
+  }
+];
+
+function getDescendantIds(node) {
+  const ids = [node.id];
+
+  for (const child of node.children || []) {
+    ids.push(...getDescendantIds(child));
+  }
+
+  return ids;
+}
+
+function TreeNode({ node, checkedIds, onToggle }) {
+  const checkboxRef = useRef(null);
+
+  const children = node.children || [];
+
+  const childCheckedCount = children.filter(
+    child => checkedIds.has(child.id)
+  ).length;
+
+  const isChecked = checkedIds.has(node.id);
+
+  const isIndeterminate =
+    children.length > 0 &&
+    childCheckedCount > 0 &&
+    childCheckedCount < children.length;
+
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
+
+  return (
+    &lt;div className="tree-node"&gt;
+      &lt;label className="tree-label"&gt;
+        &lt;input
+          ref={checkboxRef}
+          type="checkbox"
+          checked={isChecked}
+          onChange={() =&gt; onToggle(node)}
+        /&gt;
+
+        {node.label}
+      &lt;/label&gt;
+
+      {children.length &gt; 0 && (
+        &lt;div className="children"&gt;
+          {children.map(child =&gt; (
+            &lt;TreeNode
+              key={child.id}
+              node={child}
+              checkedIds={checkedIds}
+              onToggle={onToggle}
+            /&gt;
+          ))}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+function CheckboxTree() {
+  const [checkedIds, setCheckedIds] = useState(new Set());
+
+  function handleToggle(node) {
+    setCheckedIds(prev =&gt; {
+      const next = new Set(prev);
+      const ids = getDescendantIds(node);
+
+      const shouldCheck = !prev.has(node.id);
+
+      ids.forEach(id =&gt; {
+        if (shouldCheck) {
+          next.add(id);
+        } else {
+          next.delete(id);
+        }
+      });
+
+      return next;
+    });
+  }
+
+  return (
+    &lt;div className="checkbox-tree"&gt;
+      &lt;h2&gt;Checkbox Tree&lt;/h2&gt;
+
+      {treeData.map(node =&gt; (
+        &lt;TreeNode
+          key={node.id}
+          node={node}
+          checkedIds={checkedIds}
+          onToggle={handleToggle}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+export default CheckboxTree;</code></pre>
+
+<p><strong>CheckboxTree.css</strong></p>
+<pre><code>.checkbox-tree {
+  width: 500px;
+  max-width: 100%;
+  margin: 40px auto;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.1);
+}
+
+.tree-node {
+  margin: 8px 0;
+}
+
+.tree-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tree-label input {
+  width: 17px;
+  height: 17px;
+}
+
+.children {
+  margin-left: 28px;
+  border-left: 1px solid #ddd;
+  padding-left: 12px;
+}</code></pre>
+
+<div class="warn"><strong>Important implementation note:</strong> The compact example above calculates the immediate parent's indeterminate state from immediate children. For a production tree where a deeply nested descendant changes, you should derive the parent state recursively from all descendant leaves or maintain a normalized tree/index. The next section explains the robust approach.</div>
+</div></section>
+
+<section id="one" class="card"><div class="card-header">12. How to Explain in 1 Minute</div><div class="card-body">
+<div class="good">
+“I implemented a recursive Checkbox Tree in React. The tree itself is represented as nested data where every node has an id, label and optional children. I keep the selected node IDs in a Set.
+<br><br>
+I created a recursive TreeNode component. Each node renders its checkbox and recursively renders its children. When a node is selected, I collect that node and all descendants and add their IDs to the Set. When it is unchecked, I remove them.
+<br><br>
+For parent state, I derive whether all children are selected, none are selected, or only some are selected. When only some are selected, I set the checkbox's native indeterminate DOM property using a ref and useEffect. This keeps parent and child selections synchronized without duplicating state.”
+</div>
+</div></section>
+
+<section id="five" class="card"><div class="card-header">13. How to Explain in 5 Minutes</div><div class="card-body">
+<h5>1. Requirements</h5><p>“The component needs nested rendering, parent-to-child selection, child-to-parent state calculation, and indeterminate state.”</p>
+<h5>2. Data structure</h5><p>“I use recursive nested objects. A node has an id, label and children array.”</p>
+<h5>3. State</h5><p>“I store selected IDs in a Set. The tree data and selection state are separate.”</p>
+<h5>4. Recursive rendering</h5><p>“TreeNode renders one node. If it has children, it maps over them and renders TreeNode again. This supports unlimited depth.”</p>
+<h5>5. Parent selection</h5><p>“When a parent is selected, I recursively collect all descendant IDs and add them to the selection Set.”</p>
+<h5>6. Parent unselection</h5><p>“When a parent is unchecked, I remove the node and all descendants.”</p>
+<h5>7. Child changes</h5><p>“The parent status is derived from child states. All selected means checked, none means unchecked, and partial selection means indeterminate.”</p>
+<h5>8. Indeterminate</h5><p>“Indeterminate is a DOM property, so I use a ref and effect to update it.”</p>
+<h5>9. Immutability</h5><p>“I create a new Set instead of mutating the existing state Set.”</p>
+<h5>10. Edge cases</h5><p>“I test leaf nodes, deep nesting, selecting parents, unselecting parents, partial children, and selecting all children.”</p>
+</div></section>
+
+<section id="mistakes" class="card"><div class="card-header">14. Common Developer Mistakes</div><div class="card-body">
+<div class="bad"><strong>1. Mutating the Set directly</strong><pre><code>checkedIds.add(id); // ❌
+setCheckedIds(checkedIds);</code></pre><p>Use a copy:</p><pre><code>const next = new Set(checkedIds);
+next.add(id);
+setCheckedIds(next); // ✅</code></pre></div>
+<div class="bad"><strong>2. Not using recursion</strong><p>Hard-coding levels such as parent → child → grandchild breaks when the tree becomes deeper.</p></div>
+<div class="bad"><strong>3. Selecting only the parent</strong><p>If the requirement says parent selection controls descendants, update all descendant IDs.</p></div>
+<div class="bad"><strong>4. Forgetting to unselect descendants</strong><p>Unchecking a parent should remove the entire subtree when that behavior is required.</p></div>
+<div class="bad"><strong>5. Keeping separate state for every parent</strong><p>This can easily become inconsistent. Derive parent state from child selection.</p></div>
+<div class="bad"><strong>6. Treating indeterminate as checked</strong><p>Indeterminate is a third visual state and should not be confused with checked.</p></div>
+<div class="bad"><strong>7. Trying checked={true} for indeterminate</strong><p>The native checkbox indeterminate state is a DOM property, normally set through a ref.</p></div>
+<div class="bad"><strong>8. Missing stable keys</strong><p>Use unique node IDs as React keys rather than array indexes when possible.</p></div>
+<div class="bad"><strong>9. Incorrect descendant traversal</strong><p>Make sure recursive traversal reaches every depth.</p></div>
+<div class="bad"><strong>10. Only checking immediate children for deep trees</strong><p>For a deeply nested tree, parent state should ultimately reflect the complete descendant subtree, not just one level.</p></div>
+</div></section>
+
+<section id="edge" class="card"><div class="card-header">15. Edge Cases / Test Cases</div><div class="card-body">
+<table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Scenario</th><th>Expected Behavior</th></tr></thead><tbody>
+<tr><td>Click leaf node</td><td>Only that node becomes selected/unselected.</td></tr>
+<tr><td>Click parent</td><td>Parent and all descendants become selected.</td></tr>
+<tr><td>Uncheck parent</td><td>Parent and descendants become unchecked.</td></tr>
+<tr><td>Some children selected</td><td>Parent becomes indeterminate.</td></tr>
+<tr><td>All children selected</td><td>Parent becomes checked.</td></tr>
+<tr><td>No children selected</td><td>Parent becomes unchecked.</td></tr>
+<tr><td>Deep nesting</td><td>Recursive logic continues to work.</td></tr>
+<tr><td>Single-node tree</td><td>Leaf behaves like a normal checkbox.</td></tr>
+<tr><td>Empty children array</td><td>Node is treated as a leaf.</td></tr>
+<tr><td>Duplicate IDs</td><td>Avoid; IDs must be unique for Set-based selection.</td></tr>
+</tbody></table>
+</div></section>
+
+<section id="interview" class="card"><div class="card-header">16. How I Implemented It — Interviewer Flow</div><div class="card-body">
+<div class="flow"><div class="box">1. Requirements</div><span class="arrow">→</span><div class="box">2. Tree data</div><span class="arrow">→</span><div class="box">3. Selection state</div><span class="arrow">→</span><div class="box">4. Recursive component</div></div><br>
+<div class="flow"><div class="box">5. Toggle node</div><span class="arrow">→</span><div class="box">6. Find descendants</div><span class="arrow">→</span><div class="box">7. Update Set</div><span class="arrow">→</span><div class="box">8. Derive parent state</div></div><br>
+<div class="flow"><div class="box">9. Indeterminate</div><span class="arrow">→</span><div class="box">10. Re-render</div><span class="arrow">→</span><div class="box">11. Test edge cases</div></div>
+<hr>
+<h5>What I would say while coding</h5>
+<p><strong>First:</strong> “Because the data is hierarchical, I'll model it as a recursive tree rather than a flat list.”</p>
+<p><strong>Second:</strong> “I'll keep selected IDs separate from the tree data.”</p>
+<pre><code>const [checkedIds, setCheckedIds] = useState(new Set());</code></pre>
+<p><strong>Third:</strong> “I'll create a TreeNode component that renders itself recursively for every child.”</p>
+<p><strong>Fourth:</strong> “When a node is toggled, I'll recursively collect all descendant IDs and update the Set immutably.”</p>
+<p><strong>Fifth:</strong> “For parents, I'll derive checked, unchecked and indeterminate states from their descendants.”</p>
+<p><strong>Finally:</strong> “I'll test parent selection, child selection, partial selection, deep nesting and unselection.”</p>
+<div class="good">Interview formula: <strong>Tree data → recursive render → selection Set → descendant propagation → parent derived state → indeterminate → edge cases</strong>.</div>
+</div></section>
+
+<section id="follow" class="card"><div class="card-header">17. Interviewer Follow-up Questions</div><div class="card-body">
+<h6>Q1. Why recursion?</h6><p>A tree has an arbitrary number of levels. Recursion lets the same component render every depth without hard-coding levels.</p>
+<h6>Q2. Why use a Set?</h6><p>It represents membership naturally and gives efficient add/delete/has operations.</p>
+<h6>Q3. Why not store checked=true inside every tree node?</h6><p>Separating immutable source data from UI selection state makes updates and reasoning simpler.</p>
+<h6>Q4. What is indeterminate?</h6><p>It means some descendants are selected but not all. It is a third visual state between unchecked and checked.</p>
+<h6>Q5. Why useRef for indeterminate?</h6><p>Indeterminate is a native DOM property rather than a normal checkbox attribute.</p>
+<h6>Q6. How would you handle very large trees?</h6><p>Normalize the data, index parent/child relationships, memoize nodes, and consider virtualization if the rendered tree is very large.</p>
+<h6>Q7. How would you support expand/collapse?</h6><p>Add a separate Set of expanded IDs. Selection and expansion should remain independent states.</p>
+<h6>Q8. How would you implement “select only leaf nodes”?</h6><p>Change toggle behavior so parent clicks either do nothing or only affect leaf descendants based on the product requirement.</p>
+<h6>Q9. How would you persist selections?</h6><p>Serialize the selected IDs and store them in localStorage or send them to a backend.</p>
+<h6>Q10. What is the complexity?</h6><p>Toggling a node can be O(k), where k is the number of nodes in that subtree, because descendants must be visited.</p>
+</div></section>
+
+<section id="recap" class="card"><div class="card-header">18. Quick Recap</div><div class="card-body">
+<div class="recap-item"><strong>Data:</strong> Nested tree objects</div>
+<div class="recap-item"><strong>Rendering:</strong> Recursive TreeNode component</div>
+<div class="recap-item"><strong>State:</strong> Set of selected IDs</div>
+<div class="recap-item"><strong>Parent → children:</strong> Select/unselect descendants</div>
+<div class="recap-item"><strong>Children → parent:</strong> Derive parent visual state</div>
+<div class="recap-item"><strong>Three states:</strong> Unchecked / Indeterminate / Checked</div>
+<div class="recap-item"><strong>Indeterminate:</strong> Native DOM property via ref</div>
+<div class="recap-item"><strong>Immutability:</strong> Create a new Set</div>
+<div class="recap-item"><strong>Deep nesting:</strong> Recursion handles it</div>
+<div class="recap-item"><strong>Complexity:</strong> O(k) for a subtree toggle</div>
+<div class="tip mt-4"><strong>Remember:</strong><br><code>Tree Data → Recursive Render → Toggle → Descendants → Parent State → Indeterminate</code></div>
+</div></section>
+
+</main></div></div>
+
+<script>
+const links=document.querySelectorAll("#nav a");
+links.forEach(a=>a.addEventListener("click",()=>{links.forEach(x=>x.classList.remove("active"));a.classList.add("active")}));
+const sections=[...document.querySelectorAll("main section")];
+window.addEventListener("scroll",()=>{let cur="";sections.forEach(s=>{if(s.getBoundingClientRect().top<=130)cur=s.id});links.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+cur))});
+</script>
+</body>
+</html>

@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Navbar - React Machine Coding Round</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --dark: #172033;
+      --dark2: #0f172a;
+      --blue: #2563eb;
+      --light-blue: #eff6ff;
+      --border: #dbe3ef;
+      --text: #253047;
+      --muted: #64748b;
+      --success-bg: #ecfdf5;
+      --warning-bg: #fffbeb;
+      --danger-bg: #fef2f2;
+      --info-bg: #f0f9ff;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, var(--dark2), var(--dark));
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .2);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #172033, #243b67);
+      color: white;
+      padding: 52px 0;
+    }
+
+    .hero .badge {
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.2);
+      font-weight: 500;
+    }
+
+    .layout {
+      max-width: 1450px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 82px;
+      height: calc(100vh - 100px);
+      overflow-y: auto;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 5px 18px rgba(15,23,42,.05);
+    }
+
+    .sidebar-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .question-link {
+      display: block;
+      padding: 9px 11px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #475569;
+      font-size: 14px;
+      transition: .2s;
+      border-left: 3px solid transparent;
+    }
+
+    .question-link:hover,
+    .question-link.active {
+      color: #1d4ed8;
+      background: var(--light-blue);
+      border-left-color: var(--blue);
+    }
+
+    .content-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 5px 18px rgba(15,23,42,.045);
+      scroll-margin-top: 100px;
+    }
+
+    .content-card h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: var(--dark);
+      font-weight: 750;
+    }
+
+    .content-card h3 {
+      font-size: 18px;
+      color: #1e3a8a;
+      margin-top: 22px;
+      margin-bottom: 10px;
+    }
+
+    pre {
+      background: #0b1220;
+      color: #e5edf8;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      border: 1px solid #1e293b;
+    }
+
+    code {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+    }
+
+    .alert-custom {
+      border-radius: 10px;
+      padding: 15px 17px;
+      margin: 16px 0;
+      border: 1px solid;
+    }
+
+    .alert-info2 {
+      background: var(--info-bg);
+      border-color: #bae6fd;
+    }
+
+    .alert-success2 {
+      background: var(--success-bg);
+      border-color: #a7f3d0;
+    }
+
+    .alert-warning2 {
+      background: var(--warning-bg);
+      border-color: #fde68a;
+    }
+
+    .alert-danger2 {
+      background: var(--danger-bg);
+      border-color: #fecaca;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+      margin: 18px 0;
+    }
+
+    .flow-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .arrow {
+      color: #2563eb;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .visual {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin: 14px 0;
+    }
+
+    .navbar-demo {
+      background: #111827;
+      color: white;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .navbar-demo .brand {
+      font-weight: 800;
+    }
+
+    .desktop-links {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    .mobile-menu {
+      margin-top: 8px;
+      background: #1f2937;
+      border-radius: 10px;
+      padding: 12px 18px;
+    }
+
+    .mobile-menu div {
+      padding: 7px 0;
+      border-bottom: 1px solid #374151;
+    }
+
+    .mobile-menu div:last-child {
+      border-bottom: 0;
+    }
+
+    .mini-card {
+      height: 100%;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .mini-card strong {
+      color: #1e3a8a;
+    }
+
+    .mistake {
+      border-left: 4px solid #dc2626;
+      background: #fff7f7;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 7px;
+    }
+
+    .tip {
+      border-left: 4px solid #2563eb;
+      background: #eff6ff;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 7px;
+    }
+
+    .interview-box {
+      background: linear-gradient(135deg, #eff6ff, #f8fafc);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .sticky-note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .table td, .table th {
+      vertical-align: top;
+    }
+
+    @media (max-width: 991px) {
+      .sidebar {
+        position: static;
+        height: auto;
+        margin-bottom: 20px;
+      }
+      .hero {
+        padding: 35px 0;
+      }
+      .content-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark topbar">
+  <div class="container-fluid layout px-4">
+    <span class="navbar-brand fw-bold">React Machine Coding • Responsive Navbar</span>
+    <span class="text-white-50 small">Interview Ready Documentation</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container layout px-4">
+    <span class="badge rounded-pill px-3 py-2 mb-3">Machine Coding Round</span>
+    <h1 class="display-5 fw-bold">Responsive Navbar</h1>
+    <p class="lead mb-2">
+      Build a navigation bar that adapts cleanly between desktop and mobile screens.
+    </p>
+    <p class="mb-0 text-white-50">
+      Focus: responsive CSS • React state • mobile menu • accessibility • resize behavior
+    </p>
+  </div>
+</section>
+
+<div class="container-fluid layout px-4 py-4">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="sidebar">
+        <div class="sidebar-title">Questions</div>
+
+        <a class="question-link active" href="#what">1. What is Responsive Navbar?</a>
+        <a class="question-link" href="#problem">2. What problem does it solve?</a>
+        <a class="question-link" href="#requirements">3. What are the requirements?</a>
+        <a class="question-link" href="#responsive">4. How does responsive behavior work?</a>
+        <a class="question-link" href="#state">5. What state do I need?</a>
+        <a class="question-link" href="#accessibility">6. What about accessibility?</a>
+        <a class="question-link" href="#implementation">7. How do I implement it?</a>
+        <a class="question-link" href="#flow">8. What is the execution flow?</a>
+        <a class="question-link" href="#visual">9. Visual explanation</a>
+        <a class="question-link" href="#code">10. Full React code</a>
+        <a class="question-link" href="#one-minute">11. Explain in 1 minute</a>
+        <a class="question-link" href="#five-minute">12. Explain in 5 minutes</a>
+        <a class="question-link" href="#interviewer">13. How did I implement it?</a>
+        <a class="question-link" href="#mistakes">14. Common developer mistakes</a>
+        <a class="question-link" href="#edge">15. Edge cases / test cases</a>
+        <a class="question-link" href="#followups">16. Interviewer follow-ups</a>
+        <a class="question-link" href="#recap">17. Quick recap</a>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="col-lg-9">
+
+      <section id="what" class="content-card">
+        <h2>1. What is a Responsive Navbar?</h2>
+
+        <p>
+          A <strong>Responsive Navbar</strong> is a navigation component that changes its
+          layout based on the available screen width.
+        </p>
+
+        <div class="alert-custom alert-info2">
+          <strong>Simple definition:</strong>
+          On a desktop screen, navigation links can be displayed horizontally. On a smaller
+          screen, those links are usually hidden behind a menu button such as a hamburger icon.
+        </div>
+
+        <h3>Typical desktop view</h3>
+        <div class="navbar-demo">
+          <span class="brand">MyApp</span>
+          <div class="desktop-links">
+            <span>Home</span>
+            <span>About</span>
+            <span>Services</span>
+            <span>Contact</span>
+          </div>
+        </div>
+
+        <h3>Typical mobile view</h3>
+        <div class="navbar-demo">
+          <span class="brand">MyApp</span>
+          <span>☰</span>
+        </div>
+        <div class="mobile-menu">
+          <div>Home</div>
+          <div>About</div>
+          <div>Services</div>
+          <div>Contact</div>
+        </div>
+
+        <div class="tip">
+          <strong>Interview keyword:</strong>
+          Responsive Navbar = desktop links + mobile menu + responsive CSS + menu state.
+        </div>
+      </section>
+
+      <section id="problem" class="content-card">
+        <h2>2. What problem does it solve?</h2>
+
+        <p>
+          A desktop navigation bar may have enough horizontal space for several links.
+          On mobile, the same links can overflow, wrap awkwardly, or make the header unusable.
+        </p>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="mini-card">
+              <strong>Desktop</strong>
+              <p class="mb-0 mt-2">
+                More horizontal space → show navigation links directly.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mini-card">
+              <strong>Mobile</strong>
+              <p class="mb-0 mt-2">
+                Limited space → collapse links behind a menu button.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mini-card">
+              <strong>User experience</strong>
+              <p class="mb-0 mt-2">
+                Keeps navigation readable and usable on different devices.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p class="mt-4 mb-0">
+          This pattern is common in websites, dashboards, e-commerce applications,
+          documentation sites, and portfolio applications.
+        </p>
+      </section>
+
+      <section id="requirements" class="content-card">
+        <h2>3. What are the requirements?</h2>
+
+        <h3>Core requirements</h3>
+        <ol>
+          <li>Display the brand/logo.</li>
+          <li>Show navigation links on desktop.</li>
+          <li>Show a hamburger/menu button on smaller screens.</li>
+          <li>Open and close the mobile menu.</li>
+          <li>Close the menu when a navigation link is selected.</li>
+          <li>Keep the layout usable at different screen widths.</li>
+        </ol>
+
+        <h3>Good interview-level enhancements</h3>
+        <ul>
+          <li>Accessible button with <code>aria-expanded</code>.</li>
+          <li><code>aria-controls</code> pointing to the mobile menu.</li>
+          <li>Keyboard support.</li>
+          <li>Close menu on Escape.</li>
+          <li>Close menu when resizing back to desktop.</li>
+          <li>Close mobile menu when clicking outside.</li>
+          <li>Sticky navbar.</li>
+          <li>Dropdown/submenu support.</li>
+        </ul>
+
+        <div class="alert-custom alert-warning2">
+          <strong>Machine coding tip:</strong>
+          Finish the responsive layout and open/close behavior first. Then add accessibility
+          and advanced behavior.
+        </div>
+      </section>
+
+      <section id="responsive" class="content-card">
+        <h2>4. How does responsive behavior work?</h2>
+
+        <p>
+          The most important idea is that <strong>CSS controls the layout</strong> while
+          React controls interactive state such as whether the mobile menu is open.
+        </p>
+
+        <h3>Desktop</h3>
+<pre><code>.desktop-links {
+  display: flex;
+}
+
+.menu-button {
+  display: none;
+}</code></pre>
+
+        <h3>Mobile</h3>
+<pre><code>@media (max-width: 768px) {
+  .desktop-links {
+    display: none;
+  }
+
+  .menu-button {
+    display: block;
+  }
+}</code></pre>
+
+        <div class="flow">
+          <div class="flow-box">Large screen</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">CSS shows links</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Hide menu button</div>
+        </div>
+
+        <div class="flow">
+          <div class="flow-box">Small screen</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">CSS hides links</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Show menu button</div>
+        </div>
+
+        <div class="alert-custom alert-success2">
+          <strong>Important:</strong>
+          Do not use React state just to detect every screen-width change unless the behavior
+          actually requires JavaScript. CSS media queries are usually the right tool for layout.
+        </div>
+      </section>
+
+      <section id="state" class="content-card">
+        <h2>5. What state do I need?</h2>
+
+        <p>
+          The basic implementation needs only one piece of state:
+          <strong>whether the mobile menu is open.</strong>
+        </p>
+
+<pre><code>const [isMenuOpen, setIsMenuOpen] = useState(false);</code></pre>
+
+        <h3>Toggle</h3>
+
+<pre><code>const toggleMenu = () =&gt; {
+  setIsMenuOpen(prev =&gt; !prev);
+};</code></pre>
+
+        <h3>Close after navigation</h3>
+
+<pre><code>const handleNavClick = () =&gt; {
+  setIsMenuOpen(false);
+};</code></pre>
+
+        <div class="alert-custom alert-info2">
+          <strong>Memory trick:</strong>
+          <code>false</code> = menu closed → click hamburger → <code>true</code> = menu open.
+        </div>
+
+        <div class="sticky-note">
+          <strong>Do not overcomplicate state:</strong>
+          For a basic navbar, you normally do not need Redux, Context, or a large state object.
+        </div>
+      </section>
+
+      <section id="accessibility" class="content-card">
+        <h2>6. What about accessibility?</h2>
+
+        <p>
+          A machine-coding solution becomes stronger when the menu button communicates its
+          state to screen readers and supports keyboard interaction.
+        </p>
+
+<pre><code>&lt;button
+  type="button"
+  aria-label="Toggle navigation menu"
+  aria-expanded={isMenuOpen}
+  aria-controls="mobile-menu"
+  onClick={toggleMenu}
+&gt;
+  ☰
+&lt;/button&gt;</code></pre>
+
+        <h3>Why these attributes?</h3>
+        <ul>
+          <li><code>aria-label</code> explains what the icon button does.</li>
+          <li><code>aria-expanded</code> tells whether the menu is open.</li>
+          <li><code>aria-controls</code> identifies the menu controlled by the button.</li>
+          <li>A real <code>&lt;button&gt;</code> naturally supports keyboard interaction.</li>
+        </ul>
+
+        <div class="tip">
+          <strong>Interview bonus:</strong>
+          If asked about accessibility, mention semantic HTML, keyboard navigation,
+          focus management, and ARIA state.
+        </div>
+      </section>
+
+      <section id="implementation" class="content-card">
+        <h2>7. How do I implement it?</h2>
+
+        <div class="flow">
+          <div class="flow-box">1. Create Navbar</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">2. Add brand + links</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">3. Add menu button</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">4. Add isMenuOpen</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">5. Add responsive CSS</div>
+        </div>
+
+        <h3>Component structure</h3>
+
+<pre><code>Navbar
+ ├── Brand
+ ├── Desktop Links
+ ├── Mobile Menu Button
+ └── Mobile Menu
+      ├── Home
+      ├── About
+      ├── Services
+      └── Contact</code></pre>
+
+        <h3>Core rule</h3>
+        <p>
+          Desktop and mobile are not necessarily two completely different navigation
+          systems. They can use the same navigation data while CSS decides which presentation
+          is visible.
+        </p>
+      </section>
+
+      <section id="flow" class="content-card">
+        <h2>8. What is the execution flow?</h2>
+
+        <h3>Initial desktop render</h3>
+        <div class="flow">
+          <div class="flow-box">React renders Navbar</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">isMenuOpen = false</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Desktop CSS applies</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Links visible</div>
+        </div>
+
+        <h3>Mobile menu opening</h3>
+        <div class="flow">
+          <div class="flow-box">User taps ☰</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">toggleMenu()</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">false → true</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">React re-renders</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Mobile menu appears</div>
+        </div>
+
+        <h3>Mobile menu closing</h3>
+        <div class="flow">
+          <div class="flow-box">User clicks link</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">handleNavClick()</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">set false</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Menu closes</div>
+        </div>
+      </section>
+
+      <section id="visual" class="content-card">
+        <h2>9. Visual explanation</h2>
+
+        <h3>Step 1 — Desktop</h3>
+        <div class="visual">
+          <div class="navbar-demo">
+            <span class="brand">MyApp</span>
+            <div class="desktop-links">
+              <span>Home</span>
+              <span>About</span>
+              <span>Services</span>
+              <span>Contact</span>
+            </div>
+          </div>
+          <p class="mb-0 mt-3">
+            Large width → links have enough room → links are displayed horizontally.
+          </p>
+        </div>
+
+        <h3>Step 2 — Mobile</h3>
+        <div class="visual">
+          <div class="navbar-demo">
+            <span class="brand">MyApp</span>
+            <span>☰</span>
+          </div>
+          <p class="mb-0 mt-3">
+            Small width → desktop links are hidden → hamburger button is displayed.
+          </p>
+        </div>
+
+        <h3>Step 3 — User opens menu</h3>
+        <div class="visual">
+          <div class="navbar-demo">
+            <span class="brand">MyApp</span>
+            <span>✕</span>
+          </div>
+          <div class="mobile-menu">
+            <div>Home</div>
+            <div>About</div>
+            <div>Services</div>
+            <div>Contact</div>
+          </div>
+          <p class="mb-0 mt-3">
+            <code>isMenuOpen = true</code> → mobile navigation becomes visible.
+          </p>
+        </div>
+
+        <div class="alert-custom alert-success2">
+          <strong>Remember:</strong>
+          CSS decides <em>when</em> the mobile layout is used. React state decides
+          <em>whether the mobile menu is currently open</em>.
+        </div>
+      </section>
+
+      <section id="code" class="content-card">
+        <h2>10. Full React code</h2>
+
+        <p>
+          This version includes responsive CSS, mobile menu state, close-on-link-click,
+          Escape handling, accessible attributes, and a clean component structure.
+        </p>
+
+<pre><code>import React, { useEffect, useState } from "react";
+import "./Navbar.css";
+
+const navItems = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Services", href: "#services" },
+  { label: "Contact", href: "#contact" }
+];
+
+export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () =&gt; {
+    setIsMenuOpen(prev =&gt; !prev);
+  };
+
+  const closeMenu = () =&gt; {
+    setIsMenuOpen(false);
+  };
+
+  useEffect(() =&gt; {
+    const handleEscape = (event) =&gt; {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () =&gt; {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  useEffect(() =&gt; {
+    const handleResize = () =&gt; {
+      if (window.innerWidth &gt; 768) {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () =&gt; {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    &lt;header className="navbar"&gt;
+      &lt;a href="#home" className="brand" onClick={closeMenu}&gt;
+        MyApp
+      &lt;/a&gt;
+
+      &lt;nav className="desktop-nav" aria-label="Primary navigation"&gt;
+        {navItems.map(item =&gt; (
+          &lt;a key={item.label} href={item.href}&gt;
+            {item.label}
+          &lt;/a&gt;
+        ))}
+      &lt;/nav&gt;
+
+      &lt;button
+        type="button"
+        className="menu-button"
+        aria-label="Toggle navigation menu"
+        aria-expanded={isMenuOpen}
+        aria-controls="mobile-menu"
+        onClick={toggleMenu}
+      &gt;
+        {isMenuOpen ? "✕" : "☰"}
+      &lt;/button&gt;
+
+      &lt;nav
+        id="mobile-menu"
+        className={`mobile-nav ${isMenuOpen ? "open" : ""}`}
+        aria-label="Mobile navigation"
+      &gt;
+        {navItems.map(item =&gt; (
+          &lt;a
+            key={item.label}
+            href={item.href}
+            onClick={closeMenu}
+          &gt;
+            {item.label}
+          &lt;/a&gt;
+        ))}
+      &lt;/nav&gt;
+    &lt;/header&gt;
+  );
+}</code></pre>
+
+        <h3>CSS</h3>
+
+<pre><code>.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #111827;
+  color: white;
+}
+
+.brand {
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.desktop-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.desktop-nav a,
+.mobile-nav a {
+  color: white;
+  text-decoration: none;
+}
+
+.desktop-nav a:hover,
+.mobile-nav a:hover {
+  text-decoration: underline;
+}
+
+.menu-button {
+  display: none;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  .mobile-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 24px;
+    background: #1f2937;
+  }
+
+  .mobile-nav.open {
+    display: flex;
+  }
+}</code></pre>
+
+        <div class="alert-custom alert-success2">
+          <strong>What this code demonstrates:</strong>
+          responsive CSS, one React state variable, reusable navigation data, functional
+          state updates, Escape handling, resize cleanup, and accessible menu controls.
+        </div>
+      </section>
+
+      <section id="one-minute" class="content-card">
+        <h2>11. How to explain it to interviewer in 1 minute</h2>
+
+        <div class="interview-box">
+          <p class="mb-0">
+            “I implemented the Responsive Navbar using CSS media queries for the layout and
+            React state for the mobile menu interaction. On desktop, the navigation links are
+            displayed horizontally. Below the mobile breakpoint, CSS hides those links and
+            shows a hamburger button. I maintain an <code>isMenuOpen</code> boolean in state.
+            Clicking the button toggles it, and the mobile menu is conditionally displayed
+            based on that state. I also close the menu when a link is selected or Escape is
+            pressed, and I reset the menu when resizing back to desktop. For accessibility,
+            I use a real button with <code>aria-expanded</code> and <code>aria-controls</code>.”
+          </p>
+        </div>
+
+        <div class="tip mt-3">
+          <strong>Keywords to say:</strong>
+          media queries, mobile breakpoint, boolean state, conditional rendering,
+          accessibility, Escape key, resize cleanup.
+        </div>
+      </section>
+
+      <section id="five-minute" class="content-card">
+        <h2>12. How to explain it to interviewer in 5 minutes</h2>
+
+        <h3>Minute 1 — Requirements</h3>
+        <p>
+          “The navbar needs a brand and navigation links. On desktop the links should be
+          visible, while on mobile they should collapse behind a menu button.”
+        </p>
+
+        <h3>Minute 2 — Responsive strategy</h3>
+        <p>
+          “I will use CSS media queries for layout changes. I don't need React to calculate
+          the screen width just to hide or show elements.”
+        </p>
+
+        <h3>Minute 3 — State</h3>
+        <p>
+          “The only interactive state I need initially is <code>isMenuOpen</code>. The menu
+          button toggles this state.”
+        </p>
+
+        <h3>Minute 4 — User interactions</h3>
+        <p>
+          “When a user selects a mobile navigation link, I close the menu. I also support
+          Escape to close it and close the menu if the viewport is resized back to desktop.”
+        </p>
+
+        <h3>Minute 5 — Accessibility and scalability</h3>
+        <p>
+          “I use a semantic button with ARIA state. I keep navigation items in an array so
+          adding another link does not require duplicating JSX. If needed, I can add dropdowns,
+          active-route highlighting, outside-click handling, focus management, or animations.”
+        </p>
+      </section>
+
+      <section id="interviewer" class="content-card">
+        <h2>13. How I have implemented this — interviewer explanation</h2>
+
+        <h3>While coding, explain in this order</h3>
+
+        <ol>
+          <li>
+            <strong>“I will start with navigation data.”</strong><br>
+            Keep the links in an array so they can be mapped instead of hardcoded repeatedly.
+          </li>
+          <li>
+            <strong>“Now I will create the navbar structure.”</strong><br>
+            Brand, desktop navigation, menu button, and mobile navigation.
+          </li>
+          <li>
+            <strong>“CSS will handle responsiveness.”</strong><br>
+            Desktop links are visible on larger screens; mobile menu button appears at the
+            breakpoint.
+          </li>
+          <li>
+            <strong>“I need one state variable.”</strong><br>
+            <code>isMenuOpen</code> tracks whether the mobile menu is open.
+          </li>
+          <li>
+            <strong>“Now I will connect the button.”</strong><br>
+            Clicking it toggles the boolean.
+          </li>
+          <li>
+            <strong>“Navigation should close the menu.”</strong><br>
+            Each mobile link calls <code>closeMenu</code>.
+          </li>
+          <li>
+            <strong>“Finally I will add robustness.”</strong><br>
+            Escape handling, resize cleanup, and accessibility attributes.
+          </li>
+        </ol>
+
+        <div class="alert-custom alert-info2">
+          <strong>Best interview habit:</strong>
+          Explain the separation of responsibilities:
+          <strong>CSS = responsive layout</strong> and
+          <strong>React = interaction/state</strong>.
+        </div>
+      </section>
+
+      <section id="mistakes" class="content-card">
+        <h2>14. Common developer mistakes</h2>
+
+        <div class="mistake">
+          <strong>1. Using JavaScript to handle basic responsive layout</strong><br>
+          Checking <code>window.innerWidth</code> just to decide whether links should be shown
+          is often unnecessary.
+          <br><strong>Fix:</strong> Use CSS media queries for presentation.
+        </div>
+
+        <div class="mistake">
+          <strong>2. Forgetting to close the mobile menu after navigation</strong><br>
+          The user clicks a link but the menu remains open.
+          <br><strong>Fix:</strong> Call <code>setIsMenuOpen(false)</code> on mobile link click.
+        </div>
+
+        <div class="mistake">
+          <strong>3. Using a div as the hamburger control</strong><br>
+          A clickable div is less accessible and doesn't provide normal button keyboard behavior.
+          <br><strong>Fix:</strong> Use a semantic <code>&lt;button&gt;</code>.
+        </div>
+
+        <div class="mistake">
+          <strong>4. Forgetting ARIA state</strong><br>
+          Screen readers may not know whether the menu is currently expanded.
+          <br><strong>Fix:</strong> Use <code>aria-expanded</code> and <code>aria-controls</code>.
+        </div>
+
+        <div class="mistake">
+          <strong>5. Adding resize listeners without cleanup</strong><br>
+          Repeated mounting can leave event listeners behind.
+          <br><strong>Fix:</strong> Remove the listener in the <code>useEffect</code> cleanup.
+        </div>
+
+        <div class="mistake">
+          <strong>6. Missing the viewport meta tag</strong><br>
+          Mobile browsers may not render the page at the expected device width.
+          <br><strong>Fix:</strong> Include
+          <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code>.
+        </div>
+
+        <div class="mistake">
+          <strong>7. Hardcoding the same links twice without a reason</strong><br>
+          Maintaining separate desktop and mobile JSX can cause the two lists to become inconsistent.
+          <br><strong>Fix:</strong> Store navigation items in an array and map them.
+        </div>
+
+        <div class="mistake">
+          <strong>8. No keyboard/escape behavior</strong><br>
+          A polished mobile menu should be easy to close without a mouse.
+          <br><strong>Fix:</strong> Support Escape and proper keyboard-focus behavior.
+        </div>
+
+        <div class="mistake">
+          <strong>9. Overcomplicating the first version</strong><br>
+          Starting with animations, dropdown systems, routing logic, and global state can slow
+          down a machine-coding round.
+          <br><strong>Fix:</strong> Build the core responsive navbar first, then enhance it.
+        </div>
+      </section>
+
+      <section id="edge" class="content-card">
+        <h2>15. Edge cases / test cases</h2>
+
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Test case</th>
+              <th>Expected behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Desktop width</td>
+              <td>Desktop navigation links are visible; hamburger is hidden.</td>
+            </tr>
+            <tr>
+              <td>Mobile width</td>
+              <td>Desktop links are hidden; hamburger is visible.</td>
+            </tr>
+            <tr>
+              <td>Click hamburger</td>
+              <td>Mobile menu opens.</td>
+            </tr>
+            <tr>
+              <td>Click hamburger again</td>
+              <td>Mobile menu closes.</td>
+            </tr>
+            <tr>
+              <td>Click mobile link</td>
+              <td>Navigation happens and menu closes.</td>
+            </tr>
+            <tr>
+              <td>Press Escape</td>
+              <td>Open mobile menu closes.</td>
+            </tr>
+            <tr>
+              <td>Resize mobile → desktop</td>
+              <td>Menu state resets closed.</td>
+            </tr>
+            <tr>
+              <td>Keyboard focus on menu button</td>
+              <td>Button can be activated with keyboard.</td>
+            </tr>
+            <tr>
+              <td>Long navigation labels</td>
+              <td>Navbar should not overflow unexpectedly.</td>
+            </tr>
+            <tr>
+              <td>Many navigation links</td>
+              <td>Layout should remain usable or switch to the mobile pattern at the right breakpoint.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="followups" class="content-card">
+        <h2>16. Interviewer follow-up questions</h2>
+
+        <h3>Q1. Why use CSS media queries instead of React state for responsiveness?</h3>
+        <p>
+          CSS is designed for presentation and viewport-based layout. Using CSS avoids
+          unnecessary JavaScript and resize state for simple visual changes.
+        </p>
+
+        <h3>Q2. How would you highlight the active page?</h3>
+        <p>
+          In a React Router application, I would compare the current route with each item's
+          path or use the router's active-link support.
+        </p>
+
+        <h3>Q3. How would you close the menu when clicking outside?</h3>
+        <p>
+          I would attach a document-level pointer/mouse listener and check whether the event
+          target is outside the navbar using a ref. I would clean up that listener in
+          <code>useEffect</code>.
+        </p>
+
+        <h3>Q4. How would you add a dropdown?</h3>
+        <p>
+          Each dropdown can have its own open state, ideally scoped to the specific menu item.
+          On mobile, the dropdown can become an accordion-style submenu.
+        </p>
+
+        <h3>Q5. How would you animate the mobile menu?</h3>
+        <p>
+          I would prefer CSS transitions for simple animations. For height-based animation,
+          I may use opacity/transform or another CSS-friendly approach instead of forcing
+          layout calculations in React.
+        </p>
+
+        <h3>Q6. How would you handle focus when the menu opens?</h3>
+        <p>
+          For a production-quality navigation drawer, I would move focus into the opened menu,
+          trap focus when appropriate, and return focus to the trigger when the menu closes.
+        </p>
+
+        <h3>Q7. Would you use Context or Redux?</h3>
+        <p>
+          No, not for this basic component. Local state is enough. Global state would add
+          unnecessary complexity unless the application has a real cross-component requirement.
+        </p>
+      </section>
+
+      <section id="recap" class="content-card">
+        <h2>17. Quick recap</h2>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Layout</strong>
+              <p class="mb-0 mt-2">CSS media queries handle desktop/mobile presentation.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>State</strong>
+              <p class="mb-0 mt-2"><code>isMenuOpen</code> controls the mobile menu.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Interaction</strong>
+              <p class="mb-0 mt-2">Hamburger click toggles the menu.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Accessibility</strong>
+              <p class="mb-0 mt-2">Semantic button + ARIA state + keyboard support.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Robustness</strong>
+              <p class="mb-0 mt-2">Escape handling and resize listener cleanup.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Interview keywords</strong>
+              <p class="mb-0 mt-2">Responsive design, media query, state, conditional rendering, accessibility.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-custom alert-success2 mt-4">
+          <strong>One-line memory trick:</strong>
+          “Responsive Navbar = CSS handles screen layout + React handles menu interaction.”
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll(".question-link");
+  const sections = document.querySelectorAll("main section");
+
+  links.forEach(link => {
+    link.addEventListener("click", () => {
+      links.forEach(item => item.classList.remove("active"));
+      link.classList.add("active");
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(link => link.classList.remove("active"));
+        const active = document.querySelector(
+          '.question-link[href="#' + entry.target.id + '"]'
+        );
+        if (active) active.classList.add("active");
+      }
+    });
+  }, {
+    rootMargin: "-20% 0px -65% 0px"
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

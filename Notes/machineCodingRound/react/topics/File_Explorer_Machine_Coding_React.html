@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Explorer - React Machine Coding Round</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --dark: #172033;
+      --dark2: #0f172a;
+      --blue: #2563eb;
+      --light-blue: #eff6ff;
+      --border: #dbe3ef;
+      --text: #253047;
+      --muted: #64748b;
+      --success-bg: #ecfdf5;
+      --warning-bg: #fffbeb;
+      --danger-bg: #fef2f2;
+      --info-bg: #f0f9ff;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, var(--dark2), var(--dark));
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, .2);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #172033, #243b67);
+      color: white;
+      padding: 52px 0;
+    }
+
+    .hero .badge {
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.2);
+      font-weight: 500;
+    }
+
+    .layout {
+      max-width: 1450px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 82px;
+      height: calc(100vh - 100px);
+      overflow-y: auto;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 5px 18px rgba(15,23,42,.05);
+    }
+
+    .sidebar-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .question-link {
+      display: block;
+      padding: 9px 11px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #475569;
+      font-size: 14px;
+      transition: .2s;
+      border-left: 3px solid transparent;
+    }
+
+    .question-link:hover,
+    .question-link.active {
+      color: #1d4ed8;
+      background: var(--light-blue);
+      border-left-color: var(--blue);
+    }
+
+    .content-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 5px 18px rgba(15,23,42,.045);
+      scroll-margin-top: 100px;
+    }
+
+    .content-card h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: var(--dark);
+      font-weight: 750;
+    }
+
+    .content-card h3 {
+      font-size: 18px;
+      color: #1e3a8a;
+      margin-top: 22px;
+      margin-bottom: 10px;
+    }
+
+    .code-wrap {
+      position: relative;
+      margin-top: 14px;
+    }
+
+    pre {
+      background: #0b1220;
+      color: #e5edf8;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      border: 1px solid #1e293b;
+    }
+
+    code {
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+    }
+
+    .alert-custom {
+      border-radius: 10px;
+      padding: 15px 17px;
+      margin: 16px 0;
+      border: 1px solid;
+    }
+
+    .alert-info2 {
+      background: var(--info-bg);
+      border-color: #bae6fd;
+    }
+
+    .alert-success2 {
+      background: var(--success-bg);
+      border-color: #a7f3d0;
+    }
+
+    .alert-warning2 {
+      background: var(--warning-bg);
+      border-color: #fde68a;
+    }
+
+    .alert-danger2 {
+      background: var(--danger-bg);
+      border-color: #fecaca;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+      margin: 18px 0;
+    }
+
+    .flow-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .arrow {
+      color: #2563eb;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .visual-tree {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      font-family: monospace;
+      line-height: 1.8;
+    }
+
+    .folder { color: #92400e; font-weight: 700; }
+    .file { color: #334155; }
+
+    .mini-card {
+      height: 100%;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .mini-card strong {
+      color: #1e3a8a;
+    }
+
+    .check {
+      color: #047857;
+      font-weight: 700;
+    }
+
+    .mistake {
+      border-left: 4px solid #dc2626;
+      background: #fff7f7;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 7px;
+    }
+
+    .tip {
+      border-left: 4px solid #2563eb;
+      background: #eff6ff;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 7px;
+    }
+
+    .interview-box {
+      background: linear-gradient(135deg, #eff6ff, #f8fafc);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .table td, .table th {
+      vertical-align: top;
+    }
+
+    .sticky-note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    @media (max-width: 991px) {
+      .sidebar {
+        position: static;
+        height: auto;
+        margin-bottom: 20px;
+      }
+      .hero {
+        padding: 35px 0;
+      }
+      .content-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark topbar">
+  <div class="container-fluid layout px-4">
+    <span class="navbar-brand fw-bold">React Machine Coding • File Explorer</span>
+    <span class="text-white-50 small">Interview Ready Documentation</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container layout px-4">
+    <span class="badge rounded-pill px-3 py-2 mb-3">Machine Coding Round</span>
+    <h1 class="display-5 fw-bold">File Explorer</h1>
+    <p class="lead mb-2">
+      Build a recursive folder/file tree where folders can be expanded and collapsed.
+    </p>
+    <p class="mb-0 text-white-50">
+      Focus: recursion • nested data • component design • state • event handling
+    </p>
+  </div>
+</section>
+
+<div class="container-fluid layout px-4 py-4">
+  <div class="row g-4">
+
+    <!-- LEFT -->
+    <aside class="col-lg-3">
+      <div class="sidebar">
+        <div class="sidebar-title">Questions</div>
+
+        <a class="question-link active" href="#what">1. What is File Explorer?</a>
+        <a class="question-link" href="#problem">2. What problem does it solve?</a>
+        <a class="question-link" href="#requirements">3. What are the requirements?</a>
+        <a class="question-link" href="#data">4. How should I design the data?</a>
+        <a class="question-link" href="#recursion">5. Why recursion?</a>
+        <a class="question-link" href="#state">6. How should state work?</a>
+        <a class="question-link" href="#implementation">7. How do I implement it?</a>
+        <a class="question-link" href="#flow">8. What is the execution flow?</a>
+        <a class="question-link" href="#visual">9. Visual explanation</a>
+        <a class="question-link" href="#code">10. Full React code</a>
+        <a class="question-link" href="#one-minute">11. Explain in 1 minute</a>
+        <a class="question-link" href="#five-minute">12. Explain in 5 minutes</a>
+        <a class="question-link" href="#interviewer">13. How did you implement it?</a>
+        <a class="question-link" href="#mistakes">14. Common developer mistakes</a>
+        <a class="question-link" href="#edge">15. Edge cases / test cases</a>
+        <a class="question-link" href="#followups">16. Interviewer follow-ups</a>
+        <a class="question-link" href="#recap">17. Quick recap</a>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="col-lg-9">
+
+      <section id="what" class="content-card">
+        <h2>1. What is a File Explorer?</h2>
+        <p>
+          A <strong>File Explorer</strong> is a UI that displays files and folders in a
+          hierarchical tree structure. Folders can contain files and other folders.
+        </p>
+
+        <div class="alert-custom alert-info2">
+          <strong>Simple definition:</strong>
+          A File Explorer is a nested tree UI that lets users navigate folders and files
+          by expanding and collapsing folders.
+        </div>
+
+        <h3>Typical features</h3>
+        <ul>
+          <li>Show folders and files.</li>
+          <li>Expand a folder to see its children.</li>
+          <li>Collapse a folder to hide its children.</li>
+          <li>Support unlimited nesting.</li>
+          <li>Use different icons for folders and files.</li>
+          <li>Keep expanded/collapsed state independently for each folder.</li>
+        </ul>
+
+        <div class="tip">
+          <strong>Interview keyword:</strong> When you hear “File Explorer”, think
+          <strong>tree data + recursion + expand/collapse state</strong>.
+        </div>
+      </section>
+
+      <section id="problem" class="content-card">
+        <h2>2. What problem does it solve?</h2>
+        <p>
+          A normal list works well when every item is at the same level. But files are
+          naturally hierarchical: a folder can contain another folder, which can contain
+          another folder.
+        </p>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="mini-card">
+              <strong>Without hierarchy</strong>
+              <p class="mb-0 mt-2">Everything becomes one long flat list and relationships are difficult to understand.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mini-card">
+              <strong>With tree structure</strong>
+              <p class="mb-0 mt-2">Users can understand parent-child relationships immediately.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mini-card">
+              <strong>With expand/collapse</strong>
+              <p class="mb-0 mt-2">Users see only the level they currently need.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="mt-4 mb-0">
+          This pattern is used in IDE sidebars, cloud storage, operating-system file
+          managers, documentation navigation, category trees, and organization charts.
+        </p>
+      </section>
+
+      <section id="requirements" class="content-card">
+        <h2>3. What are the requirements?</h2>
+
+        <h3>Minimum machine-coding requirements</h3>
+        <ol>
+          <li>Render folders and files.</li>
+          <li>Display nested children.</li>
+          <li>Click a folder to expand/collapse it.</li>
+          <li>Allow multiple folders to remain open.</li>
+          <li>Support nested folders recursively.</li>
+          <li>Use a unique ID for every node.</li>
+        </ol>
+
+        <h3>Good follow-up features</h3>
+        <ul>
+          <li>Add file/folder.</li>
+          <li>Delete file/folder.</li>
+          <li>Rename.</li>
+          <li>Search.</li>
+          <li>Context menu.</li>
+          <li>Keyboard navigation.</li>
+          <li>Drag and drop.</li>
+          <li>Lazy-load children from an API.</li>
+        </ul>
+
+        <div class="alert-custom alert-warning2">
+          <strong>Machine coding tip:</strong>
+          First finish the core tree + expand/collapse behavior. Then add optional features
+          only if time remains.
+        </div>
+      </section>
+
+      <section id="data" class="content-card">
+        <h2>4. How should I design the data?</h2>
+
+        <p>
+          The easiest structure is a nested array. Every node has an <code>id</code>,
+          <code>name</code>, <code>type</code>, and optionally <code>children</code>.
+        </p>
+
+<pre><code>const fileData = [
+  {
+    id: "src",
+    name: "src",
+    type: "folder",
+    children: [
+      {
+        id: "components",
+        name: "components",
+        type: "folder",
+        children: [
+          {
+            id: "button-jsx",
+            name: "Button.jsx",
+            type: "file"
+          }
+        ]
+      },
+      {
+        id: "app-jsx",
+        name: "App.jsx",
+        type: "file"
+      }
+    ]
+  },
+  {
+    id: "package-json",
+    name: "package.json",
+    type: "file"
+  }
+];</code></pre>
+
+        <h3>Think of every node like this</h3>
+        <div class="flow">
+          <div class="flow-box">Node</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">id</div>
+          <span class="arrow">+</span>
+          <div class="flow-box">name</div>
+          <span class="arrow">+</span>
+          <div class="flow-box">type</div>
+          <span class="arrow">+</span>
+          <div class="flow-box">children?</div>
+        </div>
+
+        <div class="tip">
+          <strong>Why unique IDs?</strong> The ID lets React identify nodes and lets us store
+          expanded state without depending on the display name.
+        </div>
+      </section>
+
+      <section id="recursion" class="content-card">
+        <h2>5. Why do we use recursion?</h2>
+
+        <p>
+          The data itself is recursive: a folder can contain a folder, and that folder can
+          contain another folder. Therefore a recursive component is a natural solution.
+        </p>
+
+        <div class="visual-tree">
+          <div><span class="folder">📁 src</span></div>
+          <div>&nbsp;&nbsp;├── <span class="folder">📁 components</span></div>
+          <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">📄 Button.jsx</span></div>
+          <div>&nbsp;&nbsp;└── <span class="file">📄 App.jsx</span></div>
+          <div><span class="file">📄 package.json</span></div>
+        </div>
+
+        <h3>Recursive idea</h3>
+<pre><code>function TreeNode({ node }) {
+  // Render current node
+
+  // If it is a folder and is open:
+  // render children by calling TreeNode again
+
+  return (
+    &lt;div&gt;
+      ...
+      {node.children?.map(child =&gt; (
+        &lt;TreeNode key={child.id} node={child} /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <div class="alert-custom alert-success2">
+          <strong>Easy way to remember:</strong>
+          “Render myself, then render my children using the same component.”
+        </div>
+      </section>
+
+      <section id="state" class="content-card">
+        <h2>6. How should state work?</h2>
+
+        <p>
+          We need to remember which folders are currently expanded. A
+          <code>Set</code> of folder IDs is a clean approach.
+        </p>
+
+<pre><code>const [expanded, setExpanded] = useState(new Set());</code></pre>
+
+        <h3>Toggle logic</h3>
+
+<pre><code>const toggleFolder = (id) =&gt; {
+  setExpanded(prev =&gt; {
+    const next = new Set(prev);
+
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+
+    return next;
+  });
+};</code></pre>
+
+        <h3>Why create a new Set?</h3>
+        <p>
+          React state should be updated immutably. We create a new <code>Set</code> instead
+          of directly mutating the previous one.
+        </p>
+
+        <div class="alert-custom alert-danger2">
+          <strong>Bad:</strong> <code>prev.add(id); return prev;</code><br>
+          This mutates the existing Set and returns the same reference.
+        </div>
+
+        <div class="alert-custom alert-success2">
+          <strong>Good:</strong> <code>const next = new Set(prev); next.add(id); return next;</code>
+        </div>
+      </section>
+
+      <section id="implementation" class="content-card">
+        <h2>7. How do I implement it?</h2>
+
+        <div class="flow">
+          <div class="flow-box">1. Create nested data</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">2. Create expanded state</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">3. Create TreeNode</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">4. Render node</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">5. Recursively render children</div>
+        </div>
+
+        <h3>Implementation rules</h3>
+        <ol>
+          <li>If node is a <strong>file</strong>, show the file and stop.</li>
+          <li>If node is a <strong>folder</strong>, show a clickable folder row.</li>
+          <li>When clicked, toggle its ID in <code>expanded</code>.</li>
+          <li>If expanded, map over <code>children</code>.</li>
+          <li>For each child, render <code>TreeNode</code> again.</li>
+        </ol>
+
+        <div class="sticky-note">
+          <strong>Core condition:</strong><br>
+          <code>node.type === "folder" && expanded.has(node.id)</code>
+          determines whether children should be visible.
+        </div>
+      </section>
+
+      <section id="flow" class="content-card">
+        <h2>8. What is the execution flow?</h2>
+
+        <h3>Initial render</h3>
+        <div class="flow">
+          <div class="flow-box">fileData</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">FileExplorer</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">TreeNode</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Show root nodes</div>
+        </div>
+
+        <h3>User clicks a folder</h3>
+        <div class="flow">
+          <div class="flow-box">Click 📁 src</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">toggleFolder("src")</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Set adds "src"</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">React re-renders</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">children appear</div>
+        </div>
+
+        <h3>User clicks the same folder again</h3>
+        <div class="flow">
+          <div class="flow-box">Click 📂 src</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">toggleFolder("src")</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">Set deletes "src"</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">React re-renders</div>
+          <span class="arrow">→</span>
+          <div class="flow-box">children hide</div>
+        </div>
+      </section>
+
+      <section id="visual" class="content-card">
+        <h2>9. Visual explanation</h2>
+
+        <h3>Step 1 — Initial state</h3>
+        <div class="visual-tree">
+          📁 src<br>
+          📄 package.json
+        </div>
+
+        <h3>Step 2 — Click src</h3>
+        <div class="visual-tree">
+          📂 src<br>
+          &nbsp;&nbsp;├── 📁 components<br>
+          &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── 📄 Button.jsx<br>
+          &nbsp;&nbsp;└── 📄 App.jsx<br>
+          📄 package.json
+        </div>
+
+        <h3>Step 3 — Click components</h3>
+        <div class="visual-tree">
+          📂 src<br>
+          &nbsp;&nbsp;├── 📂 components<br>
+          &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── 📄 Button.jsx<br>
+          &nbsp;&nbsp;└── 📄 App.jsx<br>
+          📄 package.json
+        </div>
+
+        <div class="alert-custom alert-info2">
+          The important point is that opening <strong>components</strong> does not close
+          <strong>src</strong>. Each folder's ID has independent expanded state.
+        </div>
+      </section>
+
+      <section id="code" class="content-card">
+        <h2>10. Full React code</h2>
+
+        <p>
+          This version focuses on the most common machine-coding requirement:
+          recursive rendering + independent expand/collapse.
+        </p>
+
+<pre><code>import React, { useState } from "react";
+import "./FileExplorer.css";
+
+const fileData = [
+  {
+    id: "src",
+    name: "src",
+    type: "folder",
+    children: [
+      {
+        id: "components",
+        name: "components",
+        type: "folder",
+        children: [
+          {
+            id: "button-jsx",
+            name: "Button.jsx",
+            type: "file"
+          },
+          {
+            id: "modal-jsx",
+            name: "Modal.jsx",
+            type: "file"
+          }
+        ]
+      },
+      {
+        id: "pages",
+        name: "pages",
+        type: "folder",
+        children: [
+          {
+            id: "home-jsx",
+            name: "Home.jsx",
+            type: "file"
+          }
+        ]
+      },
+      {
+        id: "app-jsx",
+        name: "App.jsx",
+        type: "file"
+      }
+    ]
+  },
+  {
+    id: "public",
+    name: "public",
+    type: "folder",
+    children: [
+      {
+        id: "favicon",
+        name: "favicon.ico",
+        type: "file"
+      }
+    ]
+  },
+  {
+    id: "package-json",
+    name: "package.json",
+    type: "file"
+  },
+  {
+    id: "readme",
+    name: "README.md",
+    type: "file"
+  }
+];
+
+function TreeNode({ node, expanded, toggleFolder }) {
+  const isFolder = node.type === "folder";
+  const isOpen = expanded.has(node.id);
+
+  const handleClick = () =&gt; {
+    if (isFolder) {
+      toggleFolder(node.id);
+    }
+  };
+
+  return (
+    &lt;div className="tree-node"&gt;
+      &lt;div
+        className={`tree-row ${isFolder ? "folder-row" : "file-row"}`}
+        onClick={handleClick}
+        role={isFolder ? "button" : undefined}
+        tabIndex={isFolder ? 0 : undefined}
+        onKeyDown={(e) =&gt; {
+          if (isFolder &amp;&amp; (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            toggleFolder(node.id);
+          }
+        }}
+      &gt;
+        &lt;span className="icon"&gt;
+          {isFolder ? (isOpen ? "📂" : "📁") : "📄"}
+        &lt;/span&gt;
+
+        &lt;span&gt;{node.name}&lt;/span&gt;
+      &lt;/div&gt;
+
+      {isFolder &amp;&amp; isOpen &amp;&amp; node.children?.length &gt; 0 &amp;&amp; (
+        &lt;div className="children"&gt;
+          {node.children.map((child) =&gt; (
+            &lt;TreeNode
+              key={child.id}
+              node={child}
+              expanded={expanded}
+              toggleFolder={toggleFolder}
+            /&gt;
+          ))}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default function FileExplorer() {
+  const [expanded, setExpanded] = useState(new Set());
+
+  const toggleFolder = (id) =&gt; {
+    setExpanded((prev) =&gt; {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  return (
+    &lt;div className="file-explorer"&gt;
+      &lt;h2&gt;File Explorer&lt;/h2&gt;
+
+      {fileData.map((node) =&gt; (
+        &lt;TreeNode
+          key={node.id}
+          node={node}
+          expanded={expanded}
+          toggleFolder={toggleFolder}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <h3>CSS</h3>
+
+<pre><code>.file-explorer {
+  width: 360px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  font-family: Arial, sans-serif;
+}
+
+.file-explorer h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tree-row:hover {
+  background: #f1f5f9;
+}
+
+.folder-row {
+  font-weight: 600;
+}
+
+.file-row {
+  cursor: default;
+}
+
+.children {
+  margin-left: 20px;
+  border-left: 1px solid #e2e8f0;
+  padding-left: 8px;
+}
+
+.icon {
+  width: 22px;
+}</code></pre>
+
+        <div class="alert-custom alert-success2">
+          <strong>Interview-quality detail:</strong>
+          Keyboard support for Enter/Space and a unique <code>key</code> for each recursive
+          child make the basic solution more robust.
+        </div>
+      </section>
+
+      <section id="one-minute" class="content-card">
+        <h2>11. How to explain it to interviewer in 1 minute</h2>
+
+        <div class="interview-box">
+          <p class="mb-0">
+            “I implemented the File Explorer using a recursive tree structure. Each node
+            contains an ID, name, type, and optional children. I maintain a Set of expanded
+            folder IDs in React state. When a folder is clicked, I add or remove its ID from
+            that Set, which controls whether its children are displayed. For rendering,
+            I created a reusable TreeNode component. It renders the current node and, if the
+            node is an open folder, recursively renders its children using the same component.
+            This approach naturally supports any nesting depth and keeps each folder's
+            expand/collapse state independent.”
+          </p>
+        </div>
+
+        <div class="tip mt-3">
+          <strong>Keywords to say:</strong>
+          nested data, recursive component, Set, immutable state update, expand/collapse,
+          independent state, reusable component.
+        </div>
+      </section>
+
+      <section id="five-minute" class="content-card">
+        <h2>12. How to explain it to interviewer in 5 minutes</h2>
+
+        <h3>Minute 1 — Requirements</h3>
+        <p>
+          “First I identify the requirements: render folders and files, support nested
+          folders, and allow folders to expand and collapse independently.”
+        </p>
+
+        <h3>Minute 2 — Data structure</h3>
+        <p>
+          “Because a folder can contain another folder, I represent the data as a tree.
+          Each node has an ID, name, type, and optional children array.”
+        </p>
+
+        <h3>Minute 3 — State</h3>
+        <p>
+          “I need to remember which folders are open. I use a Set of IDs. Clicking a folder
+          toggles its ID. I create a new Set before updating so the state update is immutable.”
+        </p>
+
+        <h3>Minute 4 — Recursive component</h3>
+        <p>
+          “The TreeNode component renders one node. If it is a file, it stops there. If it is
+          a folder and is expanded, it maps through children and calls TreeNode for each child.”
+        </p>
+
+        <h3>Minute 5 — Quality and extensions</h3>
+        <p>
+          “I also handle unique React keys, keyboard interaction, empty folders, and optional
+          children safely. If required, I can extend this with add, delete, rename, search,
+          drag-and-drop, or lazy loading.”
+        </p>
+      </section>
+
+      <section id="interviewer" class="content-card">
+        <h2>13. How I have implemented this — interviewer explanation</h2>
+
+        <h3>While coding, explain in this order</h3>
+
+        <ol>
+          <li>
+            <strong>“I will start with the data.”</strong><br>
+            Create a nested array containing folder and file nodes.
+          </li>
+          <li>
+            <strong>“Now I need expanded state.”</strong><br>
+            Use a Set because I only need to know whether a folder ID is open.
+          </li>
+          <li>
+            <strong>“Now I will create the recursive TreeNode.”</strong><br>
+            It receives the current node and state/update function.
+          </li>
+          <li>
+            <strong>“A file has no expandable behavior.”</strong><br>
+            Render the file row only.
+          </li>
+          <li>
+            <strong>“A folder is clickable.”</strong><br>
+            Toggle its ID in the Set.
+          </li>
+          <li>
+            <strong>“If it is open, I recursively render children.”</strong><br>
+            Map the children and render TreeNode again.
+          </li>
+          <li>
+            <strong>“Finally I will add edge-case handling and accessibility.”</strong>
+          </li>
+        </ol>
+
+        <div class="alert-custom alert-info2">
+          <strong>Best interview habit:</strong>
+          Don't immediately type the complete solution silently. Explain the data structure,
+          state design, and recursion first, then code each part.
+        </div>
+      </section>
+
+      <section id="mistakes" class="content-card">
+        <h2>14. Common developer mistakes</h2>
+
+        <div class="mistake">
+          <strong>1. Using one boolean for all folders</strong><br>
+          <code>const [isOpen, setIsOpen] = useState(false)</code> cannot independently track
+          every folder.
+          <br><strong>Fix:</strong> Store expanded folder IDs in a Set.
+        </div>
+
+        <div class="mistake">
+          <strong>2. Forgetting recursion</strong><br>
+          Rendering only the first level fails when folders contain folders.
+          <br><strong>Fix:</strong> Render children with the same TreeNode component.
+        </div>
+
+        <div class="mistake">
+          <strong>3. Mutating the Set directly</strong><br>
+          <code>expanded.add(id)</code> changes the existing state object.
+          <br><strong>Fix:</strong> Create <code>new Set(prev)</code> first.
+        </div>
+
+        <div class="mistake">
+          <strong>4. Using name as the React key</strong><br>
+          Two folders can have the same name.
+          <br><strong>Fix:</strong> Give every node a stable unique ID.
+        </div>
+
+        <div class="mistake">
+          <strong>5. Assuming every node has children</strong><br>
+          Files normally do not have a children array.
+          <br><strong>Fix:</strong> Check type and/or use optional chaining.
+        </div>
+
+        <div class="mistake">
+          <strong>6. Clicking files changes folder state</strong><br>
+          Files should not trigger expand/collapse.
+          <br><strong>Fix:</strong> Toggle only when <code>node.type === "folder"</code>.
+        </div>
+
+        <div class="mistake">
+          <strong>7. Forgetting keyboard accessibility</strong><br>
+          A clickable folder implemented as a plain div may not be keyboard friendly.
+          <br><strong>Fix:</strong> Add appropriate keyboard behavior or use an accessible button.
+        </div>
+
+        <div class="mistake">
+          <strong>8. Overengineering too early</strong><br>
+          Starting with drag/drop, API calls, context menus, and virtualization can waste
+          machine-round time.
+          <br><strong>Fix:</strong> Finish the core tree first, then enhance it.
+        </div>
+      </section>
+
+      <section id="edge" class="content-card">
+        <h2>15. Edge cases / test cases</h2>
+
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Test case</th>
+              <th>Expected behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Folder has no children</td>
+              <td>Show folder without crashing.</td>
+            </tr>
+            <tr>
+              <td>File is clicked</td>
+              <td>No expand/collapse action.</td>
+            </tr>
+            <tr>
+              <td>Two folders have same name</td>
+              <td>They still work independently because IDs are unique.</td>
+            </tr>
+            <tr>
+              <td>Open parent and child</td>
+              <td>Both can remain open.</td>
+            </tr>
+            <tr>
+              <td>Close parent</td>
+              <td>Its visible subtree disappears.</td>
+            </tr>
+            <tr>
+              <td>Deep nesting</td>
+              <td>Recursive component continues rendering.</td>
+            </tr>
+            <tr>
+              <td>Empty data array</td>
+              <td>Explorer should render an empty state rather than crash.</td>
+            </tr>
+            <tr>
+              <td>Keyboard Enter/Space on folder</td>
+              <td>Folder toggles open/closed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="followups" class="content-card">
+        <h2>16. Interviewer follow-up questions</h2>
+
+        <h3>Q1. How would you add a new file?</h3>
+        <p>
+          I would update the tree immutably and insert the new node into the target folder's
+          children array.
+        </p>
+
+        <h3>Q2. How would you implement delete?</h3>
+        <p>
+          I would recursively traverse the tree, remove the matching node, and return a new
+          tree rather than mutating the existing one.
+        </p>
+
+        <h3>Q3. How would you implement rename?</h3>
+        <p>
+          Recursively find the node by ID and return a new node with the updated name.
+        </p>
+
+        <h3>Q4. How would you add search?</h3>
+        <p>
+          Filter or recursively traverse the tree and keep matching nodes. In a real UI,
+          I would also keep ancestor folders visible so the matching file's location remains
+          understandable.
+        </p>
+
+        <h3>Q5. What if there are thousands of files?</h3>
+        <p>
+          I would consider lazy loading, virtualization, memoization, and avoiding unnecessary
+          re-renders. For remote data, children can be fetched only when a folder is opened.
+        </p>
+
+        <h3>Q6. Why not flatten the data?</h3>
+        <p>
+          A flat normalized structure can be better for large applications and frequent updates,
+          but the nested structure is simpler for a machine-coding problem focused on recursive
+          rendering.
+        </p>
+
+        <h3>Q7. What is the time complexity?</h3>
+        <p>
+          Initial rendering is proportional to the number of visible nodes, approximately
+          <strong>O(V)</strong>. Toggling a folder is effectively <strong>O(1)</strong> for the
+          Set operation, excluding the React rendering work caused by the state update.
+        </p>
+      </section>
+
+      <section id="recap" class="content-card">
+        <h2>17. Quick recap</h2>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Data</strong>
+              <p class="mb-0 mt-2">Nested tree: folder → children → folder/file.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>State</strong>
+              <p class="mb-0 mt-2">Set of expanded folder IDs.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Rendering</strong>
+              <p class="mb-0 mt-2">Recursive TreeNode component.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Interaction</strong>
+              <p class="mb-0 mt-2">Click folder → toggle ID → re-render children.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Important React rule</strong>
+              <p class="mb-0 mt-2">Update Set immutably and use stable unique keys.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mini-card">
+              <strong>Interview keywords</strong>
+              <p class="mb-0 mt-2">Tree, recursion, nested data, state, Set, immutable update.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-custom alert-success2 mt-4">
+          <strong>One-line memory trick:</strong>
+          “File Explorer = Tree data + recursive component + expanded folder IDs.”
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll(".question-link");
+  const sections = document.querySelectorAll("main section");
+
+  links.forEach(link => {
+    link.addEventListener("click", () => {
+      links.forEach(item => item.classList.remove("active"));
+      link.classList.add("active");
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(link => link.classList.remove("active"));
+        const active = document.querySelector(
+          '.question-link[href="#' + entry.target.id + '"]'
+        );
+        if (active) active.classList.add("active");
+      }
+    });
+  }, {
+    rootMargin: "-20% 0px -65% 0px"
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

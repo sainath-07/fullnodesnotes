@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Machine Coding - Kanban Board</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body{background:#f5f7fb;color:#212529}
+    .navbar{position:sticky;top:0;z-index:1030}
+    .hero{background:linear-gradient(135deg,#212529,#495057);color:#fff;border-radius:0 0 20px 20px}
+    .card{border:0;box-shadow:0 5px 18px rgba(0,0,0,.07);margin-bottom:1.5rem}
+    .left-nav{position:sticky;top:75px;max-height:calc(100vh - 95px);overflow:auto}
+    .left-nav .list-group-item{border:0;cursor:pointer;padding:.72rem 1rem}
+    .left-nav .list-group-item:hover{background:#eef2f7}
+    .left-nav .list-group-item.active{background:#212529;color:#fff}
+    .section-title{font-weight:700}
+    .small-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:#6c757d;font-weight:700}
+    pre{background:#17191c;color:#e9ecef;padding:18px;border-radius:10px;overflow:auto;font-size:14px;line-height:1.55}
+    code{color:#d63384}
+    pre code{color:inherit}
+    .tip,.success-tip,.danger-tip,.warning-tip{padding:14px 16px;border-radius:8px}
+    .tip{border-left:4px solid #0d6efd;background:#eef5ff}
+    .success-tip{border-left:4px solid #198754;background:#edf9f2}
+    .danger-tip{border-left:4px solid #dc3545;background:#fff0f1}
+    .warning-tip{border-left:4px solid #ffc107;background:#fff9e6}
+    .flow-box{border:2px solid #dee2e6;border-radius:12px;padding:16px;background:#fff;height:100%}
+    .flow-arrow{font-size:2rem;color:#6c757d;display:flex;align-items:center;justify-content:center}
+    .kanban-demo{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .board-column{background:#f1f3f5;border-radius:12px;padding:12px;min-height:210px}
+    .board-column h6{font-weight:700}
+    .task-card{background:#fff;border-radius:9px;padding:11px;margin:8px 0;box-shadow:0 2px 7px rgba(0,0,0,.08)}
+    .task-card small{color:#6c757d}
+    .column-count{float:right;background:#dee2e6;padding:2px 8px;border-radius:20px;font-size:12px}
+    .badge-soft{background:#e9ecef;color:#343a40}
+    @media(max-width:991px){
+      .left-nav{position:static;max-height:none}
+      .kanban-demo{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#top">
+      <i class="bi bi-kanban-fill me-2"></i>Kanban Board — Machine Coding Round
+    </a>
+    <span class="text-white-50 small">React Interview Guide</span>
+  </div>
+</nav>
+
+<header id="top" class="hero py-5">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-dark mb-3">React • Machine Coding • Interview Ready</span>
+        <h1 class="display-5 fw-bold">Kanban Board</h1>
+        <p class="lead mb-0">Learn how to build a task-management board with columns, task cards, add/delete, drag-and-drop, status updates, and clean immutable React state management.</p>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white text-dark rounded-4 p-4">
+          <div class="small-label">Core requirements</div>
+          <ul class="mb-0 mt-2">
+            <li>Multiple columns</li>
+            <li>Task cards</li>
+            <li>Add tasks</li>
+            <li>Delete tasks</li>
+            <li>Drag and drop</li>
+            <li>Move between columns</li>
+            <li>Persist/update state</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-fluid py-4">
+  <div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <aside class="col-lg-3">
+      <div class="card left-nav">
+        <div class="card-header bg-white fw-bold">Questions</div>
+        <div class="list-group list-group-flush">
+          <a class="list-group-item active" href="#what">What is Kanban Board?</a>
+          <a class="list-group-item" href="#why">Why do we need it?</a>
+          <a class="list-group-item" href="#requirements">Requirements</a>
+          <a class="list-group-item" href="#how">How does it work?</a>
+          <a class="list-group-item" href="#state">How should state be designed?</a>
+          <a class="list-group-item" href="#flow">Execution Flow</a>
+          <a class="list-group-item" href="#visual">Visual Explanation</a>
+          <a class="list-group-item" href="#draglogic">Drag-and-Drop Logic</a>
+          <a class="list-group-item" href="#fullcode">Full Code</a>
+          <a class="list-group-item" href="#one">Explain in 1 Minute</a>
+          <a class="list-group-item" href="#five">Explain in 5 Minutes</a>
+          <a class="list-group-item" href="#mistakes">Common Developer Mistakes</a>
+          <a class="list-group-item" href="#edge">Edge Cases</a>
+          <a class="list-group-item" href="#interviewer">How I Implemented It</a>
+          <a class="list-group-item" href="#followups">Interviewer Follow-ups</a>
+          <a class="list-group-item" href="#recap">Quick Recap</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT SIDE -->
+    <section class="col-lg-9">
+
+      <div id="what" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">What?</div>
+          <h2 class="section-title">What is a Kanban Board?</h2>
+          <p>A <strong>Kanban Board</strong> is a visual task-management system where work items are represented as cards and organized into columns based on their current status.</p>
+
+          <div class="kanban-demo my-4">
+            <div class="board-column">
+              <h6>To Do <span class="column-count">2</span></h6>
+              <div class="task-card"><strong>Login page</strong><br><small>Build authentication UI</small></div>
+              <div class="task-card"><strong>API integration</strong><br><small>Connect user endpoint</small></div>
+            </div>
+            <div class="board-column">
+              <h6>In Progress <span class="column-count">1</span></h6>
+              <div class="task-card"><strong>Dashboard</strong><br><small>Implement charts</small></div>
+            </div>
+            <div class="board-column">
+              <h6>Done <span class="column-count">1</span></h6>
+              <div class="task-card"><strong>Navbar</strong><br><small>Responsive navigation</small></div>
+            </div>
+          </div>
+
+          <div class="tip">
+            <strong>Interview definition:</strong>
+            “A Kanban Board is a visual workflow component where tasks are represented as cards and grouped by status. In React, I model the board as state and update that state when tasks are added, deleted, edited, or moved between columns.”
+          </div>
+        </div>
+      </div>
+
+      <div id="why" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Why?</div>
+          <h2 class="section-title">What problem does it solve?</h2>
+          <div class="row g-3">
+            <div class="col-md-6"><div class="flow-box"><h5>Visual workflow</h5><p class="mb-0">Users can immediately see what is pending, in progress, or completed.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Task organization</h5><p class="mb-0">Tasks are grouped into meaningful workflow stages instead of one long list.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Easy status changes</h5><p class="mb-0">Drag-and-drop lets users move work from one stage to another quickly.</p></div></div>
+            <div class="col-md-6"><div class="flow-box"><h5>Team collaboration</h5><p class="mb-0">Kanban is commonly used to visualize development and operational workflows.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="requirements" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Requirements</div>
+          <h2 class="section-title">What should I implement?</h2>
+          <ol>
+            <li>Create columns such as To Do, In Progress, and Done.</li>
+            <li>Render task cards inside each column.</li>
+            <li>Add a new task.</li>
+            <li>Delete a task.</li>
+            <li>Drag a task from one column to another.</li>
+            <li>Update the task's status after dropping.</li>
+            <li>Keep the state immutable.</li>
+            <li>Handle empty columns.</li>
+            <li>Give every task a stable unique ID.</li>
+            <li>Keep the board reusable and easy to extend.</li>
+          </ol>
+
+          <div class="success-tip">
+            <strong>Machine coding strategy:</strong> Start with static columns → add task state → render cards → add/delete → implement drag-and-drop → update the task's column → handle edge cases and UX.
+          </div>
+        </div>
+      </div>
+
+      <div id="how" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">How?</div>
+          <h2 class="section-title">How does it work?</h2>
+
+          <p>A simple and interview-friendly model is to keep a flat array of tasks. Each task contains a <strong>column/status</strong> field.</p>
+
+          <pre><code>const [tasks, setTasks] = useState([
+  {
+    id: 1,
+    title: "Build Login Page",
+    status: "todo"
+  },
+  {
+    id: 2,
+    title: "Create Dashboard",
+    status: "progress"
+  },
+  {
+    id: 3,
+    title: "Setup Navbar",
+    status: "done"
+  }
+]);</code></pre>
+
+          <p>Then filter tasks while rendering each column:</p>
+
+          <pre><code>tasks.filter(
+  task =&gt; task.status === column.id
+)</code></pre>
+
+          <div class="tip">
+            <strong>Key idea:</strong> The task's <code>status</code> determines which column displays it. Moving a card is therefore mainly a state update: change its status from one column ID to another.
+          </div>
+        </div>
+      </div>
+
+      <div id="state" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">State Design</div>
+          <h2 class="section-title">How should the state be designed?</h2>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr><th>Data</th><th>Example</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Columns</td>
+                  <td><code>todo, progress, done</code></td>
+                  <td>Defines the workflow stages.</td>
+                </tr>
+                <tr>
+                  <td>Task ID</td>
+                  <td><code>101</code></td>
+                  <td>Uniquely identifies a task.</td>
+                </tr>
+                <tr>
+                  <td>Task title</td>
+                  <td><code>"Fix login bug"</code></td>
+                  <td>Displays the task content.</td>
+                </tr>
+                <tr>
+                  <td>Task status</td>
+                  <td><code>"progress"</code></td>
+                  <td>Determines which column renders the task.</td>
+                </tr>
+                <tr>
+                  <td>Dragging ID</td>
+                  <td><code>draggedTaskId</code></td>
+                  <td>Tracks which task is currently being moved.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="warning-tip">
+            <strong>Interview tip:</strong> For a basic machine-coding round, a flat task array is easier to reason about than deeply nested state. It also makes moving a task between columns straightforward.
+          </div>
+        </div>
+      </div>
+
+      <div id="flow" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Execution Flow</div>
+          <h2 class="section-title">Step-by-step execution</h2>
+
+          <div class="row g-2 align-items-stretch">
+            <div class="col-md"><div class="flow-box"><strong>1</strong><br>Render columns</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>2</strong><br>Filter tasks by status</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>3</strong><br>Render task cards</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>4</strong><br>User drags card</div></div>
+          </div>
+
+          <div class="row g-2 align-items-stretch mt-3">
+            <div class="col-md"><div class="flow-box"><strong>5</strong><br>Drop on column</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>6</strong><br>Find task by ID</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>7</strong><br>Update status</div></div>
+            <div class="col-md-1 flow-arrow">→</div>
+            <div class="col-md"><div class="flow-box"><strong>8</strong><br>React re-renders</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="visual" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Visual Explanation</div>
+          <h2 class="section-title">How moving a task works</h2>
+
+          <pre><code>Before:
+
+TODO
+ ┌─────────────────┐
+ │ Fix Login       │ ← task id = 1
+ └─────────────────┘
+
+IN PROGRESS
+ ┌─────────────────┐
+ │ Dashboard       │
+ └─────────────────┘
+
+
+User drags task id 1
+        ↓
+onDragStart(1)
+        ↓
+draggedTaskId = 1
+        ↓
+User drops on "progress"
+        ↓
+onDrop("progress")
+        ↓
+Find task where task.id === 1
+        ↓
+Update:
+
+{
+  ...task,
+  status: "progress"
+}
+        ↓
+React re-renders
+
+
+After:
+
+TODO
+ ┌─────────────────┐
+ │                 │
+ └─────────────────┘
+
+IN PROGRESS
+ ┌─────────────────┐
+ │ Dashboard       │
+ ├─────────────────┤
+ │ Fix Login       │ ← moved
+ └─────────────────┘</code></pre>
+        </div>
+      </div>
+
+      <div id="draglogic" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Drag & Drop</div>
+          <h2 class="section-title">Drag-and-Drop Logic</h2>
+
+          <p>The native HTML5 Drag and Drop API is enough for a basic machine coding round.</p>
+
+          <pre><code>// Task card
+onDragStart={() =&gt; {
+  setDraggedTaskId(task.id);
+}}
+
+
+// Column
+onDragOver={(event) =&gt; {
+  event.preventDefault();
+}}
+
+
+// Column
+onDrop={() =&gt; {
+  moveTask(draggedTaskId, column.id);
+}}</code></pre>
+
+          <p>The actual state update:</p>
+
+          <pre><code>const moveTask = (taskId, newStatus) =&gt; {
+  setTasks(prevTasks =&gt;
+    prevTasks.map(task =&gt;
+      task.id === taskId
+        ? { ...task, status: newStatus }
+        : task
+    )
+  );
+};</code></pre>
+
+          <div class="tip">
+            <strong>Why <code>event.preventDefault()</code>?</strong> The browser's default drag-over behavior can prevent the drop event from working. Calling <code>preventDefault()</code> on <code>onDragOver</code> allows the target column to accept the drop.
+          </div>
+        </div>
+      </div>
+
+      <div id="fullcode" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Full Code</div>
+          <h2 class="section-title">React Kanban Board — Interview Version</h2>
+          <p>This implementation covers columns, add task, delete task, drag-and-drop, status changes, and empty-column handling.</p>
+
+          <pre><code>import { useState } from "react";
+
+const initialColumns = [
+  { id: "todo", title: "To Do" },
+  { id: "progress", title: "In Progress" },
+  { id: "done", title: "Done" }
+];
+
+const initialTasks = [
+  {
+    id: 1,
+    title: "Build Login Page",
+    status: "todo"
+  },
+  {
+    id: 2,
+    title: "Create Dashboard",
+    status: "progress"
+  },
+  {
+    id: 3,
+    title: "Setup Navbar",
+    status: "done"
+  }
+];
+
+function KanbanBoard() {
+  const [columns] = useState(initialColumns);
+  const [tasks, setTasks] = useState(initialTasks);
+  const [newTask, setNewTask] = useState("");
+  const [draggedTaskId, setDraggedTaskId] = useState(null);
+
+  const addTask = () =&gt; {
+    const title = newTask.trim();
+
+    if (!title) return;
+
+    const task = {
+      id: Date.now(),
+      title,
+      status: "todo"
+    };
+
+    setTasks(prevTasks =&gt; [
+      ...prevTasks,
+      task
+    ]);
+
+    setNewTask("");
+  };
+
+  const deleteTask = (taskId) =&gt; {
+    setTasks(prevTasks =&gt;
+      prevTasks.filter(
+        task =&gt; task.id !== taskId
+      )
+    );
+  };
+
+  const moveTask = (taskId, newStatus) =&gt; {
+    setTasks(prevTasks =&gt;
+      prevTasks.map(task =&gt;
+        task.id === taskId
+          ? {
+              ...task,
+              status: newStatus
+            }
+          : task
+      )
+    );
+
+    setDraggedTaskId(null);
+  };
+
+  const handleDragStart = (
+    event,
+    taskId
+  ) =&gt; {
+    setDraggedTaskId(taskId);
+
+    // Optional: useful for native drag APIs.
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData(
+      "text/plain",
+      String(taskId)
+    );
+  };
+
+  const handleDrop = (
+    event,
+    columnId
+  ) =&gt; {
+    event.preventDefault();
+
+    const taskId =
+      draggedTaskId ??
+      Number(
+        event.dataTransfer.getData("text/plain")
+      );
+
+    if (!taskId) return;
+
+    moveTask(taskId, columnId);
+  };
+
+  return (
+    &lt;div className="kanban"&gt;
+
+      &lt;div className="add-task"&gt;
+        &lt;input
+          value={newTask}
+          placeholder="Enter task"
+          onChange={event =&gt;
+            setNewTask(event.target.value)
+          }
+          onKeyDown={event =&gt; {
+            if (event.key === "Enter") {
+              addTask();
+            }
+          }}
+        /&gt;
+
+        &lt;button onClick={addTask}&gt;
+          Add Task
+        &lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;div className="board"&gt;
+        {columns.map(column =&gt; {
+          const columnTasks = tasks.filter(
+            task =&gt; task.status === column.id
+          );
+
+          return (
+            &lt;section
+              key={column.id}
+              className="column"
+              onDragOver={event =&gt;
+                event.preventDefault()
+              }
+              onDrop={event =&gt;
+                handleDrop(event, column.id)
+              }
+            &gt;
+
+              &lt;h2&gt;
+                {column.title}
+                &lt;span&gt;
+                  {columnTasks.length}
+                &lt;/span&gt;
+              &lt;/h2&gt;
+
+              {columnTasks.length === 0 &amp;&amp; (
+                &lt;p className="empty"&gt;
+                  Drop tasks here
+                &lt;/p&gt;
+              )}
+
+              {columnTasks.map(task =&gt; (
+                &lt;article
+                  key={task.id}
+                  draggable
+                  className="task-card"
+                  onDragStart={event =&gt;
+                    handleDragStart(
+                      event,
+                      task.id
+                    )
+                  }
+                &gt;
+                  &lt;div&gt;
+                    &lt;strong&gt;
+                      {task.title}
+                    &lt;/strong&gt;
+                  &lt;/div&gt;
+
+                  &lt;button
+                    onClick={() =&gt;
+                      deleteTask(task.id)
+                    }
+                    aria-label={`Delete ${task.title}`}
+                  &gt;
+                    Delete
+                  &lt;/button&gt;
+                &lt;/article&gt;
+              ))}
+            &lt;/section&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default KanbanBoard;</code></pre>
+
+          <h5 class="mt-4">Basic CSS</h5>
+          <pre><code>.kanban {
+  padding: 20px;
+}
+
+.add-task {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-task input {
+  flex: 1;
+  padding: 10px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.column {
+  background: #f1f3f5;
+  padding: 14px;
+  border-radius: 12px;
+  min-height: 400px;
+}
+
+.column h2 {
+  display: flex;
+  justify-content: space-between;
+}
+
+.column h2 span {
+  font-size: 14px;
+  background: #dee2e6;
+  border-radius: 20px;
+  padding: 4px 9px;
+}
+
+.task-card {
+  background: white;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 9px;
+  cursor: grab;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.08);
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+.task-card button {
+  margin-top: 10px;
+}
+
+.empty {
+  color: #6c757d;
+  text-align: center;
+  padding: 30px 10px;
+}</code></pre>
+        </div>
+      </div>
+
+      <div id="one" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 1 minute</h2>
+
+          <div class="success-tip">
+            “I implemented the Kanban Board using React state. I keep the tasks in a flat array, and each task has an ID, title, and status. The status determines which column displays that task. I render the columns dynamically and filter the task array by the column ID. For drag-and-drop, I store the dragged task ID when dragging starts, allow the column to receive the drop using <code>preventDefault</code>, and then update that task's status immutably when it is dropped. I also added task creation and deletion. This approach keeps the state simple because moving a task only requires changing one property.”
+          </div>
+        </div>
+      </div>
+
+      <div id="five" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Answer</div>
+          <h2 class="section-title">How to explain in 5 minutes</h2>
+
+          <ol>
+            <li><strong>Requirement:</strong> “The board has multiple workflow columns and draggable task cards.”</li>
+            <li><strong>Data model:</strong> “Each task has a stable ID, title, and status. Status points to a column ID.”</li>
+            <li><strong>Rendering:</strong> “I map through the columns and filter tasks whose status matches that column.”</li>
+            <li><strong>Add:</strong> “I validate the title, create a task with a unique ID and default status of To Do, then append it to state.”</li>
+            <li><strong>Delete:</strong> “I use filter to create a new array without the selected task.”</li>
+            <li><strong>Drag:</strong> “When dragging starts, I store the task ID and mark the drag operation as move.”</li>
+            <li><strong>Drop:</strong> “The target column calls preventDefault during drag-over and then receives the task on drop.”</li>
+            <li><strong>Move:</strong> “I use map to create a new task object with the updated status while leaving all other tasks unchanged.”</li>
+            <li><strong>Immutability:</strong> “I never mutate the existing task array directly because React state updates should produce new references.”</li>
+            <li><strong>Empty state:</strong> “If a column has no tasks, I show a drop area message so the user knows where a task can be moved.”</li>
+            <li><strong>Scalability:</strong> “For a larger application, I could persist the board through an API, add optimistic updates, permissions, ordering, and a drag-and-drop library if the interaction becomes more advanced.”</li>
+          </ol>
+
+          <div class="tip">
+            <strong>Strong closing line:</strong>
+            “The main design decision is representing the task's workflow position as data. The UI is derived from that status, so moving a card becomes a predictable state transformation instead of manually moving DOM elements.”
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakes" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Debugging</div>
+          <h2 class="section-title">Common Developer Mistakes</h2>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Mistake</th>
+                  <th>Why it is a problem</th>
+                  <th>Better approach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mutating the task array directly</td>
+                  <td>Can prevent predictable React updates.</td>
+                  <td>Use <code>map</code>, <code>filter</code>, and spread to create new references.</td>
+                </tr>
+                <tr>
+                  <td>Using array index as task key</td>
+                  <td>Can cause incorrect DOM reconciliation when tasks move/delete.</td>
+                  <td>Use a stable task ID.</td>
+                </tr>
+                <tr>
+                  <td>Storing duplicate task state per column</td>
+                  <td>Moving tasks requires updating multiple arrays and can cause synchronization bugs.</td>
+                  <td>Use one task list with a status/column ID.</td>
+                </tr>
+                <tr>
+                  <td>Forgetting <code>preventDefault()</code> on dragover</td>
+                  <td>The drop event may not fire correctly.</td>
+                  <td>Call <code>event.preventDefault()</code> in the drop target's dragover handler.</td>
+                </tr>
+                <tr>
+                  <td>Not tracking the dragged task ID</td>
+                  <td>The drop target does not know which task to move.</td>
+                  <td>Store the dragged task ID in state or use dataTransfer.</td>
+                </tr>
+                <tr>
+                  <td>Updating the DOM manually</td>
+                  <td>Creates UI/state synchronization problems in React.</td>
+                  <td>Update state and let React render the board.</td>
+                </tr>
+                <tr>
+                  <td>No empty-column state</td>
+                  <td>Users may not understand where to drop a task.</td>
+                  <td>Render a visible drop area or empty message.</td>
+                </tr>
+                <tr>
+                  <td>Generating unstable IDs</td>
+                  <td>React keys can change unexpectedly.</td>
+                  <td>Use a stable backend ID or a proper ID generator in production.</td>
+                </tr>
+                <tr>
+                  <td>Ignoring mobile interaction</td>
+                  <td>Native HTML5 drag-and-drop support is not equally convenient across touch devices.</td>
+                  <td>Use a touch-friendly interaction or a suitable drag-and-drop library when required.</td>
+                </tr>
+                <tr>
+                  <td>Implementing drag-and-drop before basic CRUD</td>
+                  <td>Increases debugging complexity during the round.</td>
+                  <td>Build the smallest working board first, then add drag-and-drop.</td>
+                </tr>
+                <tr>
+                  <td>Not considering task order</td>
+                  <td>Moving between columns works, but reordering within a column may not.</td>
+                  <td>Store an order/index or use a drag-and-drop library for advanced ordering.</td>
+                </tr>
+                <tr>
+                  <td>Mixing API calls into every card</td>
+                  <td>Creates tightly coupled components.</td>
+                  <td>Keep board state logic separate from persistence logic.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="danger-tip mt-3">
+            <strong>Most common interview bug:</strong> Trying to “move the DOM element” instead of updating React state. In React, the data/state should change first; the UI should be derived from that state.
+          </div>
+        </div>
+      </div>
+
+      <div id="edge" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Testing</div>
+          <h2 class="section-title">Edge Cases & Test Cases</h2>
+          <ul>
+            <li>Add a task with an empty title.</li>
+            <li>Add multiple tasks quickly.</li>
+            <li>Delete the first, middle, and last task.</li>
+            <li>Drag a task from To Do to In Progress.</li>
+            <li>Drag a task from In Progress to Done.</li>
+            <li>Drag a task back to an earlier column.</li>
+            <li>Drop a task into an empty column.</li>
+            <li>Drop the task into the same column.</li>
+            <li>Move several tasks quickly.</li>
+            <li>Verify the task ID remains unchanged after moving.</li>
+            <li>Verify other tasks are not modified when one task moves.</li>
+            <li>Check responsive behavior on small screens.</li>
+            <li>Test keyboard accessibility for non-drag actions such as delete/add.</li>
+            <li>Consider touch-device behavior if drag-and-drop is required on mobile.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="interviewer" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Implementation Explanation</div>
+          <h2 class="section-title">How I implemented it — interviewer flow</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>1. I defined columns</h5>
+                <p>“I created column objects with stable IDs such as todo, progress, and done.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>2. I defined task state</h5>
+                <p>“Every task has an ID, title, and status. Status maps directly to a column.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>3. I rendered dynamically</h5>
+                <p>“I map columns and filter tasks by status, so I don't duplicate rendering logic.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>4. I added CRUD</h5>
+                <p>“I added a task with an immutable array update and delete using filter.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>5. I added drag-and-drop</h5>
+                <p>“I capture the dragged task ID and update its status when it is dropped on a column.”</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="flow-box">
+                <h5>6. I handled edge cases</h5>
+                <p>“I handle empty tasks, empty columns, invalid task titles, and responsive layout.”</p>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why keep a flat task array?”</h5>
+          <div class="success-tip">
+            “Because the workflow position is just a property of the task. A single source of truth makes moving, deleting, filtering, and updating tasks simpler and avoids synchronizing multiple column arrays.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “Why use map for moving a task?”</h5>
+          <div class="success-tip">
+            “Map lets me create a new array while changing only the matching task. The other task objects are preserved, which keeps the state update immutable and predictable.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “How would you persist it?”</h5>
+          <div class="success-tip">
+            “After changing the task status, I would send the task ID and new status to the backend. For a better UX, I could update the UI optimistically and roll back if the API request fails.”
+          </div>
+
+          <h5 class="mt-4">If the interviewer asks: “How would you support reordering?”</h5>
+          <div class="success-tip">
+            “I would add an <code>order</code> property or use the source and destination indexes from a drag-and-drop library, then update the task order immutably.”
+          </div>
+        </div>
+      </div>
+
+      <div id="followups" class="card">
+        <div class="card-body p-4">
+          <div class="small-label">Interview Follow-ups</div>
+          <h2 class="section-title">Possible interviewer questions</h2>
+
+          <div class="accordion" id="followupAccordion">
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
+                  Native HTML5 drag-and-drop or a library?
+                </button>
+              </h2>
+              <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  For a simple machine-coding task, native HTML5 drag-and-drop can be enough. For production-level touch support, keyboard interactions, reordering, collision detection, and better UX, a dedicated drag-and-drop library can be preferable.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
+                  How would you add task editing?
+                </button>
+              </h2>
+              <div id="q2" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Store the editing task ID and draft title, then use <code>map</code> to replace only the matching task after Save.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
+                  How would you add priority?
+                </button>
+              </h2>
+              <div id="q3" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  Add a <code>priority</code> field such as low, medium, or high. Then use conditional styling or filtering to display it.
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
+                  How would you persist board data after refresh?
+                </button>
+              </h2>
+              <div id="q4" class="accordion-collapse collapse" data-bs-parent="#followupAccordion">
+                <div class="accordion-body">
+                  For a small local demo, use localStorage. In a real application, persist tasks through a backend API/database and fetch them when the board loads.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="recap" class="card mb-5">
+        <div class="card-body p-4">
+          <div class="small-label">Quick Recap</div>
+          <h2 class="section-title">Remember these 8 points</h2>
+
+          <div class="row g-2">
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">1. Columns → workflow</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">2. Tasks → data</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">3. Status → column</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">4. ID → identity</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">5. map → update</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">6. filter → delete</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">7. drag/drop → move</span></div>
+            <div class="col-md-3"><span class="badge badge-soft p-2 w-100">8. immutable state → React</span></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="bg-dark text-white-50 py-4">
+  <div class="container text-center small">
+    React Machine Coding Round • Kanban Board • Practice explaining the state model before coding.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('.left-nav .list-group-item').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.left-nav .list-group-item')
+        .forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

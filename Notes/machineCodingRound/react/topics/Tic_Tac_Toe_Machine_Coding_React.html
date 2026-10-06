@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tic-Tac-Toe - React Machine Coding Round</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body{background:#f5f7fb;color:#212529}.topbar{position:sticky;top:0;z-index:1030}
+.hero{background:linear-gradient(135deg,#111827,#343a40);color:#fff;padding:48px 0}
+.hero h1{font-weight:800}.layout{display:grid;grid-template-columns:270px 1fr;gap:28px}
+.sidebar{position:sticky;top:78px;height:calc(100vh - 95px);overflow-y:auto}
+.sidebar .nav-link{color:#495057;border-radius:8px;padding:9px 12px;margin-bottom:3px}
+.sidebar .nav-link:hover,.sidebar .nav-link.active{background:#212529;color:#fff}
+.card{border:0;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:24px}
+.card-header{background:#fff;border-bottom:1px solid #edf0f3;font-weight:700;padding:16px 20px}
+.tip,.success-tip,.danger-tip,.warning-tip{padding:15px 18px;border-radius:10px;margin:15px 0}
+.tip{background:#e9f5ff;border-left:5px solid #0d6efd}.success-tip{background:#eaf8ef;border-left:5px solid #198754}
+.danger-tip{background:#fff0f0;border-left:5px solid #dc3545}.warning-tip{background:#fff8e6;border-left:5px solid #ffc107}
+pre{background:#111827;color:#e5e7eb;padding:20px;border-radius:10px;overflow-x:auto;font-size:.9rem}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.flow-box{background:#fff;border:1px solid #dee2e6;border-radius:10px;padding:13px 16px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.arrow{font-size:1.4rem;color:#6c757d}.board-demo{max-width:320px;margin:20px auto;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#212529;padding:5px;border-radius:10px}
+.cell{aspect-ratio:1;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2.3rem;font-weight:800}.cell.x{color:#0d6efd}.cell.o{color:#dc3545}
+.recap-item{padding:10px 0;border-bottom:1px solid #eee}.recap-item:last-child{border-bottom:0}
+@media(max-width:991px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:0;height:auto}}
+</style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark topbar shadow-sm"><div class="container">
+<span class="navbar-brand fw-bold"><i class="bi bi-grid-3x3"></i> React Machine Coding</span>
+<span class="text-white-50">Tic-Tac-Toe</span></div></nav>
+
+<section class="hero"><div class="container">
+<span class="badge bg-primary mb-3">Machine Coding Round</span>
+<h1>Tic-Tac-Toe</h1>
+<p class="lead mb-0">Build a two-player Tic-Tac-Toe game using React state, event handling, winner detection, draw detection, and reset functionality.</p>
+</div></section>
+
+<div class="container py-4"><div class="layout">
+<aside class="sidebar"><div class="card p-3"><h6 class="text-uppercase text-muted fw-bold mb-3">Questions</h6><nav id="sideNav">
+<a class="nav-link active" href="#what">What is Tic-Tac-Toe?</a>
+<a class="nav-link" href="#why">Why / Problem Solved</a>
+<a class="nav-link" href="#requirements">Requirements</a>
+<a class="nav-link" href="#state">State Design</a>
+<a class="nav-link" href="#logic">How Does It Work?</a>
+<a class="nav-link" href="#flow">Execution Flow</a>
+<a class="nav-link" href="#visual">Visual Explanation</a>
+<a class="nav-link" href="#fullcode">Full Code</a>
+<a class="nav-link" href="#one">1-Minute Explanation</a>
+<a class="nav-link" href="#five">5-Minute Explanation</a>
+<a class="nav-link" href="#mistakes">Common Developer Mistakes</a>
+<a class="nav-link" href="#edge">Edge Cases</a>
+<a class="nav-link" href="#interviewer">How I Implemented It</a>
+<a class="nav-link" href="#followups">Interviewer Follow-ups</a>
+<a class="nav-link" href="#recap">Quick Recap</a>
+</nav></div></aside>
+
+<main>
+<section id="what" class="card"><div class="card-header">1. What is Tic-Tac-Toe?</div><div class="card-body">
+<p><strong>Tic-Tac-Toe</strong> is a two-player game played on a <strong>3 × 3 grid</strong>. One player uses <strong>X</strong> and the other uses <strong>O</strong>. Players take turns selecting empty cells. The first player to get three matching symbols horizontally, vertically, or diagonally wins.</p>
+<div class="board-demo">
+<div class="cell x">X</div><div class="cell o">O</div><div class="cell x">X</div>
+<div class="cell">O</div><div class="cell x">X</div><div class="cell">O</div>
+<div class="cell x">X</div><div class="cell">O</div><div class="cell x">X</div>
+</div>
+<div class="tip"><strong>Interview definition:</strong> “Tic-Tac-Toe is a turn-based 3×3 board game where two players alternately place X and O, and the first player to complete a winning combination wins.”</div>
+</div></section>
+
+<section id="why" class="card"><div class="card-header">2. Why Build It? What Problem Does It Solve?</div><div class="card-body">
+<p>This task tests practical React skills:</p><ul>
+<li>Managing state with <code>useState</code></li><li>Handling click events</li><li>Rendering dynamic UI with arrays</li><li>Immutable array updates</li><li>Derived state and conditional rendering</li><li>Separating game logic from UI</li><li>Handling reset and game-over states</li></ul>
+<div class="success-tip"><strong>Machine coding insight:</strong> The interviewer is checking whether you can convert requirements into clean state, event handlers, reusable logic, and predictable UI updates.</div>
+</div></section>
+
+<section id="requirements" class="card"><div class="card-header">3. Requirements</div><div class="card-body"><ol>
+<li>Display a 3 × 3 board.</li><li>Start with X.</li><li>Click an empty cell to place the current symbol.</li><li>Alternate X and O turns.</li><li>Do not overwrite an occupied cell.</li><li>Detect row, column, and diagonal wins.</li><li>Detect a draw when all cells are filled without a winner.</li><li>Display winner or draw.</li><li>Stop moves after the game ends.</li><li>Provide a New Game / Reset button.</li></ol></div></section>
+
+<section id="state" class="card"><div class="card-header">4. State Design — Most Important Part</div><div class="card-body">
+<p>Keep the state simple: the board and the current player.</p>
+<pre><code>const [board, setBoard] = useState(Array(9).fill(null));
+const [isXNext, setIsXNext] = useState(true);</code></pre>
+<p>A 3 × 3 board contains 9 cells:</p>
+<pre><code>[
+  null, null, null,
+  null, null, null,
+  null, null, null
+]
+
+Indexes:
+  0 | 1 | 2
+  ---------
+  3 | 4 | 5
+  ---------
+  6 | 7 | 8</code></pre>
+<p>There are 8 possible winning lines: 3 rows + 3 columns + 2 diagonals.</p>
+<pre><code>const winningPatterns = [
+  [0,1,2], [3,4,5], [6,7,8],
+  [0,3,6], [1,4,7], [2,5,8],
+  [0,4,8], [2,4,6]
+];</code></pre>
+<div class="tip"><strong>Memory trick:</strong> 8 winning lines = 3 rows + 3 columns + 2 diagonals.</div>
+</div></section>
+
+<section id="logic" class="card"><div class="card-header">5. How Does the Game Logic Work?</div><div class="card-body">
+<h5>Step 1 — Click</h5><pre><code>handleClick(index)</code></pre>
+<h5>Step 2 — Validate</h5><pre><code>if (board[index] || winner) return;</code></pre>
+<p>This prevents overwriting and prevents moves after the game ends.</p>
+<h5>Step 3 — Copy and update</h5><pre><code>const newBoard = [...board];
+newBoard[index] = currentPlayer;</code></pre>
+<h5>Step 4 — Check winner</h5><pre><code>for (const [a,b,c] of winningPatterns) {
+  if (newBoard[a] &&
+      newBoard[a] === newBoard[b] &&
+      newBoard[a] === newBoard[c]) {
+    return newBoard[a];
+  }
+}</code></pre>
+<h5>Step 5 — Switch player</h5><pre><code>setIsXNext(!isXNext);</code></pre>
+<div class="warning-tip"><strong>Important:</strong> Check the winner using <code>newBoard</code>, not the old <code>board</code>, because the latest move exists only in the new board.</div>
+</div></section>
+
+<section id="flow" class="card"><div class="card-header">6. Execution Flow</div><div class="card-body">
+<div class="flow"><div class="flow-box">Initial board</div><span class="arrow">→</span><div class="flow-box">X clicks</div><span class="arrow">→</span><div class="flow-box">Update board</div><span class="arrow">→</span><div class="flow-box">Check winner</div><span class="arrow">→</span><div class="flow-box">Switch to O</div></div>
+<hr>
+<div class="flow"><div class="flow-box">O clicks</div><span class="arrow">→</span><div class="flow-box">Update board</div><span class="arrow">→</span><div class="flow-box">Check winner</div><span class="arrow">→</span><div class="flow-box">Switch to X</div></div>
+<hr>
+<div class="flow"><div class="flow-box">Winner?</div><span class="arrow">→</span><div class="flow-box">Show winner</div><span class="arrow">→</span><div class="flow-box">Block moves</div></div>
+<hr>
+<div class="flow"><div class="flow-box">No winner + board full?</div><span class="arrow">→</span><div class="flow-box">Show Draw</div></div>
+</div></section>
+
+<section id="visual" class="card"><div class="card-header">7. Visual Explanation — Simple Example</div><div class="card-body">
+<h6>Initial</h6><pre><code>board = [null, null, null,
+         null, null, null,
+         null, null, null]
+
+isXNext = true
+Current player = X</code></pre>
+<h6>X clicks index 0</h6><pre><code>X |   |
+---------
+  |   |
+---------
+  |   |</code></pre>
+<pre><code>board = ['X', null, null,
+         null, null, null,
+         null, null, null]
+
+isXNext = false
+Current player = O</code></pre>
+<h6>O clicks index 4</h6><pre><code>X |   |
+---------
+  | O |
+---------
+  |   |</code></pre>
+<h6>Winning example</h6><pre><code>X | X | X
+---------
+O | O |
+---------
+  |   |</code></pre>
+<div class="success-tip">Winner check finds <code>[0,1,2]</code>, so X wins and further moves are blocked.</div>
+</div></section>
+
+<section id="fullcode" class="card"><div class="card-header">8. Full React Code</div><div class="card-body">
+<p><strong>App.jsx</strong></p>
+<pre><code>import { useState } from "react";
+import "./App.css";
+
+const winningPatterns = [
+  [0,1,2], [3,4,5], [6,7,8],
+  [0,3,6], [1,4,7], [2,5,8],
+  [0,4,8], [2,4,6]
+];
+
+function calculateWinner(board) {
+  for (const [a,b,c] of winningPatterns) {
+    if (
+      board[a] &&
+      board[a] === board[b] &&
+      board[a] === board[c]
+    ) {
+      return board[a];
+    }
+  }
+  return null;
+}
+
+function App() {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true);
+
+  const winner = calculateWinner(board);
+  const isDraw = !winner && board.every(Boolean);
+  const currentPlayer = isXNext ? "X" : "O";
+
+  function handleClick(index) {
+    if (board[index] || winner) return;
+
+    const newBoard = [...board];
+    newBoard[index] = currentPlayer;
+
+    setBoard(newBoard);
+
+    // Do not switch after a winning move.
+    if (!calculateWinner(newBoard)) {
+      setIsXNext(!isXNext);
+    }
+  }
+
+  function resetGame() {
+    setBoard(Array(9).fill(null));
+    setIsXNext(true);
+  }
+
+  function getStatus() {
+    if (winner) return \`Winner: \${winner}\`;
+    if (isDraw) return "Game Draw!";
+    return \`Next Player: \${currentPlayer}\`;
+  }
+
+  return (
+    &lt;div className="game"&gt;
+      &lt;h1&gt;Tic-Tac-Toe&lt;/h1&gt;
+      &lt;h2&gt;{getStatus()}&lt;/h2&gt;
+
+      &lt;div className="board"&gt;
+        {board.map((value, index) =&gt; (
+          &lt;button
+            key={index}
+            className="cell"
+            onClick={() =&gt; handleClick(index)}
+            disabled={Boolean(value) || Boolean(winner)}
+            aria-label={\`Cell \${index + 1}\`}
+          &gt;
+            {value}
+          &lt;/button&gt;
+        ))}
+      &lt;/div&gt;
+
+      &lt;button className="reset" onClick={resetGame}&gt;
+        New Game
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+
+<p><strong>App.css</strong></p>
+<pre><code>.game {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  gap: 5px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: white;
+  border: 2px solid #222;
+  cursor: pointer;
+}
+
+.cell:disabled {
+  cursor: not-allowed;
+}
+
+.reset {
+  padding: 10px 20px;
+}</code></pre>
+<div class="tip"><strong>Architecture:</strong> <code>calculateWinner()</code> is a pure helper function; the component manages state and UI.</div>
+</div></section>
+
+<section id="one" class="card"><div class="card-header">9. How to Explain in 1 Minute</div><div class="card-body">
+<div class="success-tip">
+“I implemented Tic-Tac-Toe as a React functional component using <strong>useState</strong>. I represent the 3×3 board as an array of 9 values where each value can be X, O, or null. I also maintain a boolean to track whose turn it is.<br><br>
+On every cell click, I first check that the cell is empty and that the game has not finished. Then I create a copy of the board, place the current player's symbol, and check the eight possible winning combinations. If there is a winner, I display the winner and stop accepting moves. If all cells are filled without a winner, I display a draw. Otherwise, I switch to the other player. Finally, I provide a reset button to start a new game.”
+</div></div></section>
+
+<section id="five" class="card"><div class="card-header">10. How to Explain in 5 Minutes</div><div class="card-body">
+<h5>1. Requirements</h5><p>“I identified nine cells, two players, alternating turns, winner detection, draw detection, and reset.”</p>
+<h5>2. State</h5><p>“I use an array of length 9 for the board and <code>isXNext</code> for the current player.”</p>
+<h5>3. Rendering</h5><p>“I use <code>board.map()</code> to render the nine cells dynamically instead of writing them manually.”</p>
+<h5>4. Click handling</h5><p>“I validate that the cell is empty and that the game is not over. Then I copy the board, update the clicked index, and save it.”</p>
+<h5>5. Winner logic</h5><p>“There are eight winning combinations. I loop over them and check whether the three positions contain the same non-null value.”</p>
+<h5>6. Draw</h5><p>“If there is no winner and every cell contains a value, the result is a draw.”</p>
+<h5>7. React principles</h5><p>“I don't mutate the existing board. I create a new array and update state so React can detect the change.”</p>
+<h5>8. Reset</h5><p>“Reset restores nine null values and makes X the first player.”</p>
+</div></section>
+
+<section id="mistakes" class="card"><div class="card-header">11. Common Developer Mistakes</div><div class="card-body">
+<div class="danger-tip"><strong>1. Mutating state directly</strong><pre><code>board[index] = "X"; // ❌
+setBoard(board);</code></pre><pre><code>const newBoard = [...board];
+newBoard[index] = "X";
+setBoard(newBoard); // ✅</code></pre></div>
+<div class="danger-tip"><strong>2. Not blocking occupied cells</strong><p>Without <code>if (board[index]) return</code>, players can overwrite moves.</p></div>
+<div class="danger-tip"><strong>3. Checking the old board</strong><p>The latest move is in <code>newBoard</code>, so winner detection must use the updated board.</p></div>
+<div class="danger-tip"><strong>4. Forgetting draw detection</strong><p>Use <code>!winner &amp;&amp; board.every(Boolean)</code>.</p></div>
+<div class="danger-tip"><strong>5. Allowing moves after winning</strong><p>Return early or disable cells when a winner exists.</p></div>
+<div class="danger-tip"><strong>6. Writing eight separate winner conditions</strong><p>Store winning patterns in an array and loop through them.</p></div>
+<div class="danger-tip"><strong>7. Switching turn after game over</strong><p>Do not switch players after a winning move.</p></div>
+<div class="danger-tip"><strong>8. Incorrect indexes</strong><p>Keep the 0–8 mapping clear and consistent.</p></div>
+</div></section>
+
+<section id="edge" class="card"><div class="card-header">12. Edge Cases / Test Cases</div><div class="card-body">
+<table class="table table-bordered align-middle"><thead class="table-dark"><tr><th>Scenario</th><th>Expected Behavior</th></tr></thead><tbody>
+<tr><td>Click empty cell</td><td>Current symbol appears</td></tr>
+<tr><td>Click occupied cell</td><td>Nothing changes</td></tr>
+<tr><td>Row completed</td><td>Correct player wins</td></tr>
+<tr><td>Column completed</td><td>Correct player wins</td></tr>
+<tr><td>Diagonal completed</td><td>Correct player wins</td></tr>
+<tr><td>Board full without winner</td><td>Draw message</td></tr>
+<tr><td>Click after winner</td><td>No additional move</td></tr>
+<tr><td>New Game</td><td>Board clears and X starts</td></tr>
+</tbody></table>
+</div></section>
+
+<section id="interviewer" class="card"><div class="card-header">13. How I Implemented It — Interviewer Flow</div><div class="card-body">
+<div class="flow"><div class="flow-box">1. Requirements</div><span class="arrow">→</span><div class="flow-box">2. State design</div><span class="arrow">→</span><div class="flow-box">3. Render board</div><span class="arrow">→</span><div class="flow-box">4. Handle click</div></div><br>
+<div class="flow"><div class="flow-box">5. Validate move</div><span class="arrow">→</span><div class="flow-box">6. Update board</div><span class="arrow">→</span><div class="flow-box">7. Check winner</div><span class="arrow">→</span><div class="flow-box">8. Check draw</div></div><br>
+<div class="flow"><div class="flow-box">9. Switch turn</div><span class="arrow">→</span><div class="flow-box">10. Stop if finished</div><span class="arrow">→</span><div class="flow-box">11. Reset</div></div>
+<hr>
+<h5>What I would say while coding</h5>
+<p><strong>First:</strong> “I'll start with the data model rather than the UI.”</p>
+<pre><code>board = Array(9).fill(null)</code></pre>
+<p><strong>Second:</strong> “I'll keep the current player separately.”</p>
+<pre><code>isXNext = true</code></pre>
+<p><strong>Third:</strong> “I'll render the board using map instead of nine hard-coded buttons.”</p>
+<p><strong>Fourth:</strong> “Before updating a click, I'll validate that the cell is empty and the game isn't over.”</p>
+<p><strong>Fifth:</strong> “After placing the symbol, I'll check the eight winning combinations.”</p>
+<p><strong>Sixth:</strong> “If there is no winner and all cells are occupied, I'll show a draw.”</p>
+<p><strong>Finally:</strong> “I'll add reset functionality so the user can start a new game.”</p>
+<div class="success-tip">This demonstrates the flow: <strong>requirements → state → UI → event → business logic → edge cases</strong>.</div>
+</div></section>
+
+<section id="followups" class="card"><div class="card-header">14. Interviewer Follow-up Questions</div><div class="card-body">
+<h6>Q1. Why an array of 9 instead of a 2D array?</h6><p>A one-dimensional array is simple to render and makes winning combinations easy to represent using indexes.</p>
+<h6>Q2. Why copy the board?</h6><p>React state should be treated as immutable. A new array makes updates predictable.</p>
+<h6>Q3. How many winning combinations?</h6><p>Eight: 3 rows + 3 columns + 2 diagonals.</p>
+<h6>Q4. Time complexity of winner checking?</h6><p><strong>O(1)</strong> for a fixed 3×3 board because there are only 8 combinations.</p>
+<h6>Q5. How would you support N×N?</h6><p>Generate winning combinations dynamically and evaluate rows, columns, and diagonals based on board size.</p>
+<h6>Q6. How add score tracking?</h6><p>Maintain a separate score object such as <code>{X: 0, O: 0}</code> and increment the winner's score.</p>
+<h6>Q7. How add AI?</h6><p>Use a random available move for basic AI, or Minimax for stronger play.</p>
+<h6>Q8. How make components reusable?</h6><p>Split into <code>Game</code>, <code>Board</code>, and <code>Cell</code>, passing data and handlers through props.</p>
+</div></section>
+
+<section id="recap" class="card"><div class="card-header">15. Quick Recap</div><div class="card-body">
+<div class="recap-item"><strong>Board:</strong> Array of 9 values</div>
+<div class="recap-item"><strong>Players:</strong> X and O</div>
+<div class="recap-item"><strong>Turn:</strong> <code>isXNext</code></div>
+<div class="recap-item"><strong>Rendering:</strong> <code>board.map()</code></div>
+<div class="recap-item"><strong>Update:</strong> Copy → modify → setState</div>
+<div class="recap-item"><strong>Winner:</strong> 8 winning combinations</div>
+<div class="recap-item"><strong>Draw:</strong> No winner + every cell filled</div>
+<div class="recap-item"><strong>Game over:</strong> Block additional moves</div>
+<div class="recap-item"><strong>Reset:</strong> Clear board + X starts</div>
+<div class="tip mt-4"><strong>Remember:</strong><br><code>State → Render → Click → Validate → Update → Winner/Draw → Switch Turn → Reset</code></div>
+</div></section>
+</main></div></div>
+
+<script>
+const links=document.querySelectorAll('#sideNav .nav-link');
+links.forEach(link=>link.addEventListener('click',()=>{links.forEach(x=>x.classList.remove('active'));link.classList.add('active')}));
+const sections=[...document.querySelectorAll('main section')];
+window.addEventListener('scroll',()=>{
+ let current='';
+ sections.forEach(s=>{if(s.getBoundingClientRect().top<=130)current=s.id});
+ links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+current));
+});
+</script>
+</body>
+</html>
