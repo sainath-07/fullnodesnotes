@@ -1,10 +1,11 @@
-Create .html downloadable file for machine coding round topic :
-task name- Responsive Navbar
 
+
+Create .html downloadable file for machine coding round topic :
+task :  Email Client
 
 
 Add Common developer mistakes.
-what is Responsive Navbar
+what is Email Client
 what problem it solves
 how to explain to interviewer, in 1 min , 5 min.
 execution flow/ add visual explanation how it works in simple steps
@@ -16,3 +17,6 @@ questions like what ,why,how , fullcode, commondeveloper mistakes
 
 right side
 selected related answer.
+
+===========
+

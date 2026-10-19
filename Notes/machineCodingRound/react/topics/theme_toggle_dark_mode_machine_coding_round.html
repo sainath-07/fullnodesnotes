@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Coding Round — Theme Toggle / Dark Mode</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--border:#e4e7ec;
+  --accent:#2563eb;--accent-soft:#eff6ff;--code:#101828;--warning:#f79009;--green:#12b76a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#101828;color:#fff;padding:24px 32px;position:sticky;top:0;z-index:5}
+header h1{margin:0 0 6px;font-size:25px}
+header p{margin:0;color:#cfd6e4;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 92px)}
+.left{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:92px;height:calc(100vh - 92px);overflow:auto}
+.left h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px}
+.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:11px 12px;border-radius:9px;margin:3px 0;cursor:pointer;color:#344054;font-size:14px}
+.nav button:hover{background:#f2f4f7}
+.nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:700;border-color:#bfdbfe}
+.right{padding:28px;max-width:1100px;width:100%}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+h2{margin:0 0 12px;font-size:22px}h3{font-size:17px;margin:20px 0 9px}
+p,li{line-height:1.65;font-size:15px}
+.tag{display:inline-block;background:#eef4ff;color:#175cd3;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700;margin:0 4px 6px 0}
+.answer{border-left:4px solid var(--accent);padding:12px 15px;background:#f8fbff;border-radius:0 9px 9px 0}
+pre{background:var(--code);color:#e6edf7;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.55}
+code{font-family:Consolas,Monaco,monospace}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.step{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff;position:relative}
+.step strong{display:block;margin-bottom:5px}.step span{font-size:13px;color:var(--muted)}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-17px;top:35px;color:#98a2b3;font-size:20px;z-index:2}
+.demo{padding:20px;border:1px solid var(--border);border-radius:12px;background:#fafbfc}
+.preview{border-radius:12px;padding:25px;min-height:150px;transition:.25s;background:#fff;color:#172033;border:1px solid #ddd}
+.preview.dark{background:#111827;color:#f9fafb;border-color:#374151}
+.toggle{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.switch{width:58px;height:32px;border-radius:20px;background:#98a2b3;border:0;cursor:pointer;position:relative}
+.switch::after{content:"";width:26px;height:26px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.2s}
+.switch.on{background:#2563eb}.switch.on::after{left:29px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.action{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:9px 13px;cursor:pointer}
+.secondary{background:#eef2f6;color:#344054}
+.mistake{padding:12px 14px;border-left:4px solid var(--warning);background:#fffaeb;margin:9px 0;border-radius:0 8px 8px 0}
+.good{padding:12px 14px;border-left:4px solid var(--green);background:#ecfdf3;margin:9px 0;border-radius:0 8px 8px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.small{color:var(--muted);font-size:13px}
+.checklist li{margin:8px 0}
+@media(max-width:850px){
+.layout{grid-template-columns:1fr}.left{position:relative;top:0;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+.flow{grid-template-columns:1fr 1fr}.step:not(:last-child)::after{display:none}.right{padding:18px}.grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Machine Coding Round — Theme Toggle / Dark Mode</h1>
+<p>Interview preparation guide • What / Why / How / Execution Flow / Full Code / Common Mistakes / Interview Explanation</p>
+</header>
+
+<div class="layout">
+<aside class="left">
+<h2>Questions / Topics</h2>
+<div class="nav">
+<button class="active" data-target="what">What is Theme Toggle / Dark Mode?</button>
+<button data-target="why">Why / What problem it solves</button>
+<button data-target="how">How to implement</button>
+<button data-target="flow">Execution flow</button>
+<button data-target="explain1">Explain to interviewer — 1 min</button>
+<button data-target="explain5">Explain to interviewer — 5 min</button>
+<button data-target="implementation">How I implemented it</button>
+<button data-target="code">Full code</button>
+<button data-target="mistakes">Common developer mistakes</button>
+<button data-target="followups">Likely interviewer follow-ups</button>
+</div>
+</aside>
+
+<main class="right">
+
+<section id="what" class="section active">
+<div class="card">
+<span class="tag">WHAT</span><span class="tag">UI COMPONENT</span>
+<h2>What is Theme Toggle / Dark Mode?</h2>
+<div class="answer">
+A theme toggle lets the user switch the application's visual theme, commonly between Light Mode and Dark Mode.
+The theme controls shared UI properties such as background color, text color, borders, surfaces and sometimes shadows.
+</div>
+<h3>Interactive example</h3>
+<div class="demo">
+<div class="toggle">
+<button id="themeSwitch" class="switch" onclick="togglePreview()" aria-label="Toggle theme"></button>
+<strong id="themeLabel">Light Mode</strong>
+</div>
+<div id="preview" class="preview">
+<h3 style="margin-top:0">Preview Card</h3>
+<p>This component changes its visual theme without changing the underlying content.</p>
+</div>
+<div class="controls">
+<button class="action" onclick="togglePreview()">Toggle Theme</button>
+<button class="action secondary" onclick="setPreview(false)">Light</button>
+<button class="action secondary" onclick="setPreview(true)">Dark</button>
+</div>
+</div>
+<h3>Typical use cases</h3>
+<ul>
+<li>Web applications and dashboards</li>
+<li>Developer tools and code editors</li>
+<li>Mobile/web products with user appearance preferences</li>
+<li>Applications that support system theme preferences</li>
+</ul>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="tag">WHY</span>
+<h2>What problem does it solve?</h2>
+<div class="grid2">
+<div class="good"><strong>Light mode</strong><br>Works well in bright environments and is familiar for many users.</div>
+<div class="good"><strong>Dark mode</strong><br>Can be more comfortable in low-light environments and gives users a personalization option.</div>
+</div>
+<h3>Interview answer</h3>
+<div class="answer">
+“The main problem is user preference and visual comfort. A theme toggle gives users control over the application's appearance.
+Instead of hardcoding colors in individual components, I centralize theme values so one state change can update the entire UI consistently.”
+</div>
+<h3>Important design goal</h3>
+<p><strong>One source of truth:</strong> the current theme should be represented by one state or document-level attribute/class, not duplicated across every component.</p>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="tag">HOW</span>
+<h2>How to implement Theme Toggle / Dark Mode</h2>
+<ol>
+<li>Define theme tokens such as background, text, surface and border colors.</li>
+<li>Represent the current theme using state or a root attribute such as <code>data-theme="dark"</code>.</li>
+<li>Use CSS variables so components consume the theme tokens instead of hardcoded colors.</li>
+<li>When the toggle changes, update the root theme.</li>
+<li>Persist the user's choice using <code>localStorage</code> if the preference should survive reloads.</li>
+<li>Optionally respect <code>prefers-color-scheme</code> when the user has not chosen a preference.</li>
+</ol>
+<pre><code>:root {
+  --bg: #ffffff;
+  --text: #111827;
+}
+
+[data-theme="dark"] {
+  --bg: #111827;
+  --text: #f9fafb;
+}
+
+document.documentElement.dataset.theme = "dark";</code></pre>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="tag">EXECUTION FLOW</span>
+<h2>How it works — simple visual explanation</h2>
+<div class="flow">
+<div class="step"><strong>1. User action</strong><span>User clicks the theme toggle.</span></div>
+<div class="step"><strong>2. Update state</strong><span>Theme changes from light to dark or vice versa.</span></div>
+<div class="step"><strong>3. Apply theme</strong><span>Root class/attribute changes.</span></div>
+<div class="step"><strong>4. CSS updates</strong><span>Variables automatically change component colors.</span></div>
+</div>
+<pre><code>User clicks Toggle
+       ↓
+currentTheme = light / dark
+       ↓
+update document theme
+       ↓
+[data-theme="dark"]
+       ↓
+CSS variables change
+       ↓
+all components re-render visually
+       ↓
+save preference (optional)</code></pre>
+<h3>Simple mental model</h3>
+<div class="answer">“JavaScript changes the theme state; CSS is responsible for the actual colors and visual styling.”</div>
+</div>
+</section>
+
+<section id="explain1" class="section">
+<div class="card">
+<span class="tag">1 MINUTE</span>
+<h2>How to explain it to the interviewer in 1 minute</h2>
+<div class="answer">
+“I implemented a theme toggle using a single source of truth for the current theme. I keep the colors in CSS variables,
+and JavaScript only changes the active theme on the root element. When the user toggles, I switch between light and dark,
+which causes all components using those variables to update consistently. I can persist the selected theme in localStorage
+so it survives page reloads. I would also consider the user's system preference using prefers-color-scheme when no explicit
+preference has been saved.”
+</div>
+<h3>1-minute structure</h3>
+<ol>
+<li><strong>What:</strong> Switch between application themes.</li>
+<li><strong>State:</strong> One current theme value.</li>
+<li><strong>Styling:</strong> CSS variables provide theme tokens.</li>
+<li><strong>Persistence:</strong> localStorage preserves user preference.</li>
+<li><strong>System preference:</strong> Optional fallback to prefers-color-scheme.</li>
+</ol>
+</div>
+</section>
+
+<section id="explain5" class="section">
+<div class="card">
+<span class="tag">5 MINUTES</span>
+<h2>How to explain it to the interviewer in 5 minutes</h2>
+<div class="answer"><strong>Opening:</strong> “I’ll explain the requirements, state design, theme application, persistence, accessibility and edge cases.”</div>
+<h3>1. Requirement</h3>
+<p>The user should be able to switch between light and dark themes, and the whole application should update consistently.</p>
+<h3>2. State design</h3>
+<p>I maintain one theme state such as <code>"light"</code> or <code>"dark"</code>. The theme is a global UI concern, so I apply it at the document/root level.</p>
+<h3>3. Styling strategy</h3>
+<p>I prefer CSS custom properties. Components consume variables like <code>--bg</code>, <code>--text</code> and <code>--surface</code>.
+The component does not need to know the actual color value for each theme.</p>
+<h3>4. Persistence</h3>
+<p>On initial load, read a saved value from <code>localStorage</code>. On toggle, update both the root theme and the saved value.</p>
+<h3>5. System preference</h3>
+<p>If there is no saved preference, use <code>window.matchMedia("(prefers-color-scheme: dark)")</code> as a sensible default.</p>
+<h3>6. Accessibility</h3>
+<p>The toggle should be keyboard accessible and expose its current state. A native checkbox/button with an accessible label is preferable to a clickable non-semantic div.</p>
+<h3>7. Edge cases</h3>
+<ul>
+<li>Invalid localStorage value → fall back to a valid theme.</li>
+<li>First visit → use saved preference or system preference.</li>
+<li>Rapid toggling → state remains the single source of truth.</li>
+<li>Missing theme variable → define sensible defaults.</li>
+</ul>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="tag">MY IMPLEMENTATION</span>
+<h2>How I would explain my implementation</h2>
+<div class="answer">
+“I started by defining the theme contract: light and dark. Then I centralized the visual tokens using CSS variables.
+Instead of changing every component individually, I put the current theme on the document root. The toggle only changes
+that root state. On initialization, I restore a saved preference from localStorage, and if none exists, I can fall back
+to the operating system preference. This keeps the logic simple, reusable and easy to extend.”
+</div>
+<h3>Implementation checklist</h3>
+<ul>
+<li>✓ Define light/dark design tokens</li>
+<li>✓ Keep theme state in one place</li>
+<li>✓ Apply theme at document/root level</li>
+<li>✓ Use CSS variables for colors</li>
+<li>✓ Persist explicit user choice</li>
+<li>✓ Support system preference as optional fallback</li>
+<li>✓ Make toggle keyboard and screen-reader accessible</li>
+<li>✓ Test reload, invalid preference and both themes</li>
+</ul>
+</div>
+</section>
+
+<section id="code" class="section">
+<div class="card">
+<span class="tag">FULL CODE</span>
+<h2>Standalone implementation</h2>
+<p class="small">This version is framework-free and includes theme state, localStorage persistence, system preference fallback and accessible controls.</p>
+<pre><code>&lt;button id="themeToggle"
+  type="button"
+  aria-label="Toggle dark mode"
+  aria-pressed="false"&gt;
+  Toggle theme
+&lt;/button&gt;
+
+&lt;script&gt;
+const STORAGE_KEY = "theme";
+const root = document.documentElement;
+const toggle = document.querySelector("#themeToggle");
+
+function getInitialTheme() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (saved === "light" || saved === "dark") {
+    return saved;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function applyTheme(theme, persist = true) {
+  const validTheme = theme === "dark" ? "dark" : "light";
+
+  root.dataset.theme = validTheme;
+
+  toggle.setAttribute(
+    "aria-pressed",
+    String(validTheme === "dark")
+  );
+
+  if (persist) {
+    localStorage.setItem(STORAGE_KEY, validTheme);
+  }
+}
+
+toggle.addEventListener("click", () =&gt; {
+  const currentTheme = root.dataset.theme;
+  applyTheme(currentTheme === "dark" ? "light" : "dark");
+});
+
+applyTheme(getInitialTheme(), false);
+&lt;/script&gt;</code></pre>
+
+<h3>CSS theme tokens</h3>
+<pre><code>:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --text: #111827;
+  --border: #e5e7eb;
+}
+
+[data-theme="dark"] {
+  --bg: #111827;
+  --surface: #1f2937;
+  --text: #f9fafb;
+  --border: #374151;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}</code></pre>
+
+<h3>React version — core idea</h3>
+<pre><code>function App() {
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() =&gt; {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  return (
+    &lt;button
+      onClick={() =&gt;
+        setTheme(t =&gt; t === "light" ? "dark" : "light")
+      }
+    &gt;
+      Toggle theme
+    &lt;/button&gt;
+  );
+}</code></pre>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="tag">COMMON MISTAKES</span>
+<h2>Common developer mistakes</h2>
+<div class="mistake"><strong>1. Changing every component individually</strong><br>This creates duplicated logic and makes the UI difficult to maintain. Prefer root-level theme state plus CSS variables.</div>
+<div class="mistake"><strong>2. Hardcoding colors everywhere</strong><br>Use semantic tokens such as <code>--background</code>, <code>--text</code> and <code>--surface</code>.</div>
+<div class="mistake"><strong>3. Forgetting persistence</strong><br>If the requirement expects the preference to survive reloads, save the explicit user choice.</div>
+<div class="mistake"><strong>4. Ignoring system preference</strong><br>When there is no saved preference, <code>prefers-color-scheme</code> can provide a better first-load experience.</div>
+<div class="mistake"><strong>5. Using a non-accessible clickable div</strong><br>Use a native button or checkbox and expose the current state to assistive technologies.</div>
+<div class="mistake"><strong>6. Flash of the wrong theme</strong><br>Applying the saved theme only after the page renders can cause a visible light-to-dark flash. In production, initialize the theme as early as possible.</div>
+<div class="mistake"><strong>7. Storing arbitrary values</strong><br>Validate localStorage values instead of trusting them blindly.</div>
+<div class="mistake"><strong>8. Overengineering</strong><br>For a basic machine-coding round, avoid unnecessary state-management libraries when document-level state and CSS variables are sufficient.</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="tag">FOLLOW-UP QUESTIONS</span>
+<h2>Likely interviewer follow-ups</h2>
+<h3>How would you avoid a flash during page load?</h3>
+<p>Run a small initialization script before the main UI paints, or set the theme as early as possible based on saved preference/system preference.</p>
+<h3>Why use CSS variables?</h3>
+<p>They keep theme values centralized and let the same components automatically consume different values without duplicated styling logic.</p>
+<h3>How would you support more than two themes?</h3>
+<p>Use a theme identifier such as <code>light</code>, <code>dark</code>, <code>high-contrast</code> or <code>blue</code>, with a corresponding token set.</p>
+<h3>What if the user changes the OS theme?</h3>
+<p>If the user has not explicitly selected a theme, listen to the <code>matchMedia</code> change event and update the application. If the user has explicitly chosen a theme, keep their choice.</p>
+<h3>How would you test it?</h3>
+<ul>
+<li>Toggle light → dark → light.</li>
+<li>Reload and verify the saved preference.</li>
+<li>Test first load with system dark/light preference.</li>
+<li>Test invalid localStorage values.</li>
+<li>Verify keyboard accessibility and aria state.</li>
+<li>Verify all major components use theme tokens.</li>
+</ul>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+const buttons = document.querySelectorAll(".nav button");
+const sections = document.querySelectorAll(".section");
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    buttons.forEach(b => b.classList.remove("active"));
+    sections.forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+let previewDark = false;
+function setPreview(dark) {
+  previewDark = dark;
+  const preview = document.getElementById("preview");
+  const sw = document.getElementById("themeSwitch");
+  preview.classList.toggle("dark", dark);
+  sw.classList.toggle("on", dark);
+  document.getElementById("themeLabel").textContent = dark ? "Dark Mode" : "Light Mode";
+}
+function togglePreview() { setPreview(!previewDark); }
+setPreview(false);
+</script>
+</body>
+</html>

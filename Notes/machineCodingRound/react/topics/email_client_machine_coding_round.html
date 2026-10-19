@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Client - Machine Coding Round</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#64748b;--border:#dbe2ea;
+  --primary:#2563eb;--primary-soft:#eff6ff;--dark:#111827;--success:#15803d;
+  --warning:#b45309;--warning-bg:#fff7ed;--code:#0b1220;
+  --danger:#b91c1c;--shadow:0 10px 30px rgba(15,23,42,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+header{background:linear-gradient(135deg,#111827,#1e3a8a);color:#fff;padding:28px 32px;position:sticky;top:0;z-index:20;box-shadow:0 5px 20px rgba(0,0,0,.16)}
+header h1{margin:0 0 4px;font-size:28px}header p{margin:0;color:#dbeafe;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 94px)}
+aside{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:94px;height:calc(100vh - 94px);overflow-y:auto}
+.nav-title{font-weight:800;margin-bottom:12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.nav-btn{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:12px 14px;margin-bottom:7px;border-radius:10px;cursor:pointer;color:#334155;font-weight:650;transition:.2s}
+.nav-btn:hover{background:#f8fafc;border-color:var(--border)}
+.nav-btn.active{background:var(--primary-soft);border-color:#bfdbfe;color:#1d4ed8}
+main{padding:28px;max-width:1200px;width:100%;margin:0 auto}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:28px;margin-bottom:22px}
+.eyebrow{display:inline-block;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;margin-bottom:10px}
+h2{margin-top:0;font-size:25px}h3{margin-top:24px}.muted{color:var(--muted)}
+ul,ol{padding-left:22px}li{margin:7px 0}
+.highlight{background:var(--primary-soft);border-left:4px solid var(--primary);padding:14px 16px;border-radius:8px;margin:16px 0}
+.success{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--success);padding:15px 16px;border-radius:10px;margin:12px 0}
+.warning{background:var(--warning-bg);border:1px solid #fed7aa;border-left:4px solid var(--warning);padding:15px 16px;border-radius:10px;margin:12px 0}
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:stretch;margin:22px 0}
+.flow-step{position:relative;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:15px 10px;text-align:center;font-size:13px}
+.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-15px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:22px;font-weight:900;z-index:2}
+.number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800;margin:0 auto 8px}
+.demo{border:1px solid var(--border);background:#fafafa;border-radius:14px;padding:20px;margin-top:18px}
+.mail-demo{display:grid;grid-template-columns:175px 1fr 1.25fr;min-height:440px;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#fff}
+.mail-sidebar{background:#f8fafc;border-right:1px solid var(--border);padding:14px}
+.mail-sidebar h4{margin:0 0 14px}
+.mail-folder{width:100%;border:0;background:transparent;text-align:left;padding:10px;border-radius:7px;cursor:pointer;color:#334155}
+.mail-folder:hover,.mail-folder.active{background:#dbeafe;color:#1d4ed8;font-weight:700}
+.mail-list{border-right:1px solid var(--border);overflow:auto}
+.mail-toolbar{padding:12px;border-bottom:1px solid var(--border);display:flex;gap:7px}
+.mail-toolbar input{width:100%;padding:9px;border:1px solid var(--border);border-radius:7px}
+.mail-item{padding:13px;border-bottom:1px solid #eef2f7;cursor:pointer}
+.mail-item:hover,.mail-item.active{background:#eff6ff}
+.mail-item strong{display:block;font-size:13px}.mail-item span{font-size:12px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mail-reader{padding:20px;overflow:auto}
+.mail-reader h3{margin:0 0 8px}
+.reader-meta{color:var(--muted);font-size:12px;margin-bottom:18px}
+.reader-body{white-space:pre-line}
+.demo-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.demo-actions button{border:1px solid var(--border);background:#fff;padding:8px 11px;border-radius:7px;cursor:pointer}
+.demo-actions button:hover{background:#f1f5f9}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:12px;font-weight:700;margin:3px}
+pre{background:var(--code);color:#e5e7eb;padding:20px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
+code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+.code-label{margin:18px 0 7px;font-size:13px;font-weight:800;color:#475569}
+.mistake-grid,.followup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mistake,.followup{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
+.mistake strong{color:#9a3412}.followup strong{color:#1d4ed8}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.badge{font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;background:#f1f5f9;color:#475569}
+@media(max-width:1000px){
+  .flow{grid-template-columns:repeat(3,1fr)}
+  .mail-demo{grid-template-columns:160px 1fr}
+  .mail-reader{grid-column:1/-1;border-top:1px solid var(--border)}
+}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+  .flow{grid-template-columns:1fr}
+  .flow-step:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-22px;transform:translateX(-50%)}
+  .mistake-grid,.followup-grid,.two-col{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  header{padding:22px}.mail-demo{grid-template-columns:1fr}.mail-sidebar{border-right:0;border-bottom:1px solid var(--border)}
+  .mail-list{border-right:0}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Email Client — Machine Coding Round</h1>
+<p>Interview-ready guide: What, Why, How, execution flow, implementation explanation, full code, mistakes and follow-ups.</p>
+</header>
+
+<div class="layout">
+<aside>
+<div class="nav-title">Questions / Topics</div>
+<button class="nav-btn active" data-target="what">What is Email Client?</button>
+<button class="nav-btn" data-target="why">Why / What problem?</button>
+<button class="nav-btn" data-target="how">How to implement?</button>
+<button class="nav-btn" data-target="flow">Execution Flow</button>
+<button class="nav-btn" data-target="one">Explain in 1 Minute</button>
+<button class="nav-btn" data-target="five">Explain in 5 Minutes</button>
+<button class="nav-btn" data-target="implementation">How I Implemented It</button>
+<button class="nav-btn" data-target="fullcode">Full Code</button>
+<button class="nav-btn" data-target="mistakes">Common Developer Mistakes</button>
+<button class="nav-btn" data-target="followups">Likely Interviewer Follow-ups</button>
+</aside>
+
+<main>
+<section id="what" class="section active">
+<div class="card">
+<span class="eyebrow">WHAT</span>
+<h2>What is an Email Client?</h2>
+<p>
+An <strong>Email Client</strong> is a user interface that lets people view, organize, compose, send,
+reply to, forward, search and manage email messages. Examples include web-based clients and desktop/mobile
+mail applications.
+</p>
+<div class="highlight">
+<strong>Simple interview definition:</strong>
+“An email client is a data-driven application that manages a collection of messages and provides
+navigation, list/detail views, composition and message actions such as read, unread, archive and delete.”
+</div>
+
+<h3>Core features to consider in a machine coding round</h3>
+<div>
+<span class="pill">Inbox</span><span class="pill">Folders</span><span class="pill">Email list</span>
+<span class="pill">Email reader</span><span class="pill">Compose</span><span class="pill">Search</span>
+<span class="pill">Read / unread</span><span class="pill">Archive</span><span class="pill">Delete</span>
+<span class="pill">Responsive UI</span>
+</div>
+
+<h3>Interactive mini email client</h3>
+<div class="demo">
+<div class="mail-demo">
+<div class="mail-sidebar">
+<h4>Mail</h4>
+<button class="mail-folder active" data-folder="Inbox">Inbox <span class="badge">3</span></button>
+<button class="mail-folder" data-folder="Starred">Starred</button>
+<button class="mail-folder" data-folder="Sent">Sent</button>
+<button class="mail-folder" data-folder="Archive">Archive</button>
+<button class="mail-folder" data-folder="Trash">Trash</button>
+</div>
+
+<div class="mail-list">
+<div class="mail-toolbar"><input id="searchMail" type="search" placeholder="Search emails..." aria-label="Search emails"></div>
+<div id="mailItems"></div>
+</div>
+
+<div class="mail-reader">
+<div class="demo-actions">
+<button id="markReadBtn">Mark read</button>
+<button id="archiveBtn">Archive</button>
+<button id="deleteBtn">Delete</button>
+</div>
+<div id="readerContent">
+<h3>Select an email</h3>
+<p class="muted">Choose a message from the list to read it.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="eyebrow">WHY</span>
+<h2>What problem does an Email Client solve?</h2>
+<p>
+An email client provides a single interface for managing potentially thousands of messages. It hides
+the complexity of mail storage, folders, message state and server communication behind simple user actions.
+</p>
+
+<h3>Problems it demonstrates in a machine coding round</h3>
+<ul>
+<li><strong>List/detail UI:</strong> Show a collection of messages and the selected message together.</li>
+<li><strong>State management:</strong> Track selected email, folder, search term and message status.</li>
+<li><strong>CRUD-like actions:</strong> Archive, delete, mark read/unread, star and compose.</li>
+<li><strong>Search/filtering:</strong> Derive the visible list from user input and current folder.</li>
+<li><strong>Data flow:</strong> Keep email data separate from the rendering components.</li>
+<li><strong>Async behavior:</strong> Real clients need loading, error, retry and optimistic update handling.</li>
+<li><strong>Scalability:</strong> Large inboxes require pagination, virtualization and server-side search where appropriate.</li>
+</ul>
+
+<div class="success">
+<strong>Interview point:</strong> The challenge is not drawing an inbox. The interviewer is evaluating
+how you model message state, interactions, data flow, reusable components and edge cases.
+</div>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="eyebrow">HOW</span>
+<h2>How to implement an Email Client</h2>
+
+<ol>
+<li><strong>Clarify scope:</strong> Decide whether the round requires inbox only or also compose, search, folders and actions.</li>
+<li><strong>Define the email model:</strong> Use fields such as id, sender, recipients, subject, body, timestamp, read and folder.</li>
+<li><strong>Build the layout:</strong> Sidebar/folders → email list → reader/detail pane.</li>
+<li><strong>Componentize:</strong> EmailSidebar, Toolbar, EmailList, EmailListItem, EmailReader and ComposeModal.</li>
+<li><strong>Manage state:</strong> Selected email, current folder, search text, compose visibility and message state.</li>
+<li><strong>Derive visible messages:</strong> Filter by folder/search instead of maintaining duplicate lists unnecessarily.</li>
+<li><strong>Implement actions:</strong> Mark read/unread, archive, delete, star, reply and compose.</li>
+<li><strong>Handle async states:</strong> Loading, error, empty inbox and sending state.</li>
+<li><strong>Make responsive:</strong> On mobile, switch from three panes to list → reader navigation.</li>
+<li><strong>Optimize:</strong> Virtualize large lists and debounce server-side search when needed.</li>
+</ol>
+
+<h3>Recommended component structure</h3>
+<pre><code>App
+└── EmailClient
+    ├── Sidebar
+    │   ├── Inbox
+    │   ├── Starred
+    │   ├── Sent
+    │   ├── Archive
+    │   └── Trash
+    ├── Toolbar
+    │   ├── Search
+    │   └── Actions
+    ├── EmailList
+    │   └── EmailListItem
+    ├── EmailReader
+    └── ComposeModal</code></pre>
+
+<h3>Email data model</h3>
+<pre><code>{
+  id: "mail-101",
+  sender: { name: "Priya", email: "priya@example.com" },
+  recipients: ["me@example.com"],
+  subject: "Interview preparation",
+  body: "Let's review the machine coding round.",
+  timestamp: "2026-10-19T08:30:00Z",
+  read: false,
+  starred: true,
+  folder: "Inbox"
+}</code></pre>
+
+<div class="highlight">
+<strong>Good architecture:</strong> Keep the source of truth for messages in one place. Derive
+filtered/sorted views from that state instead of creating separate copies of inbox, search results and
+archive data that can become inconsistent.
+</div>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="eyebrow">EXECUTION FLOW</span>
+<h2>How an Email Client works — simple visual explanation</h2>
+
+<div class="flow">
+<div class="flow-step"><div class="number">1</div><strong>Open client</strong><br/>Render shell</div>
+<div class="flow-step"><div class="number">2</div><strong>Load emails</strong><br/>Fetch inbox</div>
+<div class="flow-step"><div class="number">3</div><strong>Store state</strong><br/>Messages + UI state</div>
+<div class="flow-step"><div class="number">4</div><strong>Filter</strong><br/>Folder / search</div>
+<div class="flow-step"><div class="number">5</div><strong>Select</strong><br/>Open a message</div>
+<div class="flow-step"><div class="number">6</div><strong>Action</strong><br/>Read / archive / send</div>
+</div>
+
+<h3>Visual data flow</h3>
+<pre><code>User opens Email Client
+        ↓
+Load email list
+        ↓
+ ┌───────────────┐
+ │ Loading state │
+ └───────┬───────┘
+         ↓
+   API / local data
+         ↓
+   Store messages
+         ↓
+Folder + Search state
+         ↓
+   Derived message list
+         ↓
+ ┌────────────┬──────────────┐
+ ↓            ↓              ↓
+Email List   Reader       Compose
+ ↓            ↓              ↓
+Select       Mark read     Send
+ ↓            ↓              ↓
+Selected ID  Update state   API request
+ └────────────┴──────────────┘
+               ↓
+          Re-render UI</code></pre>
+
+<h3>Example: opening an unread email</h3>
+<ol>
+<li>User clicks an email row.</li>
+<li>Store its ID as <code>selectedEmailId</code>.</li>
+<li>Reader finds the message from the source collection.</li>
+<li>If it was unread, update its read state.</li>
+<li>Reader displays sender, subject, timestamp and body.</li>
+<li>The list updates the unread styling/count.</li>
+</ol>
+
+<h3>Example: search flow</h3>
+<ol>
+<li>User enters search text.</li>
+<li>Update <code>searchQuery</code>.</li>
+<li>Filter by subject/sender/body for local data, or debounce and query the server for large datasets.</li>
+<li>Render matching messages.</li>
+<li>If there are no matches, show a useful empty state.</li>
+</ol>
+
+<div class="warning">
+<strong>Real-world distinction:</strong> In a production client, sending, reading and moving mail are
+server operations. The UI should handle network latency and failures rather than assuming every action succeeds.
+</div>
+</div>
+</section>
+
+<section id="one" class="section">
+<div class="card">
+<span class="eyebrow">1 MINUTE</span>
+<h2>How to explain Email Client to the interviewer in 1 minute</h2>
+<div class="success">
+<p>
+“I built the email client as a three-part responsive layout: folders on the left, the email list in the
+middle, and the selected email on the right. I keep the emails as the source of truth and store UI state
+such as selected email, current folder and search query separately. The visible list is derived from the
+current folder and search state. Email actions like mark read, archive and delete update the message state,
+while real applications would synchronize those changes with an API. I also considered loading, error and
+empty states, responsive mobile behavior, keyboard accessibility and large inbox performance.”
+</p>
+</div>
+
+<h3>Keywords to mention</h3>
+<ul>
+<li>List/detail pattern</li>
+<li>Single source of truth</li>
+<li>Derived state</li>
+<li>Search and filtering</li>
+<li>Message actions</li>
+<li>Async states</li>
+<li>Responsive design</li>
+<li>Virtualization / pagination</li>
+</ul>
+</div>
+</section>
+
+<section id="five" class="section">
+<div class="card">
+<span class="eyebrow">5 MINUTES</span>
+<h2>How to explain Email Client in 5 minutes</h2>
+
+<h3>1. Clarify the requirements</h3>
+<p>
+“I first clarify whether we need only an inbox or a complete client with compose, reply, folders,
+search, star, archive and delete. I also clarify whether the data is static or comes from an API.”
+</p>
+
+<h3>2. Choose the UI pattern</h3>
+<p>
+“I use a master-detail pattern. The sidebar controls the current folder, the list shows messages and
+the reader displays the selected message. On mobile, these can become separate navigable views.”
+</p>
+
+<h3>3. Define the state</h3>
+<p>
+“The source of truth is the message collection. UI state includes current folder, selected message ID,
+search query, compose state and request status. I avoid storing values that can be derived, such as the
+filtered list.”
+</p>
+
+<h3>4. Componentize</h3>
+<p>
+“I create small components such as Sidebar, EmailList, EmailListItem, EmailReader and ComposeModal.
+EmailListItem receives message data and callbacks rather than owning the entire application state.”
+</p>
+
+<h3>5. Implement interactions</h3>
+<ul>
+<li>Select email → update selected ID and show reader.</li>
+<li>Mark read → update message state and synchronize with server.</li>
+<li>Archive/delete → change folder/status and remove from the current derived list.</li>
+<li>Search → filter locally or debounce a server query.</li>
+<li>Compose → validate fields, show sending state, then add/sync the sent message.</li>
+</ul>
+
+<h3>6. Handle async states</h3>
+<p>
+“I explicitly handle initial loading, failed requests, empty folders and send failures. For an action such
+as archive, I can use an optimistic update and roll it back if the server rejects the operation.”
+</p>
+
+<h3>7. Performance and accessibility</h3>
+<p>
+“For a large inbox, I would paginate or virtualize rows and debounce remote search. I would use semantic
+buttons, keyboard navigation, visible focus states and accessible labels for icon actions.”
+</p>
+
+<div class="highlight">
+<strong>Strong closing line:</strong>
+“My main design decision is to keep messages as the source of truth and derive the current view from
+folder, search and selection state. That avoids inconsistent duplicate collections and makes the client
+easier to extend.”
+</div>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="eyebrow">MY IMPLEMENTATION</span>
+<h2>How I implemented it — explanation to interviewer</h2>
+
+<p>Explain your implementation in this order:</p>
+
+<div class="two-col">
+<div>
+<h3>1. Created the shell</h3>
+<p>“I started with the three-pane layout: folders, message list and reader. I made the layout responsive so the reader can become a separate mobile view.”</p>
+</div>
+<div>
+<h3>2. Defined one email model</h3>
+<p>“Each message has an ID, sender, recipients, subject, body, timestamp, read/starred state and folder. This becomes the source of truth.”</p>
+</div>
+<div>
+<h3>3. Added UI state</h3>
+<p>“I track selected email ID, active folder, search query and compose visibility. These are UI concerns and remain separate from the email data.”</p>
+</div>
+<div>
+<h3>4. Derived the list</h3>
+<p>“The displayed messages are calculated from the source collection using folder and search filters. I don't maintain separate inbox and search arrays.”</p>
+</div>
+<div>
+<h3>5. Added actions</h3>
+<p>“Selecting opens a message. Mark read, archive and delete update the source collection and therefore automatically update the derived list.”</p>
+</div>
+<div>
+<h3>6. Added production considerations</h3>
+<p>“For real APIs, I would add loading/error states, optimistic updates where appropriate, retry handling, debounced search and pagination or virtualization.”</p>
+</div>
+</div>
+
+<h3>How to narrate while coding</h3>
+<div class="highlight">
+“First I will build the three-pane layout. Then I'll define the email data model and render the list from
+data. Next I'll add selected-email state and the reader. After that I'll implement search and message
+actions. Finally I'll add async states, responsive behavior and accessibility.”
+</div>
+
+<h3>Implementation decisions worth explaining</h3>
+<ul>
+<li><strong>Selected ID instead of selected object:</strong> avoids holding a stale copy after a message changes.</li>
+<li><strong>Derived filtered list:</strong> prevents duplicate state from becoming inconsistent.</li>
+<li><strong>Reusable EmailListItem:</strong> keeps repeated message markup consistent.</li>
+<li><strong>Server synchronization:</strong> UI state is not treated as the final source of truth in a real client.</li>
+</ul>
+
+<div class="success">
+<strong>Interview-ready summary:</strong>
+“I separated the message data model, UI state, derived views and presentation components. That makes
+actions predictable and lets me add features such as starred mail, labels or pagination without rewriting
+the entire client.”
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="section">
+<div class="card">
+<span class="eyebrow">FULL CODE</span>
+<h2>Standalone HTML + CSS + JavaScript</h2>
+<p class="muted">This compact implementation demonstrates folders, search, email selection, mark-read, archive and delete.</p>
+
+<div class="code-label">Complete standalone implementation</div>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;Email Client&lt;/title&gt;
+  &lt;style&gt;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    .email-client {
+      display: grid;
+      grid-template-columns: 180px 320px 1fr;
+      min-height: 100vh;
+      background: white;
+    }
+
+    .sidebar {
+      padding: 18px;
+      background: #f8fafc;
+      border-right: 1px solid #dbe2ea;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 6px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .sidebar button.active,
+    .sidebar button:hover {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .list {
+      border-right: 1px solid #dbe2ea;
+      overflow: auto;
+    }
+
+    .toolbar {
+      padding: 12px;
+      border-bottom: 1px solid #dbe2ea;
+    }
+
+    .toolbar input {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+    }
+
+    .email-row {
+      padding: 14px;
+      border-bottom: 1px solid #eef2f7;
+      cursor: pointer;
+    }
+
+    .email-row:hover,
+    .email-row.active {
+      background: #eff6ff;
+    }
+
+    .email-row.unread {
+      font-weight: 700;
+    }
+
+    .reader {
+      padding: 24px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 850px) {
+      .email-client {
+        grid-template-columns: 160px 1fr;
+      }
+
+      .reader {
+        grid-column: 1 / -1;
+        border-top: 1px solid #dbe2ea;
+      }
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;div class="email-client"&gt;
+
+    &lt;aside class="sidebar"&gt;
+      &lt;h3&gt;Mail&lt;/h3&gt;
+      &lt;button class="folder active" data-folder="Inbox"&gt;Inbox&lt;/button&gt;
+      &lt;button class="folder" data-folder="Starred"&gt;Starred&lt;/button&gt;
+      &lt;button class="folder" data-folder="Sent"&gt;Sent&lt;/button&gt;
+      &lt;button class="folder" data-folder="Archive"&gt;Archive&lt;/button&gt;
+      &lt;button class="folder" data-folder="Trash"&gt;Trash&lt;/button&gt;
+    &lt;/aside&gt;
+
+    &lt;section class="list"&gt;
+      &lt;div class="toolbar"&gt;
+        &lt;input id="search" placeholder="Search emails..." /&gt;
+      &lt;/div&gt;
+      &lt;div id="emailList"&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;main class="reader"&gt;
+      &lt;div class="actions"&gt;
+        &lt;button id="readBtn"&gt;Mark read&lt;/button&gt;
+        &lt;button id="archiveBtn"&gt;Archive&lt;/button&gt;
+        &lt;button id="deleteBtn"&gt;Delete&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div id="readerContent"&gt;
+        &lt;h2&gt;Select an email&lt;/h2&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+
+  &lt;/div&gt;
+
+  &lt;script&gt;
+    let emails = [
+      {
+        id: 1,
+        sender: "Priya",
+        subject: "Interview preparation",
+        body: "Let's review the machine coding round.",
+        read: false,
+        folder: "Inbox"
+      },
+      {
+        id: 2,
+        sender: "Team",
+        subject: "Weekly update",
+        body: "Here is the weekly project update.",
+        read: true,
+        folder: "Inbox"
+      },
+      {
+        id: 3,
+        sender: "Recruiter",
+        subject: "Interview schedule",
+        body: "Your interview is scheduled for tomorrow.",
+        read: false,
+        folder: "Inbox"
+      }
+    ];
+
+    let currentFolder = "Inbox";
+    let selectedId = null;
+    let searchQuery = "";
+
+    const listEl = document.getElementById("emailList");
+    const readerEl = document.getElementById("readerContent");
+
+    function getVisibleEmails() {
+      const query = searchQuery.trim().toLowerCase();
+
+      return emails.filter(email =&gt; {
+        const folderMatch = email.folder === currentFolder;
+        const text = `${email.sender} ${email.subject} ${email.body}`.toLowerCase();
+        return folderMatch &amp;&amp; text.includes(query);
+      });
+    }
+
+    function renderList() {
+      const visible = getVisibleEmails();
+
+      listEl.innerHTML = visible.length
+        ? visible.map(email =&gt; `
+            &lt;div
+              class="email-row ${email.id === selectedId ? "active" : ""} ${!email.read ? "unread" : ""}"
+              data-id="${email.id}"
+            &gt;
+              &lt;div&gt;${email.sender}&lt;/div&gt;
+              &lt;div&gt;${email.subject}&lt;/div&gt;
+              &lt;small&gt;${email.body}&lt;/small&gt;
+            &lt;/div&gt;
+          `).join("")
+        : "&lt;p style='padding:16px'&gt;No emails found.&lt;/p&gt;";
+
+      document.querySelectorAll(".email-row").forEach(row =&gt; {
+        row.addEventListener("click", () =&gt; {
+          selectedId = Number(row.dataset.id);
+
+          const email = emails.find(item =&gt; item.id === selectedId);
+
+          if (email) {
+            email.read = true;
+          }
+
+          render();
+        });
+      });
+    }
+
+    function renderReader() {
+      const email = emails.find(item =&gt; item.id === selectedId);
+
+      if (!email) {
+        readerEl.innerHTML = "&lt;h2&gt;Select an email&lt;/h2&gt;";
+        return;
+      }
+
+      readerEl.innerHTML = `
+        &lt;h2&gt;${email.subject}&lt;/h2&gt;
+        &lt;p&gt;&lt;strong&gt;From:&lt;/strong&gt; ${email.sender}&lt;/p&gt;
+        &lt;p&gt;${email.body}&lt;/p&gt;
+      `;
+    }
+
+    function render() {
+      renderList();
+      renderReader();
+    }
+
+    document.querySelectorAll(".folder").forEach(button =&gt; {
+      button.addEventListener("click", () =&gt; {
+        document.querySelectorAll(".folder")
+          .forEach(btn =&gt; btn.classList.remove("active"));
+
+        button.classList.add("active");
+        currentFolder = button.dataset.folder;
+        selectedId = null;
+
+        render();
+      });
+    });
+
+    document.getElementById("search").addEventListener("input", event =&gt; {
+      searchQuery = event.target.value;
+      renderList();
+    });
+
+    document.getElementById("readBtn").addEventListener("click", () =&gt; {
+      const email = emails.find(item =&gt; item.id === selectedId);
+
+      if (email) {
+        email.read = true;
+        render();
+      }
+    });
+
+    document.getElementById("archiveBtn").addEventListener("click", () =&gt; {
+      const email = emails.find(item =&gt; item.id === selectedId);
+
+      if (email) {
+        email.folder = "Archive";
+        selectedId = null;
+        render();
+      }
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", () =&gt; {
+      const email = emails.find(item =&gt; item.id === selectedId);
+
+      if (email) {
+        email.folder = "Trash";
+        selectedId = null;
+        render();
+      }
+    });
+
+    render();
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<div class="code-label">React core implementation</div>
+<pre><code>import { useMemo, useState } from "react";
+
+const initialEmails = [
+  {
+    id: "1",
+    sender: "Priya",
+    subject: "Interview preparation",
+    body: "Let's review the machine coding round.",
+    read: false,
+    starred: true,
+    folder: "Inbox"
+  },
+  {
+    id: "2",
+    sender: "Team",
+    subject: "Weekly update",
+    body: "Here is the weekly project update.",
+    read: true,
+    starred: false,
+    folder: "Inbox"
+  }
+];
+
+const folders = ["Inbox", "Starred", "Sent", "Archive", "Trash"];
+
+function EmailClient() {
+  const [emails, setEmails] = useState(initialEmails);
+  const [folder, setFolder] = useState("Inbox");
+  const [selectedId, setSelectedId] = useState(null);
+  const [query, setQuery] = useState("");
+
+  const visibleEmails = useMemo(() =&gt; {
+    const q = query.trim().toLowerCase();
+
+    return emails.filter(email =&gt; {
+      const folderMatch =
+        folder === "Starred"
+          ? email.starred
+          : email.folder === folder;
+
+      const text =
+        `${email.sender} ${email.subject} ${email.body}`
+          .toLowerCase();
+
+      return folderMatch &amp;&amp; text.includes(q);
+    });
+  }, [emails, folder, query]);
+
+  const selectedEmail =
+    emails.find(email =&gt; email.id === selectedId) || null;
+
+  function markRead() {
+    if (!selectedId) return;
+
+    setEmails(prev =&gt;
+      prev.map(email =&gt;
+        email.id === selectedId
+          ? { ...email, read: true }
+          : email
+      )
+    );
+  }
+
+  function archive() {
+    if (!selectedId) return;
+
+    setEmails(prev =&gt;
+      prev.map(email =&gt;
+        email.id === selectedId
+          ? { ...email, folder: "Archive" }
+          : email
+      )
+    );
+
+    setSelectedId(null);
+  }
+
+  return (
+    &lt;div className="email-client"&gt;
+      &lt;aside&gt;
+        {folders.map(item =&gt; (
+          &lt;button
+            key={item}
+            onClick={() =&gt; setFolder(item)}
+          &gt;
+            {item}
+          &lt;/button&gt;
+        ))}
+      &lt;/aside&gt;
+
+      &lt;section&gt;
+        &lt;input
+          value={query}
+          onChange={event =&gt; setQuery(event.target.value)}
+          placeholder="Search emails"
+        /&gt;
+
+        {visibleEmails.map(email =&gt; (
+          &lt;button
+            key={email.id}
+            onClick={() =&gt; {
+              setSelectedId(email.id);
+              if (!email.read) markRead();
+            }}
+          &gt;
+            &lt;strong&gt;{email.sender}&lt;/strong&gt;
+            &lt;span&gt;{email.subject}&lt;/span&gt;
+          &lt;/button&gt;
+        ))}
+      &lt;/section&gt;
+
+      &lt;main&gt;
+        {selectedEmail ? (
+          &lt;&gt;
+            &lt;h2&gt;{selectedEmail.subject}&lt;/h2&gt;
+            &lt;p&gt;{selectedEmail.body}&lt;/p&gt;
+            &lt;button onClick={markRead}&gt;Mark read&lt;/button&gt;
+            &lt;button onClick={archive}&gt;Archive&lt;/button&gt;
+          &lt;/&gt;
+        ) : (
+          &lt;p&gt;Select an email&lt;/p&gt;
+        )}
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default EmailClient;</code></pre>
+
+<div class="highlight">
+<strong>What to say after showing the code:</strong>
+“The important design decision is that emails are the source of truth. Folder and search determine
+the derived list, while selectedId identifies the current message. Actions update the source collection,
+which automatically updates every view that depends on it.”
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="eyebrow">COMMON MISTAKES</span>
+<h2>Common Developer Mistakes</h2>
+
+<div class="mistake-grid">
+<div class="mistake"><strong>1. Maintaining duplicate email collections</strong><p>Keeping separate inbox, search, archive and starred arrays can easily make the UI inconsistent.</p><p><b>Better:</b> Keep one source of truth and derive views.</p></div>
+
+<div class="mistake"><strong>2. Storing the entire selected email as state</strong><p>The selected object can become stale after mark-read/archive updates.</p><p><b>Better:</b> Store <code>selectedEmailId</code> and derive the object.</p></div>
+
+<div class="mistake"><strong>3. Making EmailListItem responsible for everything</strong><p>Individual rows should not own global search, folder or server synchronization logic.</p><p><b>Better:</b> Pass focused props and callbacks.</p></div>
+
+<div class="mistake"><strong>4. Ignoring loading/error/empty states</strong><p>Real email data is asynchronous and can fail.</p><p><b>Better:</b> Explicitly model request states and useful empty messages.</p></div>
+
+<div class="mistake"><strong>5. Searching on every keystroke against the server</strong><p>This can create unnecessary requests and race conditions.</p><p><b>Better:</b> Debounce server search and handle stale responses.</p></div>
+
+<div class="mistake"><strong>6. Rendering thousands of emails</strong><p>A huge DOM list can make scrolling and interaction slow.</p><p><b>Better:</b> Use pagination or virtualization.</p></div>
+
+<div class="mistake"><strong>7. No optimistic update strategy</strong><p>Waiting for every archive/read action before updating the UI can feel slow.</p><p><b>Better:</b> Consider optimistic updates with rollback when the operation is safe and reversible.</p></div>
+
+<div class="mistake"><strong>8. No confirmation strategy for destructive actions</strong><p>Delete or permanently remove actions can cause accidental data loss.</p><p><b>Better:</b> Use undo, confirmation or soft-delete depending on the product.</p></div>
+
+<div class="mistake"><strong>9. Poor responsive behavior</strong><p>A three-column desktop layout does not automatically work on phones.</p><p><b>Better:</b> Switch to list/detail navigation or stacked views.</p></div>
+
+<div class="mistake"><strong>10. Weak accessibility</strong><p>Icon-only buttons, unreadable labels and mouse-only interactions exclude keyboard and assistive-technology users.</p><p><b>Better:</b> Use semantic buttons, labels, focus states and keyboard-friendly navigation.</p></div>
+
+<div class="mistake"><strong>11. Unsafe HTML rendering of email bodies</strong><p>Real emails can contain HTML and untrusted content.</p><p><b>Better:</b> Sanitize untrusted HTML before rendering it and use safe link handling.</p></div>
+
+<div class="mistake"><strong>12. Mixing UI and server synchronization</strong><p>Putting API calls everywhere makes failure handling difficult.</p><p><b>Better:</b> Centralize or clearly isolate data-access logic.</p></div>
+</div>
+
+<div class="warning">
+<strong>Machine coding tip:</strong> If time is limited, prioritize the list/detail interaction,
+state model, search, one or two message actions, responsive behavior and clear component boundaries
+before adding advanced email features.
+</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="eyebrow">FOLLOW-UPS</span>
+<h2>Likely Interviewer Follow-up Questions</h2>
+
+<div class="followup-grid">
+<div class="followup"><strong>How would you handle 100,000 emails?</strong><p>Use server-side pagination/search, virtualization for visible rows and avoid loading the entire mailbox into the browser.</p></div>
+
+<div class="followup"><strong>How would you implement search?</strong><p>For small local data, filter derived state. For production-scale mail, debounce and send a server-side search request.</p></div>
+
+<div class="followup"><strong>How would you prevent stale search responses?</strong><p>Use request cancellation, request IDs or a data-fetching library that handles stale results.</p></div>
+
+<div class="followup"><strong>How would you implement optimistic archive?</strong><p>Update the UI immediately, send the request, and restore the previous state with an error message if the server rejects it.</p></div>
+
+<div class="followup"><strong>How would you handle compose?</strong><p>Use a controlled form, validate recipients/subject/body, track sending state, disable duplicate submission and handle server errors.</p></div>
+
+<div class="followup"><strong>How would you render HTML email safely?</strong><p>Sanitize untrusted HTML before inserting it into the DOM and apply safe policies to links and embedded content.</p></div>
+
+<div class="followup"><strong>How would you implement unread counts?</strong><p>Derive the count from the source email collection or use server-provided counts for large datasets.</p></div>
+
+<div class="followup"><strong>Why store selectedId instead of selectedEmail?</strong><p>The ID remains stable while the email object can change after actions. Deriving the object prevents stale state.</p></div>
+
+<div class="followup"><strong>How would you make the email client accessible?</strong><p>Use semantic controls, keyboard navigation, focus management, clear labels, sufficient contrast and meaningful announcements for state changes.</p></div>
+
+<div class="followup"><strong>How would you test it?</strong><p>Test folder switching, search, selection, read/unread state, archive/delete, empty/error states and important data transformations.</p></div>
+</div>
+
+<h3>Final interview checklist</h3>
+<ul>
+<li>Can I explain the master-detail layout?</li>
+<li>Can I define the email data model?</li>
+<li>Can I explain source-of-truth vs derived state?</li>
+<li>Can I explain search and folder filtering?</li>
+<li>Can I handle async and failure states?</li>
+<li>Can I explain optimistic updates?</li>
+<li>Can I explain large-inbox performance?</li>
+<li>Can I explain accessibility and safe HTML rendering?</li>
+</ul>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const navButtons=document.querySelectorAll(".nav-btn");
+const sections=document.querySelectorAll(".section");
+
+navButtons.forEach(button=>{
+  button.addEventListener("click",()=>{
+    navButtons.forEach(btn=>btn.classList.remove("active"));
+    sections.forEach(section=>section.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+let demoEmails=[
+  {id:1,sender:"Priya",subject:"Interview preparation",body:"Let's review the machine coding round and discuss the expected implementation.",read:false,folder:"Inbox",starred:true},
+  {id:2,sender:"Team",subject:"Weekly project update",body:"Here is the weekly project update. The dashboard work is progressing well.",read:true,folder:"Inbox",starred:false},
+  {id:3,sender:"Recruiter",subject:"Interview schedule",body:"Your interview is scheduled for tomorrow. Please confirm your availability.",read:false,folder:"Inbox",starred:true},
+  {id:4,sender:"Me",subject:"Project notes",body:"I sent the latest notes to the team.",read:true,folder:"Sent",starred:false},
+  {id:5,sender:"Archive Bot",subject:"Older notification",body:"This message has been archived.",read:true,folder:"Archive",starred:false}
+];
+
+let demoFolder="Inbox";
+let demoSelected=null;
+
+const mailItems=document.getElementById("mailItems");
+const readerContent=document.getElementById("readerContent");
+const searchMail=document.getElementById("searchMail");
+
+function visibleDemoEmails(){
+  const q=searchMail.value.trim().toLowerCase();
+  return demoEmails.filter(mail=>{
+    const folderMatch=demoFolder==="Starred"?mail.starred:mail.folder===demoFolder;
+    const text=(mail.sender+" "+mail.subject+" "+mail.body).toLowerCase();
+    return folderMatch && text.includes(q);
+  });
+}
+
+function renderDemoList(){
+  const items=visibleDemoEmails();
+  if(!items.length){
+    mailItems.innerHTML="<p style='padding:14px;color:#64748b'>No emails found.</p>";
+    return;
+  }
+  mailItems.innerHTML=items.map(mail=>`
+    <div class="mail-item ${mail.id===demoSelected?'active':''}" data-id="${mail.id}">
+      <strong>${mail.read?'':'● '}${mail.sender}</strong>
+      <span>${mail.subject}</span>
+      <span>${mail.body}</span>
+    </div>
+  `).join("");
+
+  document.querySelectorAll(".mail-item").forEach(item=>{
+    item.addEventListener("click",()=>{
+      demoSelected=Number(item.dataset.id);
+      const mail=demoEmails.find(m=>m.id===demoSelected);
+      if(mail) mail.read=true;
+      renderDemo();
+    });
+  });
+}
+
+function renderDemoReader(){
+  const mail=demoEmails.find(m=>m.id===demoSelected);
+  if(!mail){
+    readerContent.innerHTML="<h3>Select an email</h3><p class='muted'>Choose a message from the list to read it.</p>";
+    return;
+  }
+  readerContent.innerHTML=`
+    <h3>${mail.subject}</h3>
+    <div class="reader-meta">From: ${mail.sender} · Folder: ${mail.folder} · ${mail.read?"Read":"Unread"}</div>
+    <div class="reader-body">${mail.body}</div>
+  `;
+}
+
+function renderDemo(){
+  renderDemoList();
+  renderDemoReader();
+}
+
+document.querySelectorAll(".mail-folder").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".mail-folder").forEach(b=>b.classList.remove("active"));
+    button.classList.add("active");
+    demoFolder=button.dataset.folder;
+    demoSelected=null;
+    renderDemo();
+  });
+});
+
+searchMail.addEventListener("input",renderDemo);
+
+document.getElementById("markReadBtn").addEventListener("click",()=>{
+  const mail=demoEmails.find(m=>m.id===demoSelected);
+  if(mail){mail.read=true;renderDemo();}
+});
+
+document.getElementById("archiveBtn").addEventListener("click",()=>{
+  const mail=demoEmails.find(m=>m.id===demoSelected);
+  if(mail){mail.folder="Archive";demoSelected=null;renderDemo();}
+});
+
+document.getElementById("deleteBtn").addEventListener("click",()=>{
+  const mail=demoEmails.find(m=>m.id===demoSelected);
+  if(mail){mail.folder="Trash";demoSelected=null;renderDemo();}
+});
+
+renderDemo();
+</script>
+</body>
+</html>

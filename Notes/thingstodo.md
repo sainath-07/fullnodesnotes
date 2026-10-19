@@ -3,19 +3,38 @@
 1. After completion of any library/framework add quick revision topics/notes, I can revise later.
 2. weekly once revision.
 
-### TRACK Daily activity.... =======================================================
-
 
 ### To do ================================================
+ 
+## DSA ======================:
 
-### most important
-======next week=======
+## How to solve dsa problem?
+1. NO SOLUTION FOR PROBLEM
+2. UNDERSTAND PROBLEM
+3. REVISE 10 TIMES AS IF YOU ARE EXPLAINING TO SOME ONE WHO DONT KNOW ABOUT IT.
+4. PRACTICE IT ONCE
+5. NEXT SATURDAY SOVLE SAME PROBLEMS BY MEMORIZING STEP BY STEP.
+6. AFTER SOLVING ONCE AGAIN MEMORIZIE PROBLEM.
 
-1. Jenkins
+===
+17/10/2026 - saturday.
+
+1. binary search- basic questions
+   3. Count how many times a target occurs
+   10. Find the closest value to a target
+
+==============================
+
+ 
+## most important
+======this week=======
+
+1. Jenkins - completed
 2. full react machine coding round
 3. sql
 4. node
-
+5. react query 
+  
 after completiion of node and djnago revision,
 once go through pending topics of node and django
 along with machine coding round.
@@ -51,8 +70,6 @@ along with machine coding round.
 
 ### DAILY THINGS WHICH I DO =======================================================
 
-speed . correct . focused . revision . consistency .No distraction
-switch as soon as possible.
 
 1. daily morning devops, you can replace it with ai engineering skills if you complete it early.
 2. 1hr dsa, remaining motham skills upgrade
@@ -68,124 +85,13 @@ MISTAKES :
 4. not watching classes while travelling
 5. not giving 100% focus while listening classes
 
-### CREATE NOTES =======================================================
+========== ALL COMMANDS TO SETUP FRONT END PROJECT =============
 
-start creating notes of below one with ai.
+npm create vite@latest
+npm i @tanstack/react-query
+npm i @tanstack/react-query-devtools
 
-part-a
-redis
-postgrese,sql
-nextjs
-websocket
-reduxtoolkit
-react router dom
-css
-tailwind
-bootstrap
-material ui
-lodash
 
-part-b
-full system design
-frontend system design
-database scaling and schema designing
-backend system design
-graphql & graphql with apollo client
-gen ai
-agentic ai
-radixui
-react native
-react hook form
-zod
-
-### REVISIE =======================================================
-
-devops
-
-1. LINUX COMMMANDS
-2. GIT COMMANDS
-3. JENKINS WORKFLOW
-4. DOCKER COMMANDS
-
-programming languages , libraries and frameworks.
-
-5. JS AND JS INTERNALS
-6. NODE AND NODEJS INTERNALS
-
-7. PYTHON AND DJANGO
-8. MONGODB
-
-9. TO-DO-TASK OF BOTH NODE AND DJANGO
-10. TYPESCRIPT
-
-11. DSA PROBLEMS LOGIC REVISION
-
-### SWITCH GOAL =================================================================
-
-todo cheat sheet and machine coding round task.
-react
-Django
-node
-
-daily devops
-daily DSA
-
-nextjs
-postgrese/sql
-redis
-css,bootstrap,tailwind,materialui
-redux toolkit
-react router dom
-apache e-charts
-
-project,interview,revision
-nodejs microservices
-websockets
-project,interview,revision
-
-### AFTER SWICH TO START ============================================
-
-full system design
-frontend system design
-database scaling and schema designing
-backend system design
-
-graphql & graphql with apollo client
-gen ai
-agentic ai
-
-radixui
-react native
-react hook form
-zod
-
-### IN RESUME =======================================================
-
-html
-css
-bootstrap
-tailwind
-materialui
-
-react
-react-router-dom
-redux toolkit
-
-js
-python
-
-Django
-node
-express
-mongodb,mongoose
-sql
-
-node microservices
-webscokets
-
-lodash
-react query
-ag-grid
-apache e-charts
-
-devops
+========== ALL COMMANDS TO SETUP NODE BACKEND END PROJECT =============
+npm init -y
+npm i express mongodb mongoose cors ejs nodemailer multer

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transfer List - Machine Coding Round</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#64748b;--border:#dbe2ea;
+  --primary:#2563eb;--primary-soft:#eff6ff;--dark:#111827;--success:#15803d;
+  --warning:#b45309;--warning-bg:#fff7ed;--code:#0b1220;
+  --shadow:0 10px 30px rgba(15,23,42,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+header{background:linear-gradient(135deg,#111827,#1e3a8a);color:#fff;padding:28px 32px;position:sticky;top:0;z-index:20;box-shadow:0 5px 20px rgba(0,0,0,.16)}
+header h1{margin:0 0 4px;font-size:28px} header p{margin:0;color:#dbeafe;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 94px)}
+aside{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:94px;height:calc(100vh - 94px);overflow-y:auto}
+.nav-title{font-weight:800;margin-bottom:12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.nav-btn{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:12px 14px;margin-bottom:7px;border-radius:10px;cursor:pointer;color:#334155;font-weight:650;transition:.2s}
+.nav-btn:hover{background:#f8fafc;border-color:var(--border)}
+.nav-btn.active{background:var(--primary-soft);border-color:#bfdbfe;color:#1d4ed8}
+main{padding:28px;max-width:1200px;width:100%;margin:0 auto}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:28px;margin-bottom:22px}
+.eyebrow{display:inline-block;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;margin-bottom:10px}
+h2{margin-top:0;font-size:25px}h3{margin-top:24px}h4{margin-bottom:6px}.muted{color:var(--muted)}
+ul,ol{padding-left:22px}li{margin:7px 0}
+.highlight{background:var(--primary-soft);border-left:4px solid var(--primary);padding:14px 16px;border-radius:8px;margin:16px 0}
+.success{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--success);padding:15px 16px;border-radius:10px;margin:12px 0}
+.warning{background:var(--warning-bg);border:1px solid #fed7aa;border-left:4px solid var(--warning);padding:15px 16px;border-radius:10px;margin:12px 0}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;margin:22px 0}
+.flow-step{position:relative;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;font-size:13px}
+.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-15px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:22px;font-weight:900;z-index:2}
+.number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800;margin:0 auto 8px}
+.demo{border:1px solid var(--border);background:#fafafa;border-radius:14px;padding:20px;margin-top:18px}
+.transfer-demo{display:grid;grid-template-columns:1fr 110px 1fr;gap:16px;align-items:center}
+.list-box{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.list-title{font-weight:800;padding:12px 14px;background:#f8fafc;border-bottom:1px solid var(--border)}
+.item-list{max-height:270px;overflow:auto;padding:8px}
+.item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer}
+.item:hover{background:#f1f5f9}
+.item.selected{background:#dbeafe;color:#1e3a8a;font-weight:700}
+.item input{accent-color:var(--primary)}
+.transfer-actions{display:flex;flex-direction:column;gap:8px}
+.transfer-actions button,.demo-action{border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:8px;padding:9px 10px;cursor:pointer;font-weight:700}
+.transfer-actions button:hover,.demo-action:hover{background:#eff6ff}
+.demo-note{margin:10px 0 0;color:var(--muted);font-size:13px}
+pre{background:var(--code);color:#e5e7eb;padding:20px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
+code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+.mistake-grid,.followup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mistake,.followup{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
+.mistake strong{color:#9a3412}.followup strong{color:#1d4ed8}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:12px;font-weight:700;margin:3px}
+.code-label{margin:18px 0 7px;font-size:13px;font-weight:800;color:#475569}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){
+.layout{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+.flow{grid-template-columns:1fr}.flow-step:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-22px;transform:translateX(-50%)}
+.mistake-grid,.followup-grid,.two-col{grid-template-columns:1fr}
+.transfer-demo{grid-template-columns:1fr}.transfer-actions{flex-direction:row;justify-content:center;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Transfer List — Machine Coding Round</h1>
+<p>Interview-ready guide: What, Why, How, execution flow, implementation explanation, full code, mistakes and follow-ups.</p>
+</header>
+
+<div class="layout">
+<aside>
+<div class="nav-title">Questions / Topics</div>
+<button class="nav-btn active" data-target="what">What is Transfer List?</button>
+<button class="nav-btn" data-target="why">Why / What problem?</button>
+<button class="nav-btn" data-target="how">How to implement?</button>
+<button class="nav-btn" data-target="flow">Execution Flow</button>
+<button class="nav-btn" data-target="one">Explain in 1 Minute</button>
+<button class="nav-btn" data-target="five">Explain in 5 Minutes</button>
+<button class="nav-btn" data-target="implementation">How I Implemented It</button>
+<button class="nav-btn" data-target="fullcode">Full Code</button>
+<button class="nav-btn" data-target="mistakes">Common Developer Mistakes</button>
+<button class="nav-btn" data-target="followups">Likely Interviewer Follow-ups</button>
+</aside>
+
+<main>
+<section id="what" class="section active">
+<div class="card">
+<span class="eyebrow">WHAT</span>
+<h2>What is a Transfer List?</h2>
+<p>
+A <strong>Transfer List</strong> is a UI component that displays two lists of items and allows the user
+to move selected items from one list to another. A common version has an <strong>Available</strong> list
+on the left and a <strong>Selected</strong> list on the right, with controls such as
+<strong>→, ←, Transfer All</strong> and <strong>Clear</strong>.
+</p>
+<div class="highlight">
+<strong>Simple interview definition:</strong>
+“Transfer List is a dual-list selection component where users select one or more items from an available
+collection and transfer them to a selected collection.”
+</div>
+<h3>Typical examples</h3>
+<div>
+<span class="pill">Assign users to a team</span>
+<span class="pill">Select permissions</span>
+<span class="pill">Move products</span>
+<span class="pill">Choose columns</span>
+<span class="pill">Assign roles</span>
+<span class="pill">Select features</span>
+</div>
+
+<h3>Interactive demo</h3>
+<div class="demo">
+<div class="transfer-demo">
+<div class="list-box">
+<div class="list-title">Available</div>
+<div id="availableList" class="item-list"></div>
+</div>
+<div class="transfer-actions">
+<button id="moveRight" type="button">→ Move</button>
+<button id="moveLeft" type="button">← Move</button>
+<button id="moveAllRight" type="button">→→ All</button>
+<button id="moveAllLeft" type="button">←← All</button>
+</div>
+<div class="list-box">
+<div class="list-title">Selected</div>
+<div id="selectedList" class="item-list"></div>
+</div>
+</div>
+<p class="demo-note">Select one or more items, then move them between lists. The same item cannot exist in both lists.</p>
+</div>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="eyebrow">WHY</span>
+<h2>What problem does a Transfer List solve?</h2>
+<p>
+A normal multi-select can become difficult to understand when users need to see both
+<strong>available choices</strong> and <strong>already selected choices</strong> at the same time.
+A Transfer List makes that relationship explicit.
+</p>
+<h3>Problems it solves</h3>
+<ul>
+<li><strong>Clear selection state:</strong> Users can see available and selected items separately.</li>
+<li><strong>Bulk selection:</strong> Multiple items can be moved in one action.</li>
+<li><strong>Easy reversal:</strong> Users can move items back without reopening another dialog.</li>
+<li><strong>Large collections:</strong> Search/filter can be added independently to each side.</li>
+<li><strong>Structured state:</strong> The application can maintain selected IDs rather than parsing UI text.</li>
+<li><strong>Assignment workflows:</strong> Useful for users, permissions, products, categories and teams.</li>
+</ul>
+<div class="success">
+<strong>Key interview point:</strong> The core problem is maintaining a consistent relationship between
+the source collection and the selected collection while allowing bulk, reversible movement.
+</div>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="eyebrow">HOW</span>
+<h2>How to implement a Transfer List</h2>
+<ol>
+<li>Define the complete collection of items using stable IDs.</li>
+<li>Maintain which items are currently selected in each side, or maintain a selected-ID set and derive both lists.</li>
+<li>Track temporary UI selection separately from the final transferred state.</li>
+<li>When the user clicks Move Right, identify selected items from the left.</li>
+<li>Move those items to the right while removing them from the left.</li>
+<li>Clear the temporary selection after a transfer.</li>
+<li>Implement the reverse operation for Move Left.</li>
+<li>Add Move All / Clear All if required.</li>
+<li>Keep item IDs unique so an item never appears in both lists.</li>
+<li>Add search, sorting, disabled items and keyboard support as requirements demand.</li>
+</ol>
+<h3>Recommended state model</h3>
+<pre><code>items = [
+  { id: 1, name: "React" },
+  { id: 2, name: "Vue" },
+  { id: 3, name: "Angular" }
+]
+
+leftItems  = [React, Vue]
+rightItems = [Angular]
+
+selectedIds = new Set([1, 3])</code></pre>
+<div class="highlight">
+<strong>Design choice:</strong> For a machine coding round, two arrays for left/right items are easy to explain.
+For a production component, keeping one source of truth plus a selected-ID set can reduce synchronization bugs.
+</div>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="eyebrow">EXECUTION FLOW</span>
+<h2>How Transfer List works — simple visual explanation</h2>
+<div class="flow">
+<div class="flow-step"><div class="number">1</div><strong>Render data</strong><br/>Available + Selected</div>
+<div class="flow-step"><div class="number">2</div><strong>User selects</strong><br/>One or many items</div>
+<div class="flow-step"><div class="number">3</div><strong>Click transfer</strong><br/>→ or ←</div>
+<div class="flow-step"><div class="number">4</div><strong>Update state</strong><br/>Move selected IDs</div>
+<div class="flow-step"><div class="number">5</div><strong>Re-render</strong><br/>Both lists stay consistent</div>
+</div>
+<h3>Move Right example</h3>
+<pre><code>Before:
+Left  = [React, Vue, Angular]
+Right = [Node]
+
+Selected on Left = [Vue, Angular]
+
+Click "→"
+
+After:
+Left  = [React]
+Right = [Node, Vue, Angular]</code></pre>
+<h3>Move Left example</h3>
+<pre><code>Before:
+Left  = [React]
+Right = [Node, Vue, Angular]
+
+Selected on Right = [Vue]
+
+Click "←"
+
+After:
+Left  = [React, Vue]
+Right = [Node, Angular]</code></pre>
+<div class="highlight">
+<strong>One-line mental model:</strong>
+Select → Identify IDs → Transfer → Remove from source → Add to destination → Clear selection → Render.
+</div>
+</div>
+</section>
+
+<section id="one" class="section">
+<div class="card">
+<span class="eyebrow">1 MINUTE</span>
+<h2>How to explain Transfer List to the interviewer in 1 minute</h2>
+<div class="success">
+<p>
+“I implemented the Transfer List as a dual-list component. I have a source list and a selected list,
+and I keep item identity using stable IDs. The user can select one or multiple items on either side.
+When they click the transfer button, I collect the selected IDs, remove those items from the source list,
+add them to the destination list, and clear the temporary selection. I also make sure an item cannot
+exist in both lists at the same time. The same logic works in reverse for moving items back. I can extend
+this with Move All, search, disabled items, sorting and keyboard accessibility.”
+</p>
+</div>
+<h3>What the interviewer should hear</h3>
+<ul>
+<li>Two-list / dual-list model</li>
+<li>Stable item IDs</li>
+<li>Multi-selection</li>
+<li>Immutable state updates</li>
+<li>Source-to-destination transfer</li>
+<li>No duplicate items across lists</li>
+<li>Temporary selection vs committed placement</li>
+<li>Accessibility and extensibility</li>
+</ul>
+</div>
+</section>
+
+<section id="five" class="section">
+<div class="card">
+<span class="eyebrow">5 MINUTES</span>
+<h2>How to explain Transfer List in 5 minutes</h2>
+<h3>1. Clarify the requirement</h3>
+<p>
+“The component should display available and selected items. Users should be able to select one or many
+items and transfer them in either direction. I would also clarify whether we need search, sorting,
+disabled items, Move All, drag-and-drop and a maximum selection.”
+</p>
+<h3>2. Explain the data model</h3>
+<p>
+“I give every item a stable unique ID. The UI selection is separate from the item's actual location.
+That makes it easier to move items without depending on their display text.”
+</p>
+<h3>3. Explain selection</h3>
+<p>
+“I maintain a temporary selection for each side. Clicking an item toggles its selected state.
+This allows bulk transfer.”
+</p>
+<h3>4. Explain transfer</h3>
+<p>
+“For Move Right, I find the selected items in the left list, append them to the right list and remove
+them from the left. Then I clear the selection. Move Left uses the same operation in reverse.”
+</p>
+<h3>5. Explain consistency</h3>
+<p>
+“The main invariant is that an item belongs to exactly one side. The transfer function is the only place
+that changes item ownership, which helps prevent duplicates.”
+</p>
+<h3>6. Explain edge cases</h3>
+<ul>
+<li>No items selected → disable transfer button or do nothing.</li>
+<li>Duplicate IDs → reject or normalize the input data.</li>
+<li>Disabled items → do not allow them to be selected or transferred.</li>
+<li>Maximum selected count → enforce before moving.</li>
+<li>Search active → transfer selected items from the filtered view, not only visible text.</li>
+<li>Large lists → consider virtualization and efficient lookup by ID.</li>
+</ul>
+<div class="highlight">
+<strong>Strong closing line:</strong>
+“I separated item ownership, temporary selection and rendering concerns so that features like search,
+disabled items and bulk transfer can be added without changing the core transfer algorithm.”
+</div>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="eyebrow">MY IMPLEMENTATION</span>
+<h2>How I implemented it — explanation to interviewer</h2>
+<p>Explain your implementation in this order:</p>
+<div class="two-col">
+<div>
+<h3>1. Data</h3>
+<p>“I started with an array of objects containing stable IDs and labels. IDs are used for logic; labels are only for display.”</p>
+</div>
+<div>
+<h3>2. Two lists</h3>
+<p>“I maintain which items are on the left and right. The key invariant is that the same ID should never exist in both.”</p>
+</div>
+<div>
+<h3>3. Selection</h3>
+<p>“I maintain selected IDs separately. Clicking a checkbox toggles an ID without changing its location.”</p>
+</div>
+<div>
+<h3>4. Transfer handler</h3>
+<p>“The handler gets selected IDs, filters them out of the source and adds them to the destination.”</p>
+</div>
+<div>
+<h3>5. Clear selection</h3>
+<p>“After transfer, I clear the moved IDs so stale selections cannot affect the next operation.”</p>
+</div>
+<div>
+<h3>6. Extensions</h3>
+<p>“Once the core works, I can add Move All, search, sorting, disabled items, keyboard support and drag-and-drop.”</p>
+</div>
+</div>
+<div class="success">
+<strong>Interview-friendly statement:</strong>
+“I first implemented select + move in both directions. After the core invariant was correct, I added
+bulk actions, disabled states and accessibility rather than overengineering the first version.”
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="section">
+<div class="card">
+<span class="eyebrow">FULL CODE</span>
+<h2>Standalone HTML + CSS + JavaScript</h2>
+<p class="muted">This implementation supports multi-select, move left/right and move all.</p>
+<div class="code-label">Complete implementation</div>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;Transfer List&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div class="transfer-list"&gt;
+    &lt;div&gt;
+      &lt;h3&gt;Available&lt;/h3&gt;
+      &lt;div id="leftList"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class="actions"&gt;
+      &lt;button id="moveRight"&gt;→&lt;/button&gt;
+      &lt;button id="moveLeft"&gt;←&lt;/button&gt;
+      &lt;button id="moveAllRight"&gt;→→&lt;/button&gt;
+      &lt;button id="moveAllLeft"&gt;←←&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;h3&gt;Selected&lt;/h3&gt;
+      &lt;div id="rightList"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;script&gt;
+    const items = [
+      { id: 1, name: "React" },
+      { id: 2, name: "Vue" },
+      { id: 3, name: "Angular" },
+      { id: 4, name: "Svelte" },
+      { id: 5, name: "Solid" }
+    ];
+
+    let leftItems = [...items];
+    let rightItems = [];
+    let selectedLeft = new Set();
+    let selectedRight = new Set();
+
+    function toggleSelection(side, id) {
+      const selected =
+        side === "left" ? selectedLeft : selectedRight;
+
+      if (selected.has(id)) {
+        selected.delete(id);
+      } else {
+        selected.add(id);
+      }
+
+      render();
+    }
+
+    function moveRight() {
+      const moving = leftItems.filter(item =>
+        selectedLeft.has(item.id)
+      );
+
+      leftItems = leftItems.filter(item =>
+        !selectedLeft.has(item.id)
+      );
+
+      rightItems = [...rightItems, ...moving];
+
+      selectedLeft.clear();
+      render();
+    }
+
+    function moveLeft() {
+      const moving = rightItems.filter(item =>
+        selectedRight.has(item.id)
+      );
+
+      rightItems = rightItems.filter(item =>
+        !selectedRight.has(item.id)
+      );
+
+      leftItems = [...leftItems, ...moving];
+
+      selectedRight.clear();
+      render();
+    }
+
+    function moveAllRight() {
+      rightItems = [...rightItems, ...leftItems];
+      leftItems = [];
+      selectedLeft.clear();
+      render();
+    }
+
+    function moveAllLeft() {
+      leftItems = [...leftItems, ...rightItems];
+      rightItems = [];
+      selectedRight.clear();
+      render();
+    }
+
+    function renderList(containerId, list, selected, side) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      list.forEach(item =&gt; {
+        const label = document.createElement("label");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = selected.has(item.id);
+
+        checkbox.addEventListener("change", () =&gt; {
+          toggleSelection(side, item.id);
+        });
+
+        label.append(
+          checkbox,
+          document.createTextNode(" " + item.name)
+        );
+
+        container.appendChild(label);
+        container.appendChild(document.createElement("br"));
+      });
+    }
+
+    function render() {
+      renderList(
+        "leftList",
+        leftItems,
+        selectedLeft,
+        "left"
+      );
+
+      renderList(
+        "rightList",
+        rightItems,
+        selectedRight,
+        "right"
+      );
+    }
+
+    document
+      .getElementById("moveRight")
+      .addEventListener("click", moveRight);
+
+    document
+      .getElementById("moveLeft")
+      .addEventListener("click", moveLeft);
+
+    document
+      .getElementById("moveAllRight")
+      .addEventListener("click", moveAllRight);
+
+    document
+      .getElementById("moveAllLeft")
+      .addEventListener("click", moveAllLeft);
+
+    render();
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<div class="code-label">React core implementation</div>
+<pre><code>import { useState } from "react";
+
+const initialItems = [
+  { id: 1, name: "React" },
+  { id: 2, name: "Vue" },
+  { id: 3, name: "Angular" },
+  { id: 4, name: "Svelte" }
+];
+
+function TransferList() {
+  const [leftItems, setLeftItems] = useState(initialItems);
+  const [rightItems, setRightItems] = useState([]);
+  const [selectedLeft, setSelectedLeft] = useState(new Set());
+  const [selectedRight, setSelectedRight] = useState(new Set());
+
+  const toggle = (side, id) =&gt; {
+    const setter =
+      side === "left" ? setSelectedLeft : setSelectedRight;
+
+    setter(prev =&gt; {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  const moveRight = () =&gt; {
+    const moving = leftItems.filter(item =>
+      selectedLeft.has(item.id)
+    );
+
+    setLeftItems(prev =>
+      prev.filter(item =&gt; !selectedLeft.has(item.id))
+    );
+
+    setRightItems(prev =&gt; [...prev, ...moving]);
+    setSelectedLeft(new Set());
+  };
+
+  const moveLeft = () =&gt; {
+    const moving = rightItems.filter(item =>
+      selectedRight.has(item.id)
+    );
+
+    setRightItems(prev =>
+      prev.filter(item =&gt; !selectedRight.has(item.id))
+    );
+
+    setLeftItems(prev =&gt; [...prev, ...moving]);
+    setSelectedRight(new Set());
+  };
+
+  const renderList = (items, selected, side) =&gt; (
+    &lt;div&gt;
+      {items.map(item =&gt; (
+        &lt;label key={item.id}&gt;
+          &lt;input
+            type="checkbox"
+            checked={selected.has(item.id)}
+            onChange={() =&gt; toggle(side, item.id)}
+          /&gt;
+          {item.name}
+        &lt;/label&gt;
+      ))}
+    &lt;/div&gt;
+  );
+
+  return (
+    &lt;div className="transfer-list"&gt;
+      &lt;div&gt;
+        &lt;h3&gt;Available&lt;/h3&gt;
+        {renderList(leftItems, selectedLeft, "left")}
+      &lt;/div&gt;
+
+      &lt;div className="actions"&gt;
+        &lt;button
+          onClick={moveRight}
+          disabled={selectedLeft.size === 0}
+        &gt;
+          →
+        &lt;/button&gt;
+
+        &lt;button
+          onClick={moveLeft}
+          disabled={selectedRight.size === 0}
+        &gt;
+          ←
+        &lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;h3&gt;Selected&lt;/h3&gt;
+        {renderList(rightItems, selectedRight, "right")}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default TransferList;</code></pre>
+
+<div class="highlight">
+<strong>Production improvement:</strong> If the items have stable IDs, use IDs as the source of truth.
+Avoid relying on labels because two items may have the same display name.
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="eyebrow">COMMON MISTAKES</span>
+<h2>Common developer mistakes</h2>
+<div class="mistake-grid">
+<div class="mistake"><strong>1. Duplicating an item across both lists</strong><p>After moving an item, forgetting to remove it from the source creates inconsistent state.</p><p><b>Better:</b> Make transfer atomic: remove from source and add to destination.</p></div>
+<div class="mistake"><strong>2. Using labels instead of stable IDs</strong><p>Two items may have the same name, so label-based transfer can move the wrong item.</p><p><b>Better:</b> Identify items by stable unique IDs.</p></div>
+<div class="mistake"><strong>3. Mutating arrays directly</strong><p>Methods like <code>splice()</code> can mutate state and make React updates harder to reason about.</p><p><b>Better:</b> Use immutable <code>filter()</code>, spread and functional state updates.</p></div>
+<div class="mistake"><strong>4. Mixing selection with item location</strong><p>A checkbox selection should not itself move the item.</p><p><b>Better:</b> Keep temporary selection state separate from transfer state.</p></div>
+<div class="mistake"><strong>5. Not clearing selection after transfer</strong><p>Stale selected IDs can cause the next transfer to move unexpected items.</p><p><b>Better:</b> Clear the moved side's selection immediately after transfer.</p></div>
+<div class="mistake"><strong>6. Search only filters UI but breaks transfer logic</strong><p>When a filtered list is shown, developers sometimes transfer only visible indexes.</p><p><b>Better:</b> Transfer by stable IDs, not by filtered array indexes.</p></div>
+<div class="mistake"><strong>7. No disabled/empty-state handling</strong><p>Users may see buttons that do nothing when no items are selected.</p><p><b>Better:</b> Disable unavailable actions and show useful empty states.</p></div>
+<div class="mistake"><strong>8. Poor keyboard accessibility</strong><p>A component that only works with mouse clicks is incomplete.</p><p><b>Better:</b> Use native checkboxes/buttons, visible focus and logical keyboard order.</p></div>
+<div class="mistake"><strong>9. Overusing index as React key</strong><p>Moving items between lists can make index-based keys unstable.</p><p><b>Better:</b> Use the item's stable ID as the key.</p></div>
+<div class="mistake"><strong>10. Overengineering too early</strong><p>Adding drag-and-drop, virtualization and async search before the core transfer works wastes time.</p><p><b>Better:</b> Implement selection and two-way transfer first, then add requirements.</p></div>
+</div>
+<div class="warning">
+<strong>Machine coding round tip:</strong> State the invariant clearly:
+<strong>“Every item belongs to exactly one list.”</strong> Then make every transfer operation preserve that invariant.
+</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="eyebrow">FOLLOW-UPS</span>
+<h2>Likely interviewer follow-up questions</h2>
+<div class="followup-grid">
+<div class="followup"><strong>How would you implement Move All?</strong><p>Move the entire source collection into the destination and clear the source in one state transition.</p></div>
+<div class="followup"><strong>How would you add search?</strong><p>Keep the complete list unchanged and derive a filtered display list. Transfer using stable IDs so filtering does not affect correctness.</p></div>
+<div class="followup"><strong>How would you handle disabled items?</strong><p>Store a disabled flag and prevent both selection and transfer for those items.</p></div>
+<div class="followup"><strong>How would you support drag and drop?</strong><p>Reuse the same transfer function. Drag-and-drop should only determine which IDs are being moved; the state transition remains the same.</p></div>
+<div class="followup"><strong>How would you handle 10,000 items?</strong><p>Use efficient ID lookup, memoized derived lists and possibly virtualization so only visible rows are rendered.</p></div>
+<div class="followup"><strong>How would you maintain one source of truth?</strong><p>Keep all items in one array and store selected IDs, or keep an item-to-side mapping. Derive left/right views from that source.</p></div>
+<div class="followup"><strong>How would you preserve sorting?</strong><p>Define a deterministic ordering rule and apply it after transfer, rather than depending on incidental array mutation.</p></div>
+<div class="followup"><strong>How would you test it?</strong><p>Test single and multi-select, both directions, Move All, empty selections, duplicate IDs, disabled items, filtering and keyboard behavior.</p></div>
+</div>
+<h3>Final interview checklist</h3>
+<ul>
+<li>Can I explain the two-list data model?</li>
+<li>Can I clearly distinguish temporary selection from item location?</li>
+<li>Can I transfer multiple items in either direction?</li>
+<li>Can I guarantee no item exists in both lists?</li>
+<li>Can I explain why stable IDs matter?</li>
+<li>Can I add Move All and search without breaking the core logic?</li>
+<li>Can I discuss accessibility and performance?</li>
+</ul>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const buttons=document.querySelectorAll(".nav-btn");
+const sections=document.querySelectorAll(".section");
+buttons.forEach(button=>{
+  button.addEventListener("click",()=>{
+    buttons.forEach(btn=>btn.classList.remove("active"));
+    sections.forEach(section=>section.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+// Interactive demo
+const demoItems=[
+  {id:1,name:"React"},{id:2,name:"Vue"},{id:3,name:"Angular"},
+  {id:4,name:"Svelte"},{id:5,name:"Node.js"},{id:6,name:"TypeScript"}
+];
+let available=[...demoItems];
+let selected=[];
+let selectedAvailable=new Set();
+let selectedChosen=new Set();
+
+function toggleDemoSelection(side,id){
+  const set=side==="available"?selectedAvailable:selectedChosen;
+  if(set.has(id)) set.delete(id); else set.add(id);
+  renderDemo();
+}
+
+function moveDemoRight(){
+  const moving=available.filter(item=>selectedAvailable.has(item.id));
+  available=available.filter(item=>!selectedAvailable.has(item.id));
+  selected=[...selected,...moving];
+  selectedAvailable.clear();
+  renderDemo();
+}
+
+function moveDemoLeft(){
+  const moving=selected.filter(item=>selectedChosen.has(item.id));
+  selected=selected.filter(item=>!selectedChosen.has(item.id));
+  available=[...available,...moving];
+  selectedChosen.clear();
+  renderDemo();
+}
+
+function moveDemoAllRight(){
+  selected=[...selected,...available];
+  available=[];
+  selectedAvailable.clear();
+  renderDemo();
+}
+
+function moveDemoAllLeft(){
+  available=[...available,...selected];
+  selected=[];
+  selectedChosen.clear();
+  renderDemo();
+}
+
+function renderDemoList(containerId,list,set,side){
+  const container=document.getElementById(containerId);
+  container.innerHTML="";
+  list.forEach(item=>{
+    const row=document.createElement("label");
+    row.className="item"+(set.has(item.id)?" selected":"");
+    const checkbox=document.createElement("input");
+    checkbox.type="checkbox";
+    checkbox.checked=set.has(item.id);
+    checkbox.addEventListener("change",()=>toggleDemoSelection(side,item.id));
+    const text=document.createElement("span");
+    text.textContent=item.name;
+    row.append(checkbox,text);
+    container.appendChild(row);
+  });
+}
+
+function renderDemo(){
+  renderDemoList("availableList",available,selectedAvailable,"available");
+  renderDemoList("selectedList",selected,selectedChosen,"selected");
+}
+document.getElementById("moveRight").addEventListener("click",moveDemoRight);
+document.getElementById("moveLeft").addEventListener("click",moveDemoLeft);
+document.getElementById("moveAllRight").addEventListener("click",moveDemoAllRight);
+document.getElementById("moveAllLeft").addEventListener("click",moveDemoAllLeft);
+renderDemo();
+</script>
+</body>
+</html>

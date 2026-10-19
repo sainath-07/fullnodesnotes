@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chips Input - Machine Coding Round</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --panel: #ffffff;
+    --text: #172033;
+    --muted: #64748b;
+    --border: #dbe2ea;
+    --primary: #2563eb;
+    --primary-soft: #eff6ff;
+    --dark: #111827;
+    --success: #15803d;
+    --warning: #b45309;
+    --warning-bg: #fff7ed;
+    --code: #0b1220;
+    --shadow: 0 10px 30px rgba(15, 23, 42, .08);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  header {
+    background: linear-gradient(135deg, #111827, #1e3a8a);
+    color: white;
+    padding: 28px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 5px 20px rgba(0,0,0,.16);
+  }
+
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 28px;
+  }
+
+  header p {
+    margin: 0;
+    color: #dbeafe;
+    font-size: 14px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    min-height: calc(100vh - 94px);
+  }
+
+  aside {
+    background: #fff;
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    position: sticky;
+    top: 94px;
+    height: calc(100vh - 94px);
+    overflow-y: auto;
+  }
+
+  .nav-title {
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+  }
+
+  .nav-btn {
+    width: 100%;
+    text-align: left;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 12px 14px;
+    margin-bottom: 7px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #334155;
+    font-weight: 650;
+    transition: .2s ease;
+  }
+
+  .nav-btn:hover {
+    background: #f8fafc;
+    border-color: var(--border);
+  }
+
+  .nav-btn.active {
+    background: var(--primary-soft);
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+  }
+
+  main {
+    padding: 28px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    margin-bottom: 10px;
+  }
+
+  h2 { margin-top: 0; font-size: 25px; }
+  h3 { margin-top: 24px; }
+  h4 { margin-bottom: 6px; }
+
+  .muted { color: var(--muted); }
+
+  ul, ol { padding-left: 22px; }
+  li { margin: 7px 0; }
+
+  .highlight {
+    background: var(--primary-soft);
+    border-left: 4px solid var(--primary);
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+
+  .warning {
+    background: var(--warning-bg);
+    border: 1px solid #fed7aa;
+    border-left: 4px solid var(--warning);
+    padding: 15px 16px;
+    border-radius: 10px;
+    margin: 12px 0;
+  }
+
+  .success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid var(--success);
+    padding: 15px 16px;
+    border-radius: 10px;
+    margin: 12px 0;
+  }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    align-items: stretch;
+    margin: 22px 0;
+  }
+
+  .flow-step {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    font-size: 22px;
+    font-weight: 900;
+    z-index: 2;
+  }
+
+  .number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--primary);
+    color: white;
+    font-weight: 800;
+    margin: 0 auto 8px;
+  }
+
+  .demo {
+    border: 1px solid var(--border);
+    background: #fafafa;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 18px;
+  }
+
+  .chip-input {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 10px;
+    background: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+  }
+
+  .chip-input:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #dbeafe;
+    color: #1e3a8a;
+    border: 1px solid #93c5fd;
+    border-radius: 999px;
+    padding: 5px 9px 5px 11px;
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  .chip button {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    color: #1e40af;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 2px;
+  }
+
+  .chip-input input {
+    flex: 1;
+    min-width: 130px;
+    border: 0;
+    outline: 0;
+    padding: 8px 4px;
+    font-size: 15px;
+  }
+
+  .demo-note {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  pre {
+    background: var(--code);
+    color: #e5e7eb;
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+
+  .mistake-grid, .followup-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .mistake, .followup {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+  }
+
+  .mistake strong { color: #9a3412; }
+  .followup strong { color: #1d4ed8; }
+
+  .pill {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 3px;
+  }
+
+  .code-label {
+    margin: 18px 0 7px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #475569;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside {
+      position: static;
+      height: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .flow { grid-template-columns: 1fr; }
+    .flow-step:not(:last-child)::after {
+      content: "↓";
+      right: auto;
+      left: 50%;
+      top: auto;
+      bottom: -22px;
+      transform: translateX(-50%);
+    }
+    .mistake-grid, .followup-grid, .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+
+<body>
+<header>
+  <h1>Chips Input — Machine Coding Round</h1>
+  <p>Interview-ready guide: What, Why, How, execution flow, implementation explanation, full code, mistakes and follow-ups.</p>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="nav-title">Questions / Topics</div>
+    <button class="nav-btn active" data-target="what">What is Chips Input?</button>
+    <button class="nav-btn" data-target="why">Why / What problem?</button>
+    <button class="nav-btn" data-target="how">How to implement?</button>
+    <button class="nav-btn" data-target="flow">Execution Flow</button>
+    <button class="nav-btn" data-target="one">Explain in 1 Minute</button>
+    <button class="nav-btn" data-target="five">Explain in 5 Minutes</button>
+    <button class="nav-btn" data-target="implementation">How I Implemented It</button>
+    <button class="nav-btn" data-target="fullcode">Full Code</button>
+    <button class="nav-btn" data-target="mistakes">Common Developer Mistakes</button>
+    <button class="nav-btn" data-target="followups">Likely Interviewer Follow-ups</button>
+  </aside>
+
+  <main>
+    <section id="what" class="section active">
+      <div class="card">
+        <span class="eyebrow">WHAT</span>
+        <h2>What is a Chips Input?</h2>
+        <p>
+          A <strong>Chips Input</strong> is a UI control that lets the user enter multiple values and
+          represent each committed value as a small removable <strong>chip</strong> or <strong>tag</strong>.
+        </p>
+
+        <div class="highlight">
+          <strong>Simple interview definition:</strong>
+          “It is a multi-value input where each submitted value is converted into a chip, and the user can
+          remove individual chips or continue adding more values.”
+        </div>
+
+        <h3>Typical examples</h3>
+        <div>
+          <span class="pill">Email recipients</span>
+          <span class="pill">Tags</span>
+          <span class="pill">Skills</span>
+          <span class="pill">Search filters</span>
+          <span class="pill">Categories</span>
+          <span class="pill">User mentions</span>
+        </div>
+
+        <h3>Interactive demo</h3>
+        <div class="demo">
+          <div class="chip-input" id="demoInput">
+            <input id="chipText" aria-label="Add chip" placeholder="Type a value and press Enter..." />
+          </div>
+          <p class="demo-note">Try: <strong>React</strong> → Enter → <strong>JavaScript</strong> → Enter. Click × to remove a chip. Backspace on an empty input removes the last chip.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="why" class="section">
+      <div class="card">
+        <span class="eyebrow">WHY</span>
+        <h2>What problem does Chips Input solve?</h2>
+        <p>
+          A normal text input represents one continuous string. A chips input is useful when the application
+          needs a <strong>collection of separate values</strong> while still keeping data entry compact.
+        </p>
+
+        <h3>Problems it solves</h3>
+        <ul>
+          <li><strong>Multiple values:</strong> Users can enter many independent items in one control.</li>
+          <li><strong>Clear visual separation:</strong> Each value is immediately recognizable as a separate item.</li>
+          <li><strong>Easy deletion:</strong> Individual values can be removed without editing a long string.</li>
+          <li><strong>Validation:</strong> Each item can be checked independently, for example an email address.</li>
+          <li><strong>Better UX:</strong> Users can see exactly what has already been added.</li>
+          <li><strong>Structured state:</strong> The UI can maintain an array instead of parsing one large string later.</li>
+        </ul>
+
+        <div class="success">
+          <strong>Key interview point:</strong> The important part is not the visual pill. The important part is
+          converting free-form typing into a structured array of committed values.
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="section">
+      <div class="card">
+        <span class="eyebrow">HOW</span>
+        <h2>How to implement a Chips Input</h2>
+
+        <ol>
+          <li>Create an array/state to store committed chips.</li>
+          <li>Create a separate input state for the value currently being typed.</li>
+          <li>Listen for <code>Enter</code> to commit the current input.</li>
+          <li>Trim whitespace and ignore empty values.</li>
+          <li>Optionally prevent duplicate values.</li>
+          <li>Add the valid value to the chips array and clear the input.</li>
+          <li>Render every item from the array as a chip.</li>
+          <li>Add a remove action to delete a chip by index or ID.</li>
+          <li>Handle <code>Backspace</code> when the input is empty to remove the last chip.</li>
+          <li>Add validation/accessibility depending on the product requirement.</li>
+        </ol>
+
+        <h3>Core state model</h3>
+        <pre><code>chips = ["React", "JavaScript"]
+inputValue = "TypeScript"</code></pre>
+
+        <p>
+          The input value and chips should be treated as <strong>different pieces of state</strong>.
+          The typed text is temporary; a chip is a committed value.
+        </p>
+      </div>
+    </section>
+
+    <section id="flow" class="section">
+      <div class="card">
+        <span class="eyebrow">EXECUTION FLOW</span>
+        <h2>How Chips Input works — simple visual flow</h2>
+
+        <div class="flow">
+          <div class="flow-step"><div class="number">1</div><strong>User types</strong><br/>"React"</div>
+          <div class="flow-step"><div class="number">2</div><strong>Press Enter</strong><br/>Commit event</div>
+          <div class="flow-step"><div class="number">3</div><strong>Validate</strong><br/>Trim / duplicate check</div>
+          <div class="flow-step"><div class="number">4</div><strong>Update state</strong><br/>Add to chips array</div>
+          <div class="flow-step"><div class="number">5</div><strong>Render chip</strong><br/>React → [React ×]</div>
+        </div>
+
+        <h3>Deletion flow</h3>
+        <div class="flow">
+          <div class="flow-step"><div class="number">1</div><strong>Click ×</strong><br/>User chooses chip</div>
+          <div class="flow-step"><div class="number">2</div><strong>Identify item</strong><br/>Index / ID</div>
+          <div class="flow-step"><div class="number">3</div><strong>Filter</strong><br/>Remove selected value</div>
+          <div class="flow-step"><div class="number">4</div><strong>Update state</strong><br/>New array</div>
+          <div class="flow-step"><div class="number">5</div><strong>Re-render</strong><br/>Chip disappears</div>
+        </div>
+
+        <div class="highlight">
+          <strong>One-line mental model:</strong>
+          Type → Enter → Validate → Store → Render → Remove when needed.
+        </div>
+      </div>
+    </section>
+
+    <section id="one" class="section">
+      <div class="card">
+        <span class="eyebrow">1 MINUTE</span>
+        <h2>How to explain Chips Input to the interviewer in 1 minute</h2>
+
+        <div class="success">
+          <p>
+            “I implemented the Chips Input as a controlled multi-value input. I keep two pieces of state:
+            one for the current text and another array for committed chips. When the user presses Enter,
+            I trim the value, validate that it is not empty and optionally check for duplicates. If valid,
+            I append it to the chips array and clear the input. Each chip is rendered with a remove button,
+            so removing a chip creates a new array without that item. I also handle Backspace when the input
+            is empty so the last chip can be removed. This keeps temporary input separate from committed data
+            and makes the component easy to validate, reuse and extend.”
+          </p>
+        </div>
+
+        <h3>What the interviewer should hear</h3>
+        <ul>
+          <li>Controlled input</li>
+          <li>Array-based state</li>
+          <li>Enter-to-commit behavior</li>
+          <li>Validation and duplicate handling</li>
+          <li>Immutable updates</li>
+          <li>Individual chip deletion</li>
+          <li>Keyboard accessibility</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="five" class="section">
+      <div class="card">
+        <span class="eyebrow">5 MINUTES</span>
+        <h2>How to explain Chips Input in 5 minutes</h2>
+
+        <h3>1. Start with the requirement</h3>
+        <p>
+          “The requirement is to allow users to enter multiple independent values in one input.
+          Once a value is committed, it should become a chip that can be removed independently.”
+        </p>
+
+        <h3>2. Explain the state</h3>
+        <p>
+          “I separate temporary input from committed values. The temporary text lives in
+          <code>inputValue</code>, while committed values live in <code>chips</code>.”
+        </p>
+
+        <pre><code>const [inputValue, setInputValue] = useState("");
+const [chips, setChips] = useState([]);</code></pre>
+
+        <h3>3. Explain adding</h3>
+        <p>
+          “On Enter, I prevent the default behavior, trim the input, reject empty values and,
+          if required, reject duplicates. Then I add the value to the array and reset the input.”
+        </p>
+
+        <h3>4. Explain rendering</h3>
+        <p>
+          “The chips array is mapped into UI elements. Each chip has its own remove button.
+          In React I use a stable key, ideally an ID when the data has one.”
+        </p>
+
+        <h3>5. Explain deletion</h3>
+        <p>
+          “When the remove button is clicked, I filter the selected item out and update state
+          immutably. If the product supports keyboard deletion, Backspace on an empty input removes
+          the last chip.”
+        </p>
+
+        <h3>6. Explain edge cases</h3>
+        <ul>
+          <li>Empty input</li>
+          <li>Leading/trailing spaces</li>
+          <li>Duplicate values</li>
+          <li>Very long values</li>
+          <li>Keyboard-only interaction</li>
+          <li>Paste behavior</li>
+          <li>Maximum chip count</li>
+          <li>Validation errors</li>
+        </ul>
+
+        <div class="highlight">
+          <strong>Strong closing line:</strong>
+          “The component is intentionally split into input state, committed chip state and interaction
+          handlers, so validation rules or async suggestions can be added without changing the core model.”
+        </div>
+      </div>
+    </section>
+
+    <section id="implementation" class="section">
+      <div class="card">
+        <span class="eyebrow">MY IMPLEMENTATION</span>
+        <h2>How I implemented it — explanation to interviewer</h2>
+
+        <p>You can explain your implementation in this order:</p>
+
+        <div class="two-col">
+          <div>
+            <h3>1. Data model</h3>
+            <p>
+              “I use an array for committed chips and a string for the current input. This avoids
+              mixing temporary text with committed values.”
+            </p>
+          </div>
+          <div>
+            <h3>2. Input event</h3>
+            <p>
+              “I listen to the keyboard event and only commit on Enter. I also prevent form submission
+              when this control is inside a form.”
+            </p>
+          </div>
+          <div>
+            <h3>3. Validation</h3>
+            <p>
+              “Before adding, I trim whitespace and check that the value is not empty. I can add
+              case-insensitive duplicate detection if the requirement needs it.”
+            </p>
+          </div>
+          <div>
+            <h3>4. Rendering</h3>
+            <p>
+              “I map the chips array into small pill-shaped elements. Each chip exposes a remove action.”
+            </p>
+          </div>
+          <div>
+            <h3>5. Removal</h3>
+            <p>
+              “The remove handler creates a new array using filter instead of mutating the existing state.”
+            </p>
+          </div>
+          <div>
+            <h3>6. Keyboard UX</h3>
+            <p>
+              “When the input is empty, Backspace removes the last chip. This makes the component feel
+              like a native token input.”
+            </p>
+          </div>
+        </div>
+
+        <div class="success">
+          <strong>Interview-friendly implementation statement:</strong>
+          “I first implemented the smallest correct behavior—add on Enter and remove on click.
+          Then I added edge cases such as trimming, duplicates, Backspace behavior and accessibility.”
+        </div>
+      </div>
+    </section>
+
+    <section id="fullcode" class="section">
+      <div class="card">
+        <span class="eyebrow">FULL CODE</span>
+        <h2>Standalone HTML + CSS + JavaScript</h2>
+        <p class="muted">
+          This version is framework-independent and demonstrates the complete interaction model.
+        </p>
+
+        <div class="code-label">Complete implementation</div>
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;Chips Input&lt;/title&gt;
+  &lt;style&gt;
+    .chip-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #dbeafe;
+    }
+
+    .chip button {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input {
+      flex: 1;
+      min-width: 140px;
+      border: 0;
+      outline: 0;
+      padding: 8px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div class="chip-input" id="chipInput"&gt;
+    &lt;input
+      id="input"
+      type="text"
+      placeholder="Type and press Enter..."
+      aria-label="Add value"
+    /&gt;
+  &lt;/div&gt;
+
+  &lt;script&gt;
+    const chipInput = document.getElementById("chipInput");
+    const input = document.getElementById("input");
+
+    let chips = [];
+
+    function addChip(value) {
+      const trimmed = value.trim();
+
+      if (!trimmed) return;
+
+      const alreadyExists = chips.some(
+        chip =&gt; chip.toLowerCase() === trimmed.toLowerCase()
+      );
+
+      if (alreadyExists) return;
+
+      chips.push(trimmed);
+      render();
+    }
+
+    function removeChip(index) {
+      chips = chips.filter((_, i) =&gt; i !== index);
+      render();
+      input.focus();
+    }
+
+    function render() {
+      chipInput.querySelectorAll(".chip").forEach(el =&gt; el.remove());
+
+      chips.forEach((chip, index) =&gt; {
+        const chipElement = document.createElement("span");
+        chipElement.className = "chip";
+
+        const text = document.createElement("span");
+        text.textContent = chip;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "×";
+        button.setAttribute("aria-label", "Remove " + chip);
+
+        button.addEventListener("click", () =&gt; {
+          removeChip(index);
+        });
+
+        chipElement.append(text, button);
+        chipInput.insertBefore(chipElement, input);
+      });
+    }
+
+    input.addEventListener("keydown", event =&gt; {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addChip(input.value);
+        input.value = "";
+      }
+
+      if (
+        event.key === "Backspace" &&
+        input.value === "" &&
+        chips.length &gt; 0
+      ) {
+        removeChip(chips.length - 1);
+      }
+    });
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <div class="code-label">React core implementation</div>
+        <pre><code>import { useState } from "react";
+
+function ChipsInput() {
+  const [inputValue, setInputValue] = useState("");
+  const [chips, setChips] = useState([]);
+
+  const addChip = () =&gt; {
+    const value = inputValue.trim();
+
+    if (!value) return;
+
+    const exists = chips.some(
+      chip =&gt; chip.toLowerCase() === value.toLowerCase()
+    );
+
+    if (exists) return;
+
+    setChips(prev =&gt; [...prev, value]);
+    setInputValue("");
+  };
+
+  const removeChip = (index) =&gt; {
+    setChips(prev =&gt; prev.filter((_, i) =&gt; i !== index));
+  };
+
+  const handleKeyDown = (event) =&gt; {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addChip();
+    }
+
+    if (
+      event.key === "Backspace" &&
+      inputValue === "" &&
+      chips.length &gt; 0
+    ) {
+      removeChip(chips.length - 1);
+    }
+  };
+
+  return (
+    &lt;div className="chip-input"&gt;
+      {chips.map((chip, index) =&gt; (
+        &lt;span className="chip" key={chip}&gt;
+          {chip}
+          &lt;button
+            type="button"
+            aria-label={`Remove ${chip}`}
+            onClick={() =&gt; removeChip(index)}
+          &gt;
+            ×
+          &lt;/button&gt;
+        &lt;/span&gt;
+      ))}
+
+      &lt;input
+        value={inputValue}
+        onChange={e =&gt; setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Type and press Enter..."
+        aria-label="Add value"
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default ChipsInput;</code></pre>
+
+        <div class="highlight">
+          <strong>Note:</strong> For production, prefer stable IDs as React keys when chip objects have IDs.
+          For an email chips input, validate the email format before committing.
+        </div>
+      </div>
+    </section>
+
+    <section id="mistakes" class="section">
+      <div class="card">
+        <span class="eyebrow">COMMON MISTAKES</span>
+        <h2>Common developer mistakes</h2>
+
+        <div class="mistake-grid">
+          <div class="mistake">
+            <strong>1. Storing everything as one string</strong>
+            <p>Using <code>"React, JS, CSS"</code> as the source of truth makes deletion and validation harder.</p>
+            <p><b>Better:</b> Keep committed values in an array.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>2. Forgetting trim()</strong>
+            <p>Users can accidentally create values such as <code>" React "</code>.</p>
+            <p><b>Better:</b> Normalize the value before storing it.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>3. Allowing duplicates unintentionally</strong>
+            <p>The same chip can be added repeatedly if duplicate rules are not defined.</p>
+            <p><b>Better:</b> Decide whether duplicates are allowed and enforce the rule.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>4. Mutating state directly</strong>
+            <p>Using array mutation such as <code>chips.push()</code> with React state can cause stale or unexpected UI.</p>
+            <p><b>Better:</b> Use immutable updates such as <code>setChips(prev =&gt; [...prev, value])</code>.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>5. Not preventing Enter's default behavior</strong>
+            <p>Inside a form, Enter may submit the form instead of only adding the chip.</p>
+            <p><b>Better:</b> Call <code>event.preventDefault()</code> when committing.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>6. Missing keyboard support</strong>
+            <p>A chip input that works only with mouse clicks is poor for keyboard users.</p>
+            <p><b>Better:</b> Support Enter, Backspace and keyboard-accessible remove buttons.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>7. Using array index blindly as key</strong>
+            <p>Index keys can cause rendering problems when items are reordered or deleted.</p>
+            <p><b>Better:</b> Use a stable unique ID when available.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>8. Ignoring accessibility</strong>
+            <p>Icon-only × buttons without labels are difficult for screen-reader users.</p>
+            <p><b>Better:</b> Add an accessible name such as <code>Remove React</code>.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>9. Not defining paste behavior</strong>
+            <p>Some products expect pasted comma-separated values to become multiple chips.</p>
+            <p><b>Better:</b> Clarify the requirement and support it intentionally.</p>
+          </div>
+
+          <div class="mistake">
+            <strong>10. Overengineering too early</strong>
+            <p>Adding autocomplete, async APIs and complex abstractions before the basic behavior works slows the round.</p>
+            <p><b>Better:</b> Build add/remove first, then layer advanced requirements.</p>
+          </div>
+        </div>
+
+        <div class="warning">
+          <strong>Machine coding round tip:</strong> First make the happy path work. Then proactively mention
+          edge cases and accessibility while improving the implementation.
+        </div>
+      </div>
+    </section>
+
+    <section id="followups" class="section">
+      <div class="card">
+        <span class="eyebrow">FOLLOW-UPS</span>
+        <h2>Likely interviewer follow-up questions</h2>
+
+        <div class="followup-grid">
+          <div class="followup">
+            <strong>How would you prevent duplicates?</strong>
+            <p>Normalize with trim/lowercase and check the existing array before adding.</p>
+          </div>
+
+          <div class="followup">
+            <strong>How would you support email chips?</strong>
+            <p>Run email validation before committing and show an item-level validation error if needed.</p>
+          </div>
+
+          <div class="followup">
+            <strong>How would you support comma-separated input?</strong>
+            <p>Parse delimiters such as comma, split into values, normalize, validate and add all valid items.</p>
+          </div>
+
+          <div class="followup">
+            <strong>What if there is a maximum of 10 chips?</strong>
+            <p>Check the current length before adding and show a clear limit message.</p>
+          </div>
+
+          <div class="followup">
+            <strong>How would you add autocomplete?</strong>
+            <p>Keep input state separate, debounce the query, fetch suggestions and let the user select one to commit.</p>
+          </div>
+
+          <div class="followup">
+            <strong>How would you make it accessible?</strong>
+            <p>Use a real input, labeled remove buttons, visible focus states and sensible keyboard interactions.</p>
+          </div>
+
+          <div class="followup">
+            <strong>How would you handle thousands of chips?</strong>
+            <p>Question the UX first. If truly required, consider virtualization and avoid unnecessary re-renders.</p>
+          </div>
+
+          <div class="followup">
+            <strong>How would you test it?</strong>
+            <p>Test add, empty input, trimming, duplicate behavior, deletion, Backspace, Enter inside forms and accessibility.</p>
+          </div>
+        </div>
+
+        <h3>Final interview checklist</h3>
+        <ul>
+          <li>Can I explain the difference between input state and chips state?</li>
+          <li>Can I implement Enter-to-add without submitting a form?</li>
+          <li>Can I remove one chip immutably?</li>
+          <li>Can I handle empty and duplicate values?</li>
+          <li>Can I explain Backspace behavior?</li>
+          <li>Can I mention accessibility?</li>
+          <li>Can I extend the component to autocomplete, validation or paste support?</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll(".nav-btn");
+  const sections = document.querySelectorAll(".section");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      buttons.forEach(btn => btn.classList.remove("active"));
+      sections.forEach(section => section.classList.remove("active"));
+
+      button.classList.add("active");
+      document.getElementById(button.dataset.target).classList.add("active");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  // Demo implementation
+  const demoInput = document.getElementById("demoInput");
+  const chipText = document.getElementById("chipText");
+  let demoChips = [];
+
+  function renderDemo() {
+    demoInput.querySelectorAll(".chip").forEach(el => el.remove());
+
+    demoChips.forEach((chip, index) => {
+      const chipEl = document.createElement("span");
+      chipEl.className = "chip";
+
+      const text = document.createElement("span");
+      text.textContent = chip;
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "×";
+      remove.setAttribute("aria-label", `Remove ${chip}`);
+      remove.addEventListener("click", () => {
+        demoChips = demoChips.filter((_, i) => i !== index);
+        renderDemo();
+        chipText.focus();
+      });
+
+      chipEl.append(text, remove);
+      demoInput.insertBefore(chipEl, chipText);
+    });
+  }
+
+  chipText.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+
+      const value = chipText.value.trim();
+      if (!value) return;
+
+      const exists = demoChips.some(
+        chip => chip.toLowerCase() === value.toLowerCase()
+      );
+
+      if (!exists) {
+        demoChips.push(value);
+        chipText.value = "";
+        renderDemo();
+      }
+    }
+
+    if (
+      event.key === "Backspace" &&
+      chipText.value === "" &&
+      demoChips.length
+    ) {
+      demoChips.pop();
+      renderDemo();
+    }
+  });
+</script>
+</body>
+</html>

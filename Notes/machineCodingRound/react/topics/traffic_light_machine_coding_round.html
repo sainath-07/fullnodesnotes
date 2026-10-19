@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traffic Light - Machine Coding Round</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#64748b;--border:#dbe2ea;
+  --primary:#2563eb;--primary-soft:#eff6ff;--dark:#111827;--success:#15803d;
+  --warning:#b45309;--warning-bg:#fff7ed;--code:#0b1220;
+  --shadow:0 10px 30px rgba(15,23,42,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+header{background:linear-gradient(135deg,#111827,#1e3a8a);color:#fff;padding:28px 32px;position:sticky;top:0;z-index:20;box-shadow:0 5px 20px rgba(0,0,0,.16)}
+header h1{margin:0 0 4px;font-size:28px}
+header p{margin:0;color:#dbeafe;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 94px)}
+aside{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:94px;height:calc(100vh - 94px);overflow-y:auto}
+.nav-title{font-weight:800;margin-bottom:12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.nav-btn{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:12px 14px;margin-bottom:7px;border-radius:10px;cursor:pointer;color:#334155;font-weight:650;transition:.2s}
+.nav-btn:hover{background:#f8fafc;border-color:var(--border)}
+.nav-btn.active{background:var(--primary-soft);border-color:#bfdbfe;color:#1d4ed8}
+main{padding:28px;max-width:1200px;width:100%;margin:0 auto}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:28px;margin-bottom:22px}
+.eyebrow{display:inline-block;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;margin-bottom:10px}
+h2{margin-top:0;font-size:25px}h3{margin-top:24px}.muted{color:var(--muted)}
+ul,ol{padding-left:22px}li{margin:7px 0}
+.highlight{background:var(--primary-soft);border-left:4px solid var(--primary);padding:14px 16px;border-radius:8px;margin:16px 0}
+.success{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--success);padding:15px 16px;border-radius:10px;margin:12px 0}
+.warning{background:var(--warning-bg);border:1px solid #fed7aa;border-left:4px solid var(--warning);padding:15px 16px;border-radius:10px;margin:12px 0}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;margin:22px 0}
+.flow-step{position:relative;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;font-size:13px}
+.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-15px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:22px;font-weight:900;z-index:2}
+.number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800;margin:0 auto 8px}
+.demo{border:1px solid var(--border);background:#fafafa;border-radius:14px;padding:20px;margin-top:18px}
+.traffic-demo{display:flex;flex-direction:column;align-items:center;gap:18px}
+.signal{background:#151a23;border-radius:22px;padding:18px 18px;display:flex;flex-direction:column;gap:13px;box-shadow:0 12px 28px rgba(15,23,42,.2)}
+.light{width:82px;height:82px;border-radius:50%;background:#2a303a;opacity:.35;border:3px solid #303846;transition:.25s}
+.light.active{opacity:1;box-shadow:0 0 28px currentColor}
+.light.red.active{background:#ef4444;color:#ef4444}.light.yellow.active{background:#f59e0b;color:#f59e0b}.light.green.active{background:#22c55e;color:#22c55e}
+.demo-controls{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.demo-controls button{border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:700}
+.demo-controls button:hover{background:#eff6ff}
+.demo-status{font-weight:800}
+.demo-note{margin:0;color:var(--muted);font-size:13px;text-align:center}
+pre{background:var(--code);color:#e5e7eb;padding:20px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
+code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+.mistake-grid,.followup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mistake,.followup{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
+.mistake strong{color:#9a3412}.followup strong{color:#1d4ed8}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:12px;font-weight:700;margin:3px}
+.code-label{margin:18px 0 7px;font-size:13px;font-weight:800;color:#475569}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.state-diagram{display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center;margin:18px 0}
+.state-box{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.state-arrow{text-align:center;font-size:26px;font-weight:900;color:var(--primary)}
+@media(max-width:900px){
+.layout{grid-template-columns:1fr}
+aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+.flow{grid-template-columns:1fr}
+.flow-step:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-22px;transform:translateX(-50%)}
+.mistake-grid,.followup-grid,.two-col,.state-diagram{grid-template-columns:1fr}
+.state-arrow{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Traffic Light — Machine Coding Round</h1>
+<p>Interview-ready guide: What, Why, How, execution flow, implementation explanation, full code, mistakes and follow-ups.</p>
+</header>
+
+<div class="layout">
+<aside>
+<div class="nav-title">Questions / Topics</div>
+<button class="nav-btn active" data-target="what">What is Traffic Light?</button>
+<button class="nav-btn" data-target="why">Why / What problem?</button>
+<button class="nav-btn" data-target="how">How to implement?</button>
+<button class="nav-btn" data-target="flow">Execution Flow</button>
+<button class="nav-btn" data-target="one">Explain in 1 Minute</button>
+<button class="nav-btn" data-target="five">Explain in 5 Minutes</button>
+<button class="nav-btn" data-target="implementation">How I Implemented It</button>
+<button class="nav-btn" data-target="fullcode">Full Code</button>
+<button class="nav-btn" data-target="mistakes">Common Developer Mistakes</button>
+<button class="nav-btn" data-target="followups">Likely Interviewer Follow-ups</button>
+</aside>
+
+<main>
+<section id="what" class="section active">
+<div class="card">
+<span class="eyebrow">WHAT</span>
+<h2>What is a Traffic Light?</h2>
+<p>
+A <strong>Traffic Light</strong> machine coding problem is a state-driven UI component that displays
+traffic signal states such as <strong>Red, Yellow and Green</strong> and changes between them according
+to a defined sequence and timing rule.
+</p>
+<div class="highlight">
+<strong>Simple interview definition:</strong>
+“Traffic Light is a finite state machine where the UI represents the current signal state and a timer
+or user action transitions the component to the next valid state.”
+</div>
+<h3>Typical requirements</h3>
+<div>
+<span class="pill">Red → Green → Yellow → Red</span>
+<span class="pill">Automatic timer</span>
+<span class="pill">Countdown</span>
+<span class="pill">Start / Pause / Reset</span>
+<span class="pill">Configurable duration</span>
+<span class="pill">Accessibility</span>
+</div>
+
+<h3>Interactive demo</h3>
+<div class="demo">
+<div class="traffic-demo">
+<div class="signal" aria-label="Traffic light">
+<div id="redLight" class="light red"></div>
+<div id="yellowLight" class="light yellow"></div>
+<div id="greenLight" class="light green"></div>
+</div>
+<div class="demo-status" id="demoStatus">RED · 5s</div>
+<div class="demo-controls">
+<button id="startBtn" type="button">Start</button>
+<button id="pauseBtn" type="button">Pause</button>
+<button id="resetBtn" type="button">Reset</button>
+</div>
+<p class="demo-note">The demo follows Red → Green → Yellow → Red with configurable durations in the code.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="eyebrow">WHY</span>
+<h2>What problem does a Traffic Light component solve?</h2>
+<p>
+This problem tests whether you can model a UI that has <strong>multiple states, strict transitions and time-based behavior</strong>.
+It is less about drawing three circles and more about managing state predictably.
+</p>
+<h3>Problems it demonstrates</h3>
+<ul>
+<li><strong>State management:</strong> Only one signal state should be active at a time.</li>
+<li><strong>State transitions:</strong> A state can transition only to the next valid state.</li>
+<li><strong>Timers:</strong> The UI must change at the correct time.</li>
+<li><strong>Cleanup:</strong> Timers must be stopped when the component is paused or unmounted.</li>
+<li><strong>Derived UI:</strong> The active light and countdown come from the current state.</li>
+<li><strong>Extensibility:</strong> Start, pause, reset and configurable durations can be added cleanly.</li>
+</ul>
+<div class="success">
+<strong>Key interview point:</strong> Treat the traffic light as a small state machine, not as three independent
+boolean variables such as <code>isRed</code>, <code>isYellow</code> and <code>isGreen</code>.
+</div>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="eyebrow">HOW</span>
+<h2>How to implement a Traffic Light</h2>
+<ol>
+<li>Define the allowed states: <code>RED</code>, <code>GREEN</code>, <code>YELLOW</code>.</li>
+<li>Define the duration for each state.</li>
+<li>Keep one state variable for the current light.</li>
+<li>Keep a countdown/timer value if the UI needs to display remaining seconds.</li>
+<li>On every timer tick, decrement the countdown.</li>
+<li>When the countdown reaches zero, transition to the next valid state.</li>
+<li>Reset the countdown using the duration of the new state.</li>
+<li>Clear the interval when paused, reset or when the component unmounts.</li>
+<li>Render the active light based on the current state.</li>
+</ol>
+<h3>State model</h3>
+<pre><code>state = {
+  current: "RED",
+  remaining: 5,
+  running: true
+}
+
+durations = {
+  RED: 5,
+  GREEN: 4,
+  YELLOW: 2
+}</code></pre>
+
+<div class="state-diagram">
+<div class="state-box"><strong>RED</strong><br>5 seconds</div>
+<div class="state-arrow">→</div>
+<div class="state-box"><strong>GREEN</strong><br>4 seconds</div>
+</div>
+<div class="state-diagram">
+<div class="state-box"><strong>GREEN</strong><br>4 seconds</div>
+<div class="state-arrow">→</div>
+<div class="state-box"><strong>YELLOW</strong><br>2 seconds</div>
+</div>
+<div class="state-diagram">
+<div class="state-box"><strong>YELLOW</strong><br>2 seconds</div>
+<div class="state-arrow">→</div>
+<div class="state-box"><strong>RED</strong><br>5 seconds</div>
+</div>
+
+<div class="highlight">
+<strong>Important:</strong> There should be one source of truth for the active state. The UI should be a
+pure representation of that state rather than separately toggling CSS/classes from multiple places.
+</div>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="eyebrow">EXECUTION FLOW</span>
+<h2>How Traffic Light works — simple visual explanation</h2>
+<div class="flow">
+<div class="flow-step"><div class="number">1</div><strong>Initial state</strong><br/>RED + duration</div>
+<div class="flow-step"><div class="number">2</div><strong>Start timer</strong><br/>1-second ticks</div>
+<div class="flow-step"><div class="number">3</div><strong>Countdown</strong><br/>Remaining seconds decrease</div>
+<div class="flow-step"><div class="number">4</div><strong>Transition</strong><br/>At zero, choose next state</div>
+<div class="flow-step"><div class="number">5</div><strong>Render</strong><br/>Light + timer update</div>
+</div>
+
+<h3>Example execution</h3>
+<pre><code>Initial:
+RED = 5 seconds
+
+5 → 4 → 3 → 2 → 1
+          ↓
+RED expires
+          ↓
+GREEN = 4 seconds
+
+4 → 3 → 2 → 1
+          ↓
+GREEN expires
+          ↓
+YELLOW = 2 seconds
+
+2 → 1
+  ↓
+YELLOW expires
+  ↓
+RED = 5 seconds
+  ↓
+Repeat</code></pre>
+
+<h3>Timer lifecycle</h3>
+<div class="flow">
+<div class="flow-step"><div class="number">1</div><strong>Mount / Start</strong><br/>Create interval</div>
+<div class="flow-step"><div class="number">2</div><strong>Tick</strong><br/>Update countdown</div>
+<div class="flow-step"><div class="number">3</div><strong>Pause / Unmount</strong><br/>Clear interval</div>
+<div class="flow-step"><div class="number">4</div><strong>Resume</strong><br/>Create a fresh interval</div>
+<div class="flow-step"><div class="number">5</div><strong>Reset</strong><br/>Restore initial state</div>
+</div>
+
+<div class="warning">
+<strong>Timer rule:</strong> Never create a new interval on every render without cleaning up the old one.
+That causes multiple timers to run simultaneously.
+</div>
+</div>
+</section>
+
+<section id="one" class="section">
+<div class="card">
+<span class="eyebrow">1 MINUTE</span>
+<h2>How to explain Traffic Light to the interviewer in 1 minute</h2>
+<div class="success">
+<p>
+“I implemented the traffic light as a small finite state machine. I have three valid states:
+Red, Green and Yellow, and each state has a configured duration. I keep the current state and
+remaining time in state. A one-second interval decrements the remaining time. When it reaches zero,
+I transition to the next valid state and reset the countdown using that state's duration. The UI only
+renders based on the current state, so there is one source of truth. I also clean up the interval on
+pause, reset and component unmount to avoid multiple timers or memory leaks.”
+</p>
+</div>
+<h3>What the interviewer should hear</h3>
+<ul>
+<li>Finite state machine</li>
+<li>One current state, not three unrelated booleans</li>
+<li>Configured state durations</li>
+<li>Timer lifecycle and cleanup</li>
+<li>Predictable state transitions</li>
+<li>UI derived from state</li>
+<li>Easy extension to pause, reset and countdown</li>
+</ul>
+</div>
+</section>
+
+<section id="five" class="section">
+<div class="card">
+<span class="eyebrow">5 MINUTES</span>
+<h2>How to explain Traffic Light in 5 minutes</h2>
+<h3>1. Clarify the requirement</h3>
+<p>
+“I first clarify the sequence and durations. For example, Red → Green → Yellow → Red.
+I also ask whether the timer should be visible and whether Start, Pause and Reset are required.”
+</p>
+
+<h3>2. Model it as a state machine</h3>
+<p>
+“I don't keep separate <code>isRed</code>, <code>isGreen</code> and <code>isYellow</code> flags because
+those can become inconsistent. Instead, one variable represents the current state.”
+</p>
+
+<h3>3. Define durations</h3>
+<pre><code>const durations = {
+  RED: 5,
+  GREEN: 4,
+  YELLOW: 2
+};</code></pre>
+
+<h3>4. Run the timer</h3>
+<p>
+“Every second I decrement the remaining time. When it reaches zero, I calculate the next state and
+reset the remaining time to that state's duration.”
+</p>
+
+<h3>5. Handle lifecycle</h3>
+<p>
+“The interval must be cleared when the component is paused or unmounted. If I use React, this belongs
+inside an effect cleanup so the component never leaves an orphaned timer.”
+</p>
+
+<h3>6. Explain edge cases</h3>
+<ul>
+<li>Pause should freeze both the light and countdown.</li>
+<li>Resume should continue from the current remaining time.</li>
+<li>Reset should restore the initial state and duration.</li>
+<li>Invalid duration values should be normalized or rejected.</li>
+<li>Changing duration configuration should not create duplicate intervals.</li>
+<li>Tab/background throttling means browser timers are not real-time clocks for safety-critical systems.</li>
+</ul>
+
+<div class="highlight">
+<strong>Strong closing line:</strong>
+“The key design decision is to model the problem as a state machine with one source of truth and a
+well-managed timer lifecycle. That makes the behavior predictable and easy to extend.”
+</div>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="eyebrow">MY IMPLEMENTATION</span>
+<h2>How I implemented it — explanation to interviewer</h2>
+<p>Explain your implementation in this order:</p>
+
+<div class="two-col">
+<div>
+<h3>1. Constants</h3>
+<p>“I defined the states and their durations separately so the transition logic doesn't contain hard-coded timing everywhere.”</p>
+</div>
+<div>
+<h3>2. Current state</h3>
+<p>“I store one current state such as RED. The active CSS class is derived from that value.”</p>
+</div>
+<div>
+<h3>3. Countdown</h3>
+<p>“I keep remaining seconds separately because it is display state. It is reset whenever the signal changes.”</p>
+</div>
+<div>
+<h3>4. Transition function</h3>
+<p>“I use a deterministic mapping: RED → GREEN, GREEN → YELLOW, YELLOW → RED.”</p>
+</div>
+<div>
+<h3>5. Timer</h3>
+<p>“The interval runs only while the component is active. Each tick updates the countdown and triggers a transition at zero.”</p>
+</div>
+<div>
+<h3>6. Cleanup</h3>
+<p>“I clear the interval during cleanup. This prevents multiple intervals and stale updates after unmount.”</p>
+</div>
+</div>
+
+<div class="success">
+<strong>Interview-friendly statement:</strong>
+“I first built the state transition correctly, then added the timer, then added controls and cleanup.
+This keeps the core logic independently testable.”
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="section">
+<div class="card">
+<span class="eyebrow">FULL CODE</span>
+<h2>Standalone HTML + CSS + JavaScript</h2>
+<p class="muted">This version includes automatic transitions, countdown, Start, Pause and Reset.</p>
+
+<div class="code-label">Complete implementation</div>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;Traffic Light&lt;/title&gt;
+  &lt;style&gt;
+    .traffic-light {
+      width: 120px;
+      padding: 20px;
+      border-radius: 20px;
+      background: #111827;
+    }
+
+    .light {
+      width: 70px;
+      height: 70px;
+      margin: 10px auto;
+      border-radius: 50%;
+      background: #374151;
+      opacity: .3;
+    }
+
+    .light.active {
+      opacity: 1;
+    }
+
+    .red.active {
+      background: red;
+    }
+
+    .yellow.active {
+      background: orange;
+    }
+
+    .green.active {
+      background: green;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div class="traffic-light"&gt;
+    &lt;div id="red" class="light red"&gt;&lt;/div&gt;
+    &lt;div id="yellow" class="light yellow"&gt;&lt;/div&gt;
+    &lt;div id="green" class="light green"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;p id="status"&gt;&lt;/p&gt;
+
+  &lt;button id="start"&gt;Start&lt;/button&gt;
+  &lt;button id="pause"&gt;Pause&lt;/button&gt;
+  &lt;button id="reset"&gt;Reset&lt;/button&gt;
+
+  &lt;script&gt;
+    const durations = {
+      RED: 5,
+      GREEN: 4,
+      YELLOW: 2
+    };
+
+    const nextState = {
+      RED: "GREEN",
+      GREEN: "YELLOW",
+      YELLOW: "RED"
+    };
+
+    let current = "RED";
+    let remaining = durations[current];
+    let timerId = null;
+
+    function render() {
+      document.querySelectorAll(".light")
+        .forEach(light =&gt; light.classList.remove("active"));
+
+      document
+        .getElementById(current.toLowerCase())
+        .classList.add("active");
+
+      document.getElementById("status").textContent =
+        `${current} · ${remaining}s`;
+    }
+
+    function tick() {
+      if (remaining &gt; 1) {
+        remaining -= 1;
+      } else {
+        current = nextState[current];
+        remaining = durations[current];
+      }
+
+      render();
+    }
+
+    function start() {
+      if (timerId !== null) return;
+
+      timerId = setInterval(tick, 1000);
+    }
+
+    function pause() {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function reset() {
+      pause();
+      current = "RED";
+      remaining = durations[current];
+      render();
+    }
+
+    document.getElementById("start")
+      .addEventListener("click", start);
+
+    document.getElementById("pause")
+      .addEventListener("click", pause);
+
+    document.getElementById("reset")
+      .addEventListener("click", reset);
+
+    render();
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<div class="code-label">React implementation</div>
+<pre><code>import { useEffect, useState } from "react";
+
+const DURATIONS = {
+  RED: 5,
+  GREEN: 4,
+  YELLOW: 2
+};
+
+const NEXT = {
+  RED: "GREEN",
+  GREEN: "YELLOW",
+  YELLOW: "RED"
+};
+
+function TrafficLight() {
+  const [current, setCurrent] = useState("RED");
+  const [remaining, setRemaining] = useState(DURATIONS.RED);
+  const [running, setRunning] = useState(true);
+
+  useEffect(() =&gt; {
+    if (!running) return;
+
+    const timerId = setInterval(() =&gt; {
+      setRemaining(prev =&gt; {
+        if (prev &gt; 1) {
+          return prev - 1;
+        }
+
+        setCurrent(currentState =&gt; {
+          const next = NEXT[currentState];
+          return next;
+        });
+
+        return DURATIONS[NEXT[current]];
+      });
+    }, 1000);
+
+    return () =&gt; clearInterval(timerId);
+  }, [running]);
+
+  const reset = () =&gt; {
+    setRunning(false);
+    setCurrent("RED");
+    setRemaining(DURATIONS.RED);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;div className="traffic-light"&gt;
+        {["RED", "YELLOW", "GREEN"].map(light =&gt; (
+          &lt;div
+            key={light}
+            className={`light ${light.toLowerCase()}
+              ${current === light ? "active" : ""}`}
+          /&gt;
+        ))}
+      &lt;/div&gt;
+
+      &lt;p&gt;
+        {current} · {remaining}s
+      &lt;/p&gt;
+
+      &lt;button onClick={() =&gt; setRunning(true)}&gt;
+        Start
+      &lt;/button&gt;
+
+      &lt;button onClick={() =&gt; setRunning(false)}&gt;
+        Pause
+      &lt;/button&gt;
+
+      &lt;button onClick={reset}&gt;
+        Reset
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default TrafficLight;</code></pre>
+
+<div class="highlight">
+<strong>Production note:</strong> For an interview implementation, a one-second interval is usually enough.
+For real timing guarantees, use timestamp-based calculations because browser timers can be delayed when
+a tab is backgrounded.
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="eyebrow">COMMON MISTAKES</span>
+<h2>Common developer mistakes</h2>
+
+<div class="mistake-grid">
+<div class="mistake"><strong>1. Using three independent booleans</strong><p>Keeping <code>isRed</code>, <code>isYellow</code> and <code>isGreen</code> can create impossible states where multiple lights are active.</p><p><b>Better:</b> Keep one <code>current</code> state.</p></div>
+
+<div class="mistake"><strong>2. Creating multiple intervals</strong><p>Starting a new <code>setInterval</code> every render or every button click can make the light change too quickly.</p><p><b>Better:</b> Ensure only one active timer exists and clean it up.</p></div>
+
+<div class="mistake"><strong>3. Forgetting cleanup</strong><p>An interval that continues after unmount can cause memory leaks or stale updates.</p><p><b>Better:</b> Clear the interval in cleanup.</p></div>
+
+<div class="mistake"><strong>4. Hard-coding transitions everywhere</strong><p>Scattering <code>if/else</code> timing and transition logic makes the component harder to extend.</p><p><b>Better:</b> Keep durations and next-state mapping in configuration.</p></div>
+
+<div class="mistake"><strong>5. Resetting the timer incorrectly</strong><p>After RED expires, accidentally using RED's duration for GREEN produces incorrect timing.</p><p><b>Better:</b> Set remaining time from the new state's duration.</p></div>
+
+<div class="mistake"><strong>6. Mixing DOM manipulation with state</strong><p>Manually adding/removing classes in many places can drift away from application state.</p><p><b>Better:</b> Render the UI from the current state.</p></div>
+
+<div class="mistake"><strong>7. Pause creates another timer on resume</strong><p>If the old timer isn't cleared, resume can create multiple intervals.</p><p><b>Better:</b> Make Start idempotent and track the active timer.</p></div>
+
+<div class="mistake"><strong>8. Ignoring browser timer limitations</strong><p><code>setInterval</code> is not a real-time clock and can be throttled in background tabs.</p><p><b>Better:</b> Use elapsed timestamps for accuracy-sensitive behavior.</p></div>
+
+<div class="mistake"><strong>9. No initial render</strong><p>The component may show no active light until the first timer tick.</p><p><b>Better:</b> Render the initial state immediately.</p></div>
+
+<div class="mistake"><strong>10. Overengineering too early</strong><p>Building a complex state library or animation system before the state machine works wastes machine-coding time.</p><p><b>Better:</b> Implement the state transition and timer lifecycle first.</p></div>
+</div>
+
+<div class="warning">
+<strong>Machine coding round tip:</strong> Say this explicitly:
+<strong>“I am treating the traffic light as a finite state machine, and the timer only drives transitions between valid states.”</strong>
+</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="eyebrow">FOLLOW-UPS</span>
+<h2>Likely interviewer follow-up questions</h2>
+
+<div class="followup-grid">
+<div class="followup"><strong>How would you change the duration dynamically?</strong><p>Keep durations in configuration/state and make the transition logic read the latest duration for the active state.</p></div>
+
+<div class="followup"><strong>How would you add a countdown?</strong><p>Keep remaining seconds as derived display state and decrement it on each tick.</p></div>
+
+<div class="followup"><strong>How would you implement pause/resume?</strong><p>Track a running flag and create/clear the interval based on that flag while preserving remaining time.</p></div>
+
+<div class="followup"><strong>How would you test the transition logic?</strong><p>Extract the state transition into a pure function and test RED → GREEN, GREEN → YELLOW and YELLOW → RED independently.</p></div>
+
+<div class="followup"><strong>Why not use three booleans?</strong><p>Because one enum-like current state guarantees only one active state and makes transitions explicit.</p></div>
+
+<div class="followup"><strong>What happens when the browser tab is inactive?</strong><p>Timers can be throttled. For accurate timing, compare timestamps instead of assuming exactly one callback per second.</p></div>
+
+<div class="followup"><strong>How would you add pedestrian mode?</strong><p>Add a higher-level state machine or transition rules for pedestrian requests instead of directly changing light classes.</p></div>
+
+<div class="followup"><strong>How would you make it accessible?</strong><p>Expose the current state and countdown with an appropriate status/live region and ensure controls have accessible names and keyboard support.</p></div>
+</div>
+
+<h3>Final interview checklist</h3>
+<ul>
+<li>Can I explain why this is a state-machine problem?</li>
+<li>Can I define the valid states and transitions?</li>
+<li>Can I implement the timer without duplicate intervals?</li>
+<li>Can I clean up the timer?</li>
+<li>Can I implement pause, resume and reset?</li>
+<li>Can I explain browser timer limitations?</li>
+<li>Can I separate transition logic from rendering?</li>
+</ul>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const buttons=document.querySelectorAll(".nav-btn");
+const sections=document.querySelectorAll(".section");
+
+buttons.forEach(button=>{
+  button.addEventListener("click",()=>{
+    buttons.forEach(btn=>btn.classList.remove("active"));
+    sections.forEach(section=>section.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+// Interactive Traffic Light Demo
+const durations={RED:5,GREEN:4,YELLOW:2};
+const nextState={RED:"GREEN",GREEN:"YELLOW",YELLOW:"RED"};
+
+let current="RED";
+let remaining=durations[current];
+let timerId=null;
+
+function renderTrafficDemo(){
+  document.querySelectorAll(".light").forEach(light=>{
+    light.classList.remove("active");
+  });
+
+  document.getElementById(current.toLowerCase()+"Light").classList.add("active");
+  document.getElementById("demoStatus").textContent=
+    current+" · "+remaining+"s";
+}
+
+function tickDemo(){
+  if(remaining>1){
+    remaining--;
+  }else{
+    current=nextState[current];
+    remaining=durations[current];
+  }
+  renderTrafficDemo();
+}
+
+function startDemo(){
+  if(timerId!==null)return;
+  timerId=setInterval(tickDemo,1000);
+}
+
+function pauseDemo(){
+  clearInterval(timerId);
+  timerId=null;
+}
+
+function resetDemo(){
+  pauseDemo();
+  current="RED";
+  remaining=durations[current];
+  renderTrafficDemo();
+}
+
+document.getElementById("startBtn").addEventListener("click",startDemo);
+document.getElementById("pauseBtn").addEventListener("click",pauseDemo);
+document.getElementById("resetBtn").addEventListener("click",resetDemo);
+
+renderTrafficDemo();
+</script>
+</body>
+</html>

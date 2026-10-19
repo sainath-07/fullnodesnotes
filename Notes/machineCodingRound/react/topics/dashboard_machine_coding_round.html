@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Machine Coding Round</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#64748b;--border:#dbe2ea;
+  --primary:#2563eb;--primary-soft:#eff6ff;--dark:#111827;--success:#15803d;
+  --warning:#b45309;--warning-bg:#fff7ed;--code:#0b1220;
+  --shadow:0 10px 30px rgba(15,23,42,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+header{background:linear-gradient(135deg,#111827,#1e3a8a);color:#fff;padding:28px 32px;position:sticky;top:0;z-index:20;box-shadow:0 5px 20px rgba(0,0,0,.16)}
+header h1{margin:0 0 4px;font-size:28px} header p{margin:0;color:#dbeafe;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 94px)}
+aside{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:94px;height:calc(100vh - 94px);overflow-y:auto}
+.nav-title{font-weight:800;margin-bottom:12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.nav-btn{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:12px 14px;margin-bottom:7px;border-radius:10px;cursor:pointer;color:#334155;font-weight:650;transition:.2s}
+.nav-btn:hover{background:#f8fafc;border-color:var(--border)}
+.nav-btn.active{background:var(--primary-soft);border-color:#bfdbfe;color:#1d4ed8}
+main{padding:28px;max-width:1200px;width:100%;margin:0 auto}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:28px;margin-bottom:22px}
+.eyebrow{display:inline-block;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.06em;margin-bottom:10px}
+h2{margin-top:0;font-size:25px} h3{margin-top:24px}.muted{color:var(--muted)}
+ul,ol{padding-left:22px}li{margin:7px 0}
+.highlight{background:var(--primary-soft);border-left:4px solid var(--primary);padding:14px 16px;border-radius:8px;margin:16px 0}
+.success{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--success);padding:15px 16px;border-radius:10px;margin:12px 0}
+.warning{background:var(--warning-bg);border:1px solid #fed7aa;border-left:4px solid var(--warning);padding:15px 16px;border-radius:10px;margin:12px 0}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;margin:22px 0}
+.flow-step{position:relative;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;font-size:13px}
+.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-15px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:22px;font-weight:900;z-index:2}
+.number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800;margin:0 auto 8px}
+.demo{border:1px solid var(--border);background:#fafafa;border-radius:14px;padding:20px;margin-top:18px}
+.dashboard-demo{display:grid;grid-template-columns:190px 1fr;min-height:390px;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;background:#fff}
+.demo-side{background:#0f172a;color:#cbd5e1;padding:18px}.demo-side h4{margin:0 0 18px;color:#fff}
+.demo-side button{display:block;width:100%;background:transparent;border:0;color:#cbd5e1;text-align:left;padding:10px;border-radius:7px;margin-bottom:4px;cursor:pointer}
+.demo-side button.active,.demo-side button:hover{background:#1e293b;color:#fff}
+.demo-main{padding:20px}.demo-main h3{margin:0 0 15px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{border:1px solid var(--border);border-radius:10px;padding:14px;background:#fff}.kpi span{display:block;color:var(--muted);font-size:12px}.kpi strong{font-size:23px}
+.chart{height:120px;display:flex;align-items:end;gap:7px;padding:15px 4px;border-bottom:1px solid var(--border);margin-top:15px}
+.bar{flex:1;border-radius:5px 5px 0 0;background:#93c5fd;min-height:18px}
+.demo-message{margin-top:13px;color:var(--muted);font-size:13px}
+pre{background:var(--code);color:#e5e7eb;padding:20px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
+code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+.code-label{margin:18px 0 7px;font-size:13px;font-weight:800;color:#475569}
+.mistake-grid,.followup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mistake,.followup{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff}
+.mistake strong{color:#9a3412}.followup strong{color:#1d4ed8}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:12px;font-weight:700;margin:3px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){
+.layout{grid-template-columns:1fr}
+aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+.flow{grid-template-columns:1fr}
+.flow-step:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-22px;transform:translateX(-50%)}
+.mistake-grid,.followup-grid,.two-col,.kpis,.dashboard-demo{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Dashboard — Machine Coding Round</h1>
+<p>Interview-ready guide: What, Why, How, execution flow, implementation explanation, full code, mistakes and follow-ups.</p>
+</header>
+
+<div class="layout">
+<aside>
+<div class="nav-title">Questions / Topics</div>
+<button class="nav-btn active" data-target="what">What is Dashboard?</button>
+<button class="nav-btn" data-target="why">Why / What problem?</button>
+<button class="nav-btn" data-target="how">How to implement?</button>
+<button class="nav-btn" data-target="flow">Execution Flow</button>
+<button class="nav-btn" data-target="one">Explain in 1 Minute</button>
+<button class="nav-btn" data-target="five">Explain in 5 Minutes</button>
+<button class="nav-btn" data-target="implementation">How I Implemented It</button>
+<button class="nav-btn" data-target="fullcode">Full Code</button>
+<button class="nav-btn" data-target="mistakes">Common Developer Mistakes</button>
+<button class="nav-btn" data-target="followups">Likely Interviewer Follow-ups</button>
+</aside>
+
+<main>
+<section id="what" class="section active">
+<div class="card">
+<span class="eyebrow">WHAT</span>
+<h2>What is a Dashboard?</h2>
+<p>
+A <strong>Dashboard</strong> is a UI that brings important information, metrics and actions into one place
+so a user can understand the current state of a system quickly and take action.
+In a machine coding round, a dashboard usually combines a layout, reusable widgets/cards, navigation,
+filters, tables or charts, loading states and responsive behavior.
+</p>
+<div class="highlight">
+<strong>Simple interview definition:</strong>
+“A dashboard is a data-driven UI that organizes key metrics and visualizations into reusable sections,
+with a clear information hierarchy so users can monitor and act on important information quickly.”
+</div>
+
+<h3>Typical dashboard requirements</h3>
+<div>
+<span class="pill">Sidebar navigation</span>
+<span class="pill">Header</span>
+<span class="pill">KPI cards</span>
+<span class="pill">Charts</span>
+<span class="pill">Tables</span>
+<span class="pill">Filters</span>
+<span class="pill">Responsive layout</span>
+<span class="pill">Loading / error states</span>
+</div>
+
+<h3>Interactive demo</h3>
+<div class="demo">
+<div class="dashboard-demo">
+<div class="demo-side">
+<h4>My Dashboard</h4>
+<button class="demo-nav active" data-page="Overview">Overview</button>
+<button class="demo-nav" data-page="Analytics">Analytics</button>
+<button class="demo-nav" data-page="Users">Users</button>
+<button class="demo-nav" data-page="Settings">Settings</button>
+</div>
+<div class="demo-main">
+<h3 id="demoTitle">Overview</h3>
+<div class="kpis">
+<div class="kpi"><span>Revenue</span><strong id="kpi1">₹84.2K</strong></div>
+<div class="kpi"><span>Users</span><strong id="kpi2">12,480</strong></div>
+<div class="kpi"><span>Conversion</span><strong id="kpi3">7.8%</strong></div>
+</div>
+<div class="chart" id="demoChart">
+<div class="bar" style="height:42%"></div><div class="bar" style="height:67%"></div>
+<div class="bar" style="height:51%"></div><div class="bar" style="height:82%"></div>
+<div class="bar" style="height:61%"></div><div class="bar" style="height:94%"></div>
+<div class="bar" style="height:73%"></div><div class="bar" style="height:88%"></div>
+</div>
+<div class="demo-message" id="demoMessage">Click a navigation item to change the dashboard view.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="eyebrow">WHY</span>
+<h2>What problem does a Dashboard solve?</h2>
+<p>
+A dashboard solves the problem of presenting a large amount of operational or business information
+without forcing the user to inspect multiple screens individually.
+</p>
+<h3>Problems it demonstrates in a machine coding round</h3>
+<ul>
+<li><strong>Information hierarchy:</strong> Important KPIs should be visible before secondary details.</li>
+<li><strong>Componentization:</strong> Cards, charts, tables, filters and navigation should be reusable.</li>
+<li><strong>Responsive design:</strong> The layout should adapt from desktop to smaller screens.</li>
+<li><strong>State management:</strong> Filters, selected navigation, loading and errors affect what is displayed.</li>
+<li><strong>Data handling:</strong> API results should be transformed into UI-friendly structures.</li>
+<li><strong>UI states:</strong> Empty, loading, error and success states should be considered.</li>
+<li><strong>Performance:</strong> Expensive charts and large tables should not cause unnecessary rendering.</li>
+</ul>
+<div class="success">
+<strong>Key interview point:</strong> Don't describe a dashboard as “just cards and charts.”
+The interesting part is the architecture: reusable components, data flow, state, responsive layout and
+clear handling of loading/error/empty states.
+</div>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="eyebrow">HOW</span>
+<h2>How to implement a Dashboard</h2>
+<ol>
+<li><strong>Clarify requirements:</strong> Identify required widgets, navigation, filters and interactions.</li>
+<li><strong>Design the layout:</strong> Create sidebar/header/content regions using CSS Grid or Flexbox.</li>
+<li><strong>Break into components:</strong> Sidebar, Header, KPI Card, Chart Card, Table, Filter Bar and Dashboard Page.</li>
+<li><strong>Define the data model:</strong> Keep API/data structures separate from presentation where possible.</li>
+<li><strong>Manage state:</strong> Track selected navigation, filters and UI states in the appropriate component.</li>
+<li><strong>Render reusable widgets:</strong> Use arrays and mapping instead of duplicating markup.</li>
+<li><strong>Handle async states:</strong> Show loading, error, empty and successful data states.</li>
+<li><strong>Make responsive:</strong> Collapse or stack sidebar/widgets based on available width.</li>
+<li><strong>Optimize:</strong> Memoize expensive derived data only when needed and avoid unnecessary API calls.</li>
+</ol>
+
+<h3>Recommended component structure</h3>
+<pre><code>App
+├── DashboardLayout
+│   ├── Sidebar
+│   ├── Header
+│   └── MainContent
+│       ├── FilterBar
+│       ├── KPIGrid
+│       │   └── KpiCard
+│       ├── ChartGrid
+│       │   └── ChartCard
+│       └── DataTable
+└── Loading / Error / Empty states</code></pre>
+
+<h3>Example data-driven KPI cards</h3>
+<pre><code>const metrics = [
+  { label: "Revenue", value: "₹84.2K", change: "+12.4%" },
+  { label: "Users", value: "12,480", change: "+8.2%" },
+  { label: "Conversion", value: "7.8%", change: "+1.1%" }
+];
+
+metrics.map(metric =&gt; (
+  &lt;KpiCard key={metric.label} {...metric} /&gt;
+));</code></pre>
+
+<div class="highlight">
+<strong>Design principle:</strong> Build the shell first, then make each widget reusable, then connect
+data and interactions. This is faster and safer than building the entire dashboard as one large component.
+</div>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="eyebrow">EXECUTION FLOW</span>
+<h2>How a Dashboard works — simple visual explanation</h2>
+<div class="flow">
+<div class="flow-step"><div class="number">1</div><strong>Load page</strong><br/>Dashboard shell renders</div>
+<div class="flow-step"><div class="number">2</div><strong>Fetch data</strong><br/>API / local data</div>
+<div class="flow-step"><div class="number">3</div><strong>Store state</strong><br/>Data + UI state</div>
+<div class="flow-step"><div class="number">4</div><strong>Transform</strong><br/>Prepare widget data</div>
+<div class="flow-step"><div class="number">5</div><strong>Render</strong><br/>Cards, charts, table</div>
+</div>
+
+<h3>Visual data flow</h3>
+<pre><code>User opens Dashboard
+        ↓
+Dashboard Layout
+        ↓
+Fetch dashboard data
+        ↓
+ ┌───────────────┐
+ │ Loading state │
+ └───────┬───────┘
+         ↓
+     API response
+         ↓
+ ┌───────┴────────┐
+ │                │
+Success          Error
+ │                │
+ ↓                ↓
+Transform       Error UI
+data
+ ↓
+ ┌────────┬──────────┬───────────┐
+ ↓        ↓          ↓
+KPI      Chart      Table
+Cards
+ ↓        ↓          ↓
+       User filters
+             ↓
+       Update state
+             ↓
+       Re-render widgets</code></pre>
+
+<h3>Interaction flow: filter example</h3>
+<ol>
+<li>User changes a date/filter.</li>
+<li>Filter state updates.</li>
+<li>Dashboard decides whether data can be filtered locally or a new API request is needed.</li>
+<li>Loading state can be shown for remote data.</li>
+<li>New data is transformed and passed to widgets.</li>
+<li>Only the affected UI should update where practical.</li>
+</ol>
+
+<div class="warning">
+<strong>Important:</strong> Keep data fetching and business logic separate from presentation components.
+It makes the dashboard easier to test and maintain.
+</div>
+</div>
+</section>
+
+<section id="one" class="section">
+<div class="card">
+<span class="eyebrow">1 MINUTE</span>
+<h2>How to explain Dashboard to the interviewer in 1 minute</h2>
+<div class="success">
+<p>
+“I built the dashboard as a responsive layout with reusable components. I separated the shell into
+sidebar, header and main content, and then composed the main content from reusable KPI cards, charts
+and a table. The dashboard data is kept separately from the presentation so the widgets can render
+from configuration or API responses. I also considered loading, error and empty states. For interactions
+like filters and navigation, I keep the selected values in state and derive the displayed data from that
+state. The main focus is componentization, predictable data flow, responsive layout and avoiding a large
+monolithic dashboard component.”
+</p>
+</div>
+<h3>Keywords to mention</h3>
+<ul>
+<li>Reusable components</li>
+<li>Data-driven rendering</li>
+<li>Responsive CSS Grid / Flexbox</li>
+<li>State and data flow</li>
+<li>Loading / error / empty states</li>
+<li>Separation of concerns</li>
+<li>Performance</li>
+</ul>
+</div>
+</section>
+
+<section id="five" class="section">
+<div class="card">
+<span class="eyebrow">5 MINUTES</span>
+<h2>How to explain Dashboard in 5 minutes</h2>
+
+<h3>1. Clarify the requirement</h3>
+<p>
+“I first identify the widgets and interactions. For example, KPI cards, a trend chart, recent activity,
+a table, sidebar navigation and a date filter. I also clarify whether the data is static or API-driven.”
+</p>
+
+<h3>2. Design the page structure</h3>
+<p>
+“I use a two-dimensional layout: a fixed or collapsible sidebar, a header and a responsive main content
+area. CSS Grid is useful for the widget layout because cards can resize and wrap naturally.”
+</p>
+
+<h3>3. Componentize</h3>
+<p>
+“I don't create one huge Dashboard component. I split it into DashboardLayout, Sidebar, Header,
+FilterBar, KpiCard, ChartCard and DataTable. Repeated widgets receive data through props.”
+</p>
+
+<h3>4. Define data flow</h3>
+<p>
+“API data is loaded at the page/container level and passed to presentation components. If a filter changes,
+I either derive the filtered result locally or refetch from the server depending on the requirement.”
+</p>
+
+<h3>5. Handle UI states</h3>
+<ul>
+<li>Initial loading → skeleton/spinner.</li>
+<li>Success → dashboard widgets.</li>
+<li>Empty → meaningful empty-state message.</li>
+<li>Error → retry/error message.</li>
+<li>Partial widget failure → ideally isolate failure to that widget.</li>
+</ul>
+
+<h3>6. Make it responsive</h3>
+<p>
+“On smaller screens, the sidebar can collapse and the KPI/chart grids can move from multiple columns to
+one column. Tables can scroll horizontally instead of breaking the layout.”
+</p>
+
+<h3>7. Performance</h3>
+<p>
+“For large datasets, I avoid rendering unnecessary rows, use pagination or virtualization for tables,
+and avoid recalculating expensive chart transformations on every render.”
+</p>
+
+<div class="highlight">
+<strong>Strong closing line:</strong>
+“My approach is to build the dashboard as a data-driven composition of small reusable components,
+with clear state boundaries and explicit loading/error/empty states. That keeps the UI scalable as more
+widgets are added.”
+</div>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="eyebrow">MY IMPLEMENTATION</span>
+<h2>How I implemented it — explanation to interviewer</h2>
+<p>Explain your implementation in this order:</p>
+
+<div class="two-col">
+<div>
+<h3>1. Layout first</h3>
+<p>“I first created the dashboard shell with a sidebar, header and responsive content area. This gives every widget a predictable place.”</p>
+</div>
+<div>
+<h3>2. Reusable widgets</h3>
+<p>“I created a generic KPI card and used data mapping to render multiple metrics instead of copying markup.”</p>
+</div>
+<div>
+<h3>3. Data model</h3>
+<p>“I kept widget data in structured objects so the presentation component doesn't contain business-specific hard-coded values.”</p>
+</div>
+<div>
+<h3>4. State</h3>
+<p>“Navigation selection and filters are state. The rendered dashboard content is derived from that state.”</p>
+</div>
+<div>
+<h3>5. Async states</h3>
+<p>“If data comes from an API, I explicitly model loading, success, error and empty states instead of assuming the request always succeeds.”</p>
+</div>
+<div>
+<h3>6. Responsive behavior</h3>
+<p>“I used CSS Grid/Flexbox and breakpoints so cards stack naturally on smaller screens and the layout remains usable.”</p>
+</div>
+</div>
+
+<h3>How to narrate while coding</h3>
+<div class="highlight">
+“First I will create the page shell. Then I will define the data structure for repeated widgets.
+Next I will build one reusable card and render the rest from data. After that I will add interactions
+such as filters/navigation, then handle loading/error/empty states, and finally check responsiveness
+and performance.”
+</div>
+
+<div class="success">
+<strong>Interview-friendly summary:</strong>
+“I separated layout, reusable presentation components, state and data transformation. This lets me
+change the data source or add another widget without rewriting the whole dashboard.”
+</div>
+</div>
+</section>
+
+<section id="fullcode" class="section">
+<div class="card">
+<span class="eyebrow">FULL CODE</span>
+<h2>Standalone HTML + CSS + JavaScript</h2>
+<p class="muted">A compact machine-coding implementation with sidebar navigation, KPI cards, chart-like bars, responsive layout and state-driven view switching.</p>
+
+<div class="code-label">Complete standalone implementation</div>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;Dashboard&lt;/title&gt;
+  &lt;style&gt;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 6px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #cbd5e1;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .sidebar button.active,
+    .sidebar button:hover {
+      background: #1e293b;
+      color: white;
+    }
+
+    .main {
+      padding: 24px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #dbe2ea;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .chart {
+      height: 180px;
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .bar {
+      flex: 1;
+      background: #93c5fd;
+      border-radius: 5px 5px 0 0;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;div class="layout"&gt;
+
+    &lt;aside class="sidebar"&gt;
+      &lt;h3&gt;Dashboard&lt;/h3&gt;
+      &lt;button class="nav active" data-page="Overview"&gt;
+        Overview
+      &lt;/button&gt;
+      &lt;button class="nav" data-page="Analytics"&gt;
+        Analytics
+      &lt;/button&gt;
+      &lt;button class="nav" data-page="Users"&gt;
+        Users
+      &lt;/button&gt;
+      &lt;button class="nav" data-page="Settings"&gt;
+        Settings
+      &lt;/button&gt;
+    &lt;/aside&gt;
+
+    &lt;main class="main"&gt;
+      &lt;h1 id="title"&gt;Overview&lt;/h1&gt;
+
+      &lt;section class="kpi-grid"&gt;
+        &lt;article class="card"&gt;
+          &lt;small&gt;Revenue&lt;/small&gt;
+          &lt;h2&gt;₹84.2K&lt;/h2&gt;
+        &lt;/article&gt;
+
+        &lt;article class="card"&gt;
+          &lt;small&gt;Users&lt;/small&gt;
+          &lt;h2&gt;12,480&lt;/h2&gt;
+        &lt;/article&gt;
+
+        &lt;article class="card"&gt;
+          &lt;small&gt;Conversion&lt;/small&gt;
+          &lt;h2&gt;7.8%&lt;/h2&gt;
+        &lt;/article&gt;
+      &lt;/section&gt;
+
+      &lt;section class="card" style="margin-top:16px"&gt;
+        &lt;h3&gt;Weekly trend&lt;/h3&gt;
+
+        &lt;div class="chart"&gt;
+          &lt;div class="bar" style="height:42%"&gt;&lt;/div&gt;
+          &lt;div class="bar" style="height:67%"&gt;&lt;/div&gt;
+          &lt;div class="bar" style="height:51%"&gt;&lt;/div&gt;
+          &lt;div class="bar" style="height:82%"&gt;&lt;/div&gt;
+          &lt;div class="bar" style="height:61%"&gt;&lt;/div&gt;
+          &lt;div class="bar" style="height:94%"&gt;&lt;/div&gt;
+          &lt;div class="bar" style="height:73%"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+    &lt;/main&gt;
+
+  &lt;/div&gt;
+
+  &lt;script&gt;
+    const navItems = document.querySelectorAll(".nav");
+    const title = document.getElementById("title");
+
+    navItems.forEach(item =&gt; {
+      item.addEventListener("click", () =&gt; {
+        navItems.forEach(nav =&gt; nav.classList.remove("active"));
+
+        item.classList.add("active");
+
+        const page = item.dataset.page;
+        title.textContent = page;
+      });
+    });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<div class="code-label">React core implementation</div>
+<pre><code>import { useState } from "react";
+
+const metrics = [
+  { label: "Revenue", value: "₹84.2K", change: "+12.4%" },
+  { label: "Users", value: "12,480", change: "+8.2%" },
+  { label: "Conversion", value: "7.8%", change: "+1.1%" }
+];
+
+const navItems = ["Overview", "Analytics", "Users", "Settings"];
+
+function KpiCard({ label, value, change }) {
+  return (
+    &lt;article className="card"&gt;
+      &lt;span&gt;{label}&lt;/span&gt;
+      &lt;h2&gt;{value}&lt;/h2&gt;
+      &lt;small&gt;{change}&lt;/small&gt;
+    &lt;/article&gt;
+  );
+}
+
+function Dashboard() {
+  const [page, setPage] = useState("Overview");
+
+  return (
+    &lt;div className="dashboard-layout"&gt;
+      &lt;aside className="sidebar"&gt;
+        &lt;h2&gt;Dashboard&lt;/h2&gt;
+
+        {navItems.map(item =&gt; (
+          &lt;button
+            key={item}
+            className={page === item ? "active" : ""}
+            onClick={() =&gt; setPage(item)}
+          &gt;
+            {item}
+          &lt;/button&gt;
+        ))}
+      &lt;/aside&gt;
+
+      &lt;main className="content"&gt;
+        &lt;header&gt;
+          &lt;h1&gt;{page}&lt;/h1&gt;
+        &lt;/header&gt;
+
+        &lt;section className="kpi-grid"&gt;
+          {metrics.map(metric =&gt; (
+            &lt;KpiCard key={metric.label} {...metric} /&gt;
+          ))}
+        &lt;/section&gt;
+
+        &lt;section className="card"&gt;
+          &lt;h2&gt;Weekly trend&lt;/h2&gt;
+          {/* Render chart component here */}
+        &lt;/section&gt;
+
+        &lt;section className="card"&gt;
+          &lt;h2&gt;Recent activity&lt;/h2&gt;
+          {/* Render table component here */}
+        &lt;/section&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default Dashboard;</code></pre>
+
+<div class="highlight">
+<strong>What to say after showing the code:</strong>
+“The important part isn't the styling itself. The implementation is data-driven: repeated UI is rendered
+from arrays, navigation is state-driven, and each widget can be extracted into its own reusable component.”
+</div>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="eyebrow">COMMON MISTAKES</span>
+<h2>Common developer mistakes</h2>
+
+<div class="mistake-grid">
+<div class="mistake"><strong>1. Building one huge Dashboard component</strong><p>Putting sidebar, API calls, cards, charts, tables and filters into one component becomes difficult to maintain.</p><p><b>Better:</b> Split by responsibility and reuse repeated widgets.</p></div>
+
+<div class="mistake"><strong>2. Duplicating KPI/card markup</strong><p>Copy-pasting five nearly identical cards makes future changes error-prone.</p><p><b>Better:</b> Store widget data in arrays and map it into a reusable component.</p></div>
+
+<div class="mistake"><strong>3. Mixing API logic with presentation</strong><p>A card that directly fetches and transforms its own unrelated data becomes hard to test and coordinate.</p><p><b>Better:</b> Define clear data boundaries and pass data into presentation components.</p></div>
+
+<div class="mistake"><strong>4. Ignoring loading, error and empty states</strong><p>A dashboard that only handles successful API responses is incomplete.</p><p><b>Better:</b> Design all important UI states explicitly.</p></div>
+
+<div class="mistake"><strong>5. Poor responsive layout</strong><p>Desktop-only fixed widths cause horizontal scrolling and broken charts/tables on smaller screens.</p><p><b>Better:</b> Use responsive Grid/Flexbox, breakpoints and horizontal table scrolling where appropriate.</p></div>
+
+<div class="mistake"><strong>6. Fetching data on every render</strong><p>Incorrect effect dependencies can trigger repeated API calls.</p><p><b>Better:</b> Understand effect dependencies and separate fetch triggers from render logic.</p></div>
+
+<div class="mistake"><strong>7. Overusing global state</strong><p>Putting every local UI state into a global store adds unnecessary complexity.</p><p><b>Better:</b> Keep state close to the components that own it unless multiple areas truly need it.</p></div>
+
+<div class="mistake"><strong>8. No stable keys for lists</strong><p>Using array indexes as keys for dynamic/reorderable lists can produce incorrect UI reconciliation.</p><p><b>Better:</b> Use stable IDs from the data.</p></div>
+
+<div class="mistake"><strong>9. Ignoring large datasets</strong><p>Rendering thousands of table rows or expensive charts directly can make the dashboard slow.</p><p><b>Better:</b> Use pagination, virtualization, aggregation or lazy loading where appropriate.</p></div>
+
+<div class="mistake"><strong>10. Premature optimization</strong><p>Adding memoization everywhere makes the code harder to understand without necessarily improving performance.</p><p><b>Better:</b> First make the architecture correct, then optimize measured bottlenecks.</p></div>
+
+<div class="mistake"><strong>11. Poor accessibility</strong><p>Icon-only controls, low contrast and charts with no meaningful alternative can make the dashboard difficult to use.</p><p><b>Better:</b> Use semantic elements, labels, keyboard support and accessible data summaries.</p></div>
+
+<div class="mistake"><strong>12. No clear information hierarchy</strong><p>Showing every metric with equal visual weight makes it hard to identify what matters.</p><p><b>Better:</b> Prioritize the most important KPIs and actions.</p></div>
+</div>
+
+<div class="warning">
+<strong>Machine coding round tip:</strong> Don't spend the entire time perfecting chart visuals.
+Prioritize layout, reusable components, data flow, interactions, responsive behavior and correct UI states.
+</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="eyebrow">FOLLOW-UPS</span>
+<h2>Likely interviewer follow-up questions</h2>
+
+<div class="followup-grid">
+<div class="followup"><strong>How would you make the dashboard responsive?</strong><p>Use CSS Grid/Flexbox, responsive breakpoints, collapsible navigation and horizontally scrollable tables where needed.</p></div>
+
+<div class="followup"><strong>How would you handle API loading and errors?</strong><p>Model request state explicitly and render loading, success, empty and error UI. For independent widgets, consider isolating failures.</p></div>
+
+<div class="followup"><strong>How would you add filters?</strong><p>Keep filter values in state and either derive filtered data locally or request new data from the server based on the filter.</p></div>
+
+<div class="followup"><strong>How would you optimize a dashboard with many charts?</strong><p>Lazy-load noncritical widgets, avoid unnecessary calculations, memoize only expensive work, and consider chart virtualization/aggregation.</p></div>
+
+<div class="followup"><strong>How would you handle a large table?</strong><p>Use pagination or virtualization, stable keys, server-side filtering/sorting when appropriate, and avoid rendering all rows at once.</p></div>
+
+<div class="followup"><strong>Why use reusable KPI cards?</strong><p>They enforce consistent structure and styling and let new metrics be added through data rather than copied markup.</p></div>
+
+<div class="followup"><strong>Where should API calls live?</strong><p>Usually at a container/page or data-fetching layer, keeping presentation components focused on rendering and user interaction.</p></div>
+
+<div class="followup"><strong>How would you test the dashboard?</strong><p>Test widget rendering, navigation/filter interactions, loading/error/empty states, and important data transformations separately.</p></div>
+
+<div class="followup"><strong>How would you make charts accessible?</strong><p>Provide meaningful labels, summaries or tabular alternatives and ensure keyboard users can access relevant controls.</p></div>
+
+<div class="followup"><strong>What if different widgets use different APIs?</strong><p>Give each widget an isolated loading/error boundary where appropriate, or aggregate requests in a data layer while keeping the UI independent.</p></div>
+</div>
+
+<h3>Final interview checklist</h3>
+<ul>
+<li>Can I explain the dashboard architecture before coding?</li>
+<li>Can I identify reusable components?</li>
+<li>Can I explain where data comes from and how it flows?</li>
+<li>Can I handle loading, error and empty states?</li>
+<li>Can I make the layout responsive?</li>
+<li>Can I explain how I would optimize a large dashboard?</li>
+<li>Can I distinguish local UI state from shared/global state?</li>
+</ul>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const buttons=document.querySelectorAll(".nav-btn");
+const sections=document.querySelectorAll(".section");
+
+buttons.forEach(button=>{
+  button.addEventListener("click",()=>{
+    buttons.forEach(btn=>btn.classList.remove("active"));
+    sections.forEach(section=>section.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+const demoData={
+  Overview:{
+    metrics:["₹84.2K","12,480","7.8%"],
+    message:"Overview shows the most important KPIs and a high-level trend."
+  },
+  Analytics:{
+    metrics:["₹91.7K","14,920","8.4%"],
+    message:"Analytics focuses on trends and deeper performance information."
+  },
+  Users:{
+    metrics:["₹76.3K","18,240","6.9%"],
+    message:"Users focuses on audience volume and user-related metrics."
+  },
+  Settings:{
+    metrics:["—","—","—"],
+    message:"Settings is an example of a separate dashboard section for configuration."
+  }
+};
+
+document.querySelectorAll(".demo-nav").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".demo-nav").forEach(b=>b.classList.remove("active"));
+    button.classList.add("active");
+    const page=button.dataset.page;
+    const data=demoData[page];
+
+    document.getElementById("demoTitle").textContent=page;
+    document.getElementById("kpi1").textContent=data.metrics[0];
+    document.getElementById("kpi2").textContent=data.metrics[1];
+    document.getElementById("kpi3").textContent=data.metrics[2];
+    document.getElementById("demoMessage").textContent=data.message;
+  });
+});
+</script>
+</body>
+</html>

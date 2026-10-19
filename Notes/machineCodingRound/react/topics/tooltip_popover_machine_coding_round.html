@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Coding Round — Tooltip / Popover</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--border:#e4e7ec;
+  --accent:#2563eb;--accent-soft:#eff6ff;--code:#101828;--warning:#f79009;--green:#12b76a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#101828;color:#fff;padding:24px 32px;position:sticky;top:0;z-index:10}
+header h1{margin:0 0 6px;font-size:25px}
+header p{margin:0;color:#cfd6e4;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 92px)}
+.left{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:92px;height:calc(100vh - 92px);overflow:auto}
+.left h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px}
+.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:11px 12px;border-radius:9px;margin:3px 0;cursor:pointer;color:#344054;font-size:14px}
+.nav button:hover{background:#f2f4f7}
+.nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:700;border-color:#bfdbfe}
+.right{padding:28px;max-width:1100px;width:100%}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+h2{margin:0 0 12px;font-size:22px}h3{font-size:17px;margin:20px 0 9px}
+p,li{line-height:1.65;font-size:15px}
+.tag{display:inline-block;background:#eef4ff;color:#175cd3;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700;margin:0 4px 6px 0}
+.answer{border-left:4px solid var(--accent);padding:12px 15px;background:#f8fbff;border-radius:0 9px 9px 0}
+pre{background:var(--code);color:#e6edf7;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.55}
+code{font-family:Consolas,Monaco,monospace}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.step{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff;position:relative}
+.step strong{display:block;margin-bottom:5px}.step span{font-size:13px;color:var(--muted)}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-17px;top:35px;color:#98a2b3;font-size:20px;z-index:2}
+.demo{padding:25px;border:1px solid var(--border);border-radius:12px;background:#fafbfc;min-height:300px}
+.demo-row{display:flex;gap:24px;align-items:center;justify-content:center;padding:55px 10px}
+.demo-target{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.demo-button{border:1px solid #98a2b3;background:#fff;border-radius:8px;padding:10px 15px;cursor:pointer;color:#344054}
+.tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(5px);background:#101828;color:#fff;padding:8px 10px;border-radius:7px;font-size:13px;white-space:nowrap;opacity:0;pointer-events:none;transition:.18s;z-index:5}
+.demo-target:hover .tooltip,.demo-target:focus-within .tooltip{opacity:1;transform:translateX(-50%) translateY(0)}
+.popover{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) scale(.98);width:230px;background:#fff;border:1px solid #d0d5dd;border-radius:10px;box-shadow:0 12px 30px rgba(16,24,40,.16);padding:14px;text-align:left;opacity:0;pointer-events:none;transition:.18s;z-index:6}
+.popover.show{opacity:1;pointer-events:auto;transform:translateX(-50%) scale(1)}
+.popover strong{display:block;margin-bottom:5px}.popover p{font-size:13px;margin:0;color:#667085}
+.demo-status{text-align:center;color:var(--muted);font-size:13px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.action{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:9px 13px;cursor:pointer}
+.secondary{background:#eef2f6;color:#344054}
+.mistake{padding:12px 14px;border-left:4px solid var(--warning);background:#fffaeb;margin:9px 0;border-radius:0 8px 8px 0}
+.good{padding:12px 14px;border-left:4px solid var(--green);background:#ecfdf3;margin:9px 0;border-radius:0 8px 8px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.small{color:var(--muted);font-size:13px}
+.checklist li{margin:8px 0}
+@media(max-width:850px){
+.layout{grid-template-columns:1fr}.left{position:relative;top:0;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+.flow{grid-template-columns:1fr 1fr}.step:not(:last-child)::after{display:none}.right{padding:18px}.grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Machine Coding Round — Tooltip / Popover</h1>
+<p>Interview preparation guide • What / Why / How / Execution Flow / Full Code / Common Mistakes / Interview Explanation</p>
+</header>
+
+<div class="layout">
+<aside class="left">
+<h2>Questions / Topics</h2>
+<div class="nav">
+<button class="active" data-target="what">What is Tooltip / Popover?</button>
+<button data-target="why">Why / What problem it solves</button>
+<button data-target="how">How to implement</button>
+<button data-target="flow">Execution flow</button>
+<button data-target="explain1">Explain to interviewer — 1 min</button>
+<button data-target="explain5">Explain to interviewer — 5 min</button>
+<button data-target="implementation">How I implemented it</button>
+<button data-target="code">Full code</button>
+<button data-target="mistakes">Common developer mistakes</button>
+<button data-target="followups">Likely interviewer follow-ups</button>
+</div>
+</aside>
+
+<main class="right">
+
+<section id="what" class="section active">
+<div class="card">
+<span class="tag">WHAT</span><span class="tag">UI COMPONENT</span>
+<h2>What is Tooltip / Popover?</h2>
+<div class="answer">
+A <strong>tooltip</strong> is a small, usually non-interactive message that gives brief information about a UI element,
+typically on hover or focus. A <strong>popover</strong> is a richer floating panel that can contain interactive content
+such as buttons, links, forms or additional details and is usually opened by a click/tap.
+</div>
+<div class="grid2">
+<div>
+<h3>Tooltip</h3>
+<ul>
+<li>Short contextual information</li>
+<li>Usually hover/focus triggered</li>
+<li>Usually non-interactive</li>
+<li>Examples: “Delete”, “Settings”, keyboard shortcut</li>
+</ul>
+</div>
+<div>
+<h3>Popover</h3>
+<ul>
+<li>More detailed contextual content</li>
+<li>Usually click/tap triggered</li>
+<li>Can contain interactive controls</li>
+<li>Examples: filters, account menu, date details</li>
+</ul>
+</div>
+</div>
+
+<h3>Interactive example</h3>
+<div class="demo">
+<div class="demo-row">
+<div class="demo-target" tabindex="0">
+<button class="demo-button" type="button">Hover / Focus</button>
+<div class="tooltip" role="tooltip">This is a tooltip</div>
+</div>
+
+<div class="demo-target">
+<button id="popoverTrigger" class="demo-button" type="button" aria-expanded="false">Click for Popover</button>
+<div id="popover" class="popover" role="dialog" aria-label="Example popover">
+<strong>Popover content</strong>
+<p>This panel can contain richer content and interactive controls.</p>
+<div class="controls" style="justify-content:flex-start">
+<button class="action" onclick="closePopover()">Close</button>
+</div>
+</div>
+</div>
+</div>
+<p class="demo-status" id="demoStatus">Tooltip appears on hover/focus. Popover opens on click.</p>
+</div>
+
+<h3>Simple rule</h3>
+<div class="answer"><strong>Tooltip = explain.</strong> <strong>Popover = interact.</strong> That distinction is a useful interview answer.</div>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="tag">WHY</span>
+<h2>What problem does it solve?</h2>
+<p>Tooltip and popover components provide contextual information without permanently taking up screen space.</p>
+<div class="grid2">
+<div class="good"><strong>Tooltip</strong><br>Explains an unfamiliar icon, field, control or state without adding permanent labels.</div>
+<div class="good"><strong>Popover</strong><br>Provides richer contextual content or actions without navigating away or opening a full page/modal.</div>
+</div>
+<h3>Interview answer</h3>
+<div class="answer">
+“The problem is contextual information and actions. We don't want to clutter the main UI with every explanation
+or secondary action. A tooltip gives lightweight information, while a popover provides a richer interactive surface
+anchored to a particular element.”
+</div>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="tag">HOW</span>
+<h2>How to implement Tooltip / Popover</h2>
+<ol>
+<li>Create a trigger element and a floating content element.</li>
+<li>For a tooltip, open it on hover and focus, and close it when the trigger loses those states.</li>
+<li>For a popover, toggle it on click/tap.</li>
+<li>Position the floating element relative to the trigger.</li>
+<li>Keep it inside the viewport by calculating available space.</li>
+<li>Close a popover on outside click and Escape.</li>
+<li>Use appropriate accessibility relationships and keyboard behavior.</li>
+</ol>
+<pre><code>// Basic tooltip idea
+trigger.addEventListener("mouseenter", showTooltip);
+trigger.addEventListener("mouseleave", hideTooltip);
+trigger.addEventListener("focus", showTooltip);
+trigger.addEventListener("blur", hideTooltip);
+
+// Basic popover idea
+trigger.addEventListener("click", togglePopover);
+document.addEventListener("click", closeOnOutsideClick);
+document.addEventListener("keydown", closeOnEscape);</code></pre>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="tag">EXECUTION FLOW</span>
+<h2>How it works — simple visual explanation</h2>
+<div class="flow">
+<div class="step"><strong>1. Trigger</strong><span>Hover, focus or click on the anchor element.</span></div>
+<div class="step"><strong>2. State</strong><span>Set tooltip/popover to visible.</span></div>
+<div class="step"><strong>3. Position</strong><span>Calculate location relative to the trigger.</span></div>
+<div class="step"><strong>4. Dismiss</strong><span>Hide based on interaction and accessibility rules.</span></div>
+</div>
+<pre><code>Trigger interaction
+      ↓
+show / hide state changes
+      ↓
+measure trigger + floating content
+      ↓
+calculate best position
+      ↓
+render floating UI
+      ↓
+outside click / Escape / blur / mouse leave
+      ↓
+close when appropriate</code></pre>
+<h3>Key point to tell the interviewer</h3>
+<div class="answer">“The trigger owns the relationship; the floating content is positioned relative to it and has its own visibility lifecycle.”</div>
+</div>
+</section>
+
+<section id="explain1" class="section">
+<div class="card">
+<span class="tag">1 MINUTE</span>
+<h2>How to explain it to the interviewer in 1 minute</h2>
+<div class="answer">
+“I implemented tooltip and popover behavior around a trigger element. A tooltip is for brief, non-interactive information
+and opens on hover or focus, while a popover is richer and can be interactive, so it opens on click. The component tracks
+whether the floating content is visible, positions it relative to the trigger, and closes it using the appropriate interaction
+such as blur, outside click or Escape. In production, I would also handle viewport boundaries and accessibility, including
+keyboard navigation and correct ARIA relationships.”
+</div>
+<h3>1-minute structure</h3>
+<ol>
+<li><strong>What:</strong> Contextual floating UI.</li>
+<li><strong>Difference:</strong> Tooltip explains; popover can interact.</li>
+<li><strong>State:</strong> Visible/hidden + trigger relationship.</li>
+<li><strong>Positioning:</strong> Anchor to trigger and avoid viewport overflow.</li>
+<li><strong>Accessibility:</strong> Keyboard/focus/Escape and ARIA semantics.</li>
+</ol>
+</div>
+</section>
+
+<section id="explain5" class="section">
+<div class="card">
+<span class="tag">5 MINUTES</span>
+<h2>How to explain it to the interviewer in 5 minutes</h2>
+<div class="answer"><strong>Opening:</strong> “I’ll explain the distinction between tooltip and popover, then state, positioning, dismissal, accessibility and edge cases.”</div>
+<h3>1. Requirement</h3>
+<p>Provide contextual information near a trigger without taking the user to another screen. The behavior differs depending on whether the content is informational or interactive.</p>
+<h3>2. Tooltip vs Popover</h3>
+<p>A tooltip is lightweight and generally non-interactive. A popover is a richer floating surface and may contain buttons, links, filters or form controls.</p>
+<h3>3. State design</h3>
+<p>At minimum, I need visibility state. For a reusable component, I may also track the trigger/reference element, placement and positioning data.</p>
+<h3>4. Positioning</h3>
+<p>Measure the trigger and floating content, then choose a placement such as top, bottom, left or right. If the preferred placement overflows the viewport, fall back to another placement or shift the content.</p>
+<h3>5. Dismissal</h3>
+<ul>
+<li>Tooltip: close on pointer leave and loss of focus.</li>
+<li>Popover: close on outside click and Escape.</li>
+<li>Don't close a popover when the user interacts with its own content.</li>
+</ul>
+<h3>6. Accessibility</h3>
+<p>Tooltip content should be associated with its trigger, and a popover should have an appropriate accessible name/relationship and keyboard behavior. The trigger itself must be keyboard accessible.</p>
+<h3>7. Edge cases</h3>
+<ul>
+<li>Trigger near viewport edges.</li>
+<li>Scrolling or resizing while open.</li>
+<li>Nested interactive content inside a popover.</li>
+<li>Rapid open/close interactions.</li>
+<li>Touch devices where hover does not exist.</li>
+<li>Long tooltip text or dynamic content changing the popover size.</li>
+</ul>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="tag">MY IMPLEMENTATION</span>
+<h2>How I would explain my implementation</h2>
+<div class="answer">
+“I started by identifying the trigger and the type of floating content. For the tooltip, I use hover and focus because
+the content is informational. For the popover, I use click because it can contain interactive controls. I keep visibility
+as state and position the floating content relative to the trigger. I also separate positioning from interaction logic so
+I can add viewport collision handling later. Finally, I close the popover on outside click or Escape while keeping focus
+and accessibility in mind.”
+</div>
+<h3>Implementation checklist</h3>
+<ul>
+<li>✓ Distinguish tooltip from popover requirements</li>
+<li>✓ Track open/closed state</li>
+<li>✓ Associate floating content with its trigger</li>
+<li>✓ Support hover/focus for tooltip</li>
+<li>✓ Support click/tap for popover</li>
+<li>✓ Handle outside click and Escape for popover</li>
+<li>✓ Calculate safe viewport-aware placement</li>
+<li>✓ Support keyboard accessibility</li>
+<li>✓ Handle touch where hover is unavailable</li>
+</ul>
+</div>
+</section>
+
+<section id="code" class="section">
+<div class="card">
+<span class="tag">FULL CODE</span>
+<h2>Standalone implementation</h2>
+<p class="small">Framework-free core implementation suitable for explaining the machine-coding approach.</p>
+<pre><code>&lt;button
+  id="infoTrigger"
+  aria-describedby="tooltip"
+&gt;
+  Help
+&lt;/button&gt;
+
+&lt;div id="tooltip" role="tooltip" hidden&gt;
+  Helpful information
+&lt;/div&gt;
+
+&lt;button
+  id="popoverTrigger"
+  aria-expanded="false"
+  aria-controls="popover"
+&gt;
+  Options
+&lt;/button&gt;
+
+&lt;div id="popover" role="dialog" hidden&gt;
+  &lt;button&gt;Edit&lt;/button&gt;
+  &lt;button&gt;Delete&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const infoTrigger = document.querySelector("#infoTrigger");
+const tooltip = document.querySelector("#tooltip");
+
+function showTooltip() {
+  tooltip.hidden = false;
+  positionFloating(infoTrigger, tooltip);
+}
+
+function hideTooltip() {
+  tooltip.hidden = true;
+}
+
+infoTrigger.addEventListener("mouseenter", showTooltip);
+infoTrigger.addEventListener("mouseleave", hideTooltip);
+infoTrigger.addEventListener("focus", showTooltip);
+infoTrigger.addEventListener("blur", hideTooltip);
+
+const popoverTrigger = document.querySelector("#popoverTrigger");
+const popover = document.querySelector("#popover");
+
+function openPopover() {
+  popover.hidden = false;
+  popoverTrigger.setAttribute("aria-expanded", "true");
+  positionFloating(popoverTrigger, popover);
+}
+
+function closePopover() {
+  popover.hidden = true;
+  popoverTrigger.setAttribute("aria-expanded", "false");
+}
+
+popoverTrigger.addEventListener("click", () =&gt; {
+  if (popover.hidden) openPopover();
+  else closePopover();
+});
+
+document.addEventListener("click", (event) =&gt; {
+  if (
+    !popover.hidden &amp;&amp;
+    !popover.contains(event.target) &amp;&amp;
+    !popoverTrigger.contains(event.target)
+  ) {
+    closePopover();
+  }
+});
+
+document.addEventListener("keydown", (event) =&gt; {
+  if (event.key === "Escape") closePopover();
+});
+
+function positionFloating(trigger, floating) {
+  const rect = trigger.getBoundingClientRect();
+
+  floating.style.position = "fixed";
+  floating.style.left = `${rect.left}px`;
+  floating.style.top = `${rect.bottom + 8}px`;
+
+  // Production version should measure the floating element
+  // and flip/shift when it would overflow the viewport.
+}
+&lt;/script&gt;</code></pre>
+
+<h3>React version — core idea</h3>
+<pre><code>function Popover({ children }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() =&gt; {
+    if (!open) return;
+
+    const onKeyDown = e =&gt; {
+      if (e.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () =&gt; document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  return (
+    &lt;div className="popover-wrapper"&gt;
+      &lt;button
+        aria-expanded={open}
+        onClick={() =&gt; setOpen(v =&gt; !v)}
+      &gt;
+        Options
+      &lt;/button&gt;
+
+      {open &amp;&amp; (
+        &lt;div role="dialog"&gt;
+          {children}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="tag">COMMON MISTAKES</span>
+<h2>Common developer mistakes</h2>
+<div class="mistake"><strong>1. Treating tooltip and popover as the same thing</strong><br>A tooltip is generally non-interactive information; a popover can contain interactive content and has different dismissal/focus behavior.</div>
+<div class="mistake"><strong>2. Tooltip works only on hover</strong><br>Keyboard users may never hover. Support focus as well.</div>
+<div class="mistake"><strong>3. No viewport collision handling</strong><br>A floating element can be clipped at the top, bottom or sides of the viewport.</div>
+<div class="mistake"><strong>4. Closing popover when clicking inside it</strong><br>Global outside-click logic must exclude both the trigger and the popover itself.</div>
+<div class="mistake"><strong>5. Forgetting Escape</strong><br>Escape provides a predictable keyboard dismissal mechanism for popovers.</div>
+<div class="mistake"><strong>6. Using hover for interactive popovers</strong><br>Interactive content should not disappear simply because the pointer moves from the trigger to the popover.</div>
+<div class="mistake"><strong>7. Missing ARIA relationships</strong><br>Connect the trigger and floating content appropriately and expose expanded state where applicable.</div>
+<div class="mistake"><strong>8. Ignoring touch devices</strong><br>Hover is not a reliable interaction on touch. Use click/tap or another touch-friendly interaction for appropriate components.</div>
+<div class="mistake"><strong>9. Building positioning logic from scratch unnecessarily</strong><br>In production, a mature positioning solution can handle collision detection, flipping and shifting more reliably. In a machine-coding round, explain the algorithm clearly before adding dependencies.</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="tag">FOLLOW-UP QUESTIONS</span>
+<h2>Likely interviewer follow-ups</h2>
+<h3>What is the difference between tooltip and popover?</h3>
+<p>Tooltip is brief, contextual and normally non-interactive. Popover is richer, can contain interactive content and usually has explicit open/close behavior.</p>
+<h3>How do you prevent a tooltip from going outside the viewport?</h3>
+<p>Measure the trigger and floating element, then choose or adjust placement based on available viewport space. Common strategies are flip and shift.</p>
+<h3>How would you handle a popover inside a scrollable container?</h3>
+<p>Decide whether it should be positioned relative to the container or viewport. Recalculate on scroll/resize and ensure the correct stacking context.</p>
+<h3>How would you make it accessible?</h3>
+<p>Use a keyboard-accessible trigger, correct ARIA relationships, focus management for interactive popovers, Escape dismissal and visible focus styles.</p>
+<h3>Would you build the positioning library yourself?</h3>
+<p>For a machine-coding round, implement the core positioning logic if asked. For production, use a proven positioning primitive/library when it reduces edge-case risk.</p>
+<h3>How would you test it?</h3>
+<ul>
+<li>Tooltip opens on hover and focus.</li>
+<li>Tooltip closes on pointer leave/blur.</li>
+<li>Popover opens and closes on click.</li>
+<li>Popover closes on outside click and Escape.</li>
+<li>Interactive popover content remains usable.</li>
+<li>Placement stays visible near viewport edges.</li>
+<li>Keyboard and touch interactions work.</li>
+</ul>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+const buttons = document.querySelectorAll(".nav button");
+const sections = document.querySelectorAll(".section");
+
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    buttons.forEach(b => b.classList.remove("active"));
+    sections.forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+const popoverTrigger = document.getElementById("popoverTrigger");
+const popover = document.getElementById("popover");
+
+popoverTrigger.addEventListener("click", (event) => {
+  event.stopPropagation();
+  const open = popover.classList.toggle("show");
+  popoverTrigger.setAttribute("aria-expanded", String(open));
+  document.getElementById("demoStatus").textContent =
+    open ? "Popover opened. Click outside or use Close/Escape." : "Popover closed.";
+});
+
+popover.addEventListener("click", event => event.stopPropagation());
+
+document.addEventListener("click", () => closePopover());
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closePopover();
+});
+
+function closePopover(){
+  popover.classList.remove("show");
+  popoverTrigger.setAttribute("aria-expanded","false");
+}
+</script>
+</body>
+</html>

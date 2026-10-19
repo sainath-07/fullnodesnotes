@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Coding Round — Context Menu</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--border:#e4e7ec;
+  --accent:#2563eb;--accent-soft:#eff6ff;--code:#101828;--warning:#f79009;--green:#12b76a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#101828;color:#fff;padding:24px 32px;position:sticky;top:0;z-index:5}
+header h1{margin:0 0 6px;font-size:25px}
+header p{margin:0;color:#cfd6e4;font-size:14px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 92px)}
+.left{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:92px;height:calc(100vh - 92px);overflow:auto}
+.left h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px}
+.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:11px 12px;border-radius:9px;margin:3px 0;cursor:pointer;color:#344054;font-size:14px}
+.nav button:hover{background:#f2f4f7}
+.nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:700;border-color:#bfdbfe}
+.right{padding:28px;max-width:1100px;width:100%}
+.section{display:none}.section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+h2{margin:0 0 12px;font-size:22px}h3{font-size:17px;margin:20px 0 9px}
+p,li{line-height:1.65;font-size:15px}
+.tag{display:inline-block;background:#eef4ff;color:#175cd3;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700;margin:0 4px 6px 0}
+.answer{border-left:4px solid var(--accent);padding:12px 15px;background:#f8fbff;border-radius:0 9px 9px 0}
+pre{background:var(--code);color:#e6edf7;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.55}
+code{font-family:Consolas,Monaco,monospace}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.step{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff;position:relative}
+.step strong{display:block;margin-bottom:5px}.step span{font-size:13px;color:var(--muted)}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-17px;top:35px;color:#98a2b3;font-size:20px;z-index:2}
+.demo{position:relative;min-height:280px;padding:22px;border:1px solid var(--border);border-radius:12px;background:#fafbfc;overflow:hidden}
+.demo-area{height:180px;border:2px dashed #98a2b3;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#667085;user-select:none}
+.menu{position:absolute;display:none;min-width:190px;background:#fff;border:1px solid #d0d5dd;border-radius:10px;box-shadow:0 12px 30px rgba(16,24,40,.16);padding:6px;z-index:20}
+.menu.show{display:block}
+.menu button{width:100%;text-align:left;border:0;background:transparent;padding:9px 11px;border-radius:7px;cursor:pointer;color:#344054;font-size:14px}
+.menu button:hover{background:#f2f4f7}
+.menu button.danger{color:#d92d20}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.action{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:9px 13px;cursor:pointer}
+.secondary{background:#eef2f6;color:#344054}
+.mistake{padding:12px 14px;border-left:4px solid var(--warning);background:#fffaeb;margin:9px 0;border-radius:0 8px 8px 0}
+.good{padding:12px 14px;border-left:4px solid var(--green);background:#ecfdf3;margin:9px 0;border-radius:0 8px 8px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.small{color:var(--muted);font-size:13px}
+.checklist li{margin:8px 0}
+@media(max-width:850px){
+.layout{grid-template-columns:1fr}.left{position:relative;top:0;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+.flow{grid-template-columns:1fr 1fr}.step:not(:last-child)::after{display:none}.right{padding:18px}.grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Machine Coding Round — Context Menu</h1>
+<p>Interview preparation guide • What / Why / How / Execution Flow / Full Code / Common Mistakes / Interview Explanation</p>
+</header>
+
+<div class="layout">
+<aside class="left">
+<h2>Questions / Topics</h2>
+<div class="nav">
+<button class="active" data-target="what">What is a Context Menu?</button>
+<button data-target="why">Why / What problem it solves</button>
+<button data-target="how">How to implement</button>
+<button data-target="flow">Execution flow</button>
+<button data-target="explain1">Explain to interviewer — 1 min</button>
+<button data-target="explain5">Explain to interviewer — 5 min</button>
+<button data-target="implementation">How I implemented it</button>
+<button data-target="code">Full code</button>
+<button data-target="mistakes">Common developer mistakes</button>
+<button data-target="followups">Likely interviewer follow-ups</button>
+</div>
+</aside>
+
+<main class="right">
+
+<section id="what" class="section active">
+<div class="card">
+<span class="tag">WHAT</span><span class="tag">INTERACTION</span>
+<h2>What is a Context Menu?</h2>
+<div class="answer">
+A context menu is a small menu that appears near the user's pointer after a context-specific action,
+most commonly a right-click. It contains actions relevant to the selected element or location, such as
+Copy, Rename, Delete, Open, Download or Inspect.
+</div>
+<h3>Interactive example</h3>
+<div class="demo" id="demo">
+<div class="demo-area" id="demoArea">Right-click inside this area</div>
+<div class="menu" id="contextMenu" role="menu">
+<button role="menuitem" onclick="menuAction('Open')">Open</button>
+<button role="menuitem" onclick="menuAction('Copy')">Copy</button>
+<button role="menuitem" onclick="menuAction('Rename')">Rename</button>
+<button role="menuitem" class="danger" onclick="menuAction('Delete')">Delete</button>
+</div>
+<p id="demoStatus" class="small">Try right-clicking anywhere inside the demo area.</p>
+</div>
+<h3>Common use cases</h3>
+<ul>
+<li>File managers: Open, Rename, Delete, Download</li>
+<li>Text editors: Copy, Paste, Select All</li>
+<li>Tables: Row-specific actions</li>
+<li>Design tools: Duplicate, Group, Bring Forward</li>
+<li>Maps and canvases: Context-specific actions</li>
+</ul>
+</div>
+</section>
+
+<section id="why" class="section">
+<div class="card">
+<span class="tag">WHY</span>
+<h2>What problem does it solve?</h2>
+<p>A context menu reduces UI clutter by showing actions <strong>when and where they are relevant</strong>.</p>
+<div class="grid2">
+<div class="good"><strong>Without a context menu</strong><br>Every possible action may need a permanently visible button or toolbar, making the interface crowded.</div>
+<div class="good"><strong>With a context menu</strong><br>Secondary or contextual actions stay hidden until the user asks for them.</div>
+</div>
+<h3>Interview answer</h3>
+<div class="answer">
+“The context menu provides contextual actions without permanently occupying screen space.
+The important part is that the menu depends on the target and appears at the correct pointer position,
+while closing when the user clicks outside, presses Escape, or selects an action.”
+</div>
+</div>
+</section>
+
+<section id="how" class="section">
+<div class="card">
+<span class="tag">HOW</span>
+<h2>How to implement a Context Menu</h2>
+<ol>
+<li>Listen for the <code>contextmenu</code> event on the target area.</li>
+<li>Call <code>preventDefault()</code> if the custom menu should replace the browser's native menu.</li>
+<li>Store the pointer coordinates and the target/context data.</li>
+<li>Set the menu position and make it visible.</li>
+<li>Keep the menu inside the viewport by adjusting its position when necessary.</li>
+<li>Close it on outside click, Escape, scroll, or after an action.</li>
+<li>For keyboard users, provide an accessible alternative rather than relying only on right-click.</li>
+</ol>
+<pre><code>target.addEventListener("contextmenu", (event) =&gt; {
+  event.preventDefault();
+
+  menu.style.left = `${event.clientX}px`;
+  menu.style.top = `${event.clientY}px`;
+  menu.hidden = false;
+});
+
+document.addEventListener("click", closeMenu);</code></pre>
+</div>
+</section>
+
+<section id="flow" class="section">
+<div class="card">
+<span class="tag">EXECUTION FLOW</span>
+<h2>How it works — simple visual explanation</h2>
+<div class="flow">
+<div class="step"><strong>1. User action</strong><span>User right-clicks a target.</span></div>
+<div class="step"><strong>2. Event</strong><span>contextmenu event is captured.</span></div>
+<div class="step"><strong>3. Position</strong><span>Read pointer coordinates and target.</span></div>
+<div class="step"><strong>4. Render</strong><span>Show menu and close it on dismissal.</span></div>
+</div>
+<pre><code>Right-click
+    ↓
+contextmenu event
+    ↓
+preventDefault()
+    ↓
+capture target + x/y
+    ↓
+calculate safe position
+    ↓
+show context menu
+    ↓
+user selects / clicks outside / presses Escape
+    ↓
+close menu</code></pre>
+<h3>Key point to tell the interviewer</h3>
+<div class="answer">“The menu is transient UI. Its state is essentially closed/open plus the current position and target context.”</div>
+</div>
+</section>
+
+<section id="explain1" class="section">
+<div class="card">
+<span class="tag">1 MINUTE</span>
+<h2>How to explain it to the interviewer in 1 minute</h2>
+<div class="answer">
+“I implemented a custom context menu that opens on the contextmenu event. I prevent the browser's default menu,
+capture the pointer coordinates and the target item, then position the custom menu near the cursor. I also handle
+important dismissal cases like clicking outside and pressing Escape. For production, I would keep the menu inside
+the viewport and make its actions keyboard accessible. If the menu is attached to a list or table, the selected
+target can be stored so each action operates on the correct item.”
+</div>
+<h3>1-minute structure</h3>
+<ol>
+<li><strong>What:</strong> Context-specific action menu.</li>
+<li><strong>Trigger:</strong> <code>contextmenu</code> event.</li>
+<li><strong>State:</strong> open/closed + position + target.</li>
+<li><strong>Interaction:</strong> select action or dismiss.</li>
+<li><strong>Production:</strong> viewport boundaries + accessibility.</li>
+</ol>
+</div>
+</section>
+
+<section id="explain5" class="section">
+<div class="card">
+<span class="tag">5 MINUTES</span>
+<h2>How to explain it to the interviewer in 5 minutes</h2>
+<div class="answer"><strong>Opening:</strong> “I’ll explain the event flow, state model, positioning, dismissal behavior, accessibility and edge cases.”</div>
+<h3>1. Requirement</h3>
+<p>Show a custom action menu when the user invokes a context action, position it close to the pointer, and provide relevant actions for the target.</p>
+<h3>2. State model</h3>
+<p>I need three main pieces of state: whether the menu is open, its position, and the target/context for which the menu was opened.</p>
+<h3>3. Event handling</h3>
+<p>The <code>contextmenu</code> event gives me the pointer coordinates and target element. I call <code>preventDefault()</code> only when I intentionally replace the browser menu.</p>
+<h3>4. Positioning</h3>
+<p>The menu is positioned using pointer coordinates. Before showing it, I can compare its dimensions with viewport boundaries and shift it left/up when it would overflow.</p>
+<h3>5. Closing behavior</h3>
+<ul>
+<li>Click outside the menu.</li>
+<li>Press Escape.</li>
+<li>Scroll or resize when appropriate.</li>
+<li>Select a menu action.</li>
+<li>Open another context menu and replace the previous one.</li>
+</ul>
+<h3>6. Accessibility</h3>
+<p>Use semantic menu/menuitem roles where appropriate, support keyboard navigation, provide a non-pointer way to reach actions, and manage focus if the component behaves like a full menu.</p>
+<h3>7. Edge cases</h3>
+<ul>
+<li>Menu near the bottom/right edge of the viewport.</li>
+<li>Rapidly opening multiple menus.</li>
+<li>Target removed while the menu is open.</li>
+<li>Nested elements with different context actions.</li>
+<li>Touch devices where long-press behavior may be needed instead of right-click.</li>
+</ul>
+</div>
+</section>
+
+<section id="implementation" class="section">
+<div class="card">
+<span class="tag">MY IMPLEMENTATION</span>
+<h2>How I would explain my implementation</h2>
+<div class="answer">
+“I started with a closed menu as the default state. On a right-click, I prevent the native context menu,
+store the cursor position and the target element, then make the custom menu visible. I keep the positioning logic
+separate so I can later add viewport-boundary handling. I attach global dismissal behavior for outside clicks and
+Escape. If this were a file list, the target reference or item ID would be stored in state so actions such as Rename
+or Delete know exactly which item the user selected.”
+</div>
+<h3>Implementation checklist</h3>
+<ul>
+<li>✓ Listen to <code>contextmenu</code></li>
+<li>✓ Prevent default browser menu intentionally</li>
+<li>✓ Track menu visibility</li>
+<li>✓ Track pointer position</li>
+<li>✓ Track selected/target item</li>
+<li>✓ Handle outside click and Escape</li>
+<li>✓ Prevent viewport overflow</li>
+<li>✓ Provide keyboard/touch alternatives</li>
+<li>✓ Keep action handlers independent from positioning logic</li>
+</ul>
+</div>
+</section>
+
+<section id="code" class="section">
+<div class="card">
+<span class="tag">FULL CODE</span>
+<h2>Standalone implementation</h2>
+<p class="small">Framework-free implementation showing the core machine-coding logic.</p>
+<pre><code>&lt;div id="target" class="target"&gt;
+  Right-click here
+&lt;/div&gt;
+
+&lt;div id="menu" class="context-menu" role="menu" hidden&gt;
+  &lt;button role="menuitem" data-action="copy"&gt;Copy&lt;/button&gt;
+  &lt;button role="menuitem" data-action="rename"&gt;Rename&lt;/button&gt;
+  &lt;button role="menuitem" data-action="delete"&gt;Delete&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const target = document.querySelector("#target");
+const menu = document.querySelector("#menu");
+
+let contextTarget = null;
+
+target.addEventListener("contextmenu", (event) =&gt; {
+  event.preventDefault();
+
+  contextTarget = event.target;
+
+  const menuWidth = 190;
+  const menuHeight = 150;
+
+  const left = Math.min(
+    event.clientX,
+    window.innerWidth - menuWidth - 8
+  );
+
+  const top = Math.min(
+    event.clientY,
+    window.innerHeight - menuHeight - 8
+  );
+
+  menu.style.left = `${Math.max(8, left)}px`;
+  menu.style.top = `${Math.max(8, top)}px`;
+  menu.hidden = false;
+});
+
+document.addEventListener("click", (event) =&gt; {
+  if (!menu.contains(event.target)) {
+    closeMenu();
+  }
+});
+
+document.addEventListener("keydown", (event) =&gt; {
+  if (event.key === "Escape") {
+    closeMenu();
+  }
+});
+
+menu.addEventListener("click", (event) =&gt; {
+  const action = event.target.dataset.action;
+
+  if (!action || !contextTarget) return;
+
+  console.log("Action:", action, "Target:", contextTarget);
+  closeMenu();
+});
+
+function closeMenu() {
+  menu.hidden = true;
+  contextTarget = null;
+}
+&lt;/script&gt;</code></pre>
+
+<h3>React version — core idea</h3>
+<pre><code>function ContextMenu({ children }) {
+  const [menu, setMenu] = useState(null);
+
+  const handleContextMenu = (event) =&gt; {
+    event.preventDefault();
+
+    setMenu({
+      x: event.clientX,
+      y: event.clientY,
+      target: event.currentTarget
+    });
+  };
+
+  return (
+    &lt;div onContextMenu={handleContextMenu}&gt;
+      {children}
+
+      {menu &amp;&amp; (
+        &lt;div
+          role="menu"
+          style={{
+            position: "fixed",
+            left: menu.x,
+            top: menu.y
+          }}
+        &gt;
+          &lt;button role="menuitem"&gt;Copy&lt;/button&gt;
+          &lt;button role="menuitem"&gt;Rename&lt;/button&gt;
+          &lt;button role="menuitem"&gt;Delete&lt;/button&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+</div>
+</section>
+
+<section id="mistakes" class="section">
+<div class="card">
+<span class="tag">COMMON MISTAKES</span>
+<h2>Common developer mistakes</h2>
+<div class="mistake"><strong>1. Forgetting preventDefault()</strong><br>The browser's native context menu appears together with the custom menu.</div>
+<div class="mistake"><strong>2. Not closing on outside click</strong><br>The menu can remain stuck on screen after the user moves elsewhere.</div>
+<div class="mistake"><strong>3. Ignoring Escape</strong><br>Keyboard users need a predictable way to dismiss the menu.</div>
+<div class="mistake"><strong>4. Positioning without viewport checks</strong><br>A menu near the right or bottom edge can render partially outside the screen.</div>
+<div class="mistake"><strong>5. Losing the target item</strong><br>In a list/table, actions can affect the wrong row if the selected target is not stored correctly.</div>
+<div class="mistake"><strong>6. Using only right-click</strong><br>Touch devices and keyboard users may not have the same interaction. Provide accessible alternatives.</div>
+<div class="mistake"><strong>7. Putting all logic in one handler</strong><br>Separate opening, positioning, action execution and closing so the component is easier to test.</div>
+<div class="mistake"><strong>8. Overengineering keyboard behavior</strong><br>For a basic round, start with accessible semantics and Escape/outside-click handling, then add arrow-key navigation if the requirements call for a full menu pattern.</div>
+</div>
+</section>
+
+<section id="followups" class="section">
+<div class="card">
+<span class="tag">FOLLOW-UP QUESTIONS</span>
+<h2>Likely interviewer follow-ups</h2>
+<h3>How do you prevent the menu from going outside the viewport?</h3>
+<p>Measure the menu and compare its dimensions with <code>window.innerWidth</code>/<code>innerHeight</code>. Shift the menu left/up when necessary and keep a small viewport margin.</p>
+<h3>How would you make it work for a table?</h3>
+<p>Attach the handler to rows or the table container, identify the row from the event target, and store the row ID as the context target. Menu actions then operate on that ID.</p>
+<h3>How would you support touch devices?</h3>
+<p>Provide an explicit action button or support a long-press gesture if the product genuinely needs context-menu behavior on touch.</p>
+<h3>How would you make it accessible?</h3>
+<p>Use semantic controls, keyboard access, visible focus, Escape to close, and an accessible trigger/alternative action path. A context menu should not depend solely on a mouse.</p>
+<h3>How would you test it?</h3>
+<ul>
+<li>Right-click opens at the pointer location.</li>
+<li>Browser native menu does not appear when custom behavior is enabled.</li>
+<li>Click outside closes it.</li>
+<li>Escape closes it.</li>
+<li>Bottom/right-edge positioning stays visible.</li>
+<li>Correct target is used for actions.</li>
+<li>Keyboard and touch alternatives work.</li>
+</ul>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+const buttons = document.querySelectorAll(".nav button");
+const sections = document.querySelectorAll(".section");
+
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    buttons.forEach(b => b.classList.remove("active"));
+    sections.forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.target).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+const demo = document.getElementById("demo");
+const demoArea = document.getElementById("demoArea");
+const contextMenu = document.getElementById("contextMenu");
+const demoStatus = document.getElementById("demoStatus");
+
+demoArea.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+
+  const rect = demo.getBoundingClientRect();
+  const menuWidth = 190;
+  const menuHeight = 170;
+
+  let x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
+
+  x = Math.min(x, rect.width - menuWidth - 10);
+  y = Math.min(y, rect.height - menuHeight - 10);
+
+  contextMenu.style.left = Math.max(10, x) + "px";
+  contextMenu.style.top = Math.max(10, y) + "px";
+  contextMenu.classList.add("show");
+  demoStatus.textContent = "Context menu opened. Choose an action or click outside.";
+});
+
+function closeDemoMenu(){
+  contextMenu.classList.remove("show");
+}
+
+document.addEventListener("click", (event) => {
+  if (!contextMenu.contains(event.target)) closeDemoMenu();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeDemoMenu();
+});
+
+function menuAction(action){
+  demoStatus.textContent = action + " action selected.";
+  closeDemoMenu();
+}
+</script>
+</body>
+</html>

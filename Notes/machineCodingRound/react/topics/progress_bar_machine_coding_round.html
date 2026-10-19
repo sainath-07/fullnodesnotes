@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine Coding Round — Progress Bar</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --panel:#fff; --text:#172033; --muted:#667085;
+    --border:#e4e7ec; --accent:#2563eb; --accent-soft:#eff6ff;
+    --code:#101828; --green:#12b76a; --warning:#f79009;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:#101828;color:white;padding:24px 32px;position:sticky;top:0;z-index:5}
+  header h1{margin:0 0 6px;font-size:25px}
+  header p{margin:0;color:#cfd6e4;font-size:14px}
+  .layout{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:calc(100vh - 92px)}
+  .left{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:92px;height:calc(100vh - 92px);overflow:auto}
+  .left h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px}
+  .nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;padding:11px 12px;border-radius:9px;margin:3px 0;cursor:pointer;color:#344054;font-size:14px}
+  .nav button:hover{background:#f2f4f7}
+  .nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:700;border-color:#bfdbfe}
+  .right{padding:28px;max-width:1100px;width:100%}
+  .section{display:none}
+  .section.active{display:block}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  h2{margin:0 0 12px;font-size:22px}
+  h3{font-size:17px;margin:20px 0 9px}
+  p,li{line-height:1.65;font-size:15px}
+  .tag{display:inline-block;background:#eef4ff;color:#175cd3;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700;margin:0 4px 6px 0}
+  .answer{border-left:4px solid var(--accent);padding:12px 15px;background:#f8fbff;border-radius:0 9px 9px 0}
+  pre{background:var(--code);color:#e6edf7;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.55}
+  code{font-family:Consolas,Monaco,monospace}
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+  .step{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff;position:relative}
+  .step strong{display:block;margin-bottom:5px}
+  .step span{font-size:13px;color:var(--muted)}
+  .step:not(:last-child)::after{content:"→";position:absolute;right:-17px;top:35px;color:#98a2b3;font-size:20px;z-index:2}
+  .demo{padding:18px;border:1px solid var(--border);border-radius:12px;background:#fafbfc}
+  .bar-wrap{height:26px;background:#eaecf0;border-radius:999px;overflow:hidden}
+  .bar{height:100%;width:65%;background:var(--accent);transition:width .3s}
+  .controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  button.action{border:0;background:var(--accent);color:white;border-radius:8px;padding:9px 13px;cursor:pointer}
+  button.secondary{background:#eef2f6;color:#344054}
+  .mistake{padding:12px 14px;border-left:4px solid var(--warning);background:#fffaeb;margin:9px 0;border-radius:0 8px 8px 0}
+  .good{padding:12px 14px;border-left:4px solid var(--green);background:#ecfdf3;margin:9px 0;border-radius:0 8px 8px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .small{color:var(--muted);font-size:13px}
+  .checklist li{margin:8px 0}
+  @media(max-width:850px){
+    .layout{grid-template-columns:1fr}.left{position:relative;top:0;height:auto;border-right:0;border-bottom:1px solid var(--border)}
+    .flow{grid-template-columns:1fr 1fr}.step:not(:last-child)::after{display:none}
+    .right{padding:18px}.grid2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Machine Coding Round — Progress Bar</h1>
+  <p>Interview preparation guide • What / Why / How / Full Code / Common Developer Mistakes / Interview Explanation</p>
+</header>
+
+<div class="layout">
+  <aside class="left">
+    <h2>Questions / Topics</h2>
+    <div class="nav" id="nav">
+      <button class="active" data-target="what">What is a Progress Bar?</button>
+      <button data-target="why">Why / What problem it solves</button>
+      <button data-target="how">How to implement</button>
+      <button data-target="flow">Execution flow</button>
+      <button data-target="explain1">Explain to interviewer — 1 min</button>
+      <button data-target="explain5">Explain to interviewer — 5 min</button>
+      <button data-target="implementation">How I implemented it</button>
+      <button data-target="code">Full code</button>
+      <button data-target="mistakes">Common developer mistakes</button>
+      <button data-target="followups">Likely interviewer follow-ups</button>
+    </div>
+  </aside>
+
+  <main class="right">
+
+    <section id="what" class="section active">
+      <div class="card">
+        <span class="tag">WHAT</span><span class="tag">UI COMPONENT</span>
+        <h2>What is a Progress Bar?</h2>
+        <div class="answer">
+          A progress bar is a visual UI component that communicates how much of a task is completed compared with the total work.
+          It normally represents progress as a percentage from 0% to 100%.
+        </div>
+        <h3>Simple example</h3>
+        <div class="demo">
+          <div class="bar-wrap"><div class="bar" id="demoBar"></div></div>
+          <p><strong id="demoText">65%</strong> completed</p>
+          <div class="controls">
+            <button class="action" onclick="changeDemo(10)">+10%</button>
+            <button class="action secondary" onclick="changeDemo(-10)">-10%</button>
+            <button class="action secondary" onclick="changeDemo(0,true)">Reset</button>
+          </div>
+        </div>
+        <h3>Typical use cases</h3>
+        <ul>
+          <li>File uploads and downloads</li>
+          <li>Multi-step forms and onboarding</li>
+          <li>Long-running API or processing jobs</li>
+          <li>Installations, imports and data migrations</li>
+          <li>Video/audio loading or buffering</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="why" class="section">
+      <div class="card">
+        <span class="tag">WHY</span>
+        <h2>What problem does it solve?</h2>
+        <p>A progress bar solves the communication problem of <strong>uncertainty during a waiting operation</strong>.</p>
+        <div class="grid2">
+          <div class="good"><strong>Without progress</strong><br>User sees a spinner and may not know whether the task is moving, stuck, or nearly complete.</div>
+          <div class="good"><strong>With progress</strong><br>User gets a clear estimate of completion and can understand the current state.</div>
+        </div>
+        <h3>Interview answer</h3>
+        <div class="answer">
+          “The main problem is feedback. When an operation takes time, users need to know that work is progressing.
+          A progress bar gives a measurable visual indication instead of leaving the user with an indefinite wait.”
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="section">
+      <div class="card">
+        <span class="tag">HOW</span>
+        <h2>How to implement a Progress Bar</h2>
+        <ol>
+          <li>Keep a numeric progress value, normally between <code>0</code> and <code>100</code>.</li>
+          <li>Render an outer track representing the total possible progress.</li>
+          <li>Render an inner fill element whose width represents the current percentage.</li>
+          <li>When progress changes, update the state/value.</li>
+          <li>Clamp the value so it never goes below 0 or above 100.</li>
+          <li>Update accessible information such as <code>aria-valuenow</code>.</li>
+        </ol>
+        <pre><code>const progress = 65;
+
+// Visual representation
+fill.style.width = `${progress}%`;
+
+// Accessible representation
+bar.setAttribute("aria-valuenow", progress);</code></pre>
+      </div>
+    </section>
+
+    <section id="flow" class="section">
+      <div class="card">
+        <span class="tag">EXECUTION FLOW</span>
+        <h2>How it works — simple visual explanation</h2>
+        <div class="flow">
+          <div class="step"><strong>1. Source</strong><span>API, upload, timer or user action provides progress.</span></div>
+          <div class="step"><strong>2. State</strong><span>Store progress as a number from 0–100.</span></div>
+          <div class="step"><strong>3. Render</strong><span>Set the fill width to the percentage.</span></div>
+          <div class="step"><strong>4. Feedback</strong><span>User sees progress and completion status.</span></div>
+        </div>
+        <pre><code>Progress source
+      ↓
+progress = 0...100
+      ↓
+validate / clamp
+      ↓
+fill width = progress + "%"
+      ↓
+UI updates
+      ↓
+progress reaches 100
+      ↓
+show completed state</code></pre>
+        <h3>Key point to tell the interviewer</h3>
+        <div class="answer">“The progress value is the source of truth. The UI is only a visual representation of that value.”</div>
+      </div>
+    </section>
+
+    <section id="explain1" class="section">
+      <div class="card">
+        <span class="tag">1 MINUTE</span>
+        <h2>How to explain it to the interviewer in 1 minute</h2>
+        <div class="answer">
+          “I implemented a reusable progress bar that visually represents completion from 0 to 100 percent.
+          The component has a track and a fill area. I keep the current percentage as the source of truth and update
+          the fill width whenever the value changes. I also clamp the value between 0 and 100 so invalid input cannot
+          break the UI. For accessibility, I expose the current value with ARIA attributes. The component can be
+          driven by a timer, API progress, upload events, or any other source that produces a percentage.”
+        </div>
+        <h3>1-minute structure</h3>
+        <ol>
+          <li><strong>What:</strong> Visual indicator of task completion.</li>
+          <li><strong>How:</strong> State/value → fill width.</li>
+          <li><strong>Safety:</strong> Clamp 0–100.</li>
+          <li><strong>Accessibility:</strong> ARIA progress semantics.</li>
+          <li><strong>Extensibility:</strong> Can connect to API/upload/timer events.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="explain5" class="section">
+      <div class="card">
+        <span class="tag">5 MINUTES</span>
+        <h2>How to explain it to the interviewer in 5 minutes</h2>
+        <div class="answer">
+          <strong>Opening:</strong> “I’ll first explain the component contract, then the state flow, rendering,
+          edge cases, accessibility and how I would make it production-ready.”
+        </div>
+        <h3>1. Requirement</h3>
+        <p>Accept a progress value and visually display completion from 0–100%. The component should remain predictable when the input is invalid.</p>
+        <h3>2. Data flow</h3>
+        <p>The external source owns the real progress. The component receives or stores the current value, validates it, and converts it into a visual width.</p>
+        <h3>3. Rendering</h3>
+        <p>The outer element is the track. The inner element uses <code>width: progress%</code>. CSS transition can make changes easier to perceive.</p>
+        <h3>4. Edge cases</h3>
+        <ul>
+          <li>Negative values → treat as 0.</li>
+          <li>Values above 100 → treat as 100.</li>
+          <li>Missing/invalid values → choose a defined fallback.</li>
+          <li>Unknown duration → use an indeterminate progress indicator instead of pretending to know a percentage.</li>
+        </ul>
+        <h3>5. Accessibility</h3>
+        <p>Use <code>role="progressbar"</code>, <code>aria-valuemin="0"</code>, <code>aria-valuemax="100"</code>, and <code>aria-valuenow</code>.</p>
+        <h3>6. Production improvements</h3>
+        <p>Make the component reusable, support custom labels, expose completion callbacks if needed, test boundaries, and separate progress calculation from presentation.</p>
+      </div>
+    </section>
+
+    <section id="implementation" class="section">
+      <div class="card">
+        <span class="tag">MY IMPLEMENTATION</span>
+        <h2>How I would explain my implementation</h2>
+        <div class="answer">
+          “I started with the simplest requirement: render a horizontal track and a fill.
+          I then made the progress value the single source of truth. Every time it changes, I update the fill width.
+          Before rendering, I normalize the value to the valid 0–100 range. Finally, I added semantic ARIA attributes
+          so assistive technologies can understand the current progress.”
+        </div>
+        <h3>Implementation checklist</h3>
+        <ul class="checklist">
+          <li>✓ Separate track and fill elements</li>
+          <li>✓ Progress value controls the fill</li>
+          <li>✓ Clamp value to 0–100</li>
+          <li>✓ Display percentage when useful</li>
+          <li>✓ Add ARIA progressbar semantics</li>
+          <li>✓ Handle 0%, 100%, invalid and boundary values</li>
+          <li>✓ Keep styling independent from progress calculation</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="code" class="section">
+      <div class="card">
+        <span class="tag">FULL CODE</span>
+        <h2>Standalone implementation</h2>
+        <p class="small">This is intentionally framework-free so the interviewer can focus on the core logic. The same pattern maps directly to React/Vue/Angular.</p>
+<pre><code>&lt;div
+  class="progress"
+  role="progressbar"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="65"
+  aria-label="Upload progress"
+&gt;
+  &lt;div class="progress__fill" style="width: 65%"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+function clampProgress(value) {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return 0;
+  }
+
+  return Math.min(100, Math.max(0, numericValue));
+}
+
+function setProgress(progressElement, value) {
+  const progress = clampProgress(value);
+  const fill = progressElement.querySelector(".progress__fill");
+
+  fill.style.width = `${progress}%`;
+  progressElement.setAttribute("aria-valuenow", progress);
+}
+
+// Example:
+// setProgress(document.querySelector(".progress"), 75);
+&lt;/script&gt;</code></pre>
+
+        <h3>React version — core idea</h3>
+<pre><code>function ProgressBar({ value }) {
+  const progress = Math.min(100, Math.max(0, Number(value) || 0));
+
+  return (
+    &lt;div
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={progress}
+    &gt;
+      &lt;div style={{ width: `${progress}%` }} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="mistakes" class="section">
+      <div class="card">
+        <span class="tag">COMMON MISTAKES</span>
+        <h2>Common developer mistakes</h2>
+        <div class="mistake"><strong>1. Not clamping the value</strong><br>Allowing -20% or 150% can produce incorrect UI. Normalize to 0–100.</div>
+        <div class="mistake"><strong>2. Mixing calculation and presentation</strong><br>Putting API/timer logic directly inside rendering makes the component harder to test and reuse.</div>
+        <div class="mistake"><strong>3. Forgetting accessibility</strong><br>A visual bar alone does not communicate its state to screen readers. Use progressbar semantics and ARIA values.</div>
+        <div class="mistake"><strong>4. Treating unknown progress as 0%</strong><br>If the system genuinely cannot calculate progress, an indeterminate indicator is more honest.</div>
+        <div class="mistake"><strong>5. No completion handling</strong><br>Consider what should happen at 100%: show “Complete”, trigger a callback, or transition to the next state.</div>
+        <div class="mistake"><strong>6. Overengineering</strong><br>For a basic machine-coding task, don't introduce unnecessary state managers, libraries or abstractions.</div>
+        <div class="mistake"><strong>7. Ignoring boundary cases</strong><br>Test 0, 1, 50, 99, 100, negative, greater-than-100, NaN and missing values.</div>
+        <div class="mistake"><strong>8. Poor visual feedback</strong><br>A progress update that jumps too aggressively or has no transition can feel broken. Use a small, appropriate CSS transition.</div>
+      </div>
+    </section>
+
+    <section id="followups" class="section">
+      <div class="card">
+        <span class="tag">FOLLOW-UP QUESTIONS</span>
+        <h2>Likely interviewer follow-ups</h2>
+        <h3>What if you don't know the percentage?</h3>
+        <p>Use an <strong>indeterminate progress bar</strong>. It communicates that work is happening without making up a percentage.</p>
+        <h3>How would you make it reusable?</h3>
+        <p>Expose props such as <code>value</code>, <code>max</code>, <code>label</code>, <code>showPercentage</code>, and styling variants while keeping progress calculation outside.</p>
+        <h3>How would an upload drive it?</h3>
+        <p>Use upload progress events from the networking layer, convert bytes sent / total bytes into a percentage, then pass that value to the component.</p>
+        <h3>How would you test it?</h3>
+        <ul>
+          <li>0% renders an empty fill.</li>
+          <li>50% renders half the track.</li>
+          <li>100% renders full width.</li>
+          <li>Negative and &gt;100 values are clamped.</li>
+          <li>ARIA values match the rendered state.</li>
+          <li>Indeterminate mode renders correctly when total work is unknown.</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const navButtons = document.querySelectorAll(".nav button");
+  const sections = document.querySelectorAll(".section");
+
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      navButtons.forEach(b => b.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.target).classList.add("active");
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+  });
+
+  let demoValue = 65;
+  function changeDemo(delta, reset=false){
+    if(reset) demoValue = 0;
+    else demoValue = Math.min(100, Math.max(0, demoValue + delta));
+    document.getElementById("demoBar").style.width = demoValue + "%";
+    document.getElementById("demoText").textContent = demoValue + "%";
+  }
+</script>
+</body>
+</html>
